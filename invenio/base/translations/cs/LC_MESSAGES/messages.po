@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Invenio 1.2.0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2015-08-27 12:32+0200\n"
-"PO-Revision-Date: 2015-08-27 12:56+0200\n"
+"POT-Creation-Date: 2015-08-27 15:26+0200\n"
+"PO-Revision-Date: 2015-08-27 20:09+0200\n"
 "Last-Translator: Jiří Kunčar <jiri.kuncar@cern.ch>\n"
 "Language-Team: CS <info@invenio-software.org>\n"
 "Plural-Forms: nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2)\n"
@@ -58,8 +58,8 @@ msgstr "Hlavní stránka"
 #: invenio/base/templates/401.html:37
 #, python-format
 msgid ""
-"Or, %(x_url_open)s%(x_url_open_1)s%(x_url_open_2)slogout%(x_url_close)s and "
-"login with a different user."
+"Or, %(x_url_open)s%(x_url_open_1)s%(x_url_open_2)slogout%(x_url_close)s "
+"and login with a different user."
 msgstr ""
 
 #: invenio/base/templates/404.html:26
@@ -226,17 +226,17 @@ msgstr ""
 #: invenio/ext/email/__init__.py:247
 #, python-format
 msgid ""
-"The system is not attempting to send an email from %(x_from)s, to %(x_to)s, "
-"with body %(x_body)s."
+"The system is not attempting to send an email from %(x_from)s, to "
+"%(x_to)s, with body %(x_body)s."
 msgstr ""
 
 #: invenio/ext/email/__init__.py:269
 #, python-format
 msgid ""
-"Error in sending message.                         Waiting %(sec)s seconds. "
-"Exception is %(exc)s,                         while sending email from "
-"%(sender)s to %(receipient)s                         with body "
-"%(email_body)s."
+"Error in sending message.                         Waiting %(sec)s "
+"seconds. Exception is %(exc)s,                         while sending "
+"email from %(sender)s to %(receipient)s                         with body"
+" %(email_body)s."
 msgstr ""
 
 #: invenio/ext/email/__init__.py:287
@@ -304,10 +304,11 @@ msgstr "Role autorizačního požadavku"
 #: invenio/ext/script/__init__.py:143
 #, fuzzy, python-format
 msgid ""
-"A newer version of Invenio is available for download. You may want to visit "
-"<a href=\"%(wiki)s\">%()s</a>"
+"A newer version of Invenio is available for download. You may want to "
+"visit <a href=\"%(wiki)s\">%()s</a>"
 msgstr ""
-"A nová verze Invenio je k dispozici ke stažení. Možná budete chtít navštívit "
+"A nová verze Invenio je k dispozici ke stažení. Možná budete chtít "
+"navštívit "
 
 #: invenio/ext/script/__init__.py:153
 #, python-format
@@ -510,8 +511,7 @@ msgstr "Žádná práva k nahrání do kolekce '%s'"
 #: invenio/legacy/batchuploader/engine.py:563
 #: invenio/legacy/batchuploader/engine.py:576
 #, python-format
-msgid ""
-"The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"
+msgid "The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"
 msgstr "Uživatel '%(x_user)s' není oprávněn měnit collection '%(x_coll)s'"
 
 #: invenio/legacy/batchuploader/templates.py:235
@@ -724,11 +724,10 @@ msgstr "Záznam byl vymazán."
 
 #: invenio/legacy/batchuploader/templates.py:583
 #, fuzzy
-msgid ""
-"Some files could not be moved to DONE folder. Please remove them manually."
+msgid "Some files could not be moved to DONE folder. Please remove them manually."
 msgstr ""
-"Některé soubory nemohly být přesunuty do složky HOTOVO. Prosím, odstraňte "
-"ručně. "
+"Některé soubory nemohly být přesunuty do složky HOTOVO. Prosím, odstraňte"
+" ručně. "
 
 #: invenio/legacy/batchuploader/templates.py:585
 #, fuzzy
@@ -745,8 +744,8 @@ msgstr ""
 #: invenio/legacy/batchuploader/templates.py:597
 #, python-format
 msgid ""
-"Check the %(x_url_open)sBatch Uploader daemon help page%(x_url_close)s for "
-"executing these actions periodically."
+"Check the %(x_url_open)sBatch Uploader daemon help page%(x_url_close)s "
+"for executing these actions periodically."
 msgstr ""
 
 #: invenio/legacy/batchuploader/templates.py:602
@@ -908,6 +907,18 @@ msgstr "Další"
 msgid "Admin Area"
 msgstr "Areál administrátora"
 
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:59
+msgid "BibCheck Admin"
+msgstr ""
+
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:69
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:249
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:288
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:325
+#, fuzzy
+msgid "Not authorized"
+msgstr "Nejste oprávněni používat nemocní."
+
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:79
 #, fuzzy, python-format
 msgid "ERROR: %(x_name)s does not exist"
@@ -922,6 +933,15 @@ msgstr ""
 #, python-format
 msgid "ERROR: %(x_name)s is not writable"
 msgstr ""
+
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:116
+msgid "Limit to knowledge bases containing string:"
+msgstr ""
+
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:134
+#, fuzzy
+msgid "Really delete"
+msgstr "úspěšně smazáno"
 
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:136
 #: invenio/legacy/bibcirculation/templates.py:1243
@@ -951,6 +971,10 @@ msgstr ""
 msgid "Delete"
 msgstr "Smazat"
 
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:140
+msgid "Verify syntax"
+msgstr ""
+
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:145
 #: invenio/modules/communities/views.py:258
 #, fuzzy
@@ -962,9 +986,31 @@ msgstr "Vytvořit nový košík"
 msgid "File %(x_name)s does not exist."
 msgstr "Uživatel %s neexistuje."
 
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:174
+msgid "Calling bibcheck -verify failed."
+msgstr ""
+
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:181
+msgid "Verify BibCheck config file"
+msgstr ""
+
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:182
+#, fuzzy
+msgid "Verify problem"
+msgstr "Problém databáze"
+
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:204
+#, fuzzy
+msgid "File"
+msgstr "soubor(y)"
+
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:238
 msgid "Save Changes"
 msgstr "Uložit změny"
+
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:240
+msgid "Edit BibCheck config file"
+msgstr ""
 
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:268
 #, fuzzy, python-format
@@ -981,6 +1027,10 @@ msgstr ""
 msgid "File %(x_name)s: write failed."
 msgstr ""
 
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:279
+msgid "Save BibCheck config file"
+msgstr ""
+
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:312
 #, python-format
 msgid "File %(x_name)s deleted."
@@ -989,6 +1039,10 @@ msgstr ""
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:314
 #, python-format
 msgid "File %(x_name)s: delete failed."
+msgstr ""
+
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:316
+msgid "Delete BibCheck config file"
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:195
@@ -1055,8 +1109,7 @@ msgstr ""
 #: invenio/legacy/bibcirculation/adminlib.py:880
 #: invenio/legacy/bibcirculation/adminlib.py:1874
 #, python-format
-msgid ""
-"%(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s Unknown barcode."
+msgid "%(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s Unknown barcode."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:365
@@ -1107,8 +1160,8 @@ msgstr ""
 #: invenio/legacy/bibcirculation/adminlib.py:403
 #, python-format
 msgid ""
-"Another user is waiting for the book: %(x_strong_tag_open)s%(x_title)s"
-"%(x_strong_tag_close)s. \n"
+"Another user is waiting for the book: "
+"%(x_strong_tag_open)s%(x_title)s%(x_strong_tag_close)s. \n"
 "\n"
 " If you want continue with this loan choose "
 "%(x_strong_tag_open)s[Continue]%(x_strong_tag_close)s."
@@ -1122,23 +1175,25 @@ msgstr "Prolistuj"
 #: invenio/legacy/bibcirculation/adminlib.py:481
 #, python-format
 msgid ""
-"The items with barcode %(x_strong_tag_open)s%(x_barcode)s"
-"%(x_strong_tag_close)s are already on loan."
+"The items with barcode "
+"%(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s are already on "
+"loan."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:499
 #, python-format
 msgid ""
-"The given due date %(x_strong_tag_open)s%(x_date)s%(x_strong_tag_close)s is "
-"not a valid date or date format"
+"The given due date %(x_strong_tag_open)s%(x_date)s%(x_strong_tag_close)s "
+"is not a valid date or date format"
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:541
 #, python-format
 msgid ""
-"A loan for the item %(x_strong_tag_open)s%(x_title)s%(x_strong_tag_close)s, "
-"with barcode %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s, has "
-"been registered with success."
+"A loan for the item "
+"%(x_strong_tag_open)s%(x_title)s%(x_strong_tag_close)s, with barcode "
+"%(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s, has been "
+"registered with success."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:542
@@ -1163,14 +1218,13 @@ msgstr "Vytvořit nový"
 #: invenio/legacy/bibcirculation/adminlib.py:1882
 #, python-format
 msgid ""
-"The item with the barcode %(x_strong_tag_open)s%(x_barcode)s"
-"%(x_strong_tag_close)s is on loan."
+"The item with the barcode "
+"%(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s is on loan."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:663
 #, python-format
-msgid ""
-"The given barcode \"%(x_barcode)s\" does not correspond to requested item."
+msgid "The given barcode \"%(x_barcode)s\" does not correspond to requested item."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:702
@@ -1202,8 +1256,9 @@ msgstr "Výpůjční doba"
 #: invenio/legacy/bibcirculation/adminlib.py:884
 #, python-format
 msgid ""
-"The item the with barcode %(x_strong_tag_open)s%(x_barcode)s"
-"%(x_strong_tag_close)s is not on loan. Please, try again."
+"The item the with barcode "
+"%(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s is not on loan. "
+"Please, try again."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:969
@@ -1270,8 +1325,8 @@ msgstr "Nová žádost"
 #: invenio/legacy/bibcirculation/adminlib.py:4504
 #, python-format
 msgid ""
-"The period of interest %(x_strong_tag_open)sFrom: %(x_date)s"
-"%(x_strong_tag_close)s is not a valid date or date format"
+"The period of interest %(x_strong_tag_open)sFrom: "
+"%(x_date)s%(x_strong_tag_close)s is not a valid date or date format"
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:1291
@@ -1279,8 +1334,8 @@ msgstr ""
 #: invenio/legacy/bibcirculation/adminlib.py:4511
 #, python-format
 msgid ""
-"The period of interest %(x_strong_tag_open)sTo: %(x_date)s"
-"%(x_strong_tag_close)s is not a valid date or date format"
+"The period of interest %(x_strong_tag_open)sTo: "
+"%(x_date)s%(x_strong_tag_close)s is not a valid date or date format"
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:1414
@@ -1303,8 +1358,9 @@ msgstr "Nový úvěr"
 #: invenio/legacy/bibcirculation/adminlib.py:1540
 #, python-format
 msgid ""
-"Item with barcode %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s "
-"is already on loan."
+"Item with barcode "
+"%(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s is already on "
+"loan."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:1551
@@ -1347,8 +1403,8 @@ msgstr "Hledej v %s záznamech:"
 #: invenio/legacy/bibcirculation/adminlib.py:4376
 #, python-format
 msgid ""
-"The barcode %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s does "
-"not exist on BibCirculation database."
+"The barcode %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s does"
+" not exist on BibCirculation database."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:1945
@@ -1441,8 +1497,8 @@ msgstr "Ne"
 #: invenio/legacy/bibcirculation/adminlib.py:3591
 #, python-format
 msgid ""
-"Another user is waiting for this book %(x_strong_tag_open)s%(x_title)s"
-"%(x_strong_tag_close)s."
+"Another user is waiting for this book "
+"%(x_strong_tag_open)s%(x_title)s%(x_strong_tag_close)s."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:2440
@@ -1537,8 +1593,8 @@ msgstr "<strong>%s</strong> záznamů nalezeno"
 #: invenio/legacy/bibcirculation/adminlib.py:2803
 #, python-format
 msgid ""
-"It was NOT possible to delete the copy with barcode <strong>%(x_name)s</"
-"strong>"
+"It was NOT possible to delete the copy with barcode "
+"<strong>%(x_name)s</strong>"
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:2860
@@ -1558,29 +1614,29 @@ msgstr "<strong>%s</strong> záznamů nalezeno"
 #: invenio/legacy/bibcirculation/adminlib.py:3023
 #, python-format
 msgid ""
-"Item <strong>[%(x_name)s]</strong> updated, but the <strong>status was not "
-"modified</strong>."
+"Item <strong>[%(x_name)s]</strong> updated, but the <strong>status was "
+"not modified</strong>."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:3035
 #, python-format
 msgid ""
-"Item <strong>[%(x_name)s]</strong> updated, but the <strong>barcode was not "
-"modified</strong> because it is already in use."
+"Item <strong>[%(x_name)s]</strong> updated, but the <strong>barcode was "
+"not modified</strong> because it is already in use."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:3038
 #, python-format
 msgid ""
-"Item <strong>[%(x_name)s]</strong> updated to <strong>[%(x_new)s]</strong> "
-"with success."
+"Item <strong>[%(x_name)s]</strong> updated to "
+"<strong>[%(x_new)s]</strong> with success."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:3041
 #, python-format
 msgid ""
-"Item <strong>[%(x_name)s]</strong> updated, but the <strong>barcode was not "
-"modified</strong> because it was not found (!?)."
+"Item <strong>[%(x_name)s]</strong> updated, but the <strong>barcode was "
+"not modified</strong> because it was not found (!?)."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:3145
@@ -1951,14 +2007,16 @@ msgstr "Záznam byl vymazán."
 #: invenio/legacy/bibcirculation/api.py:198
 msgid ""
 "If you think this book is interesting, suggest it and tell us why you "
-"consider this                   book is important. The library will consider "
-"your opinion and if we decide to buy the                   book, we will "
-"issue a loan for you as soon as it arrives and send it by internal mail."
+"consider this                   book is important. The library will "
+"consider your opinion and if we decide to buy the                   book,"
+" we will issue a loan for you as soon as it arrives and send it by "
+"internal mail."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/api.py:202
 msgid ""
-"In case we decide not to buy the book, we will offer you an interlibrary loan"
+"In case we decide not to buy the book, we will offer you an interlibrary "
+"loan"
 msgstr ""
 
 #: invenio/legacy/bibcirculation/api.py:268
@@ -1979,8 +2037,8 @@ msgstr ""
 #: invenio/legacy/bibcirculation/api.py:710
 #: invenio/legacy/bibcirculation/api.py:778
 msgid ""
-"Your ILL request has been registered and the document will be sent to you "
-"via internal mail."
+"Your ILL request has been registered and the document will be sent to you"
+" via internal mail."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/api.py:672
@@ -2142,8 +2200,8 @@ msgstr ""
 #, python-format
 msgid ""
 "All the copies of %(strong_tag_open)s%(title)s%(strong_tag_close)s are "
-"missing. You can request a copy using %(strong_tag_open)s%(ill_link)s"
-"%(strong_tag_close)s"
+"missing. You can request a copy using "
+"%(strong_tag_open)s%(ill_link)s%(strong_tag_close)s"
 msgstr ""
 
 #: invenio/legacy/bibcirculation/templates.py:341
@@ -2444,8 +2502,8 @@ msgstr ""
 
 #: invenio/legacy/bibcirculation/templates.py:524
 msgid ""
-"Your request has been registered and the document will be sent to you via "
-"internal mail."
+"Your request has been registered and the document will be sent to you via"
+" internal mail."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/templates.py:529
@@ -2726,8 +2784,9 @@ msgstr "Potvrdit"
 #: invenio/legacy/bibcirculation/templates.py:1047
 #, fuzzy, python-format
 msgid ""
-"You can see your library account %(x_url_open)shere%(x_url_close)s."
-"x_url_open<a href=\"/yourloans/display\">"
+"You can see your library account "
+"%(x_url_open)shere%(x_url_close)s.x_url_open<a "
+"href=\"/yourloans/display\">"
 msgstr "Pokud chcete, můžete%(x_url_open) slogin zde%(x_url_close) s."
 
 #: invenio/legacy/bibcirculation/templates.py:1129
@@ -2790,8 +2849,8 @@ msgstr "OK"
 #, python-format
 msgid ""
 "The item %(x_strong_tag_open)s%(x_title)s%(x_strong_tag_close)s, with "
-"barcode %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s, has been "
-"returned with success."
+"barcode %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s, has "
+"been returned with success."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/templates.py:1588
@@ -4092,8 +4151,8 @@ msgstr "Období zájmu (Do)"
 #: invenio/legacy/bibcirculation/templates.py:9720
 #, python-format
 msgid ""
-"Borrower accepts the %(x_url_open)sconditions%(x_url_close)s of the service "
-"in particular the return of books in due time."
+"Borrower accepts the %(x_url_open)sconditions%(x_url_close)s of the "
+"service in particular the return of books in due time."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/templates.py:9721
@@ -4112,8 +4171,8 @@ msgstr "Jen toto vydání"
 #: invenio/legacy/bibcirculation/templates.py:10260
 #, python-format
 msgid ""
-"Check if the book already exists on %(CFG_SITE_NAME)s, before sending your "
-"ILL request."
+"Check if the book already exists on %(CFG_SITE_NAME)s, before sending "
+"your ILL request."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/templates.py:10332
@@ -4172,17 +4231,17 @@ msgstr "ISSN"
 
 #: invenio/legacy/bibcirculation/templates.py:10941
 msgid ""
-"We will process your order immediately and contact "
-"you                                         as soon as the document is "
+"We will process your order immediately and contact you"
+"                                         as soon as the document is "
 "received."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/templates.py:10943
 msgid ""
-"According to a decision from the Scientific Information Policy "
-"Board,             books purchased with budget codes other than Team "
-"accounts will be added to the Library catalogue,             with the "
-"indication of the purchaser."
+"According to a decision from the Scientific Information Policy Board,"
+"             books purchased with budget codes other than Team accounts "
+"will be added to the Library catalogue,             with the indication "
+"of the purchaser."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/templates.py:10961
@@ -4575,10 +4634,10 @@ msgstr "Záznam byl vymazán."
 
 #: invenio/legacy/bibclassify/templates.py:127
 msgid ""
-"Automatically generated <span class=\"keyword single\">single</span>,        "
-"<span class=\"keyword composite\">composite</span>, <span class=\"keyword "
-"author-kw\">author</span>,        and <span class=\"keyword other-kw\">other "
-"keywords</span>."
+"Automatically generated <span class=\"keyword single\">single</span>,"
+"        <span class=\"keyword composite\">composite</span>, <span "
+"class=\"keyword author-kw\">author</span>,        and <span "
+"class=\"keyword other-kw\">other keywords</span>."
 msgstr ""
 
 #: invenio/legacy/bibclassify/templates.py:230
@@ -4638,15 +4697,15 @@ msgstr ""
 
 #: invenio/legacy/bibclassify/webinterface.py:247
 msgid ""
-"We have registered your request, the automatedkeyword extraction will run "
-"after some time. Please return back in a while."
+"We have registered your request, the automatedkeyword extraction will run"
+" after some time. Please return back in a while."
 msgstr ""
 
 #: invenio/legacy/bibclassify/webinterface.py:252
 msgid ""
 "Unfortunately, we don't have a PDF fulltext for this record in the "
-"storage,                     keywords cannot be generated using an automated "
-"process."
+"storage,                     keywords cannot be generated using an "
+"automated process."
 msgstr ""
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:398
@@ -4673,8 +4732,8 @@ msgstr "Přístup"
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:560
 msgid ""
-"The file you want to edit is protected against modifications. Your action "
-"has not been applied"
+"The file you want to edit is protected against modifications. Your action"
+" has not been applied"
 msgstr ""
 "Soubor, který chcete upravit je chráněn proti úpravám. Vaše akce nebyla "
 "aplikovaná"
@@ -4682,8 +4741,8 @@ msgstr ""
 #: invenio/legacy/bibdocfile/managedocfiles.py:580
 #, fuzzy, python-format
 msgid ""
-"The uploaded file is too small (<%(x_size)i o) and has therefore not been "
-"considered"
+"The uploaded file is too small (<%(x_size)i o) and has therefore not been"
+" considered"
 msgstr "Nahraný soubor je název příliš dlouhý, a proto není považována za"
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:585
@@ -4695,8 +4754,7 @@ msgstr "Nahraný soubor je název příliš dlouhý, a proto není považována 
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:591
 #, fuzzy
-msgid ""
-"The uploaded file name is too long and has therefore not been considered"
+msgid "The uploaded file name is too long and has therefore not been considered"
 msgstr "Nahraný soubor je název příliš dlouhý, a proto není považována za"
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:603
@@ -4715,15 +4773,17 @@ msgstr "Soubor nazvaný %s již existuje.%s Prosím, vyberte jiné jméno. "
 #: invenio/legacy/bibdocfile/managedocfiles.py:648
 #, fuzzy, python-format
 msgid ""
-"A file with format '%(x_name)s' already exists. Please upload another format."
+"A file with format '%(x_name)s' already exists. Please upload another "
+"format."
 msgstr "Soubor ve formátu '%s' již existuje. Nahrajte prosím jiný formát. "
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:656
 #: invenio/legacy/bibdocfile/managedocfiles.py:756
 msgid ""
-"You are not allowed to use dot '.', slash '/', or backslash '\\\\' in file "
-"names. Choose a different name and upload your file again. In particular, "
-"note that you should not include the extension in the renaming field."
+"You are not allowed to use dot '.', slash '/', or backslash '\\\\' in "
+"file names. Choose a different name and upload your file again. In "
+"particular, note that you should not include the extension in the "
+"renaming field."
 msgstr ""
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:836
@@ -4737,20 +4797,21 @@ msgstr "Přidat nový soubor"
 #: invenio/legacy/bibdocfile/managedocfiles.py:900
 msgid "You can decide to hide or not previous version(s) of this file."
 msgstr ""
-"Můžete se rozhodnout, zda chcete skrýt nebo zobrazit předchozí verze tohoto "
-"souboru."
+"Můžete se rozhodnout, zda chcete skrýt nebo zobrazit předchozí verze "
+"tohoto souboru."
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:901
 msgid ""
 "When you revise a file, the additional formats that you might have "
-"previously uploaded are removed, since they no longer up-to-date with the "
-"new file."
+"previously uploaded are removed, since they no longer up-to-date with the"
+" new file."
 msgstr ""
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:902
 #, fuzzy
 msgid ""
-"Alternative formats uploaded for current version of this file will be removed"
+"Alternative formats uploaded for current version of this file will be "
+"removed"
 msgstr ""
 "Alternativní formáty nahrané pro aktuální verzi tohoto souboru budou "
 "odstraněny"
@@ -4805,8 +4866,8 @@ msgstr ""
 #: invenio/legacy/bibdocfile/managedocfiles.py:935
 #, python-format
 msgid ""
-"Having a problem adding or revising a file? Send the new/revised version to "
-"%(mailto_link)s."
+"Having a problem adding or revising a file? Send the new/revised version "
+"to %(mailto_link)s."
 msgstr ""
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:1061
@@ -4857,8 +4918,8 @@ msgstr "Záznam byl vymazán."
 
 #: invenio/legacy/bibdocfile/webinterface.py:139
 msgid ""
-"The system has encountered an error in retrieving the list of files for this "
-"document."
+"The system has encountered an error in retrieving the list of files for "
+"this document."
 msgstr ""
 
 #: invenio/legacy/bibdocfile/webinterface.py:140
@@ -4979,9 +5040,9 @@ msgstr "1. Vyberte kritéria vyhledávání "
 
 #: invenio/legacy/bibeditmulti/templates.py:359
 msgid ""
-"Specify the criteria you'd like to use for filtering records that will be "
-"changed. Use \"Search\" to see which records would have been filtered using "
-"these criteria."
+"Specify the criteria you'd like to use for filtering records that will be"
+" changed. Use \"Search\" to see which records would have been filtered "
+"using these criteria."
 msgstr ""
 
 #: invenio/legacy/bibeditmulti/templates.py:361
@@ -4995,8 +5056,8 @@ msgstr "2. Definování změn "
 
 #: invenio/legacy/bibeditmulti/templates.py:614
 msgid ""
-"Specify fields and their subfields that should be changed in every record "
-"matching the search criteria."
+"Specify fields and their subfields that should be changed in every record"
+" matching the search criteria."
 msgstr ""
 
 #: invenio/legacy/bibeditmulti/templates.py:615
@@ -5127,10 +5188,11 @@ msgstr "Zpět na výsledky"
 
 #: invenio/legacy/bibeditmulti/templates.py:708
 msgid ""
-"WARNING: The following records are pending execution                        "
-"in the task queue.                        If you proceed with the changes, "
-"the modifications made                        with other tool (e.g. BibEdit) "
-"to these records will                        be lost"
+"WARNING: The following records are pending execution"
+"                        in the task queue.                        If you "
+"proceed with the changes, the modifications made                        "
+"with other tool (e.g. BibEdit) to these records will"
+"                        be lost"
 msgstr ""
 
 #: invenio/legacy/bibeditmulti/templates.py:736
@@ -5430,8 +5492,8 @@ msgstr "Smazat znalostní bázi"
 #: invenio/legacy/bibknowledge/templates.py:51
 #, python-format
 msgid ""
-"Limit display to knowledge bases matching %(keyword_field)s in their rules "
-"and descriptions"
+"Limit display to knowledge bases matching %(keyword_field)s in their "
+"rules and descriptions"
 msgstr ""
 
 #: invenio/legacy/bibknowledge/templates.py:84
@@ -5491,56 +5553,56 @@ msgstr "Prosím nastavte"
 
 #: invenio/legacy/bibknowledge/templates.py:237
 msgid ""
-"A dynamic knowledge base is a list of values of a                          "
-"given field. The list is generated dynamically by                          "
-"searching the records using a search expression."
+"A dynamic knowledge base is a list of values of a"
+"                          given field. The list is generated dynamically "
+"by                          searching the records using a search "
+"expression."
 msgstr ""
 
 #: invenio/legacy/bibknowledge/templates.py:241
 msgid ""
-"Example: Your records contain field 270__a for                          the "
-"name and address of the author's institute.                          If you "
-"set the field to '270__a' and the expression                          to "
-"'270__a:*Paris*', a list of institutes in Paris                          "
-"will be created."
+"Example: Your records contain field 270__a for                          "
+"the name and address of the author's institute.                          "
+"If you set the field to '270__a' and the expression"
+"                          to '270__a:*Paris*', a list of institutes in "
+"Paris                          will be created."
 msgstr ""
 
 #: invenio/legacy/bibknowledge/templates.py:246
 msgid ""
-"If the expression is empty, a list of all values                          in "
-"270__a will be created."
+"If the expression is empty, a list of all values"
+"                          in 270__a will be created."
 msgstr ""
 
 #: invenio/legacy/bibknowledge/templates.py:248
 #, python-format
 msgid ""
-"If the expression contains '%%', like '270__a:*"
-"%%*',                          it will be replaced by a search string when "
-"the                          knowledge base is used."
+"If the expression contains '%%', like '270__a:*%%*',"
+"                          it will be replaced by a search string when the"
+"                          knowledge base is used."
 msgstr ""
 
 #: invenio/legacy/bibknowledge/templates.py:251
 msgid ""
-"You can enter a collection name if the expression                          "
-"should be evaluated in a specific collection."
+"You can enter a collection name if the expression"
+"                          should be evaluated in a specific collection."
 msgstr ""
 
 #: invenio/legacy/bibknowledge/templates.py:253
 msgid ""
-"Example 1: Your records contain field 270__a for                          "
-"the name and address of the author's institute.                          If "
-"you set the field to '270__a' and the expression                          to "
-"'270__a:*Paris*', a list of institutes in Paris                          "
-"will be created."
+"Example 1: Your records contain field 270__a for"
+"                          the name and address of the author's institute."
+"                          If you set the field to '270__a' and the "
+"expression                          to '270__a:*Paris*', a list of "
+"institutes in Paris                          will be created."
 msgstr ""
 
 #: invenio/legacy/bibknowledge/templates.py:258
 #, python-format
 msgid ""
-"Example 2: Return the institute's name (100__a) when "
-"the                          user gives its postal code "
-"(270__a):                          Set field to 100__a, expression to 270__a:"
-"*%%*."
+"Example 2: Return the institute's name (100__a) when the"
+"                          user gives its postal code (270__a):"
+"                          Set field to 100__a, expression to 270__a:*%%*."
 msgstr ""
 
 #: invenio/legacy/bibknowledge/templates.py:262
@@ -5634,15 +5696,15 @@ msgstr "košíky"
 #: invenio/legacy/bibknowledge/templates.py:706
 #, fuzzy, python-format
 msgid ""
-"The left side of the rule (%(x_rule)s) already appears in these knowledge "
-"bases:"
+"The left side of the rule (%(x_rule)s) already appears in these knowledge"
+" bases:"
 msgstr "Levá strana pravidla (%s) se již objevuje v těchto znalostních bází:"
 
 #: invenio/legacy/bibknowledge/templates.py:709
 #, fuzzy, python-format
 msgid ""
-"The right side of the rule (%(x_rule)s) already appears in these knowledge "
-"bases:"
+"The right side of the rule (%(x_rule)s) already appears in these "
+"knowledge bases:"
 msgstr "Pravá strana pravidla (%s) se již objevuje v těchto znalostních bází:"
 
 #: invenio/legacy/bibknowledge/templates.py:722
@@ -5875,7 +5937,8 @@ msgstr "Chyba při načítání záznam"
 #: invenio/legacy/oaiharvest/admin.py:1321
 #, fuzzy
 msgid ""
-"Error when formatting the Holding Pen entry. Probably its content is broken"
+"Error when formatting the Holding Pen entry. Probably its content is "
+"broken"
 msgstr ""
 "Chyba při formátování Holding Pen záznam. Pravděpodobně jeho obsah je "
 "rozdělen "
@@ -5953,8 +6016,8 @@ msgstr "Návrat do hlavního výběru"
 #: invenio/legacy/oairepository/admin.py:352
 #, python-format
 msgid ""
-"Do you want to touch the OAI set %(x_name)s? Note that this will force all "
-"clients to re-harvest the whole set."
+"Do you want to touch the OAI set %(x_name)s? Note that this will force "
+"all clients to re-harvest the whole set."
 msgstr ""
 
 #: invenio/legacy/oairepository/admin.py:360
@@ -6129,8 +6192,8 @@ msgstr "Nebyly nalezeny žádné hodnoty."
 
 #: invenio/legacy/search_engine/__init__.py:2141
 msgid ""
-"Full-text search is currently available for all arXiv papers, many theses, a "
-"few report series and some journal articles"
+"Full-text search is currently available for all arXiv papers, many "
+"theses, a few report series and some journal articles"
 msgstr ""
 
 #: invenio/legacy/search_engine/__init__.py:2143
@@ -6159,8 +6222,8 @@ msgstr "Hledaný výraz příliš obecný, zobrazeny pouze dílčí výsledky ..
 #: invenio/legacy/search_engine/__init__.py:2165
 #, fuzzy
 msgid ""
-"Search term after reference operator too generic, displaying only partial "
-"results..."
+"Search term after reference operator too generic, displaying only partial"
+" results..."
 msgstr "Hledaný výraz příliš obecný, zobrazeny pouze dílčí výsledky ..."
 
 #: invenio/legacy/search_engine/__init__.py:2169
@@ -6172,9 +6235,11 @@ msgstr "Hledaný výraz příliš obecný, zobrazeny pouze dílčí výsledky ..
 
 #: invenio/legacy/search_engine/__init__.py:2173
 msgid ""
-"No phrase index available for fulltext yet, looking for word combination..."
+"No phrase index available for fulltext yet, looking for word "
+"combination..."
 msgstr ""
-"Index frází není k dispozici pro plné texty, zatím hledám slovní spojení ..."
+"Index frází není k dispozici pro plné texty, zatím hledám slovní spojení "
+"..."
 
 #: invenio/legacy/search_engine/__init__.py:2213
 #, python-format
@@ -6185,11 +6250,11 @@ msgstr ""
 
 #: invenio/legacy/search_engine/__init__.py:2352
 msgid ""
-"Search syntax misunderstood. Ignoring all parentheses in the query. If this "
-"doesn't help, please check your search and try again."
+"Search syntax misunderstood. Ignoring all parentheses in the query. If "
+"this doesn't help, please check your search and try again."
 msgstr ""
-"Syntaxe dotazu nepochopena. Ignorování všech závorek v dotazu. Pokud je toto "
-"nepomůže, zkontrolujte Váš dotaz a zkuste to znova."
+"Syntaxe dotazu nepochopena. Ignorování všech závorek v dotazu. Pokud je "
+"toto nepomůže, zkontrolujte Váš dotaz a zkuste to znova."
 
 #: invenio/legacy/search_engine/__init__.py:3238
 #, fuzzy, python-format
@@ -6198,13 +6263,14 @@ msgid ""
 "%(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
 msgstr ""
 "Žádný záznam nebyl nalezen v kolekci %(x_collection)s. Ostatní veřejně "
-"dostupné kolekce dali %(x_url_open)s%(x_nb_hits)d výsledků%(x_url_close)s."
+"dostupné kolekce dali %(x_url_open)s%(x_nb_hits)d "
+"výsledků%(x_url_close)s."
 
 #: invenio/legacy/search_engine/__init__.py:3255
 #, fuzzy
 msgid ""
-"No public collection matched your query. If you were looking for a hidden "
-"document, please type the correct URL for this record."
+"No public collection matched your query. If you were looking for a hidden"
+" document, please type the correct URL for this record."
 msgstr ""
 "Žádná veřejně přístupná kolekce nevyhovuje Vašemu dotazu. Jestliže jste "
 "hledali dokumenty veřejně nepřístupné, zvolte prosím nejdříve příslušnou "
@@ -6256,8 +6322,8 @@ msgstr "Index frází není k dispozici pro %s."
 #: invenio/legacy/search_engine/__init__.py:3440
 #, python-format
 msgid ""
-"Search term %(x_term)s inside index %(x_index)s did not match any record. "
-"Nearest terms in any collection are:"
+"Search term %(x_term)s inside index %(x_index)s did not match any record."
+" Nearest terms in any collection are:"
 msgstr ""
 "Hledaný výraz %(x_term)s uvnitř indexu %(x_index)s neodpovídá žádnému "
 "záznamu. Nejbližší výrazy ve všech kolekcích jsou:"
@@ -6277,14 +6343,14 @@ msgid ""
 "Sorry, %(x_option)s does not seem to be a valid sort option. The records "
 "will not be sorted."
 msgstr ""
-"Je mi líto, %s nevypadá jako platný druh volby řazení. Vybráno řazení podle "
-"názvu."
+"Je mi líto, %s nevypadá jako platný druh volby řazení. Vybráno řazení "
+"podle názvu."
 
 #: invenio/legacy/search_engine/__init__.py:4474
 #, fuzzy, python-format
 msgid ""
-"Sorry, sorting is allowed on sets of up to %(x_name)d records only. Using "
-"default sort order."
+"Sorry, sorting is allowed on sets of up to %(x_name)d records only. Using"
+" default sort order."
 msgstr ""
 "Omlouváme se, třídění je povoleno na soubory o velikosti pouze do %d "
 "záznamů. Použito výchozí řazení."
@@ -6292,11 +6358,11 @@ msgstr ""
 #: invenio/legacy/search_engine/__init__.py:4486
 #, fuzzy, python-format
 msgid ""
-"Sorry, %(x_name)s does not seem to be a valid sort option. The records will "
-"not be sorted."
+"Sorry, %(x_name)s does not seem to be a valid sort option. The records "
+"will not be sorted."
 msgstr ""
-"Je mi líto, %s nevypadá jako platný druh volby řazení. Vybráno řazení podle "
-"názvu."
+"Je mi líto, %s nevypadá jako platný druh volby řazení. Vybráno řazení "
+"podle názvu."
 
 #: invenio/legacy/search_engine/__init__.py:4766
 #: invenio/legacy/search_engine/__init__.py:5127
@@ -6331,8 +6397,8 @@ msgstr ""
 #: invenio/legacy/search_engine/__init__.py:6453
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
-"Žádný výsledek nevyhovuje Vašim omezujícím kritériím, podmínky nejsou vzaty "
-"v úvahu..."
+"Žádný výsledek nevyhovuje Vašim omezujícím kritériím, podmínky nejsou "
+"vzaty v úvahu..."
 
 #: invenio/legacy/webalert/api.py:54
 #, fuzzy, python-format
@@ -6376,9 +6442,10 @@ msgstr "Záznam byl vymazán."
 #: invenio/legacy/webalert/api.py:428
 #, python-format
 msgid ""
-"You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s "
-"is available with a possibility to (a) view search results and (b) subscribe "
-"to an automatic email alerting service for these queries."
+"You have made %(x_nb)s queries. A %(x_url_open)sdetailed "
+"list%(x_url_close)s is available with a possibility to (a) view search "
+"results and (b) subscribe to an automatic email alerting service for "
+"these queries."
 msgstr ""
 
 #: invenio/legacy/webalert/htmlparser.py:186
@@ -6573,15 +6640,15 @@ msgstr "Vy jste definován%s výstrahy."
 #: invenio/legacy/webalert/templates.py:439
 #, python-format
 msgid ""
-"You have not executed any search yet. Please go to the %(x_url_open)ssearch "
-"interface%(x_url_close)s first."
+"You have not executed any search yet. Please go to the "
+"%(x_url_open)ssearch interface%(x_url_close)s first."
 msgstr ""
 
 #: invenio/legacy/webalert/templates.py:448
 #, python-format
 msgid ""
-"You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during "
-"the last 30 days or so."
+"You have performed %(x_nb1)s searches (%(x_nb2)s different questions) "
+"during the last 30 days or so."
 msgstr ""
 
 #: invenio/legacy/webalert/templates.py:453
@@ -6765,8 +6832,7 @@ msgstr "Zobrazit výsledky:"
 #: invenio/legacy/webbasket/api.py:104 invenio/legacy/webbasket/api.py:2315
 #: invenio/legacy/webbasket/api.py:2345
 #, fuzzy
-msgid ""
-"The selected public basket does not exist or you do not have access to it."
+msgid "The selected public basket does not exist or you do not have access to it."
 msgstr "Vybraný veřejný košík neexistuje nebo nemáte přístup."
 
 #: invenio/legacy/webbasket/api.py:112
@@ -6792,8 +6858,7 @@ msgstr "Tato kolekce ješte neobsahuje žádné záznamy."
 
 #: invenio/legacy/webbasket/api.py:429 invenio/legacy/webbasket/api.py:1560
 #, fuzzy
-msgid ""
-"The note you are quoting does not exist or you do not have access to it."
+msgid "The note you are quoting does not exist or you do not have access to it."
 msgstr "The poznámka se cituje neexistuje nebo nemáte přístup k němu."
 
 #: invenio/legacy/webbasket/api.py:485 invenio/legacy/webbasket/api.py:1625
@@ -6826,8 +6891,7 @@ msgstr "Tato kolekce ješte neobsahuje žádné záznamy."
 
 #: invenio/legacy/webbasket/api.py:1689
 #, fuzzy
-msgid ""
-"The note you are deleting does not exist or you do not have access to it."
+msgid "The note you are deleting does not exist or you do not have access to it."
 msgstr "Poznámka odstraňujete neexistuje nebo nemáte přístup."
 
 #: invenio/legacy/webbasket/api.py:1791
@@ -6862,8 +6926,8 @@ msgstr "Záznam byl vymazán."
 
 #: invenio/legacy/webbasket/api.py:1842
 msgid ""
-"The url you have provided is not valid: The request contains bad syntax or "
-"cannot be fulfilled."
+"The url you have provided is not valid: The request contains bad syntax "
+"or cannot be fulfilled."
 msgstr ""
 
 #: invenio/legacy/webbasket/api.py:1849
@@ -6884,8 +6948,8 @@ msgstr "Žádné záznamy pro přidání."
 
 #: invenio/legacy/webbasket/api.py:1967
 msgid ""
-"Some items could not be moved. The destination basket already contains those "
-"items."
+"Some items could not be moved. The destination basket already contains "
+"those items."
 msgstr ""
 
 #: invenio/legacy/webbasket/api.py:1969 invenio/legacy/webbasket/api.py:2820
@@ -6921,8 +6985,8 @@ msgstr "Prosím, vyberte existující téma, nebo vytvořit novou."
 
 #: invenio/legacy/webbasket/api.py:2307
 msgid ""
-"You cannot subscribe to this basket, you are the either owner or you have "
-"already subscribed."
+"You cannot subscribe to this basket, you are the either owner or you have"
+" already subscribed."
 msgstr ""
 
 #: invenio/legacy/webbasket/api.py:2337
@@ -6992,7 +7056,8 @@ msgstr "Veřejné košíky"
 #, python-format
 msgid ""
 "You have %(x_nb_perso)s personal baskets and are subscribed to "
-"%(x_nb_group)s group baskets and %(x_nb_public)s other users public baskets."
+"%(x_nb_group)s group baskets and %(x_nb_public)s other users public "
+"baskets."
 msgstr ""
 
 #: invenio/legacy/webbasket/api.py:2797 invenio/legacy/webbasket/api.py:2835
@@ -7021,7 +7086,8 @@ msgstr ""
 #: invenio/legacy/webbasket/templates.py:108
 #, fuzzy, python-format
 msgid ""
-"You may want to start by %(x_url_open)screating a new basket%(x_url_close)s."
+"You may want to start by %(x_url_open)screating a new "
+"basket%(x_url_close)s."
 msgstr "Můžete začít tím,%(x_url_open) screating nový koš%(x_url_close) s."
 
 #: invenio/legacy/webbasket/templates.py:131
@@ -7181,8 +7247,8 @@ msgstr "Externí položka"
 
 #: invenio/legacy/webbasket/templates.py:1607
 msgid ""
-"Provide a url for the external item you wish to add and fill in a title and "
-"description"
+"Provide a url for the external item you wish to add and fill in a title "
+"and description"
 msgstr ""
 
 #: invenio/legacy/webbasket/templates.py:1612
@@ -7365,8 +7431,8 @@ msgstr "Sdílet košík s novou skupinou"
 #: invenio/legacy/webbasket/templates.py:2116
 #: invenio/legacy/websession/templates.py:676
 msgid ""
-"You are logged in as a guest user, so your baskets will disappear at the end "
-"of the current session."
+"You are logged in as a guest user, so your baskets will disappear at the "
+"end of the current session."
 msgstr ""
 "Jste přihlášeni jako uživatel host, takže vaše košíky zmizí na konci "
 "současné relace."
@@ -7375,10 +7441,10 @@ msgstr ""
 #: invenio/legacy/webbasket/templates.py:2132
 #: invenio/legacy/websession/templates.py:679
 #, fuzzy, python-format
-msgid ""
-"If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
+msgid "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
 msgstr ""
-"Pokud chcete, můžete%(x_url_open) slogin či se registrovat%(x_url_close) s."
+"Pokud chcete, můžete%(x_url_open) slogin či se registrovat%(x_url_close) "
+"s."
 
 #: invenio/legacy/webbasket/templates.py:2131
 #: invenio/legacy/websession/webinterface.py:287
@@ -7934,7 +8000,8 @@ msgstr "Nemáte oprávnění komentovat nebo hodnotit."
 #: invenio/legacy/webcomment/templates.py:1270
 #, fuzzy, python-format
 msgid ""
-"Note: Your nickname, %(nick)s, will be displayed as author of this comment."
+"Note: Your nickname, %(nick)s, will be displayed as author of this "
+"comment."
 msgstr "Poznámka: Vaše přezdívka,%s, zobrazí se jako autor tohoto komentáře."
 
 #: invenio/legacy/webcomment/templates.py:1275
@@ -8036,8 +8103,7 @@ msgstr "Zpět k záznamu"
 msgid ""
 "You can also view all the comments you have submitted so far on "
 "\"%(x_url_open)sYour Comments%(x_url_close)s\" page."
-msgstr ""
-"Můžete nahlédnout do seznamu%(x_url_open) syour vstupenky%(x_url_close) s."
+msgstr "Můžete nahlédnout do seznamu%(x_url_open) syour vstupenky%(x_url_close) s."
 
 #: invenio/legacy/webcomment/templates.py:1591
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:171
@@ -8096,7 +8162,8 @@ msgstr "Komentář ID:"
 #, fuzzy
 msgid "Or enter a record ID to list all the associated comments/reviews:"
 msgstr ""
-"Nebo zadejte rekordní ID seznam veškerých souvisejících komentáře / recenze:"
+"Nebo zadejte rekordní ID seznam veškerých souvisejících komentáře / "
+"recenze:"
 
 #: invenio/legacy/webcomment/templates.py:1661
 msgid "Record ID:"
@@ -8123,8 +8190,8 @@ msgstr "Zobrazit všechny nahlášené recenze %s"
 
 #: invenio/legacy/webcomment/templates.py:1728
 msgid ""
-"Here is a list, sorted by total number of reports, of all users who have had "
-"a comment reported at least once."
+"Here is a list, sorted by total number of reports, of all users who have "
+"had a comment reported at least once."
 msgstr ""
 
 #: invenio/legacy/webcomment/templates.py:1736
@@ -8239,14 +8306,14 @@ msgstr "Tady jsou všechny hlášené Recenze tříděné podle nejčastěji uv�
 #: invenio/legacy/webcomment/templates.py:2087
 #, fuzzy
 msgid "Here are all reported comments sorted by the most reported"
-msgstr ""
-"Tady jsou všechny nahlášené připomínky tříděné podle nejčastěji hlášenou"
+msgstr "Tady jsou všechny nahlášené připomínky tříděné podle nejčastěji hlášenou"
 
 #: invenio/legacy/webcomment/templates.py:2092
 #, fuzzy, python-format
 msgid "Here are all reviews for record %(x_num)i, sorted by the most reported"
 msgstr ""
-"Tady jsou všechny názory na rekordních%i, tříděné podle nejčastěji uváděným"
+"Tady jsou všechny názory na rekordních%i, tříděné podle nejčastěji "
+"uváděným"
 
 #: invenio/legacy/webcomment/templates.py:2093
 msgid "Show comments"
@@ -8255,8 +8322,7 @@ msgstr "Zobrazit komentáře"
 #: invenio/legacy/webcomment/templates.py:2095
 #, fuzzy, python-format
 msgid "Here are all comments for record %(x_num)i, sorted by the most reported"
-msgstr ""
-"Tady jsou všechny komentáře k záznamu%i, tříděné podle nejčastěji uváděným"
+msgstr "Tady jsou všechny komentáře k záznamu%i, tříděné podle nejčastěji uváděným"
 
 #: invenio/legacy/webcomment/templates.py:2096
 msgid "Show reviews"
@@ -8287,17 +8353,13 @@ msgstr "Ještě nerecenzováno"
 
 #: invenio/legacy/webcomment/templates.py:2256
 #, python-format
-msgid ""
-"The following review was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
-msgstr ""
-"Následující recenze byla zaslána %(CFG_SITE_NAME)s od %(user_nickname)s:"
+msgid "The following review was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
+msgstr "Následující recenze byla zaslána %(CFG_SITE_NAME)s od %(user_nickname)s:"
 
 #: invenio/legacy/webcomment/templates.py:2257
 #, python-format
-msgid ""
-"The following comment was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
-msgstr ""
-"Následující komentář byl poslán %(CFG_SITE_NAME)s od %(user_nickname)s:"
+msgid "The following comment was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
+msgstr "Následující komentář byl poslán %(CFG_SITE_NAME)s od %(user_nickname)s:"
 
 #: invenio/legacy/webcomment/templates.py:2284
 msgid "This is an automatic message, please don't reply to it."
@@ -8379,8 +8441,7 @@ msgid "Below is the list of the comments you have submitted so far."
 msgstr ""
 
 #: invenio/legacy/webcomment/templates.py:2425
-msgid ""
-"You have not yet submitted any comment in the document \"discussion\" tab."
+msgid "You have not yet submitted any comment in the document \"discussion\" tab."
 msgstr ""
 
 #: invenio/legacy/webcomment/templates.py:2428
@@ -8473,8 +8534,8 @@ msgid ""
 "The size of file \\\"%(x_file)s\\\" (%(x_size)s) is larger than maximum "
 "allowed file size (%(x_max)s). Select files again."
 msgstr ""
-"Velikost souboru \\\"%s\\\" (%s) je vetší než maximální povolená velikost "
-"(%s). Vyberte soubor(y) znovu."
+"Velikost souboru \\\"%s\\\" (%s) je vetší než maximální povolená velikost"
+" (%s). Vyberte soubor(y) znovu."
 
 #: invenio/legacy/webcomment/webinterface.py:519
 #: invenio/legacy/websubmit/templates.py:2445
@@ -8634,8 +8695,8 @@ msgstr "Omlouváme se, stránka%s nevypadá, že neexistuje."
 #: invenio/legacy/webdoc/webinterface.py:200
 #, python-format
 msgid ""
-"You may want to look at the %(x_url_open)s%(x_category)s pages"
-"%(x_url_close)s."
+"You may want to look at the %(x_url_open)s%(x_category)s "
+"pages%(x_url_close)s."
 msgstr ""
 
 #: invenio/legacy/webdoc_info/webinterface.py:208
@@ -8706,8 +8767,8 @@ msgstr "Nemohli jsme zajistit vám nějaké časopisy"
 
 #: invenio/legacy/webjournal/config.py:213
 msgid ""
-"It seems that there are no journals defined on this server. Please contact "
-"support if this is not right."
+"It seems that there are no journals defined on this server. Please "
+"contact support if this is not right."
 msgstr ""
 
 #: invenio/legacy/webjournal/config.py:239
@@ -8738,8 +8799,8 @@ msgstr "Nenašli jsme žádnou informtion o aktuálním vydání"
 
 #: invenio/legacy/webjournal/config.py:270
 msgid ""
-"The configuration for the current issue seems to be empty. Try providing an "
-"issue number or check with support."
+"The configuration for the current issue seems to be empty. Try providing "
+"an issue number or check with support."
 msgstr ""
 
 #: invenio/legacy/webjournal/config.py:298
@@ -8817,8 +8878,7 @@ msgstr ""
 #: invenio/legacy/webjournal/config.py:531
 #, fuzzy
 msgid "Sorry, this category does not exist for this journal and issue."
-msgstr ""
-"Omlouváme se, tato kategorie neexistuje pro tohoto časopisu a vydávání."
+msgstr "Omlouváme se, tato kategorie neexistuje pro tohoto časopisu a vydávání."
 
 #: invenio/legacy/webjournal/templates.py:53
 msgid "Available Journals"
@@ -8844,8 +8904,7 @@ msgstr ""
 #: invenio/legacy/webjournal/templates.py:308
 #, fuzzy, python-format
 msgid "If you cannot read this email please go to %(x_journal_link)s"
-msgstr ""
-"Pokud nemůžete přečíst tento e-mail najdete na adrese%(x_journal_link) s"
+msgstr "Pokud nemůžete přečíst tento e-mail najdete na adrese%(x_journal_link) s"
 
 #: invenio/legacy/webjournal/templates.py:699
 msgid "Apply"
@@ -8938,8 +8997,9 @@ msgstr ""
 
 #: invenio/legacy/weblinkback/adminlib.py:124
 msgid ""
-"All URLs in these lists are checked for containment (infix) in any linkback "
-"request URL. A whitelist match has precedence over a blacklist match."
+"All URLs in these lists are checked for containment (infix) in any "
+"linkback request URL. A whitelist match has precedence over a blacklist "
+"match."
 msgstr ""
 
 #: invenio/legacy/weblinkback/adminlib.py:127
@@ -8961,7 +9021,8 @@ msgstr ""
 
 #: invenio/legacy/weblinkback/adminlib.py:199
 msgid ""
-"these linkbacks are not visible to users, they must be approved or rejected."
+"these linkbacks are not visible to users, they must be approved or "
+"rejected."
 msgstr ""
 
 #: invenio/legacy/weblinkback/adminlib.py:208
@@ -9073,8 +9134,8 @@ msgid ""
 "Your message is too long, please shorten it. Maximum size allowed is "
 "%(x_size)i characters."
 msgstr ""
-"Vaše zpráva je příliš dlouhá, upravte ji. Maximální povolená velikost je %i "
-"znaků."
+"Vaše zpráva je příliš dlouhá, upravte ji. Maximální povolená velikost je "
+"%i znaků."
 
 #: invenio/legacy/webmessage/api.py:402
 #, fuzzy, python-format
@@ -9099,8 +9160,8 @@ msgid ""
 "Your message could not be sent to the following recipients as it would "
 "exceed their quotas:"
 msgstr ""
-"Vaše zpráva nemohla být odeslána na následujícím příjemcům z důvodu jejich "
-"plné schánky:"
+"Vaše zpráva nemohla být odeslána na následujícím příjemcům z důvodu "
+"jejich plné schánky:"
 
 #: invenio/legacy/webmessage/api.py:457
 msgid "Your message has been sent."
@@ -9440,16 +9501,16 @@ msgstr "Hledat také:"
 
 #: invenio/legacy/websearch/templates.py:1589
 msgid ""
-"This collection is restricted.  If you are authorized to access it, please "
-"click on the Search button."
+"This collection is restricted.  If you are authorized to access it, "
+"please click on the Search button."
 msgstr ""
 "Tato kolekce je omezena.  Pokud máte oprávnění k přístupu do systému, "
 "klepněte prosím na tlačítko Hledat."
 
 #: invenio/legacy/websearch/templates.py:1604
 msgid ""
-"This is a hosted external collection. Please click on the Search button to "
-"see its content."
+"This is a hosted external collection. Please click on the Search button "
+"to see its content."
 msgstr ""
 "To je hostovaná externí kolekce. Prosím, klikněte na tlačítko Hledat pro "
 "zobrazení obsahu."
@@ -9588,10 +9649,11 @@ msgstr "Další podrobnosti"
 
 #: invenio/legacy/websearch/templates.py:3325
 msgid ""
-"Boolean query returned no hits. Please combine your search terms differently."
+"Boolean query returned no hits. Please combine your search terms "
+"differently."
 msgstr ""
-"Booleovský dotaz nevrátil žádný výsledek. Zkuste zkombinovat dané termíny "
-"jiným způsobem."
+"Booleovský dotaz nevrátil žádný výsledek. Zkuste zkombinovat dané termíny"
+" jiným způsobem."
 
 #: invenio/legacy/websearch/templates.py:3357
 msgid "See also: similar author names"
@@ -9616,8 +9678,8 @@ msgstr "Můžete začít prohledávat od %s."
 #, python-format
 msgid ""
 "Set up a personal %(x_url1_open)semail alert%(x_url1_close)s\n"
-"                                  or subscribe to the %(x_url2_open)sRSS feed"
-"%(x_url2_close)s."
+"                                  or subscribe to the %(x_url2_open)sRSS "
+"feed%(x_url2_close)s."
 msgstr ""
 
 #: invenio/legacy/websearch/templates.py:3832
@@ -9808,8 +9870,7 @@ msgid "in"
 msgstr "v"
 
 #: invenio/legacy/websearch_external_collections/templates.py:51
-msgid ""
-"Haven't found what you were looking for? Try your search on other servers:"
+msgid "Haven't found what you were looking for? Try your search on other servers:"
 msgstr "Nenalezli jste co jste hledali? Zkuste Váš dotaz na jiných servrech:"
 
 #: invenio/legacy/websearch_external_collections/templates.py:79
@@ -9825,7 +9886,8 @@ msgid ""
 "The external search engine has not responded in time. You can check its "
 "results here:"
 msgstr ""
-"Externí vyhledávač neodpověděl včas. Můžete zkontrolovat výsledky přímo zde:"
+"Externí vyhledávač neodpověděl včas. Můžete zkontrolovat výsledky přímo "
+"zde:"
 
 #: invenio/legacy/websearch_external_collections/templates.py:146
 #: invenio/legacy/websearch_external_collections/templates.py:154
@@ -9902,8 +9964,8 @@ msgstr "povinný"
 
 #: invenio/legacy/websession/templates.py:207
 msgid ""
-"The description should be something meaningful for you to recognize the API "
-"key"
+"The description should be something meaningful for you to recognize the "
+"API key"
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:208
@@ -9913,8 +9975,8 @@ msgstr "Vytvořit nový košík"
 
 #: invenio/legacy/websession/templates.py:270
 msgid ""
-"If you want to change your email or set for the first time your nickname, "
-"please set new values in the form below."
+"If you want to change your email or set for the first time your nickname,"
+" please set new values in the form below."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:271
@@ -9931,19 +9993,19 @@ msgstr "Nastavení nových hodnot"
 
 #: invenio/legacy/websession/templates.py:285
 msgid ""
-"Since this is considered as a signature for comments and reviews, once set "
-"it can not be changed."
+"Since this is considered as a signature for comments and reviews, once "
+"set it can not be changed."
 msgstr ""
 "Protože je toto považováno za podpis pro komentáře a recenze, po prvním "
 "nastavení již nelze měnit."
 
 #: invenio/legacy/websession/templates.py:325
 msgid ""
-"If you want to change your password, please enter the old one and set the "
-"new value in the form below."
+"If you want to change your password, please enter the old one and set the"
+" new value in the form below."
 msgstr ""
-"Pokud chcete změnit své heslo, zadejte staré a nastavte nové ve spodní části "
-"formuláře."
+"Pokud chcete změnit své heslo, zadejte staré a nastavte nové ve spodní "
+"části formuláře."
 
 #: invenio/legacy/websession/templates.py:327
 msgid "Old password"
@@ -9980,8 +10042,8 @@ msgstr "Nastavení nového hesla"
 #: invenio/legacy/websession/templates.py:343
 #, fuzzy, python-format
 msgid ""
-"If you are using a lightweight CERN account you can %(x_url_open)sreset the "
-"password%(x_url_close)s."
+"If you are using a lightweight CERN account you can %(x_url_open)sreset "
+"the password%(x_url_close)s."
 msgstr ""
 "Pokud používáte lehký CERN účet mužete\n"
 "                %(x_url_open)sobnovit své heslo%(x_url_close)s."
@@ -10064,7 +10126,8 @@ msgid ""
 "Please select which login method you would like to use to authenticate "
 "yourself"
 msgstr ""
-"Vyberte, prosím, kterou přihlášovací metodu chcete používat k Vašemu ověření"
+"Vyberte, prosím, kterou přihlášovací metodu chcete používat k Vašemu "
+"ověření"
 
 #: invenio/legacy/websession/templates.py:503
 #: invenio/legacy/websession/templates.py:518
@@ -10074,13 +10137,14 @@ msgstr "Vyberte způsob"
 #: invenio/legacy/websession/templates.py:537
 #, python-format
 msgid ""
-"If you have lost the password for your %(sitename)s %(x_fmt_open)sinternal "
-"account%(x_fmt_close)s, then please enter your email address in the "
-"following form in order to have a password reset link emailed to you."
+"If you have lost the password for your %(sitename)s "
+"%(x_fmt_open)sinternal account%(x_fmt_close)s, then please enter your "
+"email address in the following form in order to have a password reset "
+"link emailed to you."
 msgstr ""
-"Pokud jste ztratili heslo pro %(sitename)s %(x_fmt_open)svnitří účet"
-"%(x_fmt_close)s, zadejte, prosím, Vaši emailovou adresu v následujícím "
-"formuláři pro zaslání odkazu na změnu hesla."
+"Pokud jste ztratili heslo pro %(sitename)s %(x_fmt_open)svnitří "
+"účet%(x_fmt_close)s, zadejte, prosím, Vaši emailovou adresu v "
+"následujícím formuláři pro zaslání odkazu na změnu hesla."
 
 #: invenio/legacy/websession/templates.py:559
 #: invenio/legacy/websession/templates.py:1220
@@ -10096,18 +10160,18 @@ msgstr "Odešli odkaz na změnu hesla"
 #: invenio/legacy/websession/templates.py:567
 #, python-format
 msgid ""
-"If you have been using the %(x_fmt_open)sCERN login system%(x_fmt_close)s, "
-"then you can recover your password through the %(x_url_open)sCERN "
-"authentication system%(x_url_close)s."
+"If you have been using the %(x_fmt_open)sCERN login "
+"system%(x_fmt_close)s, then you can recover your password through the "
+"%(x_url_open)sCERN authentication system%(x_url_close)s."
 msgstr ""
-"Pokud jste používali %(x_fmt_open)spřihlašovací systém CERNu%(x_fmt_close)s, "
-"pak můžete obnovit Vaše heslo pomocí %(x_url_open)sauthentikačního systému "
-"CERNu%(x_url_close)s."
+"Pokud jste používali %(x_fmt_open)spřihlašovací systém "
+"CERNu%(x_fmt_close)s, pak můžete obnovit Vaše heslo pomocí "
+"%(x_url_open)sauthentikačního systému CERNu%(x_url_close)s."
 
 #: invenio/legacy/websession/templates.py:571
 msgid ""
-"Note that if you have been using an external login system, then we cannot do "
-"anything and you have to ask there."
+"Note that if you have been using an external login system, then we cannot"
+" do anything and you have to ask there."
 msgstr ""
 "Všimněte si, že pokud jste používali externí přihlašovací systém, pak "
 "nemůžeme nic dělat a musíte se zeptat zde."
@@ -10118,20 +10182,20 @@ msgid ""
 "Alternatively, you can ask %(x_name)s to change your login system from "
 "external to internal."
 msgstr ""
-"Případně můžete požádat %s o změnu svého přihlašovacího účtu z externího na "
-"interní."
+"Případně můžete požádat %s o změnu svého přihlašovacího účtu z externího "
+"na interní."
 
 #: invenio/legacy/websession/templates.py:600
 #, fuzzy, python-format
 msgid ""
-"%(x_name)s offers you the possibility to personalize the interface, to set "
-"up your own personal library of documents, or to set up an automatic alert "
-"query that would run periodically and would notify you of search results by "
-"email."
+"%(x_name)s offers you the possibility to personalize the interface, to "
+"set up your own personal library of documents, or to set up an automatic "
+"alert query that would run periodically and would notify you of search "
+"results by email."
 msgstr ""
-"%s Vám nabízí možnost přizpůsobit rozhraní, nastavit vlastní osobní knihovnu "
-"dokumentů, nebo nastavit automatické zaslání upozornění při změně výsledků "
-"dotazu na email."
+"%s Vám nabízí možnost přizpůsobit rozhraní, nastavit vlastní osobní "
+"knihovnu dokumentů, nebo nastavit automatické zaslání upozornění při "
+"změně výsledků dotazu na email."
 
 #: invenio/legacy/websession/templates.py:611
 #: invenio/legacy/websession/webinterface.py:331
@@ -10150,8 +10214,8 @@ msgstr "Zobrazit všechny provedené vyhledávání během posledních 30 dnů."
 
 #: invenio/legacy/websession/templates.py:628
 msgid ""
-"With baskets you can define specific collections of items, store interesting "
-"records you want to access later or share with others."
+"With baskets you can define specific collections of items, store "
+"interesting records you want to access later or share with others."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:636
@@ -10166,22 +10230,22 @@ msgstr ""
 
 #: invenio/legacy/websession/templates.py:651
 msgid ""
-"Check out book you have on loan, submit borrowing requests, etc. Requires "
-"CERN ID."
+"Check out book you have on loan, submit borrowing requests, etc. Requires"
+" CERN ID."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:678
 msgid ""
-"You are logged in as a guest user, so your alerts will disappear at the end "
-"of the current session."
+"You are logged in as a guest user, so your alerts will disappear at the "
+"end of the current session."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:701
 #, python-format
 msgid ""
-"You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout"
-"%(x_url1_close)s; b) edit your %(x_url2_open)saccount settings"
-"%(x_url2_close)s."
+"You are logged in as %(x_user)s. You may want to a) "
+"%(x_url1_open)slogout%(x_url1_close)s; b) edit your "
+"%(x_url2_open)saccount settings%(x_url2_close)s."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:785
@@ -10189,8 +10253,7 @@ msgstr ""
 msgid ""
 "You can consult the list of %(x_url_open)syour comments%(x_url_close)s "
 "submitted so far."
-msgstr ""
-"Můžete nahlédnout do seznamu%(x_url_open) syour vstupenky%(x_url_close) s."
+msgstr "Můžete nahlédnout do seznamu%(x_url_open) syour vstupenky%(x_url_close) s."
 
 #: invenio/legacy/websession/templates.py:790
 msgid "Your Alert Searches"
@@ -10199,8 +10262,8 @@ msgstr "Vaše upozornění na vyhledávání"
 #: invenio/legacy/websession/templates.py:796
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are "
-"administering or are a member of."
+"You can consult the list of %(x_url_open)syour groups%(x_url_close)s you "
+"are administering or are a member of."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:799
@@ -10212,8 +10275,8 @@ msgstr "Vaše skupiny"
 #: invenio/legacy/websession/templates.py:802
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)syour submissions%(x_url_close)s "
-"and inquire about their status."
+"You can consult the list of %(x_url_open)syour submissions%(x_url_close)s"
+" and inquire about their status."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:805
@@ -10224,8 +10287,8 @@ msgstr "Vaše podání"
 #: invenio/legacy/websession/templates.py:808
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with "
-"the documents you approved or refereed."
+"You can consult the list of %(x_url_open)syour approvals%(x_url_close)s "
+"with the documents you approved or refereed."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:811
@@ -10236,8 +10299,7 @@ msgstr "Vaše schválení"
 #: invenio/legacy/websession/templates.py:815
 #, python-format
 msgid "You can consult the list of %(x_url_open)syour tickets%(x_url_close)s."
-msgstr ""
-"Můžete nahlédnout do seznamu%(x_url_open) syour vstupenky%(x_url_close) s."
+msgstr "Můžete nahlédnout do seznamu%(x_url_open) syour vstupenky%(x_url_close) s."
 
 #: invenio/legacy/websession/templates.py:818
 msgid "Your Tickets"
@@ -10274,11 +10336,10 @@ msgstr "S cílem potvrdit platnost této žádosti."
 #: invenio/legacy/websession/templates.py:884
 #: invenio/legacy/websession/templates.py:921
 #, fuzzy, python-format
-msgid ""
-"Please note that this URL will remain valid for about %(days)s days only."
+msgid "Please note that this URL will remain valid for about %(days)s days only."
 msgstr ""
-"Upozorňujeme, že tato adresa URL zůstane v platnosti po dobu asi"
-"%(ve dnech) s dny."
+"Upozorňujeme, že tato adresa URL zůstane v platnosti po dobu asi%(ve "
+"dnech) s dny."
 
 #: invenio/legacy/websession/templates.py:909
 #, python-format
@@ -10323,21 +10384,20 @@ msgstr "Pokud chcete, můžete%(x_url_open) slogin zde%(x_url_close) s."
 #: invenio/legacy/websession/templates.py:1011
 #, fuzzy
 msgid "If you already have an account, please login using the form below."
-msgstr ""
-"Pokud již máte účet, přihlaste se prosím pomocí níže uvedeného formuláře."
+msgstr "Pokud již máte účet, přihlaste se prosím pomocí níže uvedeného formuláře."
 
 #: invenio/legacy/websession/templates.py:1015
 #, python-format
 msgid ""
-"If you don't own a CERN account yet, you can register a %(x_url_open)snew "
-"CERN lightweight account%(x_url_close)s."
+"If you don't own a CERN account yet, you can register a %(x_url_open)snew"
+" CERN lightweight account%(x_url_close)s."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:1018
 #, python-format
 msgid ""
-"If you don't own an account yet, please %(x_url_open)sregister"
-"%(x_url_close)s an internal account."
+"If you don't own an account yet, please "
+"%(x_url_open)sregister%(x_url_close)s an internal account."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:1027
@@ -10373,11 +10433,11 @@ msgstr "Můžete použít svou přezdívku nebo e-mailovou adresu pro přihláš
 
 #: invenio/legacy/websession/templates.py:1127
 msgid ""
-"Your request is valid. Please set the new desired password in the following "
-"form."
+"Your request is valid. Please set the new desired password in the "
+"following form."
 msgstr ""
-"Vaše žádost je platná. Prosím nastavte požadované nové heslo v následujícím "
-"formuláři."
+"Vaše žádost je platná. Prosím nastavte požadované nové heslo v "
+"následujícím formuláři."
 
 #: invenio/legacy/websession/templates.py:1150
 msgid "Set a new password for"
@@ -10401,8 +10461,8 @@ msgstr "Prosím, zadejte svou e-mailovou adresu, přezdívku a heslo:"
 
 #: invenio/legacy/websession/templates.py:1177
 msgid ""
-"It will not be possible to use the account before it has been verified and "
-"activated."
+"It will not be possible to use the account before it has been verified "
+"and activated."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:1228
@@ -10419,24 +10479,24 @@ msgstr "registrovat"
 msgid ""
 "Please do not use valuable passwords such as your Unix, AFS or NICE "
 "passwords with this service. Your email address will stay strictly "
-"confidential and will not be disclosed to any third party. It will be used "
-"to identify you for personal services of %(x_name)s. For example, you may "
-"set up an automatic alert search that will look for new preprints and will "
-"notify you daily of new arrivals by email."
+"confidential and will not be disclosed to any third party. It will be "
+"used to identify you for personal services of %(x_name)s. For example, "
+"you may set up an automatic alert search that will look for new preprints"
+" and will notify you daily of new arrivals by email."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:1235
 #, python-format
 msgid ""
-"It is not possible to create an account yourself. Contact %(x_name)s if you "
-"want an account."
+"It is not possible to create an account yourself. Contact %(x_name)s if "
+"you want an account."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:1261
 #, python-format
 msgid ""
-"You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s "
-"first."
+"You seem to be a guest user. You have to "
+"%(x_url_open)slogin%(x_url_close)s first."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:1267
@@ -10570,8 +10630,8 @@ msgstr "Zde jsou některé zajímavé odkazy Web Admin pro vás:"
 #: invenio/legacy/websession/templates.py:1325
 #, python-format
 msgid ""
-"For more admin-level activities, see the complete %(x_url_open)sAdmin Area"
-"%(x_url_close)s."
+"For more admin-level activities, see the complete %(x_url_open)sAdmin "
+"Area%(x_url_close)s."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:1378
@@ -10790,11 +10850,10 @@ msgstr "Uživatel chce vstoupit do skupiny %s."
 
 #: invenio/legacy/websession/templates.py:2382
 #, python-format
-msgid ""
-"Please %(x_url_open)saccept or reject%(x_url_close)s this user's request."
+msgid "Please %(x_url_open)saccept or reject%(x_url_close)s this user's request."
 msgstr ""
-"Prosím, %(x_url_open)spříjměte nebo zamítne%(x_url_close)s tento požadavek "
-"od uživatele."
+"Prosím, %(x_url_open)spříjměte nebo zamítne%(x_url_close)s tento "
+"požadavek od uživatele."
 
 #: invenio/legacy/websession/templates.py:2400
 #, fuzzy, python-format
@@ -10820,8 +10879,7 @@ msgstr "Vaše žádost o vstup do skupiny %s byla zamítnuta."
 #: invenio/legacy/websession/templates.py:2426
 #, python-format
 msgid "You can consult the list of %(x_url_open)syour groups%(x_url_close)s."
-msgstr ""
-"Můžete nahlédnout do seznamu %(x_url_open) svašich skupin%(x_url_close)s."
+msgstr "Můžete nahlédnout do seznamu %(x_url_open) svašich skupin%(x_url_close)s."
 
 #: invenio/legacy/websession/templates.py:2422
 #, fuzzy, python-format
@@ -10836,15 +10894,16 @@ msgstr "Skupina %s byla odstraněna jejím správcem."
 #: invenio/legacy/websession/templates.py:2441
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)s%(x_nb_total)i groups"
-"%(x_url_close)s you are subscribed to (%(x_nb_member)i) or administering "
-"(%(x_nb_admin)i)."
+"You can consult the list of %(x_url_open)s%(x_nb_total)i "
+"groups%(x_url_close)s you are subscribed to (%(x_nb_member)i) or "
+"administering (%(x_nb_admin)i)."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:2460
 msgid ""
 "Warning: The password set for MySQL root user is the same as the default "
-"Invenio password. For security purposes, you may want to change the password."
+"Invenio password. For security purposes, you may want to change the "
+"password."
 msgstr ""
 "Varování: heslo MySQL uživatele root je stejné jako výchozí. Pro vyšší "
 "bezpečnost můžete chtít změnit výchozí heslo."
@@ -10852,56 +10911,61 @@ msgstr ""
 #: invenio/legacy/websession/templates.py:2466
 msgid ""
 "Warning: The password set for the Invenio MySQL user is the same as the "
-"shipped default. For security purposes, you may want to change the password."
+"shipped default. For security purposes, you may want to change the "
+"password."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:2472
 msgid ""
-"Warning: The password set for the Invenio admin user is currently empty. For "
-"security purposes, it is strongly recommended that you add a password."
+"Warning: The password set for the Invenio admin user is currently empty. "
+"For security purposes, it is strongly recommended that you add a "
+"password."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:2478
 msgid ""
-"Warning: The email address set for support email is currently set to "
-"info@invenio-software.org. It is recommended that you change this to your "
-"own address."
+"Warning: The email address set for support email is currently set to info"
+"@invenio-software.org. It is recommended that you change this to your own"
+" address."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:2484
 #, fuzzy
 msgid ""
-"A newer version of Invenio is available for download. You may want to visit  "
+"A newer version of Invenio is available for download. You may want to "
+"visit  "
 msgstr ""
-"A nová verze Invenio je k dispozici ke stažení. Možná budete chtít navštívit "
+"A nová verze Invenio je k dispozici ke stažení. Možná budete chtít "
+"navštívit "
 
 #: invenio/legacy/websession/templates.py:2491
 msgid ""
-"Cannot download or parse release notes from http://invenio-software.org/repo/"
-"invenio/tree/RELEASE-NOTES"
+"Cannot download or parse release notes from http://invenio-"
+"software.org/repo/invenio/tree/RELEASE-NOTES"
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:2496
 #, python-format
 msgid ""
-"Your e-mail is auto-generated by the system. Please change your e-mail from "
-"<a href='%(x_site)s/youraccount/edit?ln=%(x_link)s'>account settings</a>."
+"Your e-mail is auto-generated by the system. Please change your e-mail "
+"from <a href='%(x_site)s/youraccount/edit?ln=%(x_link)s'>account "
+"settings</a>."
 msgstr ""
 
 #: invenio/legacy/websession/webaccount.py:118
 #, python-format
 msgid ""
-"You are logged in as guest. You may want to %(x_url_open)slogin"
-"%(x_url_close)s as a regular user."
+"You are logged in as guest. You may want to "
+"%(x_url_open)slogin%(x_url_close)s as a regular user."
 msgstr ""
-"Jste přihlášen jako host. Možná se budete chtít %(x_url_open)spřihlásit"
-"%(x_url_close)s jako bežný uživatel."
+"Jste přihlášen jako host. Možná se budete chtít "
+"%(x_url_open)spřihlásit%(x_url_close)s jako bežný uživatel."
 
 #: invenio/legacy/websession/webaccount.py:122
 #, python-format
 msgid ""
-"The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister"
-"%(x_url_close)s first"
+"The %(x_fmt_open)sguest%(x_fmt_close)s users need to "
+"%(x_url_open)sregister%(x_url_close)s first"
 msgstr ""
 
 #: invenio/legacy/websession/webaccount.py:127
@@ -10910,14 +10974,14 @@ msgstr "Žádné dotazy nalezeny"
 
 #: invenio/legacy/websession/webaccount.py:398
 msgid ""
-"This collection is restricted.  If you think you have right to access it, "
-"please authenticate yourself."
+"This collection is restricted.  If you think you have right to access it,"
+" please authenticate yourself."
 msgstr ""
 
 #: invenio/legacy/websession/webaccount.py:399
 msgid ""
-"This file is restricted.  If you think you have right to access it, please "
-"authenticate yourself."
+"This file is restricted.  If you think you have right to access it, "
+"please authenticate yourself."
 msgstr ""
 
 #: invenio/legacy/websession/webaccount.py:400
@@ -10926,8 +10990,8 @@ msgstr ""
 
 #: invenio/legacy/websession/webaccount.py:401
 msgid ""
-"python-openid package must be installed: run make install-openid-package or "
-"download manually from https://github.com/openid/python-openid/"
+"python-openid package must be installed: run make install-openid-package "
+"or download manually from https://github.com/openid/python-openid/"
 msgstr ""
 
 #: invenio/legacy/websession/webaccount.py:401
@@ -10939,8 +11003,8 @@ msgstr ""
 
 #: invenio/legacy/websession/webaccount.py:402
 msgid ""
-"rauth package must be installed: run make install-oauth-package or download "
-"manually from https://github.com/litl/rauth/"
+"rauth package must be installed: run make install-oauth-package or "
+"download manually from https://github.com/litl/rauth/"
 msgstr ""
 
 #: invenio/legacy/websession/webaccount.py:403
@@ -11010,9 +11074,11 @@ msgstr "Prosím, vyberte člena, pokud jej chcete odstranit ze skupiny."
 
 #: invenio/legacy/websession/webgroup.py:651
 msgid ""
-"Please choose a user from the list if you want him to be added to the group."
+"Please choose a user from the list if you want him to be added to the "
+"group."
 msgstr ""
-"Prosím, vyberte uživatele ze seznamu, pokud chcete, aby se přidal ke skupině."
+"Prosím, vyberte uživatele ze seznamu, pokud chcete, aby se přidal ke "
+"skupině."
 
 #: invenio/legacy/websession/webgroup.py:664
 msgid "The user is already member of the group."
@@ -11047,8 +11113,8 @@ msgid ""
 "authorization will last until %(x_expiration)s and until you close your "
 "browser if you are a guest user."
 msgstr ""
-"Úspěšně jste získali oprávnění jako %(x_role)s! Toto oprávnění je platné do "
-"%(x_expiration)s nebo než zavřete prohlížeč pokud jste Host."
+"Úspěšně jste získali oprávnění jako %(x_role)s! Toto oprávnění je platné "
+"do %(x_expiration)s nebo než zavřete prohlížeč pokud jste Host."
 
 #: invenio/legacy/websession/webinterface.py:128
 msgid "You have confirmed the validity of your email address!"
@@ -11063,8 +11129,7 @@ msgstr "Prosím, počkejte na správce než aktivuje váš účet."
 #: invenio/legacy/websession/webinterface.py:144
 #, python-format
 msgid "You can now go to %(x_url_open)syour account page%(x_url_close)s."
-msgstr ""
-"Nyní můžete přejít na %(x_url_open)sstránku vášeho účtu%(x_url_close)s."
+msgstr "Nyní můžete přejít na %(x_url_open)sstránku vášeho účtu%(x_url_close)s."
 
 #: invenio/legacy/websession/webinterface.py:136
 #: invenio/legacy/websession/webinterface.py:145
@@ -11077,7 +11142,8 @@ msgstr "Již jste potvrdil platnost vaší e-mailové adresy!"
 
 #: invenio/legacy/websession/webinterface.py:148
 msgid ""
-"This request for confirmation of an email address is not valid or is expired."
+"This request for confirmation of an email address is not valid or is "
+"expired."
 msgstr "Tato žádost o potvrzení e-mailové adresy není platná nebo vypršela."
 
 #: invenio/legacy/websession/webinterface.py:153
@@ -11140,10 +11206,10 @@ msgstr "Přepnuto na interní přihlašovací metodu."
 
 #: invenio/legacy/websession/webinterface.py:423
 msgid ""
-"Please note that if this is the first time that you are using this account "
-"with the internal login method then the system has set for you a randomly "
-"generated password. Please click the following button to obtain a password "
-"reset request link sent to you via email:"
+"Please note that if this is the first time that you are using this "
+"account with the internal login method then the system has set for you a "
+"randomly generated password. Please click the following button to obtain "
+"a password reset request link sent to you via email:"
 msgstr ""
 
 #: invenio/legacy/websession/webinterface.py:431
@@ -11172,8 +11238,8 @@ msgstr "Přihlásit metodu úspěšně vybranou."
 #: invenio/legacy/websession/webinterface.py:452
 #, python-format
 msgid ""
-"The external login method %(x_name)s does not support email address based "
-"logins.  Please contact the site administrators."
+"The external login method %(x_name)s does not support email address based"
+" logins.  Please contact the site administrators."
 msgstr ""
 
 #: invenio/legacy/websession/webinterface.py:464
@@ -11300,8 +11366,8 @@ msgid ""
 "Cannot send password reset request since you are using external "
 "authentication system."
 msgstr ""
-"Nelze odeslat žádost o změnu hesla, protože používáte externí autentifikační "
-"systém."
+"Nelze odeslat žádost o změnu hesla, protože používáte externí "
+"autentifikační systém."
 
 #: invenio/legacy/websession/webinterface.py:665
 msgid "The entered email address does not exist in the database."
@@ -11312,8 +11378,8 @@ msgid ""
 "The entered email address is incorrect, please check that it is written "
 "correctly (e.g. johndoe@example.com)."
 msgstr ""
-"Zadaná e-mailová adresa není správná, zkontrolujte, že je napsána bez chyb "
-"(např. jan.novak@example.com)."
+"Zadaná e-mailová adresa není správná, zkontrolujte, že je napsána bez "
+"chyb (např. jan.novak@example.com)."
 
 #: invenio/legacy/websession/webinterface.py:684
 msgid "Incorrect email address"
@@ -11353,15 +11419,15 @@ msgstr ""
 #: invenio/legacy/websession/webinterface.py:984
 #: invenio/modules/accounts/views/accounts.py:132
 msgid ""
-"Please follow instructions presented there in order to complete the account "
-"registration process."
+"Please follow instructions presented there in order to complete the "
+"account registration process."
 msgstr ""
 
 #: invenio/legacy/websession/webinterface.py:986
 #: invenio/modules/accounts/views/accounts.py:134
 msgid ""
-"A second email will be sent when the account has been activated and can be "
-"used."
+"A second email will be sent when the account has been activated and can "
+"be used."
 msgstr ""
 
 #: invenio/legacy/websession/webinterface.py:989
@@ -11478,8 +11544,7 @@ msgstr ""
 
 #: invenio/legacy/webstyle/templates.py:636
 #, fuzzy, python-format
-msgid ""
-"Record created %(x_date_creation)s, last modified %(x_date_modification)s"
+msgid "Record created %(x_date_creation)s, last modified %(x_date_modification)s"
 msgstr "Záznam vytvořen %s, modifikován %s"
 
 #: invenio/legacy/webstyle/templates.py:707
@@ -11503,37 +11568,37 @@ msgstr "Přesunuto pole z pozice na pozici%s%s na stránku%podání '%s%s'."
 #: invenio/legacy/websubmit/admin_engine.py:3917
 #, python-format
 msgid ""
-"Unable to swap field at position %(x_from)s with field at position %(x_to)s "
-"on page %(x_page)s of submission %(x_sub)s - could not move field at "
-"position %(x_subm)s to temporary field location"
+"Unable to swap field at position %(x_from)s with field at position "
+"%(x_to)s on page %(x_page)s of submission %(x_sub)s - could not move "
+"field at position %(x_subm)s to temporary field location"
 msgstr ""
 
 #: invenio/legacy/websubmit/admin_engine.py:3929
 #, python-format
 msgid ""
-"Unable to swap field at position %(x_from)s with field at position %(x_to)s "
-"on page %(x_page)s of submission %(x_sub)s - could not move field at "
-"position %(x_posfrom)s to position %(x_posto)s. Please ask Admin to check "
-"that a field was not stranded in a temporary position"
+"Unable to swap field at position %(x_from)s with field at position "
+"%(x_to)s on page %(x_page)s of submission %(x_sub)s - could not move "
+"field at position %(x_posfrom)s to position %(x_posto)s. Please ask Admin"
+" to check that a field was not stranded in a temporary position"
 msgstr ""
 
 #: invenio/legacy/websubmit/admin_engine.py:3941
 #, python-format
 msgid ""
-"Unable to swap field at position %(x_from)s with field at position %(x_to)s "
-"on page %(x_page)s of submission %(x_sub)s - could not move field that was "
-"located at position %(x_posfrom)s to position %(x_posto)s from temporary "
-"position. Field is now stranded in temporary position and must be corrected "
-"manually by an Admin"
+"Unable to swap field at position %(x_from)s with field at position "
+"%(x_to)s on page %(x_page)s of submission %(x_sub)s - could not move "
+"field that was located at position %(x_posfrom)s to position %(x_posto)s "
+"from temporary position. Field is now stranded in temporary position and "
+"must be corrected manually by an Admin"
 msgstr ""
 
 #: invenio/legacy/websubmit/admin_engine.py:3953
 #, python-format
 msgid ""
 "Unable to move field at position %(x_from)s to position %(x_to)s on page "
-"%(x_page)s of submission %(x_sub)s - could not decrement the position of the "
-"fields below position %(x_pos)s. Tried to recover - please check that field "
-"ordering is not broken"
+"%(x_page)s of submission %(x_sub)s - could not decrement the position of "
+"the fields below position %(x_pos)s. Tried to recover - please check that"
+" field ordering is not broken"
 msgstr ""
 
 #: invenio/legacy/websubmit/admin_engine.py:3965
@@ -11541,15 +11606,15 @@ msgstr ""
 msgid ""
 "Unable to move field at position %(x_from)s to position %(x_to)s on page "
 "%(x_page)s of submission %(x_sub)s%(x_subm)s - could not increment the "
-"position of the fields at and below position %(x_frompos)s. The field that "
-"was at position %(x_topos)s is now stranded in a temporary position."
+"position of the fields at and below position %(x_frompos)s. The field "
+"that was at position %(x_topos)s is now stranded in a temporary position."
 msgstr ""
 
 #: invenio/legacy/websubmit/admin_engine.py:3977
 #, fuzzy, python-format
 msgid ""
-"Moved field from position %(x_from)s to position %(x_to)s on page %(x_page)s "
-"of submission '%(x_sub)s%(x_subm)s'."
+"Moved field from position %(x_from)s to position %(x_to)s on page "
+"%(x_page)s of submission '%(x_sub)s%(x_subm)s'."
 msgstr "Přesunuto pole z pozice na pozici%s%s na stránku%podání '%s%s'."
 
 #: invenio/legacy/websubmit/admin_engine.py:3999
@@ -11615,8 +11680,8 @@ msgstr "Nelze určit počet předkládání stránek."
 #: invenio/legacy/websubmit/engine.py:301
 #: invenio/legacy/websubmit/engine.py:931
 msgid ""
-"Unable to create a directory for this submission. The administrator has been "
-"alerted."
+"Unable to create a directory for this submission. The administrator has "
+"been alerted."
 msgstr ""
 
 #: invenio/legacy/websubmit/engine.py:440
@@ -11652,8 +11717,8 @@ msgstr "Přidej"
 msgid ""
 "A serious function-error has been encountered. Adminstrators have been "
 "alerted. <br /><em>Please not that this might be due to wrong characters "
-"inserted into the form</em> (e.g. by copy and pasting some text from a PDF "
-"file)."
+"inserted into the form</em> (e.g. by copy and pasting some text from a "
+"PDF file)."
 msgstr ""
 
 #: invenio/legacy/websubmit/engine.py:1501
@@ -11704,8 +11769,8 @@ msgstr "Vyberte kategorii a poté klikněte na tlačítko akce."
 
 #: invenio/legacy/websubmit/templates.py:364
 msgid ""
-"To continue with a previously interrupted submission, enter an access number "
-"into the box below:"
+"To continue with a previously interrupted submission, enter an access "
+"number into the box below:"
 msgstr ""
 
 #: invenio/legacy/websubmit/templates.py:366
@@ -11734,8 +11799,8 @@ msgstr "Zpět do hlavního menu"
 
 #: invenio/legacy/websubmit/templates.py:547
 msgid ""
-"This is your submission access number. It can be used to continue with an "
-"interrupted submission in case of problems."
+"This is your submission access number. It can be used to continue with an"
+" interrupted submission in case of problems."
 msgstr ""
 
 #: invenio/legacy/websubmit/templates.py:548
@@ -11785,8 +11850,8 @@ msgstr "Podací číslo"
 #: invenio/legacy/websubmit/templates.py:1036
 #, python-format
 msgid ""
-"Here is the %(x_action)s function list for %(x_doctype)s documents at level "
-"%(x_step)s"
+"Here is the %(x_action)s function list for %(x_doctype)s documents at "
+"level %(x_step)s"
 msgstr ""
 
 #: invenio/legacy/websubmit/templates.py:1041
@@ -11873,9 +11938,9 @@ msgstr "Seznam rozhodčího typů dokumentů"
 #: invenio/legacy/websubmit/templates.py:1479
 #, fuzzy
 msgid ""
-"Select one of the following types of documents to check the documents status"
-msgstr ""
-"Vyberte jednu z následujících typů dokumentů pro kontrolu dokumentů stav"
+"Select one of the following types of documents to check the documents "
+"status"
+msgstr "Vyberte jednu z následujících typů dokumentů pro kontrolu dokumentů stav"
 
 #: invenio/legacy/websubmit/templates.py:1447
 #, fuzzy
@@ -12019,11 +12084,10 @@ msgstr "Poznámka pro schválení:"
 
 #: invenio/legacy/websubmit/templates.py:2139
 #, fuzzy, python-format
-msgid ""
-"This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s."
+msgid "This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s."
 msgstr ""
-"Tento dokument je stále%(x_fmt_open) swaiting pro schvalování"
-"%(x_fmt_close) s."
+"Tento dokument je stále%(x_fmt_open) swaiting pro "
+"schvalování%(x_fmt_close) s."
 
 #: invenio/legacy/websubmit/templates.py:2142
 #: invenio/legacy/websubmit/templates.py:2163
@@ -12123,8 +12187,8 @@ msgstr "Vyber znalce"
 
 #: invenio/legacy/websubmit/templates.py:2278
 msgid ""
-"The referee has sent his final recommendations to the publication committee "
-"on the "
+"The referee has sent his final recommendations to the publication "
+"committee on the "
 msgstr ""
 
 #: invenio/legacy/websubmit/templates.py:2281
@@ -12143,8 +12207,8 @@ msgstr "Odeslat doporučení"
 #: invenio/legacy/websubmit/templates.py:2288
 #: invenio/legacy/websubmit/templates.py:2356
 msgid ""
-"The publication committee has sent his final recommendations to the project "
-"leader on the "
+"The publication committee has sent his final recommendations to the "
+"project leader on the "
 msgstr ""
 
 #: invenio/legacy/websubmit/templates.py:2291
@@ -12190,8 +12254,7 @@ msgstr "Přijmout rozhodnutí"
 
 #: invenio/legacy/websubmit/templates.py:2321
 #, fuzzy
-msgid ""
-"An editorial board has been selected by the publication committee on the "
+msgid "An editorial board has been selected by the publication committee on the "
 msgstr "Redakční rada byla vybrána publikace výboru"
 
 #: invenio/legacy/websubmit/templates.py:2323
@@ -12214,13 +12277,14 @@ msgstr "Znalec byl vybrán redakční radou dne"
 
 #: invenio/legacy/websubmit/templates.py:2340
 msgid ""
-"The referee has sent his final recommendations to the editorial board on the "
+"The referee has sent his final recommendations to the editorial board on "
+"the "
 msgstr "Znalec poslal své závěrečné doporučení redakční radě"
 
 #: invenio/legacy/websubmit/templates.py:2348
 msgid ""
-"The editorial board has sent his final recommendations to the publication "
-"committee on the "
+"The editorial board has sent his final recommendations to the publication"
+" committee on the "
 msgstr ""
 
 #: invenio/legacy/websubmit/templates.py:2350
@@ -12339,9 +12403,10 @@ msgstr ""
 
 #: invenio/legacy/websubmit/functions/Shared_Functions.py:208
 msgid ""
-"Because of a human intervention or a temporary problem, the task queue is "
-"currently set to the manual mode. Your submission is well registered but may "
-"take longer than usual before it is fully integrated and searchable.\n"
+"Because of a human intervention or a temporary problem, the task queue is"
+" currently set to the manual mode. Your submission is well registered but"
+" may take longer than usual before it is fully integrated and searchable."
+"\n"
 msgstr ""
 
 #: invenio/legacy/websubmit/web/approve.py:53
@@ -12639,8 +12704,8 @@ msgstr ""
 
 #: invenio/modules/access/templates/access/admin/rolearea_base.html:56
 msgid ""
-"see all the information attached to a role and decide if you want to delete "
-"it."
+"see all the information attached to a role and decide if you want to "
+"delete it."
 msgstr ""
 
 #: invenio/modules/access/templates/access/admin/rolearea_base.html:74
@@ -12683,6 +12748,11 @@ msgstr "připojeno"
 #, fuzzy
 msgid "Role details"
 msgstr "Další podrobnosti"
+
+#: invenio/modules/access/templates/access/admin/showroledetails_base.html:52
+#, fuzzy
+msgid "Id"
+msgstr "Příručka"
 
 #: invenio/modules/access/templates/access/admin/showroledetails_base.html:58
 msgid "Firewall like role definition"
@@ -12798,8 +12868,8 @@ msgstr "Daná e-mailová adresa %s již existuje v databázi."
 #: invenio/modules/accounts/forms.py:94
 #, python-format
 msgid ""
-"Note that if you have changed your email address, you                 will "
-"have to <a href=%(link)s>reset</a> your password anew."
+"Note that if you have changed your email address, you                 "
+"will have to <a href=%(link)s>reset</a> your password anew."
 msgstr ""
 
 #: invenio/modules/accounts/forms.py:117
@@ -12864,8 +12934,9 @@ msgstr ""
 #: invenio/modules/accounts/templates/accounts/logout_base.html:26
 #, python-format
 msgid ""
-"You are still recognized by the centralized %(x_fmt_open)sSSO%(x_fmt_close)s "
-"system. You can %(x_url_open)slogout from SSO%(x_url_close)s, too."
+"You are still recognized by the centralized "
+"%(x_fmt_open)sSSO%(x_fmt_close)s system. You can %(x_url_open)slogout "
+"from SSO%(x_url_close)s, too."
 msgstr ""
 
 #: invenio/modules/accounts/templates/accounts/logout_base.html:34
@@ -12889,8 +12960,8 @@ msgstr "Nastavení nového hesla"
 #: invenio/modules/accounts/templates/accounts/settings/lost_base.html:26
 #, fuzzy
 msgid ""
-"Please enter your email address. You will receive a link to create a  new "
-"password via email."
+"Please enter your email address. You will receive a link to create a  new"
+" password via email."
 msgstr "Prosím, zadejte svou e-mailovou adresu, přezdívku a heslo:"
 
 #: invenio/modules/accounts/templates/accounts/settings/profile_base.html:38
@@ -12963,7 +13034,8 @@ msgstr "Úprava bibcatalog povolení se nezdařila"
 
 #: invenio/modules/accounts/views/accounts.py:322
 msgid ""
-"Your email address has been validated, and you can now proceed to  sign-in."
+"Your email address has been validated, and you can now proceed to  sign-"
+"in."
 msgstr ""
 
 #: invenio/modules/accounts/views/accounts.py:328
@@ -13035,12 +13107,13 @@ msgstr ""
 
 #: invenio/modules/annotations/noteutils.py:58
 msgid ""
-"To add an annotation use the following syntax:<br>P.1: an annotation on page "
-"one<br>P.1,2,3: an annotation on pages one to three<br>F.2a: an annotation "
-"on subfigure 2a<br>S.1.2: an annotation on subsection 1.2<br>P.1: T.2: L.3: "
-"an annotation on the third line of table two, which appears on the first "
-"page<br>G: an annotation on the general aspect of the paper<br>R.[Ellis98]: "
-"an annotation on a reference<br><br>The available markers are:"
+"To add an annotation use the following syntax:<br>P.1: an annotation on "
+"page one<br>P.1,2,3: an annotation on pages one to three<br>F.2a: an "
+"annotation on subfigure 2a<br>S.1.2: an annotation on subsection "
+"1.2<br>P.1: T.2: L.3: an annotation on the third line of table two, which"
+" appears on the first page<br>G: an annotation on the general aspect of "
+"the paper<br>R.[Ellis98]: an annotation on a reference<br><br>The "
+"available markers are:"
 msgstr ""
 
 #: invenio/modules/annotations/views.py:94
@@ -13049,9 +13122,9 @@ msgstr ""
 
 #: invenio/modules/annotations/views.py:182
 msgid ""
-"This is a summary of all the comments that includes only "
-"the                  existing annotations. The full discussion is "
-"available                  <a href=\"\">here</a>."
+"This is a summary of all the comments that includes only the"
+"                  existing annotations. The full discussion is available"
+"                  <a href=\"\">here</a>."
 msgstr ""
 
 #: invenio/modules/annotations/static/js/annotations/pdf_notes_helpers.js:95
@@ -13226,7 +13299,8 @@ msgstr "kolekce"
 #: invenio/modules/cloudconnector/views.py:49
 #, python-format
 msgid ""
-"Click <a href=\"%(url)s\">here</a> to connect your account with %(service)s."
+"Click <a href=\"%(url)s\">here</a> to connect your account with "
+"%(service)s."
 msgstr ""
 
 #: invenio/modules/cloudconnector/views.py:59
@@ -13318,8 +13392,8 @@ msgstr "Promiňte, jste již hlasoval. Toto hlasování nebylo zaznamenáno. "
 
 #: invenio/modules/comments/api.py:283
 msgid ""
-"You have been subscribed to this discussion. From now on, you will receive "
-"an email whenever a new comment is posted."
+"You have been subscribed to this discussion. From now on, you will "
+"receive an email whenever a new comment is posted."
 msgstr ""
 
 #: invenio/modules/comments/api.py:290
@@ -13411,11 +13485,11 @@ msgstr "Záznam ID%s není číslo."
 #: invenio/modules/comments/forms.py:38 invenio/modules/messages/forms.py:80
 #, fuzzy
 msgid ""
-"Your message is too long, please edit it. Maximum size allowed is %{length}i "
-"characters."
+"Your message is too long, please edit it. Maximum size allowed is "
+"%{length}i characters."
 msgstr ""
-"Vaše zpráva je příliš dlouhá, upravte ji. Maximální povolená velikost je %i "
-"znaků."
+"Vaše zpráva je příliš dlouhá, upravte ji. Maximální povolená velikost je "
+"%i znaků."
 
 #: invenio/modules/comments/forms.py:55
 #, fuzzy
@@ -13516,8 +13590,9 @@ msgstr ""
 
 #: invenio/modules/communities/forms.py:96
 msgid ""
-"Required. Only letters, numbers and dash are allowed. The identifier is used "
-"in the URL for the community collection, and cannot be modified later."
+"Required. Only letters, numbers and dash are allowed. The identifier is "
+"used in the URL for the community collection, and cannot be modified "
+"later."
 msgstr ""
 
 #: invenio/modules/communities/forms.py:102
@@ -13536,8 +13611,8 @@ msgstr ""
 
 #: invenio/modules/communities/forms.py:122
 msgid ""
-"Optional. Please describe short and precise the policy by which you accepted/"
-"reject new uploads in this community."
+"Optional. Please describe short and precise the policy by which you "
+"accepted/reject new uploads in this community."
 msgstr ""
 
 #: invenio/modules/communities/forms.py:128
@@ -13603,7 +13678,8 @@ msgstr "recenze"
 #, python-format
 msgid ""
 "This is a preview of your upload. The public version is available on "
-"%(x_link)s. If you want to remove your upload, please contact %(x_contact)s"
+"%(x_link)s. If you want to remove your upload, please contact "
+"%(x_contact)s"
 msgstr ""
 
 #: invenio/modules/deposit/templates/deposit/deposition_type_base.html:27
@@ -13643,7 +13719,8 @@ msgstr ""
 #: invenio/modules/deposit/templates/deposit/edit_action_bar_base.html:24
 #: invenio/modules/deposit/templates/deposit/run_action_bar_base.html:25
 msgid ""
-"Press \"Save\" to save your upload for editing later, as many times you like."
+"Press \"Save\" to save your upload for editing later, as many times you "
+"like."
 msgstr ""
 
 #: invenio/modules/deposit/templates/deposit/edit_action_bar_base.html:25
@@ -13775,6 +13852,11 @@ msgstr ""
 msgid "Checking status"
 msgstr "Sklizeň stav"
 
+#: invenio/modules/editor/templates/editor/ticketsmenu.html:22
+#, fuzzy
+msgid "Tickets"
+msgstr "Vaše oznámení"
+
 #: invenio/modules/editor/templates/editor/ticketsmenu.html:26
 #, fuzzy
 msgid "loading"
@@ -13809,8 +13891,8 @@ msgstr ""
 #: invenio/modules/encoder/batch_engine.py:125
 #, python-format
 msgid ""
-"You might want to take a look at  %(guidelines_url)s and modify or redo your "
-"submission."
+"You might want to take a look at  %(guidelines_url)s and modify or redo "
+"your submission."
 msgstr ""
 
 #: invenio/modules/encoder/batch_engine.py:136
@@ -13831,8 +13913,8 @@ msgstr "Index slov není k dispozici pro %s."
 #: invenio/modules/encoder/batch_engine.py:166
 #, python-format
 msgid ""
-"If the videos quality is not as expected, you might want to take a look at "
-"%(guidelines_url)s and modify or redo your submission."
+"If the videos quality is not as expected, you might want to take a look "
+"at %(guidelines_url)s and modify or redo your submission."
 msgstr ""
 
 #: invenio/modules/formatter/engine.py:374
@@ -13848,7 +13930,8 @@ msgstr "Validace formátu elementu %s"
 #: invenio/modules/formatter/engine.py:878
 #, python-format
 msgid ""
-"Error when evaluating format element %(x_name)s with parameters %(x_params)s."
+"Error when evaluating format element %(x_name)s with parameters "
+"%(x_params)s."
 msgstr ""
 
 #: invenio/modules/formatter/engine.py:887
@@ -14164,8 +14247,8 @@ msgstr "Správa skupinových práv"
 #: invenio/modules/groups/views.py:223
 #, fuzzy, python-format
 msgid ""
-"Sorry, you don't have enough right to be able to manage the group \"%(name)s"
-"\""
+"Sorry, you don't have enough right to be able to manage the group "
+"\"%(name)s\""
 msgstr "Omlouváme se, tato kolekce ješte neobsahuje žádné záznamy."
 
 #: invenio/modules/groups/views.py:279
@@ -14406,9 +14489,9 @@ msgstr "Typ souboru"
 #: invenio/modules/oauth2server/forms.py:151
 msgid ""
 "Select confidential if your application is capable of keeping the issued "
-"client secret confidential (e.g. a web application), select public if your "
-"application cannot (e.g. a browser-based JavaScript application). If you "
-"select public, your application MUST validate the redirect URI."
+"client secret confidential (e.g. a web application), select public if "
+"your application cannot (e.g. a browser-based JavaScript application). If"
+" you select public, your application MUST validate the redirect URI."
 msgstr ""
 
 #: invenio/modules/oauth2server/forms.py:158
@@ -14492,8 +14575,8 @@ msgstr ""
 #: invenio/modules/oauthclient/templates/oauthclient/signup_base.html:34
 #, fuzzy
 msgid ""
-"Fill in your details to complete your registration. You only have to do this "
-"once."
+"Fill in your details to complete your registration. You only have to do "
+"this once."
 msgstr "Chcete-li dokončit tento účet registraci naleznete na:"
 
 #: invenio/modules/oauthclient/templates/oauthclient/signup_base.html:44
@@ -14973,6 +15056,11 @@ msgstr ""
 msgid "Saving..."
 msgstr "Nahrát"
 
+#: invenio/modules/tags/templates/tags/tag_popover_content_base.html:46
+#, fuzzy
+msgid "Done"
+msgstr "Žádný"
+
 #: invenio/modules/tags/templates/tags/tag_popover_title_base.html:24
 #, fuzzy
 msgid "(browse tagged records)"
@@ -15014,7 +15102,8 @@ msgstr "Možnosti vypůjčky"
 
 #: invenio/modules/workflows/templates/workflows/index.html:25
 msgid ""
-"Here is a list of actions remaining to be resolved grouped by type of action"
+"Here is a list of actions remaining to be resolved grouped by type of "
+"action"
 msgstr ""
 
 #: invenio/modules/workflows/templates/workflows/index.html:25
@@ -15281,1223 +15370,3 @@ msgstr "jakýkoli rok"
 #, fuzzy
 msgid " years ago"
 msgstr "Rok"
-
-#~ msgid "BibCheck Admin"
-#~ msgstr "BibCheck Administrátor"
-
-#~ msgid "Not authorized"
-#~ msgstr "Není povoleno"
-
-#~ msgid "Limit to knowledge bases containing string:"
-#~ msgstr "Omezit na znalostní báze, které obsahují řetězec:"
-
-#~ msgid "Really delete"
-#~ msgstr "Opravdu smazat"
-
-#~ msgid "Verify syntax"
-#~ msgstr "Ověření syntaxe"
-
-#~ msgid "Calling bibcheck -verify failed."
-#~ msgstr "Volání bibcheck - ověření se nezdařilo."
-
-#~ msgid "Verify BibCheck config file"
-#~ msgstr "Ověřte BibCheck konfigurační soubor"
-
-#~ msgid "Verify problem"
-#~ msgstr "Ověřit problém"
-
-#~ msgid "File"
-#~ msgstr "Soubor"
-
-#~ msgid "Edit BibCheck config file"
-#~ msgstr "Úpravy BibCheck config file"
-
-#~ msgid "Save BibCheck config file"
-#~ msgstr "Uložit BibCheck konfigurační soubor"
-
-#~ msgid "Delete BibCheck config file"
-#~ msgstr "Smazat BibCheck konfigurační soubor"
-
-#~ msgid "Id"
-#~ msgstr "Id"
-
-#~ msgid "Tickets"
-#~ msgstr "název"
-
-#~ msgid "Done"
-#~ msgstr "květen"
-
-#~ msgid "Warning: Please, select a valid time"
-#~ msgstr "Varování: Prosím, vyberte platný čas"
-
-#~ msgid "Warning: Please, select a valid file"
-#~ msgstr "Varování: Prosím, vyberte platný soubor"
-
-#~ msgid "Warning: The date format is not correct"
-#~ msgstr "Varování: Formát data není správný"
-
-#~ msgid "Warning: Please, select a valid date"
-#~ msgstr "Varování: Prosím, vyberte platné datum"
-
-#~ msgid "Invalid MARCXML"
-#~ msgstr "Neplatný MARCXML"
-
-#~ msgid " or return to your %(x_url_open)ssearch%(x_url_close)s"
-#~ msgstr "Nebo se vrátit ke svému%(x_url_open) ssearch%(x_url_close) s"
-
-#~ msgid "*** basket name ***"
-#~ msgstr "*** název košíku ***"
-
-#~ msgid "%(x_name)s"
-#~ msgstr "%(x_name)s"
-
-#~ msgid "Additional Citation Metrics"
-#~ msgstr "Další citační metriky"
-
-#~ msgid "Sorry, you must log in to perform this action."
-#~ msgstr "Je mi líto, musíte se přihlásit k provedení této akce."
-
-#~ msgid "Please log in first."
-#~ msgstr "Prosím, nejdříve se přihlašte."
-
-#~ msgid "Use the top-right menu to log in."
-#~ msgstr "Použijte pravé horní menu pro přihlášení."
-
-#~ msgid "record"
-#~ msgstr "záznam"
-
-#~ msgid "document"
-#~ msgstr "dokument"
-
-#~ msgid "Sorry parameter missing..."
-#~ msgstr "Je mi líto parametr chybí ..."
-
-#~ msgid "Next Step"
-#~ msgstr "Další krok"
-
-#~ msgid "Acquisitions"
-#~ msgstr "kolekce"
-
-#~ msgid "Order new book"
-#~ msgstr "košíky"
-
-#~ msgid "Renewalls"
-#~ msgstr "více"
-
-#~ msgid "A new loan has been registered."
-#~ msgstr "Záznam byl vymazán."
-
-#~ msgid "Associate barcode"
-#~ msgstr "Přidružený čárový kód"
-
-#~ msgid "No hold requests waiting."
-#~ msgstr "Ne držet čekající žádosti."
-
-#~ msgid "Select hold request"
-#~ msgstr "košíky"
-
-#~ msgid "Barcode(s)"
-#~ msgstr "Čárový(é) kód(y)"
-
-#~ msgid "Order new copy"
-#~ msgstr "Objednat novou kopii"
-
-#~ msgid "Book Information"
-#~ msgstr "O knize"
-
-#~ msgid "EAN"
-#~ msgstr "EAN"
-
-#~ msgid "Publication place"
-#~ msgstr "Místo publikace"
-
-#~ msgid "Number of pages"
-#~ msgstr "Počet stránek"
-
-#~ msgid "Sub-library"
-#~ msgstr "únor"
-
-#~ msgid "CERN Central Library"
-#~ msgstr "CERN Ústřední knihovna"
-
-#~ msgid "Order details"
-#~ msgstr "Detaily objednávky"
-
-#~ msgid "Price"
-#~ msgstr "Cena"
-
-#~ msgid "Ordered date"
-#~ msgstr "Datum objednání"
-
-#~ msgid "Notes about acquisition"
-#~ msgstr "Poznámky k získání"
-
-#~ msgid "A new ILL request has been registered with success."
-#~ msgstr "Nová ILL žádost byla úspěšně zaregistrována."
-
-#~ msgid "Purchase information updated with success."
-#~ msgstr "Informace o nákupu úspěšně aktualizovany."
-
-#~ msgid "the beginning"
-#~ msgstr "začátek"
-
-#~ msgid "now"
-#~ msgstr "nyní"
-
-#~ msgid "ERROR: %s does not exist"
-#~ msgstr "Chyba: %s neexistuje"
-
-#~ msgid "ERROR: %s is not a directory"
-#~ msgstr "Chyba: %s není adresář"
-
-#~ msgid "ERROR: %s is not writable"
-#~ msgstr "Chyba: %s není zapisovatelný"
-
-#~ msgid "File %s already exists."
-#~ msgstr "Soubor %s již existuje."
-
-#~ msgid "File %s: written OK."
-#~ msgstr "Soubor %s: zapsán vpořádku."
-
-#~ msgid "File %s: write failed."
-#~ msgstr "Soubor %s: chyba při zápisu."
-
-#~ msgid "File %s deleted."
-#~ msgstr "Soubor %s odstraněn."
-
-#~ msgid "File %s: delete failed."
-#~ msgstr "Soubor %s: smazání nezdařilo."
-
-#~ msgid "Guests are not authorized to run batchuploader"
-#~ msgstr "Hosté nejsou oprávněni provozovat batchuploader"
-
-#~ msgid "The user '%s' is not authorized to run batchuploader"
-#~ msgstr "Uživatel '%s' není oprávněn provozovat batchuploader"
-
-#~ msgid "Papers removed from this profile"
-#~ msgstr "Papíry odstraněn z profilu"
-
-#~ msgid "Papers in need of review"
-#~ msgstr "Papíry, které potřebují revizi"
-
-#~ msgid "Open Tickets"
-#~ msgstr "košíky"
-
-#~ msgid "Papers of this Person"
-#~ msgstr "Papíry této osoby"
-
-#~ msgid "Papers _not_ of this Person"
-#~ msgstr "Papíry _neinstalujete_ této osoby"
-
-#~ msgid "Tickets for this Person"
-#~ msgstr "Vstupenky na tuto osobu"
-
-#~ msgid "Additional Data for this Person"
-#~ msgstr "Další údaje o této osobě"
-
-#~ msgid "Yes, those papers are by this person."
-#~ msgstr "Ano, tyto dokumenty jsou od této osoby."
-
-#~ msgid "No, those papers are not by this person"
-#~ msgstr "Ne, tyto pokyny nejsou touto osobou"
-
-#~ msgid "Assign to other person"
-#~ msgstr "Přiřadit jiné osobě"
-
-#~ msgid "Forget decision"
-#~ msgstr "Zapomeň na rozhodnutí."
-
-#~ msgid "Confirm!"
-#~ msgstr "Potvrďte!"
-
-#~ msgid "Yes, this paper is by this person."
-#~ msgstr "Ano, tento článek je o této osobě."
-
-#~ msgid "Rejected!"
-#~ msgstr "Zamítnuto!"
-
-#~ msgid "To other person!"
-#~ msgstr "Na jinou osobu!"
-
-#~ msgid "Confirmed."
-#~ msgstr "Potvrzeno."
-
-#~ msgid "Marked as this person's paper"
-#~ msgstr "Označeno jako esej této osoby"
-
-#~ msgid "Forget decision!"
-#~ msgstr "Zapomeň toto rozhodnutí!"
-
-#~ msgid "Forget decision."
-#~ msgstr "Zapomeň toto rozhodnutí."
-
-#~ msgid "Repeal!"
-#~ msgstr "Zrušení!"
-
-#~ msgid "Repealed"
-#~ msgstr "Zrušeno"
-
-#~ msgid "Marked as not this person's paper"
-#~ msgstr "Označena jako této osoby papíru"
-
-#~ msgid "Your papers"
-#~ msgstr "Vaše eseje"
-
-#~ msgid "Not your papers"
-#~ msgstr "Cizí eseje"
-
-#~ msgid "These are mine!"
-#~ msgstr "Tyto jsou moje!"
-
-#~ msgid "These are not mine!"
-#~ msgstr "Tyto nejsou moje!"
-
-#~ msgid "It's not mine, but I know whose it is!"
-#~ msgstr "Toto není moje, ale já vím, čí je to!"
-
-#~ msgid "Mine!"
-#~ msgstr "Moje!"
-
-#~ msgid "This is not my paper!"
-#~ msgstr "To není moje práce!"
-
-#~ msgid "Not Mine."
-#~ msgstr "Není moje."
-
-#~ msgid "Marked as my paper!"
-#~ msgstr "Označen jako moje práce!"
-
-#~ msgid "Forget assignment decision"
-#~ msgstr "Zapomeň na přiřazení rozhodnutí"
-
-#~ msgid "Not Mine!"
-#~ msgstr "Není moje!"
-
-#~ msgid "But this is mine!"
-#~ msgstr "Ale toto je moje!"
-
-#~ msgid "But this is my paper!"
-#~ msgstr "Ale tohle je moje práce!"
-
-#~ msgid "Marked as not your paper."
-#~ msgstr "Označena jako papíru."
-
-#~ msgid "Tickes you created about this person"
-#~ msgstr "Tickes jste vytvořili o této osobě"
-
-#~ msgid "Request Tickets"
-#~ msgstr "host"
-
-#~ msgid "Submit Attribution Information"
-#~ msgstr "Odeslat Attribution informace"
-
-#~ msgid "Please review your actions"
-#~ msgstr "košíky"
-
-#~ msgid "Person search for assignment in progress!"
-#~ msgstr "Osoba hledání přiřazení v pokrok!"
-
-#~ msgid "You are searching for a person to assign the following papers:"
-#~ msgstr "Ty hledají pro osobu přiřadit následující dokumenty:"
-
-#~ msgid "You are going to claim papers for: %s"
-#~ msgstr "Ty si vyžádá podklady pro:%s"
-
-#~ msgid "Welcome!"
-#~ msgstr "Vítejte!"
-
-#~ msgid "You are about to attribute the following paper"
-#~ msgstr "Chystáte se přispět následujícím článkem"
-
-#~ msgid "Info"
-#~ msgstr "Info"
-
-#~ msgid "Names variants:"
-#~ msgstr "Varianty jména:"
-
-#~ msgid "... This tab is currently under construction ... "
-#~ msgstr "... Tato karta je v současné době ve výstavbě ... "
-
-#~ msgid "Navigation:"
-#~ msgstr "Navigace:"
-
-#~ msgid "Run paper attribution for another author"
-#~ msgstr "Spustit papíru autorství jiného autora"
-
-#~ msgid "Person Interface FAQ"
-#~ msgstr "Vnitřní Chyba"
-
-#~ msgid "Person Search"
-#~ msgstr "Hledání osoby"
-
-#~ msgid "Open tickets"
-#~ msgstr "název"
-
-#~ msgid "Please Check your entries"
-#~ msgstr "Zkontrolujte si prosím vaše údaje"
-
-#~ msgid "Sorry."
-#~ msgstr "Setřídit podle:"
-
-#~ msgid "Please provide at least one transaction."
-#~ msgstr "Prosím, uveďte alespoň jednu transakci."
-
-#~ msgid "Error:"
-#~ msgstr "Chyba:"
-
-#~ msgid "We do not have a publication list for '%s'."
-#~ msgstr "Nemáme seznam publikací pro '%s'."
-
-#~ msgid "Create a new Person for your search"
-#~ msgstr "Kolekcia %s Nenalezena"
-
-#~ msgid "YES!"
-#~ msgstr "ANO!"
-
-#~ msgid " Attribute Papers To "
-#~ msgstr "Papíry do atributu"
-
-#~ msgid "Correct my publication lists!"
-#~ msgstr "Opravit moje publikační seznamy!"
-
-#~ msgid "This book is sent to you ..."
-#~ msgstr "Tato kniha je odeslán na vás ..."
-
-#~ msgid "0 borrower(s) found."
-#~ msgstr "Hledej v %s záznamech:"
-
-#~ msgid "You can see your loans "
-#~ msgstr "Můžete vidět své úvěry"
-
-#~ msgid "."
-#~ msgstr "."
-
-#~ msgid "There %s request(s) on the book who has been returned."
-#~ msgstr "Existuje%s požadavek (y) na knize, která byla vrácena."
-
-#~ msgid "Hold requests and loans overview on"
-#~ msgstr "Držte požadavky a úvěry přehled o"
-
-#~ msgid "Library(ies)"
-#~ msgstr "Knihovna(y)"
-
-#~ msgid "new copy"
-#~ msgstr "nová kopie"
-
-#~ msgid "A %s has been added."
-#~ msgstr "Záznam byl vymazán."
-
-#~ msgid "0 library(ies) found."
-#~ msgstr "0 knihovna (y) nalézt."
-
-#~ msgid "Back borrower's loans"
-#~ msgstr "Vrátit uživatelovi výpůčky"
-
-#~ msgid "period_of_interest_from"
-#~ msgstr "období_zájmu_od"
-
-#~ msgid "jsCal3"
-#~ msgstr "jsCal3"
-
-#~ msgid "period_of_interest_to"
-#~ msgstr "období_zájmu_do"
-
-#~ msgid "jsCal4"
-#~ msgstr "jsCal4"
-
-#~ msgid "Borrower wants only this edition?"
-#~ msgstr "Dlužník chce jen toto vydání?"
-
-#~ msgid "jsCal1"
-#~ msgstr "jsCal1"
-
-#~ msgid "jsCal2"
-#~ msgstr "jsCal2"
-
-#~ msgid "Volume, Issue, Page"
-#~ msgstr "Ročník, číslo, strana"
-
-#~ msgid "Barcoce"
-#~ msgstr "Čárový kód"
-
-#~ msgid "An ILL request has been updated with success."
-#~ msgstr "ILL žádost byla úspěšně aktualizována."
-
-#~ msgid "Check if the book already exists on Invenio,"
-#~ msgstr "Zkontrolujte, zda kniha již existuje v Invenio,"
-
-#~ msgid "Book does not exists on Invenio. Please fill the following form."
-#~ msgstr "Kniha neexistuje v Invenio. Vyplňte prosím následující formulář."
-
-#~ msgid "No fulltext"
-#~ msgstr "plný text"
-
-#~ msgid "last note on"
-#~ msgstr "konto"
-
-#~ msgid ", no notes yet"
-#~ msgstr "duben"
-
-#~ msgid "HTML brief"
-#~ msgstr "stručný"
-
-#~ msgid "deleted"
-#~ msgstr "chráněno"
-
-#~ msgid "in their rules and descriptions"
-#~ msgstr "Posledně přidáno:"
-
-#~ msgid "No such knowledge base"
-#~ msgstr "košíky"
-
-#~ msgid "Time:"
-#~ msgstr "název"
-
-#~ msgid "are mandatory"
-#~ msgstr "jakýkoli den"
-
-#~ msgid "are mandatory."
-#~ msgstr "jakýkoli den"
-
-#~ msgid "Configure Bibknowledge"
-#~ msgstr "Hledej"
-
-#~ msgid "creating a new basket"
-#~ msgstr "košíky"
-
-#~ msgid "on"
-#~ msgstr "květen"
-
-#~ msgid "basket"
-#~ msgstr "košíky"
-
-#~ msgid "previous basket"
-#~ msgstr "košíky"
-
-#~ msgid "Adding"
-#~ msgstr "Agenda"
-
-#~ msgid "Please choose a basket"
-#~ msgstr "košíky"
-
-#~ msgid "Editing basket"
-#~ msgstr "košíky"
-
-#~ msgid "Editing topic"
-#~ msgstr "košíky"
-
-#~ msgid "Edit this item"
-#~ msgstr "košíky"
-
-#~ msgid "Submit and save record %s"
-#~ msgstr "Podobné záznamy"
-
-#~ msgid "updated on"
-#~ msgstr "Poslední aktualizace"
-
-#~ msgid "records"
-#~ msgstr "Podobné záznamy"
-
-#~ msgid "Non-shared basket"
-#~ msgstr "košíky"
-
-#~ msgid "Group-shared basket"
-#~ msgstr "košíky"
-
-#~ msgid "View comments"
-#~ msgstr "konto"
-
-#~ msgid "Select basket"
-#~ msgstr "košíky"
-
-#~ msgid "%i baskets"
-#~ msgstr "košíky"
-
-#~ msgid "Add to a group-shared basket"
-#~ msgstr "košíky"
-
-#~ msgid "Delete Comments"
-#~ msgstr "konto"
-
-#~ msgid "ADD TO BASKET"
-#~ msgstr "PŘIDAT DO KOŠÍKU"
-
-#~ msgid "Frequently publishes in:"
-#~ msgstr "přidání"
-
-#~ msgid "The collection to which this file belong is restricted: "
-#~ msgstr "Obsah této kolekce je chráněn."
-
-#~ msgid "This record does not exist. Please try another record ID."
-#~ msgstr "Záznam byl vymazán."
-
-#~ msgid "Move up"
-#~ msgstr "více"
-
-#~ msgid "Move down"
-#~ msgstr "více"
-
-#~ msgid "Verbose"
-#~ msgstr "Prolistuj"
-
-#~ msgid "Edit current version"
-#~ msgstr "košíky"
-
-#~ msgid "View revision"
-#~ msgstr "oddělení"
-
-#~ msgid "Back to BibEdit"
-#~ msgstr "košíky"
-
-#~ msgid "select_from1"
-#~ msgstr "košíky"
-
-#~ msgid "select_to1"
-#~ msgstr "košíky"
-
-#~ msgid "last page >>|"
-#~ msgstr "Poslední aktualizace"
-
-#~ msgid "session"
-#~ msgstr "seance"
-
-#~ msgid "alerts"
-#~ msgstr "avíza"
-
-#~ msgid "account"
-#~ msgstr "konto"
-
-#~ msgid "approvals"
-#~ msgstr "schválení"
-
-#~ msgid "link"
-#~ msgstr "v"
-
-#~ msgid "Alert sent successfully!"
-#~ msgstr "konto"
-
-#~ msgid "   Username/Email: %s\n"
-#~ msgstr "avíza"
-
-#~ msgid "Article Error"
-#~ msgstr "duben"
-
-#~ msgid "%s Personalize, Main page"
-#~ msgstr "Personalizace"
-
-#~ msgid "%s , personalize"
-#~ msgstr "Personalizace"
-
-#~ msgid "Agenda"
-#~ msgstr "Agenda"
-
-#~ msgid "Search Help"
-#~ msgstr "Nápověda pro vyhledávaní"
-
-#~ msgid "Format:"
-#~ msgstr "více"
-
-#~ msgid "username"
-#~ msgstr "avíza"
-
-#~ msgid "You seem to be %(x_role)s."
-#~ msgstr "Hledaný výraz <em>%s</em>"
-
-#~ msgid "Try your search on..."
-#~ msgstr "Zkuste hledat na..."
-
-#~ msgid "%(num)s results found"
-#~ msgstr "Hledej v %s záznamech:"
-
-#~ msgid "No result found"
-#~ msgstr "Kolekcia %s Nenalezena"
-
-#~ msgid "user #%i"
-#~ msgstr "avíza"
-
-#~ msgid "Sort by"
-#~ msgstr "Setřídit podle:"
-
-#~ msgid "Please Select:"
-#~ msgstr "košíky"
-
-#~ msgid "All of the words"
-#~ msgstr "Všechna tato slova:"
-
-#~ msgid "Any of the words"
-#~ msgstr "Jedno ze slov:"
-
-#~ msgid "Exact phrase"
-#~ msgstr "Přesná věta:"
-
-#~ msgid "Partial phrase"
-#~ msgstr "Částečná věta:"
-
-#~ msgid "Regular expression"
-#~ msgstr "Regulární výraz:"
-
-#~ msgid "Added since"
-#~ msgstr "Přidánо od:"
-
-#~ msgid "your submissions"
-#~ msgstr "přidání"
-
-#~ msgid "Create New Group"
-#~ msgstr "košíky"
-
-#~ msgid "Submission no(1)"
-#~ msgstr "přidání"
-
-#~ msgid "pending"
-#~ msgstr "Agenda"
-
-#~ msgid "Detailed record #%s"
-#~ msgstr "Úplný záznam"
-
-#~ msgid "Search term <em>%s</em>"
-#~ msgstr "Hledaný výraz <em>%s</em>"
-
-#~ msgid "inside <em>%s</em> index"
-#~ msgstr "v indexu <em>%s</em>"
-
-#~ msgid "Article:"
-#~ msgstr "duben"
-
-#~ msgid "(Report abuse)"
-#~ msgstr "září"
-
-#~ msgid "detailed list"
-#~ msgstr "podrobný"
-
-#~ msgid "your searches"
-#~ msgstr "Zkuste hledat na..."
-
-#~ msgid "%i others' baskets"
-#~ msgstr "košíky"
-
-#~ msgid "Export as"
-#~ msgstr "Exportovat jako"
-
-#~ msgid "Search Services"
-#~ msgstr "Tipy pro vyhledávaní"
-
-#~ msgid "Citation Metrics"
-#~ msgstr "Citační historie"
-
-#~ msgid "WebSearch Admin Guide"
-#~ msgstr "WebSearch Průvodce pro správce"
-
-#~ msgid "Submit Guide"
-#~ msgstr "Nápověda pro přidávání"
-
-#~ msgid "Add to personal basket"
-#~ msgstr "Přidat do osobního košíku"
-
-#~ msgid "WebSubmit Admin Guide"
-#~ msgstr "WebSubmit Průvodce pro správce"
-
-#~ msgid "Click here to review the transactions."
-#~ msgstr "Klikněte zde pro přehled transakcí."
-
-#~ msgid "Quit searching."
-#~ msgstr "Ukončete vyhledávání."
-
-#~ msgid "Cancel merging"
-#~ msgstr "Zrušeno"
-
-#~ msgid "Search for a person to assign the paper to"
-#~ msgstr " Vyhledávání osob přispívající k práci"
-
-#~ msgid "Select All"
-#~ msgstr "Vybrat vše"
-
-#~ msgid "Select None"
-#~ msgstr "Nevybrat nic"
-
-#~ msgid "Invert Selection"
-#~ msgstr "Invertovat výběr"
-
-#~ msgid "Hide successful claims"
-#~ msgstr "Skrýt úspěšné nároky"
-
-#~ msgid "Author Name"
-#~ msgstr "Autor"
-
-#~ msgid "Experiment"
-#~ msgstr "experiment"
-
-#~ msgid "Not assigned"
-#~ msgstr "Není moje!"
-
-#~ msgid "No status information found."
-#~ msgstr "Žádné informace o stavu nenalezeny."
-
-#~ msgid "Operator review of user actions pending"
-#~ msgstr "Provozovatel přehled akcí uživatele čeká"
-
-#~ msgid "Review Transaction"
-#~ msgstr "Přehled transakce"
-
-#~ msgid "On all pages"
-#~ msgstr "Na všech stranách:"
-
-#~ msgid "With selected do"
-#~ msgstr "Byl zamítnut dne:"
-
-#~ msgid "View name variants"
-#~ msgstr "Název variant"
-
-#~ msgid "The author has an internal ID!"
-#~ msgstr "Došlo k vnitřní chybě"
-
-#~ msgid "These records have been marked as not being from this person."
-#~ msgstr "Tyto záznamy byly označeny jako nepatřící této osobě."
-
-#~ msgid "They will be regarded in the next run of the author "
-#~ msgstr "Oni budou považovány v dalším běhu autora"
-
-#~ msgid "disambiguation algorithm and might disappear from this listing."
-#~ msgstr "Disambiguation algoritmus a může zmizet z tohoto seznamu."
-
-#~ msgid "No comments"
-#~ msgstr "Žádné komentáře"
-
-#~ msgid "Not Available"
-#~ msgstr "Není k dispozici"
-
-#~ msgid " Delete this ticket"
-#~ msgstr "Smazat tento lístek"
-
-#~ msgid " Commit this entire ticket"
-#~ msgstr "Zavázat se celý tento lístek"
-
-#~ msgid "No title available"
-#~ msgstr "Není k dispozici"
-
-#~ msgid ""
-#~ "Please select an author on each of the records that will be assigned."
-#~ msgstr "Vyberte autora pro záznamy v pochybnost."
-
-#~ msgid "Papers without a name selected will be ignored in the process."
-#~ msgstr "Krabice, které nebyly vybrány, budou ignorovány v tomto procesu."
-
-#~ msgid "Select name for"
-#~ msgstr "Vyberte jméno pro"
-
-#~ msgid "Error retrieving record title"
-#~ msgstr "Chyba při načítání názvu záznamu"
-
-#~ msgid "Paper title: "
-#~ msgstr "Název příspěvku:"
-
-#~ msgid "Ignore"
-#~ msgstr "Ignorovat"
-
-#~ msgid "The following names have been automatically chosen:"
-#~ msgstr "Záznam byl vymazán."
-
-#~ msgid " --  With name: "
-#~ msgstr "- S názvem:"
-
-#~ msgid "Symbols legend: "
-#~ msgstr "Symboly legenda:"
-
-#~ msgid "Everything is shiny, captain!"
-#~ msgstr "Všechno je lesklý, kapitáne!"
-
-#~ msgid "The result of this request will be visible immediately"
-#~ msgstr "Výsledkem této žádosti budou vidět okamžitě"
-
-#~ msgid "Confirmation needed to continue"
-#~ msgstr "Je potřeba potvrzení pro pokračování"
-
-#~ msgid "This will create a change request for the operators"
-#~ msgstr "Tím se vytvoří požadavek na změnu pro hospodářské subjekty"
-
-#~ msgid "Selected name on paper"
-#~ msgstr "košíky"
-
-#~ msgid "Verification needed to continue"
-#~ msgstr "Před pokračováním je potřeba ověření"
-
-#~ msgid "This will create a request for the operators"
-#~ msgstr "Tím se vytvoří žádost pro operátory"
-
-#~ msgid "Please provide your information"
-#~ msgstr "Prosím, zadejte své údaje"
-
-#~ msgid "Please provide your first name"
-#~ msgstr "Prosím, zadejte své křestní jméno"
-
-#~ msgid "Your first name:"
-#~ msgstr "Vaše křestní jméno:"
-
-#~ msgid "Please provide your last name"
-#~ msgstr "Prosím, zadejte své příjmení"
-
-#~ msgid "Your last name:"
-#~ msgstr "schválení"
-
-#~ msgid "Please provide your eMail address"
-#~ msgstr "Prosím, uveďte svou e-mailovou adresu"
-
-#~ msgid "Your eMail:"
-#~ msgstr "košíky"
-
-#~ msgid "You may leave a comment (optional)"
-#~ msgstr "Můžete zanechat komentář (nepovinný)"
-
-#~ msgid "Continue claiming*"
-#~ msgstr "Pokračovat v nárokování *"
-
-#~ msgid "Confirm these changes**"
-#~ msgstr "Potvrďte tyto změny **"
-
-#~ msgid "!Delete the entire request!"
-#~ msgstr "!Odstranit celou žádost!"
-
-#~ msgid "Mark as your documents"
-#~ msgstr "Označit jako vlastní dokumenty"
-
-#~ msgid "Mark as _not_ your documents"
-#~ msgstr "Označit jako _ne_ vlastní dokumenty"
-
-#~ msgid "Nothing staged as not yours"
-#~ msgstr "Nic není představeno jako vaše"
-
-#~ msgid "Mark as their documents"
-#~ msgstr "Označit jako jejich dokumenty"
-
-#~ msgid "Nothing staged in this category"
-#~ msgstr "Nic v této kategorii představil"
-
-#~ msgid "Mark as _not_ their documents"
-#~ msgstr "košíky"
-
-#~ msgid "Create a new Person"
-#~ msgstr "košíky"
-
-#~ msgid "This is my profile"
-#~ msgstr "To je moje práce!"
-
-#~ msgid "Assign paper"
-#~ msgstr "Přiřadit jiné osobě"
-
-#~ msgid "Add to merge list"
-#~ msgstr "Přidat k uživatelům"
-
-#~ msgid "Recent Papers"
-#~ msgstr "Nedávné práce"
-
-#~ msgid "Showing the"
-#~ msgstr "Zobrazuji"
-
-#~ msgid "most recent documents:"
-#~ msgstr "poslední dokumenty:"
-
-#~ msgid "Manage your profile"
-#~ msgstr "Správa dokumentů soubory"
-
-#~ msgid "Choose your profile"
-#~ msgstr "Vyberte soubor"
-
-#~ msgid "Manage publication list"
-#~ msgstr "Seznam publikací"
-
-#~ msgid "add external id"
-#~ msgstr "externí odkaz"
-
-#~ msgid "suggest missing ids"
-#~ msgstr "přidání"
-
-#~ msgid "Choose system"
-#~ msgstr "Vyberte šablonu"
-
-#~ msgid "Fatal: You are not allowed to access this functionality."
-#~ msgstr "Kritická chyba: Nemáte oprávnění pro přístup k této funkci."
-
-#~ msgid "Claim this paper"
-#~ msgstr "Reklamace tento papír"
-
-#~ msgid "This page is not accessible directly."
-#~ msgstr "Tato stránka v nepřístupné přímo."
-
-#~ msgid "Weighted %s keywords:"
-#~ msgstr "Citováno: %s záznamy"
-
-#~ msgid "Comparison of:"
-#~ msgstr "Srovnání:"
-
-#~ msgid "Revision"
-#~ msgstr "Revize"
-
-#~ msgid "Failed to create a ticket"
-#~ msgstr "Nepodařilo se vytvořit si jízdenku"
-
-#~ msgid "Modify Template Attributes"
-#~ msgstr "Změnit atributy šablony"
-
-#~ msgid "Template Editor"
-#~ msgstr "Editor šablony"
-
-#~ msgid "Check Dependencies"
-#~ msgstr "Kontrola závislostí"
-
-#~ msgid "Update Format Attributes"
-#~ msgstr "Aktualizace formátu atributy"
-
-#~ msgid "Show Documentation"
-#~ msgstr "Zobrazit dokumentace"
-
-#~ msgid "Hide Documentation"
-#~ msgstr "Skrýt dokumentace"
-
-#~ msgid "Last Modification Date"
-#~ msgstr "Datum poslední změny"
-
-#~ msgid "Manage Output Formats"
-#~ msgstr "Správa výstupních formátů"
-
-#~ msgid "Manage Format Templates"
-#~ msgstr "Správa formátovacích šablon"
-
-#~ msgid "Format Elements Documentation"
-#~ msgstr "Formát prvků dokumentace"
-
-#~ msgid "Add New Format Template"
-#~ msgstr "Přidat nový formát šablony"
-
-#~ msgid "Check Format Templates Extensively"
-#~ msgstr "Důkladná kontrola formátu šablon"
-
-#~ msgid "Code"
-#~ msgstr "Kód"
-
-#~ msgid "Add New Output Format"
-#~ msgstr "Přidat nový výstupní formát"
-
-#~ msgid "menu"
-#~ msgstr "menu"
-
-#~ msgid "Close Output Format"
-#~ msgstr "Zavřít výstupní formát"
-
-#~ msgid "Rules"
-#~ msgstr "Pravidla"
-
-#~ msgid "Modify Output Format Attributes"
-#~ msgstr "Změnit atributy výstupního formátu"
-
-#~ msgid "Remove Rule"
-#~ msgstr "Odstranit pravidlo"
-
-#~ msgid "Add New Rule"
-#~ msgstr "Přidat nové pravidlo"
-
-#~ msgid "No problem found with format"
-#~ msgstr "Žádný problém, vyskytující se ve formátu"
-
-#~ msgid "An error has been found"
-#~ msgstr "Byla zjištěna chyba"
-
-#~ msgid "The following errors have been found"
-#~ msgstr "Následující chyby byly nalezeny"
-
-#~ msgid "BibFormat Admin"
-#~ msgstr "BibFormat Administrátor"
-
-#~ msgid "Enter a search query here."
-#~ msgstr "Zadejte hledaný dotaz zde."
-
-#~ msgid "No Record Found for %s."
-#~ msgstr "Záznam nenalezen"
-
-#~ msgid "Template \"%s\" does not exist at line %s."
-#~ msgstr "Soubor %s neexistuje"
-
-#~ msgid "Output format %s cannot not be read. %s"
-#~ msgstr "Výstupní formát %s atributů"
-
-#~ msgid "Format template %s calls undefined element \"%s\"."
-#~ msgstr "Formátovací šablona %s závislostí"
-
-#~ msgid "Error in format element %s. %s."
-#~ msgstr "Validace formátu elementu %s"
-
-#~ msgid "Format element %s cannot not be read. %s"
-#~ msgstr "Formátovací prvek %s závislostí"
-
-#~ msgid "Restricted Output Format"
-#~ msgstr "Limitovaný výstupní formát"
-
-#~ msgid "Output Format %s Rules"
-#~ msgstr "Výstupní formát %s pravidla"
-
-#~ msgid "Output Format %s Attributes"
-#~ msgstr "Výstupní formát %s atributů"
-
-#~ msgid "Output Format %s Dependencies"
-#~ msgstr "Výstupní formát%s závislosti"
-
-#~ msgid "Delete Output Format"
-#~ msgstr "Smazat výstupní formát"
-
-#~ msgid "Cannot create output format"
-#~ msgstr "Nelze vytvořit výstupní formát"
-
-#~ msgid "Format template %s cannot not be read. %s"
-#~ msgstr "Formátovací šablona %s atributů"
-
-#~ msgid "Restricted Format Template"
-#~ msgstr "Omezený formát šablony"
-
-#~ msgid "Format Template %s"
-#~ msgstr "Formátovací šablona %s"
-
-#~ msgid "Format Template %s Attributes"
-#~ msgstr "Formátovací šablona %s atributů"
-
-#~ msgid "Format Template %s Dependencies"
-#~ msgstr "Formátovací šablona %s závislostí"
-
-#~ msgid "Delete Format Template"
-#~ msgstr "Smazat formátovací šablonu"
-
-#~ msgid "Format Element %s Dependencies"
-#~ msgstr "Formátovací prvek %s závislostí"
-
-#~ msgid "Test Format Element %s"
-#~ msgstr "Test formátu elementu %s"
-
-#~ msgid "Validation of Output Format %s"
-#~ msgstr "Validace výstupního formátu %s"
-
-#~ msgid "Validation of Format Template %s"
-#~ msgstr "Validace formátu šablony %s"
-
-#~ msgid "Restricted Format Element"
-#~ msgstr "Omezený formát elementu"
-
-#~ msgid "Validation of Format Element %s"
-#~ msgstr "Validace formátu elementu %s"
-
-#~ msgid "Format Validation"
-#~ msgstr "Formát validace"
-
-#~ msgid "Knowledge Base %s"
-#~ msgstr "Znalostní báze %s"
-
-#~ msgid "Not Set"
-#~ msgstr "Ne Set"
-
-#~ msgid "never"
-#~ msgstr "nikdy"
-
-#~ msgid "Name variants"
-#~ msgstr "Název variant"
-
-#~ msgid "No Name Variants"
-#~ msgstr "Beze jména Varianty"
-
-#~ msgid "times"
-#~ msgstr "krát"
-
-#~ msgid "Papers"
-#~ msgstr "Příspěvky"
-
-#~ msgid "No Keywords"
-#~ msgstr "Žádná klíčová slova"
-
-#~ msgid "Frequent keywords"
-#~ msgstr "Častá klíčová slova"
-
-#~ msgid "No Subject categories"
-#~ msgstr "košíky"
-
-#~ msgid "No Collaborations"
-#~ msgstr "Kolekce"
-
-#~ msgid "unknown affiliation"
-#~ msgstr "neznámá příslušnost"
-
-#~ msgid "No Affiliations"
-#~ msgstr "Žádná příslušnost"
-
-#~ msgid "Affiliations"
-#~ msgstr "Citační historie:"
-
-#~ msgid "No Frequent Co-authors"
-#~ msgstr "Občasní spoluautoři"
-
-#~ msgid "Citations%s"
-#~ msgstr "Citace"
-
-#~ msgid "No Publication Graph"
-#~ msgstr "Datum vydání"
-
-#~ msgid "<strong> Publications list </strong>"
-#~ msgstr "Seznam publikací"
-
-#~ msgid "No publications available"
-#~ msgstr "Žádné informace nejsou k dispozici"
-
-#~ msgid "Cited by 1 record"
-#~ msgstr "Citováno 1 záznamem"
-
-#~ msgid "%i comments"
-#~ msgstr "%i komentářů"
-
-#~ msgid "%i reviews"
-#~ msgstr "%i recenzí"
-
-#~ msgid "%s of"
-#~ msgstr "%s z"
-
-#~ msgid "No Papers"
-#~ msgstr "Žádné příspěvky"
-
-#~ msgid "Frequent co-authors"
-#~ msgstr "Častí spoluautoři"
-
-#~ msgid "This is me.  Verify my publication list."
-#~ msgstr "To jsem já.  Ověřte si můj seznam publikací."
-
-#~ msgid "Citations:"
-#~ msgstr "Citace:"
-
-#~ msgid "No Citation Information available"
-#~ msgstr "Žádné informace o citacích nejsou k dispozici"
-
-#~ msgid "Discussion"
-#~ msgstr "Diskuse"
-
-#~ msgid "Your alerts"
-#~ msgstr "Vaše upozornění"
-
-#~ msgid "Your approvals"
-#~ msgstr "Vaše schválení"
-
-#~ msgid "Your baskets"
-#~ msgstr "Vaše košíky"
-
-#~ msgid "Your loans"
-#~ msgstr "Vaše vypůjčky"
-
-#~ msgid "Your submissions"
-#~ msgstr "Vaše podání"
-
-#~ msgid "Statistics"
-#~ msgstr "Statistiky"
-
-#~ msgid "Group: %s"
-#~ msgstr "Skupina: %s"
-
-#~ msgid "Page %s Not Found"
-#~ msgstr "Stránka %s nebyla nalezena"
-
-#~ msgid "The field %s is mandatory."
-#~ msgstr "Pole %s je povinné."
-
-#~ msgid ""
-#~ "Unable to delete field at position %s from page %s of submission '%s'"
-#~ msgstr "Nelze smazat pole v pozici%s%z stránku podání '%s'"

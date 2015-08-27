@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Invenio 1.2.0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2015-08-27 12:32+0200\n"
-"PO-Revision-Date: 2015-08-27 12:58+0200\n"
+"POT-Creation-Date: 2015-08-27 15:26+0200\n"
+"PO-Revision-Date: 2015-08-27 20:12+0200\n"
 "Last-Translator: Joaquim Silvestre <joaquim.rodrigues.silvestre@cern.ch>\n"
 "Language-Team: PT <info@invenio-software.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -58,8 +58,8 @@ msgstr "Área do Administrador"
 #: invenio/base/templates/401.html:37
 #, python-format
 msgid ""
-"Or, %(x_url_open)s%(x_url_open_1)s%(x_url_open_2)slogout%(x_url_close)s and "
-"login with a different user."
+"Or, %(x_url_open)s%(x_url_open_1)s%(x_url_open_2)slogout%(x_url_close)s "
+"and login with a different user."
 msgstr ""
 
 #: invenio/base/templates/404.html:26
@@ -230,17 +230,17 @@ msgstr ""
 #: invenio/ext/email/__init__.py:247
 #, python-format
 msgid ""
-"The system is not attempting to send an email from %(x_from)s, to %(x_to)s, "
-"with body %(x_body)s."
+"The system is not attempting to send an email from %(x_from)s, to "
+"%(x_to)s, with body %(x_body)s."
 msgstr ""
 
 #: invenio/ext/email/__init__.py:269
 #, python-format
 msgid ""
-"Error in sending message.                         Waiting %(sec)s seconds. "
-"Exception is %(exc)s,                         while sending email from "
-"%(sender)s to %(receipient)s                         with body "
-"%(email_body)s."
+"Error in sending message.                         Waiting %(sec)s "
+"seconds. Exception is %(exc)s,                         while sending "
+"email from %(sender)s to %(receipient)s                         with body"
+" %(email_body)s."
 msgstr ""
 
 #: invenio/ext/email/__init__.py:287
@@ -308,8 +308,8 @@ msgstr "Pedido de autorização de função"
 #: invenio/ext/script/__init__.py:143
 #, python-format
 msgid ""
-"A newer version of Invenio is available for download. You may want to visit "
-"<a href=\"%(wiki)s\">%()s</a>"
+"A newer version of Invenio is available for download. You may want to "
+"visit <a href=\"%(wiki)s\">%()s</a>"
 msgstr ""
 
 #: invenio/ext/script/__init__.py:153
@@ -515,8 +515,7 @@ msgstr ""
 #: invenio/legacy/batchuploader/engine.py:563
 #: invenio/legacy/batchuploader/engine.py:576
 #, python-format
-msgid ""
-"The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"
+msgid "The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"
 msgstr ""
 
 #: invenio/legacy/batchuploader/templates.py:235
@@ -593,9 +592,9 @@ msgid ""
 "%(x_url1_open)supload history%(x_url1_close)s or %(x_url2_open)ssubmit "
 "another file%(x_url2_close)s"
 msgstr ""
-"Está autenticado como %(x_user)s. Poderá querer a) %(x_url1_open)sterminar a "
-"sessão%(x_url1_close)s; b) editar as %(x_url2_open)sdefinições da sua conta"
-"%(x_url2_close)s."
+"Está autenticado como %(x_user)s. Poderá querer a) "
+"%(x_url1_open)sterminar a sessão%(x_url1_close)s; b) editar as "
+"%(x_url2_open)sdefinições da sua conta%(x_url2_close)s."
 
 #: invenio/legacy/batchuploader/templates.py:282
 #, fuzzy
@@ -739,8 +738,7 @@ msgid "The following errors have occurred:"
 msgstr "Foram encontrados os seguintes erros"
 
 #: invenio/legacy/batchuploader/templates.py:583
-msgid ""
-"Some files could not be moved to DONE folder. Please remove them manually."
+msgid "Some files could not be moved to DONE folder. Please remove them manually."
 msgstr ""
 
 #: invenio/legacy/batchuploader/templates.py:585
@@ -757,8 +755,8 @@ msgstr ""
 #: invenio/legacy/batchuploader/templates.py:597
 #, python-format
 msgid ""
-"Check the %(x_url_open)sBatch Uploader daemon help page%(x_url_close)s for "
-"executing these actions periodically."
+"Check the %(x_url_open)sBatch Uploader daemon help page%(x_url_close)s "
+"for executing these actions periodically."
 msgstr ""
 
 #: invenio/legacy/batchuploader/templates.py:602
@@ -917,6 +915,18 @@ msgstr "Próximo"
 msgid "Admin Area"
 msgstr "Área do Administrador"
 
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:59
+msgid "BibCheck Admin"
+msgstr ""
+
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:69
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:249
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:288
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:325
+#, fuzzy
+msgid "Not authorized"
+msgstr "Não está autorizado a aceder a funções de administração."
+
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:79
 #, fuzzy, python-format
 msgid "ERROR: %(x_name)s does not exist"
@@ -935,6 +945,11 @@ msgstr ""
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:116
 msgid "Limit to knowledge bases containing string:"
 msgstr ""
+
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:134
+#, fuzzy
+msgid "Really delete"
+msgstr "apagado com sucesso"
 
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:136
 #: invenio/legacy/bibcirculation/templates.py:1243
@@ -986,6 +1001,16 @@ msgstr ""
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:181
 msgid "Verify BibCheck config file"
 msgstr ""
+
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:182
+#, fuzzy
+msgid "Verify problem"
+msgstr "Problema na Base de Dados"
+
+#: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:204
+#, fuzzy
+msgid "File"
+msgstr "ficheiro(s)"
 
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:238
 msgid "Save Changes"
@@ -1092,8 +1117,7 @@ msgstr ""
 #: invenio/legacy/bibcirculation/adminlib.py:880
 #: invenio/legacy/bibcirculation/adminlib.py:1874
 #, python-format
-msgid ""
-"%(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s Unknown barcode."
+msgid "%(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s Unknown barcode."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:365
@@ -1144,8 +1168,8 @@ msgstr "Uma nova conta foi criada em"
 #: invenio/legacy/bibcirculation/adminlib.py:403
 #, fuzzy, python-format
 msgid ""
-"Another user is waiting for the book: %(x_strong_tag_open)s%(x_title)s"
-"%(x_strong_tag_close)s. \n"
+"Another user is waiting for the book: "
+"%(x_strong_tag_open)s%(x_title)s%(x_strong_tag_close)s. \n"
 "\n"
 " If you want continue with this loan choose "
 "%(x_strong_tag_open)s[Continue]%(x_strong_tag_close)s."
@@ -1159,23 +1183,25 @@ msgstr "Explorar"
 #: invenio/legacy/bibcirculation/adminlib.py:481
 #, fuzzy, python-format
 msgid ""
-"The items with barcode %(x_strong_tag_open)s%(x_barcode)s"
-"%(x_strong_tag_close)s are already on loan."
+"The items with barcode "
+"%(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s are already on "
+"loan."
 msgstr "Uma nova conta foi criada em"
 
 #: invenio/legacy/bibcirculation/adminlib.py:499
 #, python-format
 msgid ""
-"The given due date %(x_strong_tag_open)s%(x_date)s%(x_strong_tag_close)s is "
-"not a valid date or date format"
+"The given due date %(x_strong_tag_open)s%(x_date)s%(x_strong_tag_close)s "
+"is not a valid date or date format"
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:541
 #, fuzzy, python-format
 msgid ""
-"A loan for the item %(x_strong_tag_open)s%(x_title)s%(x_strong_tag_close)s, "
-"with barcode %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s, has "
-"been registered with success."
+"A loan for the item "
+"%(x_strong_tag_open)s%(x_title)s%(x_strong_tag_close)s, with barcode "
+"%(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s, has been "
+"registered with success."
 msgstr "Uma nova conta foi criada em"
 
 #: invenio/legacy/bibcirculation/adminlib.py:542
@@ -1200,14 +1226,13 @@ msgstr "Criar um novo tópico"
 #: invenio/legacy/bibcirculation/adminlib.py:1882
 #, fuzzy, python-format
 msgid ""
-"The item with the barcode %(x_strong_tag_open)s%(x_barcode)s"
-"%(x_strong_tag_close)s is on loan."
+"The item with the barcode "
+"%(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s is on loan."
 msgstr "Uma nova conta foi criada em"
 
 #: invenio/legacy/bibcirculation/adminlib.py:663
 #, python-format
-msgid ""
-"The given barcode \"%(x_barcode)s\" does not correspond to requested item."
+msgid "The given barcode \"%(x_barcode)s\" does not correspond to requested item."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:702
@@ -1239,8 +1264,9 @@ msgstr "estado actual"
 #: invenio/legacy/bibcirculation/adminlib.py:884
 #, fuzzy, python-format
 msgid ""
-"The item the with barcode %(x_strong_tag_open)s%(x_barcode)s"
-"%(x_strong_tag_close)s is not on loan. Please, try again."
+"The item the with barcode "
+"%(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s is not on loan. "
+"Please, try again."
 msgstr "Uma nova conta foi criada em"
 
 #: invenio/legacy/bibcirculation/adminlib.py:969
@@ -1307,8 +1333,8 @@ msgstr ""
 #: invenio/legacy/bibcirculation/adminlib.py:4504
 #, python-format
 msgid ""
-"The period of interest %(x_strong_tag_open)sFrom: %(x_date)s"
-"%(x_strong_tag_close)s is not a valid date or date format"
+"The period of interest %(x_strong_tag_open)sFrom: "
+"%(x_date)s%(x_strong_tag_close)s is not a valid date or date format"
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:1291
@@ -1316,8 +1342,8 @@ msgstr ""
 #: invenio/legacy/bibcirculation/adminlib.py:4511
 #, python-format
 msgid ""
-"The period of interest %(x_strong_tag_open)sTo: %(x_date)s"
-"%(x_strong_tag_close)s is not a valid date or date format"
+"The period of interest %(x_strong_tag_open)sTo: "
+"%(x_date)s%(x_strong_tag_close)s is not a valid date or date format"
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:1414
@@ -1339,8 +1365,9 @@ msgstr ""
 #: invenio/legacy/bibcirculation/adminlib.py:1540
 #, fuzzy, python-format
 msgid ""
-"Item with barcode %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s "
-"is already on loan."
+"Item with barcode "
+"%(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s is already on "
+"loan."
 msgstr "Uma nova conta foi criada em"
 
 #: invenio/legacy/bibcirculation/adminlib.py:1551
@@ -1382,8 +1409,8 @@ msgstr "%s registos encontrados"
 #: invenio/legacy/bibcirculation/adminlib.py:4376
 #, python-format
 msgid ""
-"The barcode %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s does "
-"not exist on BibCirculation database."
+"The barcode %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s does"
+" not exist on BibCirculation database."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:1945
@@ -1474,8 +1501,8 @@ msgstr "Não"
 #: invenio/legacy/bibcirculation/adminlib.py:3591
 #, python-format
 msgid ""
-"Another user is waiting for this book %(x_strong_tag_open)s%(x_title)s"
-"%(x_strong_tag_close)s."
+"Another user is waiting for this book "
+"%(x_strong_tag_open)s%(x_title)s%(x_strong_tag_close)s."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:2440
@@ -1572,8 +1599,8 @@ msgstr "<strong>%s</strong> registros encontrados"
 #: invenio/legacy/bibcirculation/adminlib.py:2803
 #, python-format
 msgid ""
-"It was NOT possible to delete the copy with barcode <strong>%(x_name)s</"
-"strong>"
+"It was NOT possible to delete the copy with barcode "
+"<strong>%(x_name)s</strong>"
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:2860
@@ -1593,29 +1620,29 @@ msgstr "<strong>%s</strong> registros encontrados"
 #: invenio/legacy/bibcirculation/adminlib.py:3023
 #, python-format
 msgid ""
-"Item <strong>[%(x_name)s]</strong> updated, but the <strong>status was not "
-"modified</strong>."
+"Item <strong>[%(x_name)s]</strong> updated, but the <strong>status was "
+"not modified</strong>."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:3035
 #, python-format
 msgid ""
-"Item <strong>[%(x_name)s]</strong> updated, but the <strong>barcode was not "
-"modified</strong> because it is already in use."
+"Item <strong>[%(x_name)s]</strong> updated, but the <strong>barcode was "
+"not modified</strong> because it is already in use."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:3038
 #, python-format
 msgid ""
-"Item <strong>[%(x_name)s]</strong> updated to <strong>[%(x_new)s]</strong> "
-"with success."
+"Item <strong>[%(x_name)s]</strong> updated to "
+"<strong>[%(x_new)s]</strong> with success."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:3041
 #, python-format
 msgid ""
-"Item <strong>[%(x_name)s]</strong> updated, but the <strong>barcode was not "
-"modified</strong> because it was not found (!?)."
+"Item <strong>[%(x_name)s]</strong> updated, but the <strong>barcode was "
+"not modified</strong> because it was not found (!?)."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/adminlib.py:3145
@@ -1988,14 +2015,16 @@ msgstr "O registo foi apagado."
 #: invenio/legacy/bibcirculation/api.py:198
 msgid ""
 "If you think this book is interesting, suggest it and tell us why you "
-"consider this                   book is important. The library will consider "
-"your opinion and if we decide to buy the                   book, we will "
-"issue a loan for you as soon as it arrives and send it by internal mail."
+"consider this                   book is important. The library will "
+"consider your opinion and if we decide to buy the                   book,"
+" we will issue a loan for you as soon as it arrives and send it by "
+"internal mail."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/api.py:202
 msgid ""
-"In case we decide not to buy the book, we will offer you an interlibrary loan"
+"In case we decide not to buy the book, we will offer you an interlibrary "
+"loan"
 msgstr ""
 
 #: invenio/legacy/bibcirculation/api.py:268
@@ -2016,8 +2045,8 @@ msgstr ""
 #: invenio/legacy/bibcirculation/api.py:710
 #: invenio/legacy/bibcirculation/api.py:778
 msgid ""
-"Your ILL request has been registered and the document will be sent to you "
-"via internal mail."
+"Your ILL request has been registered and the document will be sent to you"
+" via internal mail."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/api.py:672
@@ -2179,8 +2208,8 @@ msgstr ""
 #, python-format
 msgid ""
 "All the copies of %(strong_tag_open)s%(title)s%(strong_tag_close)s are "
-"missing. You can request a copy using %(strong_tag_open)s%(ill_link)s"
-"%(strong_tag_close)s"
+"missing. You can request a copy using "
+"%(strong_tag_open)s%(ill_link)s%(strong_tag_close)s"
 msgstr ""
 
 #: invenio/legacy/bibcirculation/templates.py:341
@@ -2487,8 +2516,8 @@ msgstr ""
 
 #: invenio/legacy/bibcirculation/templates.py:524
 msgid ""
-"Your request has been registered and the document will be sent to you via "
-"internal mail."
+"Your request has been registered and the document will be sent to you via"
+" internal mail."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/templates.py:529
@@ -2774,8 +2803,9 @@ msgstr ""
 #: invenio/legacy/bibcirculation/templates.py:1047
 #, fuzzy, python-format
 msgid ""
-"You can see your library account %(x_url_open)shere%(x_url_close)s."
-"x_url_open<a href=\"/yourloans/display\">"
+"You can see your library account "
+"%(x_url_open)shere%(x_url_close)s.x_url_open<a "
+"href=\"/yourloans/display\">"
 msgstr "Se desejar pode autenticar-se %(x_url_open)saqui%(x_url_close)s."
 
 #: invenio/legacy/bibcirculation/templates.py:1129
@@ -2840,8 +2870,8 @@ msgstr "OK"
 #, fuzzy, python-format
 msgid ""
 "The item %(x_strong_tag_open)s%(x_title)s%(x_strong_tag_close)s, with "
-"barcode %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s, has been "
-"returned with success."
+"barcode %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s, has "
+"been returned with success."
 msgstr "Uma nova conta foi criada em"
 
 #: invenio/legacy/bibcirculation/templates.py:1588
@@ -4172,8 +4202,8 @@ msgstr ""
 #: invenio/legacy/bibcirculation/templates.py:9720
 #, python-format
 msgid ""
-"Borrower accepts the %(x_url_open)sconditions%(x_url_close)s of the service "
-"in particular the return of books in due time."
+"Borrower accepts the %(x_url_open)sconditions%(x_url_close)s of the "
+"service in particular the return of books in due time."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/templates.py:9721
@@ -4191,8 +4221,8 @@ msgstr ""
 #: invenio/legacy/bibcirculation/templates.py:10260
 #, python-format
 msgid ""
-"Check if the book already exists on %(CFG_SITE_NAME)s, before sending your "
-"ILL request."
+"Check if the book already exists on %(CFG_SITE_NAME)s, before sending "
+"your ILL request."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/templates.py:10332
@@ -4258,17 +4288,17 @@ msgstr ""
 
 #: invenio/legacy/bibcirculation/templates.py:10941
 msgid ""
-"We will process your order immediately and contact "
-"you                                         as soon as the document is "
+"We will process your order immediately and contact you"
+"                                         as soon as the document is "
 "received."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/templates.py:10943
 msgid ""
-"According to a decision from the Scientific Information Policy "
-"Board,             books purchased with budget codes other than Team "
-"accounts will be added to the Library catalogue,             with the "
-"indication of the purchaser."
+"According to a decision from the Scientific Information Policy Board,"
+"             books purchased with budget codes other than Team accounts "
+"will be added to the Library catalogue,             with the indication "
+"of the purchaser."
 msgstr ""
 
 #: invenio/legacy/bibcirculation/templates.py:10961
@@ -4672,10 +4702,10 @@ msgstr "O registo foi apagado."
 
 #: invenio/legacy/bibclassify/templates.py:127
 msgid ""
-"Automatically generated <span class=\"keyword single\">single</span>,        "
-"<span class=\"keyword composite\">composite</span>, <span class=\"keyword "
-"author-kw\">author</span>,        and <span class=\"keyword other-kw\">other "
-"keywords</span>."
+"Automatically generated <span class=\"keyword single\">single</span>,"
+"        <span class=\"keyword composite\">composite</span>, <span "
+"class=\"keyword author-kw\">author</span>,        and <span "
+"class=\"keyword other-kw\">other keywords</span>."
 msgstr ""
 
 #: invenio/legacy/bibclassify/templates.py:230
@@ -4735,15 +4765,15 @@ msgstr ""
 
 #: invenio/legacy/bibclassify/webinterface.py:247
 msgid ""
-"We have registered your request, the automatedkeyword extraction will run "
-"after some time. Please return back in a while."
+"We have registered your request, the automatedkeyword extraction will run"
+" after some time. Please return back in a while."
 msgstr ""
 
 #: invenio/legacy/bibclassify/webinterface.py:252
 msgid ""
 "Unfortunately, we don't have a PDF fulltext for this record in the "
-"storage,                     keywords cannot be generated using an automated "
-"process."
+"storage,                     keywords cannot be generated using an "
+"automated process."
 msgstr ""
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:398
@@ -4772,15 +4802,15 @@ msgstr "Regras"
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:560
 msgid ""
-"The file you want to edit is protected against modifications. Your action "
-"has not been applied"
+"The file you want to edit is protected against modifications. Your action"
+" has not been applied"
 msgstr ""
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:580
 #, python-format
 msgid ""
-"The uploaded file is too small (<%(x_size)i o) and has therefore not been "
-"considered"
+"The uploaded file is too small (<%(x_size)i o) and has therefore not been"
+" considered"
 msgstr ""
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:585
@@ -4791,8 +4821,7 @@ msgid ""
 msgstr ""
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:591
-msgid ""
-"The uploaded file name is too long and has therefore not been considered"
+msgid "The uploaded file name is too long and has therefore not been considered"
 msgstr ""
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:603
@@ -4811,15 +4840,17 @@ msgstr "O nome de utilizador pretendido %s já existe na base de dados."
 #: invenio/legacy/bibdocfile/managedocfiles.py:648
 #, fuzzy, python-format
 msgid ""
-"A file with format '%(x_name)s' already exists. Please upload another format."
+"A file with format '%(x_name)s' already exists. Please upload another "
+"format."
 msgstr "O nome de utilizador pretendido %s já existe na base de dados."
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:656
 #: invenio/legacy/bibdocfile/managedocfiles.py:756
 msgid ""
-"You are not allowed to use dot '.', slash '/', or backslash '\\\\' in file "
-"names. Choose a different name and upload your file again. In particular, "
-"note that you should not include the extension in the renaming field."
+"You are not allowed to use dot '.', slash '/', or backslash '\\\\' in "
+"file names. Choose a different name and upload your file again. In "
+"particular, note that you should not include the extension in the "
+"renaming field."
 msgstr ""
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:836
@@ -4838,13 +4869,14 @@ msgstr ""
 #: invenio/legacy/bibdocfile/managedocfiles.py:901
 msgid ""
 "When you revise a file, the additional formats that you might have "
-"previously uploaded are removed, since they no longer up-to-date with the "
-"new file."
+"previously uploaded are removed, since they no longer up-to-date with the"
+" new file."
 msgstr ""
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:902
 msgid ""
-"Alternative formats uploaded for current version of this file will be removed"
+"Alternative formats uploaded for current version of this file will be "
+"removed"
 msgstr ""
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:903
@@ -4898,8 +4930,8 @@ msgstr ""
 #: invenio/legacy/bibdocfile/managedocfiles.py:935
 #, python-format
 msgid ""
-"Having a problem adding or revising a file? Send the new/revised version to "
-"%(mailto_link)s."
+"Having a problem adding or revising a file? Send the new/revised version "
+"to %(mailto_link)s."
 msgstr ""
 
 #: invenio/legacy/bibdocfile/managedocfiles.py:1061
@@ -4955,8 +4987,8 @@ msgstr "O registro foi apagado."
 
 #: invenio/legacy/bibdocfile/webinterface.py:139
 msgid ""
-"The system has encountered an error in retrieving the list of files for this "
-"document."
+"The system has encountered an error in retrieving the list of files for "
+"this document."
 msgstr ""
 "O sistema encontrou um erro na recuperação da lista de ficheiros deste "
 "documento. "
@@ -5079,9 +5111,9 @@ msgstr ""
 
 #: invenio/legacy/bibeditmulti/templates.py:359
 msgid ""
-"Specify the criteria you'd like to use for filtering records that will be "
-"changed. Use \"Search\" to see which records would have been filtered using "
-"these criteria."
+"Specify the criteria you'd like to use for filtering records that will be"
+" changed. Use \"Search\" to see which records would have been filtered "
+"using these criteria."
 msgstr ""
 
 #: invenio/legacy/bibeditmulti/templates.py:361
@@ -5096,8 +5128,8 @@ msgstr "Guardar alterações"
 
 #: invenio/legacy/bibeditmulti/templates.py:614
 msgid ""
-"Specify fields and their subfields that should be changed in every record "
-"matching the search criteria."
+"Specify fields and their subfields that should be changed in every record"
+" matching the search criteria."
 msgstr ""
 
 #: invenio/legacy/bibeditmulti/templates.py:615
@@ -5242,10 +5274,11 @@ msgstr "Regressar aos resultados da pesquisa"
 
 #: invenio/legacy/bibeditmulti/templates.py:708
 msgid ""
-"WARNING: The following records are pending execution                        "
-"in the task queue.                        If you proceed with the changes, "
-"the modifications made                        with other tool (e.g. BibEdit) "
-"to these records will                        be lost"
+"WARNING: The following records are pending execution"
+"                        in the task queue.                        If you "
+"proceed with the changes, the modifications made                        "
+"with other tool (e.g. BibEdit) to these records will"
+"                        be lost"
 msgstr ""
 
 #: invenio/legacy/bibeditmulti/templates.py:736
@@ -5556,8 +5589,8 @@ msgstr "Apagar Base de Conhecimento"
 #: invenio/legacy/bibknowledge/templates.py:51
 #, python-format
 msgid ""
-"Limit display to knowledge bases matching %(keyword_field)s in their rules "
-"and descriptions"
+"Limit display to knowledge bases matching %(keyword_field)s in their "
+"rules and descriptions"
 msgstr ""
 
 #: invenio/legacy/bibknowledge/templates.py:84
@@ -5617,56 +5650,56 @@ msgstr "É favor autenticar-se primeiro."
 
 #: invenio/legacy/bibknowledge/templates.py:237
 msgid ""
-"A dynamic knowledge base is a list of values of a                          "
-"given field. The list is generated dynamically by                          "
-"searching the records using a search expression."
+"A dynamic knowledge base is a list of values of a"
+"                          given field. The list is generated dynamically "
+"by                          searching the records using a search "
+"expression."
 msgstr ""
 
 #: invenio/legacy/bibknowledge/templates.py:241
 msgid ""
-"Example: Your records contain field 270__a for                          the "
-"name and address of the author's institute.                          If you "
-"set the field to '270__a' and the expression                          to "
-"'270__a:*Paris*', a list of institutes in Paris                          "
-"will be created."
+"Example: Your records contain field 270__a for                          "
+"the name and address of the author's institute.                          "
+"If you set the field to '270__a' and the expression"
+"                          to '270__a:*Paris*', a list of institutes in "
+"Paris                          will be created."
 msgstr ""
 
 #: invenio/legacy/bibknowledge/templates.py:246
 msgid ""
-"If the expression is empty, a list of all values                          in "
-"270__a will be created."
+"If the expression is empty, a list of all values"
+"                          in 270__a will be created."
 msgstr ""
 
 #: invenio/legacy/bibknowledge/templates.py:248
 #, python-format
 msgid ""
-"If the expression contains '%%', like '270__a:*"
-"%%*',                          it will be replaced by a search string when "
-"the                          knowledge base is used."
+"If the expression contains '%%', like '270__a:*%%*',"
+"                          it will be replaced by a search string when the"
+"                          knowledge base is used."
 msgstr ""
 
 #: invenio/legacy/bibknowledge/templates.py:251
 msgid ""
-"You can enter a collection name if the expression                          "
-"should be evaluated in a specific collection."
+"You can enter a collection name if the expression"
+"                          should be evaluated in a specific collection."
 msgstr ""
 
 #: invenio/legacy/bibknowledge/templates.py:253
 msgid ""
-"Example 1: Your records contain field 270__a for                          "
-"the name and address of the author's institute.                          If "
-"you set the field to '270__a' and the expression                          to "
-"'270__a:*Paris*', a list of institutes in Paris                          "
-"will be created."
+"Example 1: Your records contain field 270__a for"
+"                          the name and address of the author's institute."
+"                          If you set the field to '270__a' and the "
+"expression                          to '270__a:*Paris*', a list of "
+"institutes in Paris                          will be created."
 msgstr ""
 
 #: invenio/legacy/bibknowledge/templates.py:258
 #, python-format
 msgid ""
-"Example 2: Return the institute's name (100__a) when "
-"the                          user gives its postal code "
-"(270__a):                          Set field to 100__a, expression to 270__a:"
-"*%%*."
+"Example 2: Return the institute's name (100__a) when the"
+"                          user gives its postal code (270__a):"
+"                          Set field to 100__a, expression to 270__a:*%%*."
 msgstr ""
 
 #: invenio/legacy/bibknowledge/templates.py:262
@@ -5760,15 +5793,15 @@ msgstr "Os seus avisos"
 #: invenio/legacy/bibknowledge/templates.py:706
 #, python-format
 msgid ""
-"The left side of the rule (%(x_rule)s) already appears in these knowledge "
-"bases:"
+"The left side of the rule (%(x_rule)s) already appears in these knowledge"
+" bases:"
 msgstr ""
 
 #: invenio/legacy/bibknowledge/templates.py:709
 #, python-format
 msgid ""
-"The right side of the rule (%(x_rule)s) already appears in these knowledge "
-"bases:"
+"The right side of the rule (%(x_rule)s) already appears in these "
+"knowledge bases:"
 msgstr ""
 
 #: invenio/legacy/bibknowledge/templates.py:722
@@ -6002,7 +6035,8 @@ msgstr ""
 
 #: invenio/legacy/oaiharvest/admin.py:1321
 msgid ""
-"Error when formatting the Holding Pen entry. Probably its content is broken"
+"Error when formatting the Holding Pen entry. Probably its content is "
+"broken"
 msgstr ""
 
 #: invenio/legacy/oaiharvest/admin.py:1326
@@ -6082,8 +6116,8 @@ msgstr "ir para o registro:"
 #: invenio/legacy/oairepository/admin.py:352
 #, python-format
 msgid ""
-"Do you want to touch the OAI set %(x_name)s? Note that this will force all "
-"clients to re-harvest the whole set."
+"Do you want to touch the OAI set %(x_name)s? Note that this will force "
+"all clients to re-harvest the whole set."
 msgstr ""
 
 #: invenio/legacy/oairepository/admin.py:360
@@ -6260,8 +6294,8 @@ msgstr "Não foram encontrados valores"
 
 #: invenio/legacy/search_engine/__init__.py:2141
 msgid ""
-"Full-text search is currently available for all arXiv papers, many theses, a "
-"few report series and some journal articles"
+"Full-text search is currently available for all arXiv papers, many "
+"theses, a few report series and some journal articles"
 msgstr ""
 
 #: invenio/legacy/search_engine/__init__.py:2143
@@ -6287,8 +6321,8 @@ msgstr ""
 
 #: invenio/legacy/search_engine/__init__.py:2165
 msgid ""
-"Search term after reference operator too generic, displaying only partial "
-"results..."
+"Search term after reference operator too generic, displaying only partial"
+" results..."
 msgstr ""
 
 #: invenio/legacy/search_engine/__init__.py:2169
@@ -6299,20 +6333,21 @@ msgstr ""
 
 #: invenio/legacy/search_engine/__init__.py:2173
 msgid ""
-"No phrase index available for fulltext yet, looking for word combination..."
+"No phrase index available for fulltext yet, looking for word "
+"combination..."
 msgstr ""
 
 #: invenio/legacy/search_engine/__init__.py:2213
 #, fuzzy, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr ""
-"Nenhum resultado exacto foi encontrado para <em>%s</em>, usando <em>%s</em> "
-"em substituição..."
+"Nenhum resultado exacto foi encontrado para <em>%s</em>, usando "
+"<em>%s</em> em substituição..."
 
 #: invenio/legacy/search_engine/__init__.py:2352
 msgid ""
-"Search syntax misunderstood. Ignoring all parentheses in the query. If this "
-"doesn't help, please check your search and try again."
+"Search syntax misunderstood. Ignoring all parentheses in the query. If "
+"this doesn't help, please check your search and try again."
 msgstr ""
 
 #: invenio/legacy/search_engine/__init__.py:3238
@@ -6321,28 +6356,28 @@ msgid ""
 "No match found in collection %(x_collection)s. Other collections gave "
 "%(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
 msgstr ""
-"Nenhum resultado foi encontrado na colecção %s. Outras colecções públicas "
-"retornaram <a class=\"nearestterms\" href=\"%s/search.py?%s\">%d resultados</"
-"a>."
+"Nenhum resultado foi encontrado na colecção %s. Outras colecções públicas"
+" retornaram <a class=\"nearestterms\" href=\"%s/search.py?%s\">%d "
+"resultados</a>."
 
 #: invenio/legacy/search_engine/__init__.py:3255
 #, fuzzy
 msgid ""
-"No public collection matched your query. If you were looking for a hidden "
-"document, please type the correct URL for this record."
+"No public collection matched your query. If you were looking for a hidden"
+" document, please type the correct URL for this record."
 msgstr ""
-"Nenhuma coleção pública corresponde à sua pesquisa. Se você está procurando "
-"um documento que não é público, por favor escolha a colecção restrita "
-"desejada primeiro."
+"Nenhuma coleção pública corresponde à sua pesquisa. Se você está "
+"procurando um documento que não é público, por favor escolha a colecção "
+"restrita desejada primeiro."
 
 #: invenio/legacy/search_engine/__init__.py:3259
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
 msgstr ""
-"Nenhuma coleção pública corresponde à sua pesquisa. Se você está procurando "
-"um documento que não é público, por favor escolha a colecção restrita "
-"desejada primeiro."
+"Nenhuma coleção pública corresponde à sua pesquisa. Se você está "
+"procurando um documento que não é público, por favor escolha a colecção "
+"restrita desejada primeiro."
 
 #: invenio/legacy/search_engine/__init__.py:3366
 #, fuzzy
@@ -6384,11 +6419,11 @@ msgstr "Nenhum índice de frases está disponível para"
 #: invenio/legacy/search_engine/__init__.py:3440
 #, fuzzy, python-format
 msgid ""
-"Search term %(x_term)s inside index %(x_index)s did not match any record. "
-"Nearest terms in any collection are:"
+"Search term %(x_term)s inside index %(x_index)s did not match any record."
+" Nearest terms in any collection are:"
 msgstr ""
-"A expressão procura da %(x_term)s no indice %(x_index)s não corresponde a "
-"nenhum registo. Os termos similares em todas as colecções são:"
+"A expressão procura da %(x_term)s no indice %(x_index)s não corresponde a"
+" nenhum registo. Os termos similares em todas as colecções são:"
 
 #: invenio/legacy/search_engine/__init__.py:3445
 #, fuzzy, python-format
@@ -6411,8 +6446,8 @@ msgstr ""
 #: invenio/legacy/search_engine/__init__.py:4474
 #, fuzzy, python-format
 msgid ""
-"Sorry, sorting is allowed on sets of up to %(x_name)d records only. Using "
-"default sort order."
+"Sorry, sorting is allowed on sets of up to %(x_name)d records only. Using"
+" default sort order."
 msgstr ""
 "Desculpe,mas a ordenação está disponivel em conjunto apenas acima dos %d "
 "registos. Usando definições por defeito."
@@ -6420,8 +6455,8 @@ msgstr ""
 #: invenio/legacy/search_engine/__init__.py:4486
 #, fuzzy, python-format
 msgid ""
-"Sorry, %(x_name)s does not seem to be a valid sort option. The records will "
-"not be sorted."
+"Sorry, %(x_name)s does not seem to be a valid sort option. The records "
+"will not be sorted."
 msgstr ""
 "Desculpa, %s não parece ser uma opção de ordenação válida. Escolhendo "
 "ordenação por título."
@@ -6453,14 +6488,14 @@ msgstr "Explorar"
 #: invenio/legacy/search_engine/__init__.py:6419
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
-"Nenhum resultado dentro do período de tempo especificado, desconsiderando "
-"esta condição..."
+"Nenhum resultado dentro do período de tempo especificado, desconsiderando"
+" esta condição..."
 
 #: invenio/legacy/search_engine/__init__.py:6453
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
-"Nenhum resultado dentro dos limites de pesquisa especificados, descartando "
-"esta condição..."
+"Nenhum resultado dentro dos limites de pesquisa especificados, "
+"descartando esta condição..."
 
 #: invenio/legacy/webalert/api.py:54
 #, fuzzy, python-format
@@ -6479,8 +6514,7 @@ msgstr "Voce não possui direitos suficientes para ver o conteudo deste cesto."
 
 #: invenio/legacy/webalert/api.py:198
 msgid "You already have an alert defined for the specified query and basket."
-msgstr ""
-"Já possui actualmente um aviso definido para um termo e cesto específicos"
+msgstr "Já possui actualmente um aviso definido para um termo e cesto específicos"
 
 #: invenio/legacy/webalert/api.py:221 invenio/legacy/webalert/api.py:345
 msgid "The alert name cannot be empty."
@@ -6503,14 +6537,15 @@ msgstr "O aviso %s foi actualizado com sucesso."
 #: invenio/legacy/webalert/api.py:428
 #, python-format
 msgid ""
-"You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s "
-"is available with a possibility to (a) view search results and (b) subscribe "
-"to an automatic email alerting service for these queries."
+"You have made %(x_nb)s queries. A %(x_url_open)sdetailed "
+"list%(x_url_close)s is available with a possibility to (a) view search "
+"results and (b) subscribe to an automatic email alerting service for "
+"these queries."
 msgstr ""
-"Voce criou %(x_nb)s termos de pesquisa. A %(x_url_open)slista detalhada"
-"%(x_url_close)s esta disponivel com a possibilidade de (a) ver os resultados "
-"das pesquisas e (b) subscrever um aviso automatico via email para todos "
-"estes termos de pesquisa."
+"Voce criou %(x_nb)s termos de pesquisa. A %(x_url_open)slista "
+"detalhada%(x_url_close)s esta disponivel com a possibilidade de (a) ver "
+"os resultados das pesquisas e (b) subscrever um aviso automatico via "
+"email para todos estes termos de pesquisa."
 
 #: invenio/legacy/webalert/htmlparser.py:186
 #: invenio/legacy/webbasket/templates.py:741
@@ -6655,9 +6690,9 @@ msgid ""
 "Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the "
 "%(x_url2_open)spopular searches%(x_url2_close)s, or the input form."
 msgstr ""
-"Defina um novo aviso para %(x_url1_open)sas suas pesquisas%(x_url1_close)s, "
-"as %(x_url2_open)spesquisas mais efectuadas%(x_url2_close)s, ou o formato de "
-"entrada."
+"Defina um novo aviso para %(x_url1_open)sas suas "
+"pesquisas%(x_url1_close)s, as %(x_url2_open)spesquisas mais "
+"efectuadas%(x_url2_close)s, ou o formato de entrada."
 
 #: invenio/legacy/webalert/templates.py:322
 msgid "Search checking frequency"
@@ -6712,8 +6747,8 @@ msgstr "Você definiu %s avisos."
 #: invenio/legacy/webalert/templates.py:439
 #, python-format
 msgid ""
-"You have not executed any search yet. Please go to the %(x_url_open)ssearch "
-"interface%(x_url_close)s first."
+"You have not executed any search yet. Please go to the "
+"%(x_url_open)ssearch interface%(x_url_close)s first."
 msgstr ""
 "Você ainda não realizou qualquer pesquisa até agora. Por favor vá à "
 "%(x_url_open)s interface de pesquisa %(x_url_close)s primeiro."
@@ -6721,11 +6756,11 @@ msgstr ""
 #: invenio/legacy/webalert/templates.py:448
 #, python-format
 msgid ""
-"You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during "
-"the last 30 days or so."
+"You have performed %(x_nb1)s searches (%(x_nb2)s different questions) "
+"during the last 30 days or so."
 msgstr ""
-"Você efectuou %(x_nb1)s pesquisas (%(x_nb2)s diferentes perguntas) durante "
-"os últimos 30 dias ou mais."
+"Você efectuou %(x_nb1)s pesquisas (%(x_nb2)s diferentes perguntas) "
+"durante os últimos 30 dias ou mais."
 
 #: invenio/legacy/webalert/templates.py:453
 #, fuzzy, python-format
@@ -6914,8 +6949,7 @@ msgstr "%s Personalizar, Mostrat avisos"
 
 #: invenio/legacy/webbasket/api.py:104 invenio/legacy/webbasket/api.py:2315
 #: invenio/legacy/webbasket/api.py:2345
-msgid ""
-"The selected public basket does not exist or you do not have access to it."
+msgid "The selected public basket does not exist or you do not have access to it."
 msgstr ""
 
 #: invenio/legacy/webbasket/api.py:112
@@ -6939,8 +6973,7 @@ msgid "You do not have permission to write notes to this item."
 msgstr "Voce não possui direitos suficientes para ver o conteudo deste cesto."
 
 #: invenio/legacy/webbasket/api.py:429 invenio/legacy/webbasket/api.py:1560
-msgid ""
-"The note you are quoting does not exist or you do not have access to it."
+msgid "The note you are quoting does not exist or you do not have access to it."
 msgstr ""
 
 #: invenio/legacy/webbasket/api.py:485 invenio/legacy/webbasket/api.py:1625
@@ -6968,8 +7001,7 @@ msgid "You do not have permission to delete this note."
 msgstr "Voce não possui direitos suficientes para ver o conteudo deste cesto."
 
 #: invenio/legacy/webbasket/api.py:1689
-msgid ""
-"The note you are deleting does not exist or you do not have access to it."
+msgid "The note you are deleting does not exist or you do not have access to it."
 msgstr ""
 
 #: invenio/legacy/webbasket/api.py:1791
@@ -7000,8 +7032,8 @@ msgstr "O registo não existe."
 
 #: invenio/legacy/webbasket/api.py:1842
 msgid ""
-"The url you have provided is not valid: The request contains bad syntax or "
-"cannot be fulfilled."
+"The url you have provided is not valid: The request contains bad syntax "
+"or cannot be fulfilled."
 msgstr ""
 
 #: invenio/legacy/webbasket/api.py:1849
@@ -7023,8 +7055,8 @@ msgstr "Copiar registo para o cesto"
 
 #: invenio/legacy/webbasket/api.py:1967
 msgid ""
-"Some items could not be moved. The destination basket already contains those "
-"items."
+"Some items could not be moved. The destination basket already contains "
+"those items."
 msgstr ""
 
 #: invenio/legacy/webbasket/api.py:1969 invenio/legacy/webbasket/api.py:2820
@@ -7057,8 +7089,8 @@ msgstr ""
 
 #: invenio/legacy/webbasket/api.py:2307
 msgid ""
-"You cannot subscribe to this basket, you are the either owner or you have "
-"already subscribed."
+"You cannot subscribe to this basket, you are the either owner or you have"
+" already subscribed."
 msgstr ""
 
 #: invenio/legacy/webbasket/api.py:2337
@@ -7136,10 +7168,12 @@ msgstr "Cesto Público"
 #, python-format
 msgid ""
 "You have %(x_nb_perso)s personal baskets and are subscribed to "
-"%(x_nb_group)s group baskets and %(x_nb_public)s other users public baskets."
+"%(x_nb_group)s group baskets and %(x_nb_public)s other users public "
+"baskets."
 msgstr ""
-"Você tem %(x_nb_perso)s cestos pessoais e está registada em %(x_nb_group)s "
-"grupos de cestos e noutros %(x_nb_public)s cestos públicos."
+"Você tem %(x_nb_perso)s cestos pessoais e está registada em "
+"%(x_nb_group)s grupos de cestos e noutros %(x_nb_public)s cestos "
+"públicos."
 
 #: invenio/legacy/webbasket/api.py:2797 invenio/legacy/webbasket/api.py:2835
 #, fuzzy
@@ -7166,10 +7200,11 @@ msgstr "%i grupos de utilizadores subscreveram este cesto."
 #: invenio/legacy/webbasket/templates.py:108
 #, fuzzy, python-format
 msgid ""
-"You may want to start by %(x_url_open)screating a new basket%(x_url_close)s."
+"You may want to start by %(x_url_open)screating a new "
+"basket%(x_url_close)s."
 msgstr ""
-"Podera querer ver tambem as %(x_url_open)s%(x_category)s paginas"
-"%(x_url_close)s."
+"Podera querer ver tambem as %(x_url_open)s%(x_category)s "
+"paginas%(x_url_close)s."
 
 #: invenio/legacy/webbasket/templates.py:131
 #: invenio/legacy/webbasket/templates.py:198
@@ -7348,8 +7383,8 @@ msgstr "Registo Externo"
 
 #: invenio/legacy/webbasket/templates.py:1607
 msgid ""
-"Provide a url for the external item you wish to add and fill in a title and "
-"description"
+"Provide a url for the external item you wish to add and fill in a title "
+"and description"
 msgstr ""
 
 #: invenio/legacy/webbasket/templates.py:1612
@@ -7540,21 +7575,20 @@ msgstr "Partilhar cesto a um novo grupo"
 #: invenio/legacy/webbasket/templates.py:2116
 #: invenio/legacy/websession/templates.py:676
 msgid ""
-"You are logged in as a guest user, so your baskets will disappear at the end "
-"of the current session."
+"You are logged in as a guest user, so your baskets will disappear at the "
+"end of the current session."
 msgstr ""
-"Você está autênticado como visitante, os seus cestos irão desaparecer no fim "
-"da actual sessão."
+"Você está autênticado como visitante, os seus cestos irão desaparecer no "
+"fim da actual sessão."
 
 #: invenio/legacy/webbasket/templates.py:2117
 #: invenio/legacy/webbasket/templates.py:2132
 #: invenio/legacy/websession/templates.py:679
 #, python-format
-msgid ""
-"If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
+msgid "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
 msgstr ""
-"Se desejar você pode %(x_url_open)sautênticar-se or registar-se aqui"
-"%(x_url_close)s."
+"Se desejar você pode %(x_url_open)sautênticar-se or registar-se "
+"aqui%(x_url_close)s."
 
 #: invenio/legacy/webbasket/templates.py:2131
 #: invenio/legacy/websession/webinterface.py:287
@@ -7976,8 +8010,7 @@ msgstr ""
 #: invenio/legacy/webcomment/templates.py:315
 #, fuzzy, python-format
 msgid "Readers found the following %(x_name)s reviews to be most helpful."
-msgstr ""
-"Leitores acharam que as seguintes %s analises criticas são uma boa ajuda"
+msgstr "Leitores acharam que as seguintes %s analises criticas são uma boa ajuda"
 
 #: invenio/legacy/webcomment/templates.py:317
 #: invenio/legacy/webcomment/templates.py:340
@@ -8149,7 +8182,8 @@ msgstr "Não está autorizado a aceder a funções de administração."
 #: invenio/legacy/webcomment/templates.py:1270
 #, fuzzy, python-format
 msgid ""
-"Note: Your nickname, %(nick)s, will be displayed as author of this comment."
+"Note: Your nickname, %(nick)s, will be displayed as author of this "
+"comment."
 msgstr ""
 "Nota: O seu nome de utilizador, %s, será apresentado como autor deste "
 "comentário"
@@ -8161,8 +8195,9 @@ msgid ""
 "Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. "
 "%(x_nickname)s will be displayed as the author of this comment."
 msgstr ""
-"Nota: Você não %(x_url_open)sdefiniu o seu nome de utilizador"
-"%(x_url_close)s. %(x_nickname)s será apresentado como autor deste comentário."
+"Nota: Você não %(x_url_open)sdefiniu o seu nome de "
+"utilizador%(x_url_close)s. %(x_nickname)s será apresentado como autor "
+"deste comentário."
 
 #: invenio/legacy/webcomment/templates.py:1292
 msgid "Once logged in, authorized users can also attach files."
@@ -8353,11 +8388,11 @@ msgstr "Ver todas as %s análises criticas reportadas"
 
 #: invenio/legacy/webcomment/templates.py:1728
 msgid ""
-"Here is a list, sorted by total number of reports, of all users who have had "
-"a comment reported at least once."
+"Here is a list, sorted by total number of reports, of all users who have "
+"had a comment reported at least once."
 msgstr ""
-"Aqui está uma lista, ordenada pelo numero total de relatórios, de todos os "
-"utilizadores que tenham um comentário reportado, pelo menos uma vez."
+"Aqui está uma lista, ordenada pelo numero total de relatórios, de todos "
+"os utilizadores que tenham um comentário reportado, pelo menos uma vez."
 
 #: invenio/legacy/webcomment/templates.py:1736
 #: invenio/legacy/webcomment/templates.py:1765
@@ -8390,8 +8425,7 @@ msgstr "Número total de relatórios"
 
 #: invenio/legacy/webcomment/templates.py:1744
 msgid "View all user's reported comments/reviews"
-msgstr ""
-"Ver todos os comentários/análises criticas reportados pelos utilizadores"
+msgstr "Ver todos os comentários/análises criticas reportados pelos utilizadores"
 
 #: invenio/legacy/webcomment/templates.py:1777
 #, fuzzy, python-format
@@ -8473,8 +8507,7 @@ msgstr ""
 
 #: invenio/legacy/webcomment/templates.py:2085
 msgid "Here are all reported reviews sorted by the most reported"
-msgstr ""
-"Aqui estão as análises criticas reportadas ordenadas pelo o maior número"
+msgstr "Aqui estão as análises criticas reportadas ordenadas pelo o maior número"
 
 #: invenio/legacy/webcomment/templates.py:2087
 msgid "Here are all reported comments sorted by the most reported"
@@ -8483,8 +8516,7 @@ msgstr "Aqui estão comentários reportados ordenados pelo maior número"
 #: invenio/legacy/webcomment/templates.py:2092
 #, fuzzy, python-format
 msgid "Here are all reviews for record %(x_num)i, sorted by the most reported"
-msgstr ""
-"Aqui estão as análises criticas reportadas ordenadas pelo o maior número"
+msgstr "Aqui estão as análises criticas reportadas ordenadas pelo o maior número"
 
 #: invenio/legacy/webcomment/templates.py:2093
 #, fuzzy
@@ -8526,14 +8558,12 @@ msgstr "Not yet reviewed"
 
 #: invenio/legacy/webcomment/templates.py:2256
 #, python-format
-msgid ""
-"The following review was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
+msgid "The following review was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
 msgstr ""
 
 #: invenio/legacy/webcomment/templates.py:2257
 #, python-format
-msgid ""
-"The following comment was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
+msgid "The following comment was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
 msgstr ""
 
 #: invenio/legacy/webcomment/templates.py:2284
@@ -8617,8 +8647,7 @@ msgid "Below is the list of the comments you have submitted so far."
 msgstr ""
 
 #: invenio/legacy/webcomment/templates.py:2425
-msgid ""
-"You have not yet submitted any comment in the document \"discussion\" tab."
+msgid "You have not yet submitted any comment in the document \"discussion\" tab."
 msgstr ""
 
 #: invenio/legacy/webcomment/templates.py:2428
@@ -8886,11 +8915,11 @@ msgstr "Desculpe, a pagina %s parece não existir."
 #: invenio/legacy/webdoc/webinterface.py:200
 #, python-format
 msgid ""
-"You may want to look at the %(x_url_open)s%(x_category)s pages"
-"%(x_url_close)s."
+"You may want to look at the %(x_url_open)s%(x_category)s "
+"pages%(x_url_close)s."
 msgstr ""
-"Podera querer ver tambem as %(x_url_open)s%(x_category)s paginas"
-"%(x_url_close)s."
+"Podera querer ver tambem as %(x_url_open)s%(x_category)s "
+"paginas%(x_url_close)s."
 
 #: invenio/legacy/webdoc_info/webinterface.py:208
 #, fuzzy, python-format
@@ -8961,8 +8990,8 @@ msgstr "não podemos fornecer qualquer jornal"
 
 #: invenio/legacy/webjournal/config.py:213
 msgid ""
-"It seems that there are no journals defined on this server. Please contact "
-"support if this is not right."
+"It seems that there are no journals defined on this server. Please "
+"contact support if this is not right."
 msgstr ""
 
 #: invenio/legacy/webjournal/config.py:239
@@ -8989,8 +9018,8 @@ msgstr "não encontramos nenhuma informação na actual edição"
 
 #: invenio/legacy/webjournal/config.py:270
 msgid ""
-"The configuration for the current issue seems to be empty. Try providing an "
-"issue number or check with support."
+"The configuration for the current issue seems to be empty. Try providing "
+"an issue number or check with support."
 msgstr ""
 
 #: invenio/legacy/webjournal/config.py:298
@@ -9094,6 +9123,11 @@ msgstr ""
 msgid "Apply"
 msgstr "Abril"
 
+#: invenio/legacy/webjournal/utils.py:714
+#, fuzzy
+msgid "niceName"
+msgstr "Nome de Utilizador"
+
 #: invenio/legacy/webjournal/web/admin/webjournaladmin.py:76
 #, fuzzy
 msgid "WebJournal Admin"
@@ -9177,8 +9211,9 @@ msgstr ""
 
 #: invenio/legacy/weblinkback/adminlib.py:124
 msgid ""
-"All URLs in these lists are checked for containment (infix) in any linkback "
-"request URL. A whitelist match has precedence over a blacklist match."
+"All URLs in these lists are checked for containment (infix) in any "
+"linkback request URL. A whitelist match has precedence over a blacklist "
+"match."
 msgstr ""
 
 #: invenio/legacy/weblinkback/adminlib.py:127
@@ -9200,7 +9235,8 @@ msgstr ""
 
 #: invenio/legacy/weblinkback/adminlib.py:199
 msgid ""
-"these linkbacks are not visible to users, they must be approved or rejected."
+"these linkbacks are not visible to users, they must be approved or "
+"rejected."
 msgstr ""
 
 #: invenio/legacy/weblinkback/adminlib.py:208
@@ -9316,8 +9352,8 @@ msgid ""
 "Your message is too long, please shorten it. Maximum size allowed is "
 "%(x_size)i characters."
 msgstr ""
-"A sua mensagem é demasiado grande, por favor modifique-a. O tamanho maximo "
-"permitido é %i caracteres."
+"A sua mensagem é demasiado grande, por favor modifique-a. O tamanho "
+"maximo permitido é %i caracteres."
 
 #: invenio/legacy/webmessage/api.py:402
 #, fuzzy, python-format
@@ -9342,8 +9378,8 @@ msgid ""
 "Your message could not be sent to the following recipients as it would "
 "exceed their quotas:"
 msgstr ""
-"A sua mensagem não pode ser enviada para o seguinte endereço devido à sua "
-"quota:"
+"A sua mensagem não pode ser enviada para o seguinte endereço devido à sua"
+" quota:"
 
 #: invenio/legacy/webmessage/api.py:457
 msgid "Your message has been sent."
@@ -9460,14 +9496,12 @@ msgstr "APAGAR"
 #: invenio/legacy/webmessage/templates.py:506
 #: invenio/modules/messages/templates/messages/confirm_delete_base.html:25
 msgid "Are you sure you want to empty your whole mailbox?"
-msgstr ""
-"Tem a certeza que deseja esvaziar a sua caixa de correio na totalidade?"
+msgstr "Tem a certeza que deseja esvaziar a sua caixa de correio na totalidade?"
 
 #: invenio/legacy/webmessage/templates.py:582
 #, python-format
 msgid "Quota used: %(x_nb_used)i messages out of max. %(x_nb_total)i"
-msgstr ""
-"Quota utilizada: %(x_nb_used)i mensagens para alem do max. %(x_nb_total)i"
+msgstr "Quota utilizada: %(x_nb_used)i mensagens para alem do max. %(x_nb_total)i"
 
 #: invenio/legacy/webmessage/templates.py:599
 msgid "Please select one or more:"
@@ -9705,14 +9739,14 @@ msgstr "Procurar também:"
 
 #: invenio/legacy/websearch/templates.py:1589
 msgid ""
-"This collection is restricted.  If you are authorized to access it, please "
-"click on the Search button."
+"This collection is restricted.  If you are authorized to access it, "
+"please click on the Search button."
 msgstr ""
 
 #: invenio/legacy/websearch/templates.py:1604
 msgid ""
-"This is a hosted external collection. Please click on the Search button to "
-"see its content."
+"This is a hosted external collection. Please click on the Search button "
+"to see its content."
 msgstr ""
 
 #: invenio/legacy/websearch/templates.py:1619
@@ -9727,8 +9761,7 @@ msgstr "Citado por: %s registos"
 #: invenio/legacy/websearch/templates.py:1856
 #, fuzzy, python-format
 msgid "Words nearest to %(x_word)s inside %(x_field)s in any collection are:"
-msgstr ""
-"Palavras semelhantes a %(x_word)s em %(x_field)s em qualquer colecção são:"
+msgstr "Palavras semelhantes a %(x_word)s em %(x_field)s em qualquer colecção são:"
 
 #: invenio/legacy/websearch/templates.py:1859
 #, fuzzy, python-format
@@ -9853,10 +9886,11 @@ msgstr "As suas submissões"
 
 #: invenio/legacy/websearch/templates.py:3325
 msgid ""
-"Boolean query returned no hits. Please combine your search terms differently."
+"Boolean query returned no hits. Please combine your search terms "
+"differently."
 msgstr ""
-"A consulta booleana não gerou resultados. Por favor combine seus termos de "
-"pesquisa de outra maneira."
+"A consulta booleana não gerou resultados. Por favor combine seus termos "
+"de pesquisa de outra maneira."
 
 #: invenio/legacy/websearch/templates.py:3357
 msgid "See also: similar author names"
@@ -9881,8 +9915,8 @@ msgstr "Você poderá começar a explorar a partir de %s"
 #, python-format
 msgid ""
 "Set up a personal %(x_url1_open)semail alert%(x_url1_close)s\n"
-"                                  or subscribe to the %(x_url2_open)sRSS feed"
-"%(x_url2_close)s."
+"                                  or subscribe to the %(x_url2_open)sRSS "
+"feed%(x_url2_close)s."
 msgstr ""
 
 #: invenio/legacy/websearch/templates.py:3832
@@ -10082,8 +10116,7 @@ msgstr "em"
 
 #: invenio/legacy/websearch_external_collections/templates.py:51
 #, fuzzy
-msgid ""
-"Haven't found what you were looking for? Try your search on other servers:"
+msgid "Haven't found what you were looking for? Try your search on other servers:"
 msgstr "Não encontrou o que estava procurando? Tentar a sua pesquisa em:"
 
 #: invenio/legacy/websearch_external_collections/templates.py:79
@@ -10182,8 +10215,8 @@ msgstr "obrigatório"
 
 #: invenio/legacy/websession/templates.py:207
 msgid ""
-"The description should be something meaningful for you to recognize the API "
-"key"
+"The description should be something meaningful for you to recognize the "
+"API key"
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:208
@@ -10193,11 +10226,11 @@ msgstr "Criar um novo cesto"
 
 #: invenio/legacy/websession/templates.py:270
 msgid ""
-"If you want to change your email or set for the first time your nickname, "
-"please set new values in the form below."
+"If you want to change your email or set for the first time your nickname,"
+" please set new values in the form below."
 msgstr ""
-"Se deseja mudar o seu endereço de email ou definir pela primeira vez o seu "
-"nome de utilizador, defina os dados no formulario abaixo."
+"Se deseja mudar o seu endereço de email ou definir pela primeira vez o "
+"seu nome de utilizador, defina os dados no formulario abaixo."
 
 #: invenio/legacy/websession/templates.py:271
 msgid "Edit login credentials"
@@ -10213,16 +10246,16 @@ msgstr "Definir novos dados"
 
 #: invenio/legacy/websession/templates.py:285
 msgid ""
-"Since this is considered as a signature for comments and reviews, once set "
-"it can not be changed."
+"Since this is considered as a signature for comments and reviews, once "
+"set it can not be changed."
 msgstr ""
-"Desde que isto é considerado a sua assinatura para comentarios e analises "
-"criticas, uma vez definida não pode ser alterada."
+"Desde que isto é considerado a sua assinatura para comentarios e analises"
+" criticas, uma vez definida não pode ser alterada."
 
 #: invenio/legacy/websession/templates.py:325
 msgid ""
-"If you want to change your password, please enter the old one and set the "
-"new value in the form below."
+"If you want to change your password, please enter the old one and set the"
+" new value in the form below."
 msgstr ""
 "Se deseja mudar a sua palavra passe, indique a anteior e defina anova no "
 "formulario abaixo."
@@ -10262,8 +10295,8 @@ msgstr "Definir nova palavra-passe"
 #: invenio/legacy/websession/templates.py:343
 #, fuzzy, python-format
 msgid ""
-"If you are using a lightweight CERN account you can %(x_url_open)sreset the "
-"password%(x_url_close)s."
+"If you are using a lightweight CERN account you can %(x_url_open)sreset "
+"the password%(x_url_close)s."
 msgstr ""
 "If you are using a lightweight CERN account you can\n"
 "                %(x_url_open)sreset the password%(x_url_close)s."
@@ -10361,9 +10394,10 @@ msgstr "Seleccione método"
 #: invenio/legacy/websession/templates.py:537
 #, python-format
 msgid ""
-"If you have lost the password for your %(sitename)s %(x_fmt_open)sinternal "
-"account%(x_fmt_close)s, then please enter your email address in the "
-"following form in order to have a password reset link emailed to you."
+"If you have lost the password for your %(sitename)s "
+"%(x_fmt_open)sinternal account%(x_fmt_close)s, then please enter your "
+"email address in the following form in order to have a password reset "
+"link emailed to you."
 msgstr ""
 "Se esqueceu a sua palavra-passe da sua%(sitename)s %(x_fmt_open)sconta "
 "interna%(x_fmt_close)s, indique o seu endereço de email no formulario "
@@ -10383,15 +10417,15 @@ msgstr "Enviar palavra-passe alternativa"
 #: invenio/legacy/websession/templates.py:567
 #, python-format
 msgid ""
-"If you have been using the %(x_fmt_open)sCERN login system%(x_fmt_close)s, "
-"then you can recover your password through the %(x_url_open)sCERN "
-"authentication system%(x_url_close)s."
+"If you have been using the %(x_fmt_open)sCERN login "
+"system%(x_fmt_close)s, then you can recover your password through the "
+"%(x_url_open)sCERN authentication system%(x_url_close)s."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:571
 msgid ""
-"Note that if you have been using an external login system, then we cannot do "
-"anything and you have to ask there."
+"Note that if you have been using an external login system, then we cannot"
+" do anything and you have to ask there."
 msgstr ""
 "Note que se estiver usando um sistema de autenticação externo, nos não "
 "podemos fazer nada, tendo que perguntar onde se autenticou."
@@ -10408,15 +10442,15 @@ msgstr ""
 #: invenio/legacy/websession/templates.py:600
 #, fuzzy, python-format
 msgid ""
-"%(x_name)s offers you the possibility to personalize the interface, to set "
-"up your own personal library of documents, or to set up an automatic alert "
-"query that would run periodically and would notify you of search results by "
-"email."
+"%(x_name)s offers you the possibility to personalize the interface, to "
+"set up your own personal library of documents, or to set up an automatic "
+"alert query that would run periodically and would notify you of search "
+"results by email."
 msgstr ""
-"%s permite-lhe a possibilidade de personalizar a interface, para definir a "
-"sua própria biblioteca de documentos, ou definir avisos de pesquisa "
-"automáticosque são executados periodicamente e o notificão por email acerca "
-"dos resultados obtidos."
+"%s permite-lhe a possibilidade de personalizar a interface, para definir "
+"a sua própria biblioteca de documentos, ou definir avisos de pesquisa "
+"automáticosque são executados periodicamente e o notificão por email "
+"acerca dos resultados obtidos."
 
 #: invenio/legacy/websession/templates.py:611
 #: invenio/legacy/websession/webinterface.py:331
@@ -10438,11 +10472,12 @@ msgstr "Ver todas as pesquisas efectuadas durante os últimos 30 dias."
 
 #: invenio/legacy/websession/templates.py:628
 msgid ""
-"With baskets you can define specific collections of items, store interesting "
-"records you want to access later or share with others."
+"With baskets you can define specific collections of items, store "
+"interesting records you want to access later or share with others."
 msgstr ""
 "Com os cestos, pode definir colecções especificas de items, guardar "
-"registodo seu interesse, aos quais queira aceder posteriormente ou partilhar."
+"registodo seu interesse, aos quais queira aceder posteriormente ou "
+"partilhar."
 
 #: invenio/legacy/websession/templates.py:636
 msgid "Display all the comments you have submitted so far."
@@ -10453,35 +10488,36 @@ msgid ""
 "Subscribe to a search which will be run periodically by our service. The "
 "result can be sent to you via Email or stored in one of your baskets."
 msgstr ""
-"Subscrever uma pesquisa que será executada periodicamente, ao seu serviço. "
-"Oresultado pode ser enviado por email ou guardado num dos seus cestos."
+"Subscrever uma pesquisa que será executada periodicamente, ao seu "
+"serviço. Oresultado pode ser enviado por email ou guardado num dos seus "
+"cestos."
 
 #: invenio/legacy/websession/templates.py:651
 msgid ""
-"Check out book you have on loan, submit borrowing requests, etc. Requires "
-"CERN ID."
+"Check out book you have on loan, submit borrowing requests, etc. Requires"
+" CERN ID."
 msgstr ""
-"Para verificar livros requesitados, submeter pedidos de empréstimo, etc... é "
-"necessário o seu CERN ID."
+"Para verificar livros requesitados, submeter pedidos de empréstimo, "
+"etc... é necessário o seu CERN ID."
 
 #: invenio/legacy/websession/templates.py:678
 msgid ""
-"You are logged in as a guest user, so your alerts will disappear at the end "
-"of the current session."
+"You are logged in as a guest user, so your alerts will disappear at the "
+"end of the current session."
 msgstr ""
-"Está autenticado como visitante, por isso os seus avisos irão desaparecer no "
-"fim da actual sessão."
+"Está autenticado como visitante, por isso os seus avisos irão desaparecer"
+" no fim da actual sessão."
 
 #: invenio/legacy/websession/templates.py:701
 #, python-format
 msgid ""
-"You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout"
-"%(x_url1_close)s; b) edit your %(x_url2_open)saccount settings"
-"%(x_url2_close)s."
+"You are logged in as %(x_user)s. You may want to a) "
+"%(x_url1_open)slogout%(x_url1_close)s; b) edit your "
+"%(x_url2_open)saccount settings%(x_url2_close)s."
 msgstr ""
-"Está autenticado como %(x_user)s. Poderá querer a) %(x_url1_open)sterminar a "
-"sessão%(x_url1_close)s; b) editar as %(x_url2_open)sdefinições da sua conta"
-"%(x_url2_close)s."
+"Está autenticado como %(x_user)s. Poderá querer a) "
+"%(x_url1_open)sterminar a sessão%(x_url1_close)s; b) editar as "
+"%(x_url2_open)sdefinições da sua conta%(x_url2_close)s."
 
 #: invenio/legacy/websession/templates.py:785
 #, fuzzy, python-format
@@ -10498,11 +10534,11 @@ msgstr "Os seus avisos de pesquisa"
 #: invenio/legacy/websession/templates.py:796
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are "
-"administering or are a member of."
+"You can consult the list of %(x_url_open)syour groups%(x_url_close)s you "
+"are administering or are a member of."
 msgstr ""
-"Pode consultar a lista dos %(x_url_open)sseus grupos%(x_url_close)s onde é "
-"administrador ou membro."
+"Pode consultar a lista dos %(x_url_open)sseus grupos%(x_url_close)s onde "
+"é administrador ou membro."
 
 #: invenio/legacy/websession/templates.py:799
 #: invenio/legacy/websession/templates.py:2348
@@ -10514,11 +10550,11 @@ msgstr "Os seus grupos"
 #: invenio/legacy/websession/templates.py:802
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)syour submissions%(x_url_close)s "
-"and inquire about their status."
+"You can consult the list of %(x_url_open)syour submissions%(x_url_close)s"
+" and inquire about their status."
 msgstr ""
-"Pode consultar a lista das %(x_url_open)ssuas submissões%(x_url_close)s e "
-"informar-se acerca do seu estado."
+"Pode consultar a lista das %(x_url_open)ssuas submissões%(x_url_close)s e"
+" informar-se acerca do seu estado."
 
 #: invenio/legacy/websession/templates.py:805
 #: invenio/legacy/websubmit/web/yoursubmissions.py:154
@@ -10529,11 +10565,11 @@ msgstr "As suas submissões"
 #: invenio/legacy/websession/templates.py:808
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with "
-"the documents you approved or refereed."
+"You can consult the list of %(x_url_open)syour approvals%(x_url_close)s "
+"with the documents you approved or refereed."
 msgstr ""
-"Pode consultar a lista das %(x_url_open)ssuas aprovações%(x_url_close)s com "
-"com os documentos que aprovou ou referiu."
+"Pode consultar a lista das %(x_url_open)ssuas aprovações%(x_url_close)s "
+"com com os documentos que aprovou ou referiu."
 
 #: invenio/legacy/websession/templates.py:811
 #: invenio/legacy/websubmit/web/yourapprovals.py:88
@@ -10583,10 +10619,8 @@ msgstr "a fim de confirmar a validade deste pedido."
 #: invenio/legacy/websession/templates.py:884
 #: invenio/legacy/websession/templates.py:921
 #, python-format
-msgid ""
-"Please note that this URL will remain valid for about %(days)s days only."
-msgstr ""
-"Note que este URL permanecera valido por um periodo de %(days)s apenas."
+msgid "Please note that this URL will remain valid for about %(days)s days only."
+msgstr "Note que este URL permanecera valido por um periodo de %(days)s apenas."
 
 #: invenio/legacy/websession/templates.py:909
 #, fuzzy, python-format
@@ -10637,25 +10671,25 @@ msgstr "Se já possui uma conta, é favor autenticar-se usando o formulário."
 #: invenio/legacy/websession/templates.py:1015
 #, python-format
 msgid ""
-"If you don't own a CERN account yet, you can register a %(x_url_open)snew "
-"CERN lightweight account%(x_url_close)s."
+"If you don't own a CERN account yet, you can register a %(x_url_open)snew"
+" CERN lightweight account%(x_url_close)s."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:1018
 #, python-format
 msgid ""
-"If you don't own an account yet, please %(x_url_open)sregister"
-"%(x_url_close)s an internal account."
+"If you don't own an account yet, please "
+"%(x_url_open)sregister%(x_url_close)s an internal account."
 msgstr ""
-"Se ainda não possui uma conta, é favor %(x_url_open)sregistar-se"
-"%(x_url_close)s numa conta interna."
+"Se ainda não possui uma conta, é favor %(x_url_open)sregistar-"
+"se%(x_url_close)s numa conta interna."
 
 #: invenio/legacy/websession/templates.py:1027
 #, fuzzy, python-format
 msgid "If you don't own an account yet, please contact %(x_name)s."
 msgstr ""
-"Se ainda não possui uma conta, é favor %(x_url_open)sregistar-se"
-"%(x_url_close)s numa conta interna."
+"Se ainda não possui uma conta, é favor %(x_url_open)sregistar-"
+"se%(x_url_close)s numa conta interna."
 
 #: invenio/legacy/websession/templates.py:1051
 #, fuzzy
@@ -10683,12 +10717,13 @@ msgstr "Esqueceu a sua palavra-passe?"
 #: invenio/legacy/websession/templates.py:1094
 msgid "You can use your nickname or your email address to login."
 msgstr ""
-"Pode usar o seu nome de utilizador ou endereço de email para se autenticar."
+"Pode usar o seu nome de utilizador ou endereço de email para se "
+"autenticar."
 
 #: invenio/legacy/websession/templates.py:1127
 msgid ""
-"Your request is valid. Please set the new desired password in the following "
-"form."
+"Your request is valid. Please set the new desired password in the "
+"following form."
 msgstr ""
 "O seu pedido é valido. Por favor defina a nova palavra-passe desejada "
 "noseguinte formulario."
@@ -10717,10 +10752,9 @@ msgstr ""
 
 #: invenio/legacy/websession/templates.py:1177
 msgid ""
-"It will not be possible to use the account before it has been verified and "
-"activated."
-msgstr ""
-"Não será possível utilizar a sua conta antes de ser verificada e activada."
+"It will not be possible to use the account before it has been verified "
+"and activated."
+msgstr "Não será possível utilizar a sua conta antes de ser verificada e activada."
 
 #: invenio/legacy/websession/templates.py:1228
 msgid "Retype Password"
@@ -10736,13 +10770,13 @@ msgstr "registar"
 msgid ""
 "Please do not use valuable passwords such as your Unix, AFS or NICE "
 "passwords with this service. Your email address will stay strictly "
-"confidential and will not be disclosed to any third party. It will be used "
-"to identify you for personal services of %(x_name)s. For example, you may "
-"set up an automatic alert search that will look for new preprints and will "
-"notify you daily of new arrivals by email."
+"confidential and will not be disclosed to any third party. It will be "
+"used to identify you for personal services of %(x_name)s. For example, "
+"you may set up an automatic alert search that will look for new preprints"
+" and will notify you daily of new arrivals by email."
 msgstr ""
-"É favor não usar palavras-passe de outros sistema, como Unix, AFS ou NICE "
-"como palavra-passe deste serviço. O seu endereço de email permanecerá "
+"É favor não usar palavras-passe de outros sistema, como Unix, AFS ou NICE"
+" como palavra-passe deste serviço. O seu endereço de email permanecerá "
 "confidencial e não será relevado a terceiros.  Este será utilizado para "
 "identifica-lo em funcionalidades deste serviço de %s. Por exemplo, pode "
 "definir avisos automáticos associados a pesquisas, que o informarão "
@@ -10751,20 +10785,20 @@ msgstr ""
 #: invenio/legacy/websession/templates.py:1235
 #, fuzzy, python-format
 msgid ""
-"It is not possible to create an account yourself. Contact %(x_name)s if you "
-"want an account."
+"It is not possible to create an account yourself. Contact %(x_name)s if "
+"you want an account."
 msgstr ""
-"Não é possível criar uma conta por si próprio. Contacte %s se deseja criar "
-"uma conta."
+"Não é possível criar uma conta por si próprio. Contacte %s se deseja "
+"criar uma conta."
 
 #: invenio/legacy/websession/templates.py:1261
 #, python-format
 msgid ""
-"You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s "
-"first."
+"You seem to be a guest user. You have to "
+"%(x_url_open)slogin%(x_url_close)s first."
 msgstr ""
-"Parece ser um visitante. Tem que se %(x_url_open)sautenticar%(x_url_close)s "
-"primeiro."
+"Parece ser um visitante. Tem que se "
+"%(x_url_open)sautenticar%(x_url_close)s primeiro."
 
 #: invenio/legacy/websession/templates.py:1267
 msgid "You are not authorized to access administrative functions."
@@ -10896,14 +10930,13 @@ msgstr ""
 
 #: invenio/legacy/websession/templates.py:1323
 msgid "Here are some interesting web admin links for you:"
-msgstr ""
-"Aqui estão alguns links interessantes para si, sobre administração web:"
+msgstr "Aqui estão alguns links interessantes para si, sobre administração web:"
 
 #: invenio/legacy/websession/templates.py:1325
 #, python-format
 msgid ""
-"For more admin-level activities, see the complete %(x_url_open)sAdmin Area"
-"%(x_url_close)s."
+"For more admin-level activities, see the complete %(x_url_open)sAdmin "
+"Area%(x_url_close)s."
 msgstr ""
 "Para mais actividades de administração, consulte a %(x_url_open)sÁrea "
 "deAdministração%(x_url_close)s."
@@ -11141,8 +11174,7 @@ msgstr "Um utilizador pretende juntar-se ao grupo %s."
 
 #: invenio/legacy/websession/templates.py:2382
 #, python-format
-msgid ""
-"Please %(x_url_open)saccept or reject%(x_url_close)s this user's request."
+msgid "Please %(x_url_open)saccept or reject%(x_url_close)s this user's request."
 msgstr ""
 "É favor %(x_url_open)saceitar ou rejeitar%(x_url_close)s o pedido deste "
 "utilizador."
@@ -11186,73 +11218,79 @@ msgstr "Grupo %s foi apagado pelo seu administrador."
 #: invenio/legacy/websession/templates.py:2441
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)s%(x_nb_total)i groups"
-"%(x_url_close)s you are subscribed to (%(x_nb_member)i) or administering "
-"(%(x_nb_admin)i)."
+"You can consult the list of %(x_url_open)s%(x_nb_total)i "
+"groups%(x_url_close)s you are subscribed to (%(x_nb_member)i) or "
+"administering (%(x_nb_admin)i)."
 msgstr ""
-"Pode consultar a list de %(x_url_open)s%(x_nb_total)i grupos%(x_url_close)s "
-"que suscreveu como (%(x_nb_member)i) ou como administrador (%(x_nb_admin)i)."
+"Pode consultar a list de %(x_url_open)s%(x_nb_total)i "
+"grupos%(x_url_close)s que suscreveu como (%(x_nb_member)i) ou como "
+"administrador (%(x_nb_admin)i)."
 
 #: invenio/legacy/websession/templates.py:2460
 msgid ""
 "Warning: The password set for MySQL root user is the same as the default "
-"Invenio password. For security purposes, you may want to change the password."
+"Invenio password. For security purposes, you may want to change the "
+"password."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:2466
 msgid ""
 "Warning: The password set for the Invenio MySQL user is the same as the "
-"shipped default. For security purposes, you may want to change the password."
+"shipped default. For security purposes, you may want to change the "
+"password."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:2472
 msgid ""
-"Warning: The password set for the Invenio admin user is currently empty. For "
-"security purposes, it is strongly recommended that you add a password."
+"Warning: The password set for the Invenio admin user is currently empty. "
+"For security purposes, it is strongly recommended that you add a "
+"password."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:2478
 msgid ""
-"Warning: The email address set for support email is currently set to "
-"info@invenio-software.org. It is recommended that you change this to your "
-"own address."
+"Warning: The email address set for support email is currently set to info"
+"@invenio-software.org. It is recommended that you change this to your own"
+" address."
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:2484
 msgid ""
-"A newer version of Invenio is available for download. You may want to visit  "
+"A newer version of Invenio is available for download. You may want to "
+"visit  "
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:2491
 msgid ""
-"Cannot download or parse release notes from http://invenio-software.org/repo/"
-"invenio/tree/RELEASE-NOTES"
+"Cannot download or parse release notes from http://invenio-"
+"software.org/repo/invenio/tree/RELEASE-NOTES"
 msgstr ""
 
 #: invenio/legacy/websession/templates.py:2496
 #, python-format
 msgid ""
-"Your e-mail is auto-generated by the system. Please change your e-mail from "
-"<a href='%(x_site)s/youraccount/edit?ln=%(x_link)s'>account settings</a>."
+"Your e-mail is auto-generated by the system. Please change your e-mail "
+"from <a href='%(x_site)s/youraccount/edit?ln=%(x_link)s'>account "
+"settings</a>."
 msgstr ""
 
 #: invenio/legacy/websession/webaccount.py:118
 #, python-format
 msgid ""
-"You are logged in as guest. You may want to %(x_url_open)slogin"
-"%(x_url_close)s as a regular user."
+"You are logged in as guest. You may want to "
+"%(x_url_open)slogin%(x_url_close)s as a regular user."
 msgstr ""
-"Você está autenticado como visitante. Poderá desejar "
-"%(x_url_open)sautenticar-se%(x_url_close)s como um utilizador normal."
+"Você está autenticado como visitante. Poderá desejar %(x_url_open"
+")sautenticar-se%(x_url_close)s como um utilizador normal."
 
 #: invenio/legacy/websession/webaccount.py:122
 #, python-format
 msgid ""
-"The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister"
-"%(x_url_close)s first"
+"The %(x_fmt_open)sguest%(x_fmt_close)s users need to "
+"%(x_url_open)sregister%(x_url_close)s first"
 msgstr ""
-"O %(x_fmt_open)svisitante%(x_fmt_close)s precisa de se %(x_url_open)sregistar"
-"%(x_url_close)s primeiro"
+"O %(x_fmt_open)svisitante%(x_fmt_close)s precisa de se "
+"%(x_url_open)sregistar%(x_url_close)s primeiro"
 
 #: invenio/legacy/websession/webaccount.py:127
 msgid "No queries found"
@@ -11260,14 +11298,14 @@ msgstr "Nenhuma termo de pesquisa encontrado"
 
 #: invenio/legacy/websession/webaccount.py:398
 msgid ""
-"This collection is restricted.  If you think you have right to access it, "
-"please authenticate yourself."
+"This collection is restricted.  If you think you have right to access it,"
+" please authenticate yourself."
 msgstr ""
 
 #: invenio/legacy/websession/webaccount.py:399
 msgid ""
-"This file is restricted.  If you think you have right to access it, please "
-"authenticate yourself."
+"This file is restricted.  If you think you have right to access it, "
+"please authenticate yourself."
 msgstr ""
 
 #: invenio/legacy/websession/webaccount.py:400
@@ -11276,8 +11314,8 @@ msgstr ""
 
 #: invenio/legacy/websession/webaccount.py:401
 msgid ""
-"python-openid package must be installed: run make install-openid-package or "
-"download manually from https://github.com/openid/python-openid/"
+"python-openid package must be installed: run make install-openid-package "
+"or download manually from https://github.com/openid/python-openid/"
 msgstr ""
 
 #: invenio/legacy/websession/webaccount.py:401
@@ -11289,8 +11327,8 @@ msgstr ""
 
 #: invenio/legacy/websession/webaccount.py:402
 msgid ""
-"rauth package must be installed: run make install-oauth-package or download "
-"manually from https://github.com/litl/rauth/"
+"rauth package must be installed: run make install-oauth-package or "
+"download manually from https://github.com/litl/rauth/"
 msgstr ""
 
 #: invenio/legacy/websession/webaccount.py:403
@@ -11370,7 +11408,8 @@ msgstr ""
 
 #: invenio/legacy/websession/webgroup.py:651
 msgid ""
-"Please choose a user from the list if you want him to be added to the group."
+"Please choose a user from the list if you want him to be added to the "
+"group."
 msgstr ""
 
 #: invenio/legacy/websession/webgroup.py:664
@@ -11409,8 +11448,8 @@ msgid ""
 "browser if you are a guest user."
 msgstr ""
 "Obtece com sucesso autorização para as funçoes de %(x_role)s! Esta "
-"autorização sera valida ate %(x_expiration)s e ate que encerre o seubrowser "
-"no caso de ser visitante."
+"autorização sera valida ate %(x_expiration)s e ate que encerre o "
+"seubrowser no caso de ser visitante."
 
 #: invenio/legacy/websession/webinterface.py:128
 msgid "You have confirmed the validity of your email address!"
@@ -11439,9 +11478,9 @@ msgstr "Voce ja confirmou a validade do seu endereço de email!"
 
 #: invenio/legacy/websession/webinterface.py:148
 msgid ""
-"This request for confirmation of an email address is not valid or is expired."
-msgstr ""
-"Este pedido de confirmação de endereço de email não é valido ou expirou."
+"This request for confirmation of an email address is not valid or is "
+"expired."
+msgstr "Este pedido de confirmação de endereço de email não é valido ou expirou."
 
 #: invenio/legacy/websession/webinterface.py:153
 msgid "This request for an authorization is not valid or is expired."
@@ -11508,15 +11547,15 @@ msgstr "Mudar para metodo de autenticação interno."
 #: invenio/legacy/websession/webinterface.py:423
 #, fuzzy
 msgid ""
-"Please note that if this is the first time that you are using this account "
-"with the internal login method then the system has set for you a randomly "
-"generated password. Please click the following button to obtain a password "
-"reset request link sent to you via email:"
+"Please note that if this is the first time that you are using this "
+"account with the internal login method then the system has set for you a "
+"randomly generated password. Please click the following button to obtain "
+"a password reset request link sent to you via email:"
 msgstr ""
-"Por favor note que se esta é a primeira vez que esta´ usando esta contacom "
-"um metodo de autenticação interno entao o sistema definiu uma palavra-passe "
-"aleatoria. Por favor clique no seguinte botao para que lhe seja enviado por "
-"emailum link, onde podera alterar a palavra-passe:"
+"Por favor note que se esta é a primeira vez que esta´ usando esta "
+"contacom um metodo de autenticação interno entao o sistema definiu uma "
+"palavra-passe aleatoria. Por favor clique no seguinte botao para que lhe "
+"seja enviado por emailum link, onde podera alterar a palavra-passe:"
 
 #: invenio/legacy/websession/webinterface.py:431
 msgid "Send Password"
@@ -11528,8 +11567,8 @@ msgid ""
 "Unable to switch to external login method %(x_name)s, because your email "
 "address is unknown."
 msgstr ""
-"Não é possivel mudar para metodo de autenticação externa %s, porque o seu "
-"endereço de email é desconhecido."
+"Não é possivel mudar para metodo de autenticação externa %s, porque o seu"
+" endereço de email é desconhecido."
 
 #: invenio/legacy/websession/webinterface.py:445
 #, fuzzy, python-format
@@ -11537,8 +11576,8 @@ msgid ""
 "Unable to switch to external login method %(x_meth)s, because your email "
 "address is unknown to the external login system."
 msgstr ""
-"Não é possivel mudar para metodo de aitenticação externa %s, porque o seu "
-"endereço de email é desconhecido para o sistema externo de autenticação."
+"Não é possivel mudar para metodo de aitenticação externa %s, porque o seu"
+" endereço de email é desconhecido para o sistema externo de autenticação."
 
 #: invenio/legacy/websession/webinterface.py:449
 msgid "Login method successfully selected."
@@ -11547,8 +11586,8 @@ msgstr "Método de autenticação escolhido com sucesso."
 #: invenio/legacy/websession/webinterface.py:452
 #, fuzzy, python-format
 msgid ""
-"The external login method %(x_name)s does not support email address based "
-"logins.  Please contact the site administrators."
+"The external login method %(x_name)s does not support email address based"
+" logins.  Please contact the site administrators."
 msgstr ""
 "O método de autenticação externa %s não suporta endereços de email como "
 "forma de autenticação.  É favor contactar os administradores do site."
@@ -11680,8 +11719,8 @@ msgid ""
 "Cannot send password reset request since you are using external "
 "authentication system."
 msgstr ""
-"não pode enviar pedido de alteração de palavra-passe pois esta´ usando um "
-"sistema de autenticação interno."
+"não pode enviar pedido de alteração de palavra-passe pois esta´ usando um"
+" sistema de autenticação interno."
 
 #: invenio/legacy/websession/webinterface.py:665
 msgid "The entered email address does not exist in the database."
@@ -11736,19 +11775,20 @@ msgstr ""
 #: invenio/legacy/websession/webinterface.py:984
 #: invenio/modules/accounts/views/accounts.py:132
 msgid ""
-"Please follow instructions presented there in order to complete the account "
-"registration process."
+"Please follow instructions presented there in order to complete the "
+"account registration process."
 msgstr ""
-"Siga as seguintes intruçoes apresentadas aqui a fim de completar o processo "
-"de registo da sua conta."
+"Siga as seguintes intruçoes apresentadas aqui a fim de completar o "
+"processo de registo da sua conta."
 
 #: invenio/legacy/websession/webinterface.py:986
 #: invenio/modules/accounts/views/accounts.py:134
 msgid ""
-"A second email will be sent when the account has been activated and can be "
-"used."
+"A second email will be sent when the account has been activated and can "
+"be used."
 msgstr ""
-"Um segundo email será enviado quando a conta for activada e poder ser usada."
+"Um segundo email será enviado quando a conta for activada e poder ser "
+"usada."
 
 #: invenio/legacy/websession/webinterface.py:989
 #, python-format
@@ -11789,8 +11829,8 @@ msgstr "O nome de utilizador pretendido %s já existe na base de dados."
 #: invenio/modules/accounts/views/accounts.py:143
 msgid "Users cannot register themselves, only admin can register them."
 msgstr ""
-"Utilizadores não se podem registar eles próprios, apenas o administrador os "
-"pode registar."
+"Utilizadores não se podem registar eles próprios, apenas o administrador "
+"os pode registar."
 
 #: invenio/legacy/websession/webinterface.py:1023
 #: invenio/modules/accounts/views/accounts.py:148
@@ -11798,8 +11838,8 @@ msgid ""
 "The site is having troubles in sending you an email for confirming your "
 "email address."
 msgstr ""
-"Este site esta´ com problemas em enviar-lhe um email com a confirmação do "
-"seu endereço de email."
+"Este site esta´ com problemas em enviar-lhe um email com a confirmação do"
+" seu endereço de email."
 
 #: invenio/legacy/websession/webinterface.py:1432
 #, fuzzy
@@ -11871,8 +11911,7 @@ msgstr ""
 
 #: invenio/legacy/webstyle/templates.py:636
 #, fuzzy, python-format
-msgid ""
-"Record created %(x_date_creation)s, last modified %(x_date_modification)s"
+msgid "Record created %(x_date_creation)s, last modified %(x_date_modification)s"
 msgstr ""
 "Registo criado %(x_date_creation)s, modificado pela última vez em "
 "%(x_date_modification)s"
@@ -11900,37 +11939,37 @@ msgstr ""
 #: invenio/legacy/websubmit/admin_engine.py:3917
 #, python-format
 msgid ""
-"Unable to swap field at position %(x_from)s with field at position %(x_to)s "
-"on page %(x_page)s of submission %(x_sub)s - could not move field at "
-"position %(x_subm)s to temporary field location"
+"Unable to swap field at position %(x_from)s with field at position "
+"%(x_to)s on page %(x_page)s of submission %(x_sub)s - could not move "
+"field at position %(x_subm)s to temporary field location"
 msgstr ""
 
 #: invenio/legacy/websubmit/admin_engine.py:3929
 #, python-format
 msgid ""
-"Unable to swap field at position %(x_from)s with field at position %(x_to)s "
-"on page %(x_page)s of submission %(x_sub)s - could not move field at "
-"position %(x_posfrom)s to position %(x_posto)s. Please ask Admin to check "
-"that a field was not stranded in a temporary position"
+"Unable to swap field at position %(x_from)s with field at position "
+"%(x_to)s on page %(x_page)s of submission %(x_sub)s - could not move "
+"field at position %(x_posfrom)s to position %(x_posto)s. Please ask Admin"
+" to check that a field was not stranded in a temporary position"
 msgstr ""
 
 #: invenio/legacy/websubmit/admin_engine.py:3941
 #, python-format
 msgid ""
-"Unable to swap field at position %(x_from)s with field at position %(x_to)s "
-"on page %(x_page)s of submission %(x_sub)s - could not move field that was "
-"located at position %(x_posfrom)s to position %(x_posto)s from temporary "
-"position. Field is now stranded in temporary position and must be corrected "
-"manually by an Admin"
+"Unable to swap field at position %(x_from)s with field at position "
+"%(x_to)s on page %(x_page)s of submission %(x_sub)s - could not move "
+"field that was located at position %(x_posfrom)s to position %(x_posto)s "
+"from temporary position. Field is now stranded in temporary position and "
+"must be corrected manually by an Admin"
 msgstr ""
 
 #: invenio/legacy/websubmit/admin_engine.py:3953
 #, python-format
 msgid ""
 "Unable to move field at position %(x_from)s to position %(x_to)s on page "
-"%(x_page)s of submission %(x_sub)s - could not decrement the position of the "
-"fields below position %(x_pos)s. Tried to recover - please check that field "
-"ordering is not broken"
+"%(x_page)s of submission %(x_sub)s - could not decrement the position of "
+"the fields below position %(x_pos)s. Tried to recover - please check that"
+" field ordering is not broken"
 msgstr ""
 
 #: invenio/legacy/websubmit/admin_engine.py:3965
@@ -11938,15 +11977,15 @@ msgstr ""
 msgid ""
 "Unable to move field at position %(x_from)s to position %(x_to)s on page "
 "%(x_page)s of submission %(x_sub)s%(x_subm)s - could not increment the "
-"position of the fields at and below position %(x_frompos)s. The field that "
-"was at position %(x_topos)s is now stranded in a temporary position."
+"position of the fields at and below position %(x_frompos)s. The field "
+"that was at position %(x_topos)s is now stranded in a temporary position."
 msgstr ""
 
 #: invenio/legacy/websubmit/admin_engine.py:3977
 #, python-format
 msgid ""
-"Moved field from position %(x_from)s to position %(x_to)s on page %(x_page)s "
-"of submission '%(x_sub)s%(x_subm)s'."
+"Moved field from position %(x_from)s to position %(x_to)s on page "
+"%(x_page)s of submission '%(x_sub)s%(x_subm)s'."
 msgstr ""
 
 #: invenio/legacy/websubmit/admin_engine.py:3999
@@ -12014,8 +12053,8 @@ msgstr "Não é possivel determinar o número de páginas da submissão."
 #: invenio/legacy/websubmit/engine.py:931
 #, fuzzy
 msgid ""
-"Unable to create a directory for this submission. The administrator has been "
-"alerted."
+"Unable to create a directory for this submission. The administrator has "
+"been alerted."
 msgstr "Não é possível criar um directório para esta submissão."
 
 #: invenio/legacy/websubmit/engine.py:440
@@ -12051,8 +12090,8 @@ msgstr "Submeter"
 msgid ""
 "A serious function-error has been encountered. Adminstrators have been "
 "alerted. <br /><em>Please not that this might be due to wrong characters "
-"inserted into the form</em> (e.g. by copy and pasting some text from a PDF "
-"file)."
+"inserted into the form</em> (e.g. by copy and pasting some text from a "
+"PDF file)."
 msgstr ""
 
 #: invenio/legacy/websubmit/engine.py:1501
@@ -12102,8 +12141,8 @@ msgstr "Seleccione uma categoria e clique no botão"
 
 #: invenio/legacy/websubmit/templates.py:364
 msgid ""
-"To continue with a previously interrupted submission, enter an access number "
-"into the box below:"
+"To continue with a previously interrupted submission, enter an access "
+"number into the box below:"
 msgstr ""
 "Para continuar com a submissão interrompida anteriormente, indique o seu "
 "número de acesso na caixa abaixo:"
@@ -12136,11 +12175,11 @@ msgstr "Voltar ao menu principal"
 
 #: invenio/legacy/websubmit/templates.py:547
 msgid ""
-"This is your submission access number. It can be used to continue with an "
-"interrupted submission in case of problems."
+"This is your submission access number. It can be used to continue with an"
+" interrupted submission in case of problems."
 msgstr ""
-"Este é o seu número de submissão. Pode ser utilizado para continuar com uma "
-"submissão interrompida em caso de problemas."
+"Este é o seu número de submissão. Pode ser utilizado para continuar com "
+"uma submissão interrompida em caso de problemas."
 
 #: invenio/legacy/websubmit/templates.py:548
 msgid "Mandatory fields appear in red in the SUMMARY window."
@@ -12189,11 +12228,11 @@ msgstr "Submissão num"
 #: invenio/legacy/websubmit/templates.py:1036
 #, python-format
 msgid ""
-"Here is the %(x_action)s function list for %(x_doctype)s documents at level "
-"%(x_step)s"
+"Here is the %(x_action)s function list for %(x_doctype)s documents at "
+"level %(x_step)s"
 msgstr ""
-"Aqui está a %(x_action)s lista de funções para %(x_doctype)s documentos no "
-"nível %(x_step)s"
+"Aqui está a %(x_action)s lista de funções para %(x_doctype)s documentos "
+"no nível %(x_step)s"
 
 #: invenio/legacy/websubmit/templates.py:1041
 #, fuzzy
@@ -12279,9 +12318,11 @@ msgstr "Lista de tipos de documentos sob moderação"
 #: invenio/legacy/websubmit/templates.py:1479
 #, fuzzy
 msgid ""
-"Select one of the following types of documents to check the documents status"
+"Select one of the following types of documents to check the documents "
+"status"
 msgstr ""
-"Seleccione um dos seguintes tipos de documentos para verificar o seu estato."
+"Seleccione um dos seguintes tipos de documentos para verificar o seu "
+"estato."
 
 #: invenio/legacy/websubmit/templates.py:1447
 msgid "Go to specific approval workflow"
@@ -12424,10 +12465,10 @@ msgstr "Aprove"
 
 #: invenio/legacy/websubmit/templates.py:2139
 #, python-format
-msgid ""
-"This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s."
+msgid "This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s."
 msgstr ""
-"Este documento continua à %(x_fmt_open)sespera de aprovação%(x_fmt_close)s."
+"Este documento continua à %(x_fmt_open)sespera de "
+"aprovação%(x_fmt_close)s."
 
 #: invenio/legacy/websubmit/templates.py:2142
 #: invenio/legacy/websubmit/templates.py:2163
@@ -12460,8 +12501,7 @@ msgstr "Enviar novamente"
 
 #: invenio/legacy/websubmit/templates.py:2150
 msgid "WARNING! Upon confirmation, an email will be sent to the referee."
-msgstr ""
-"AVISO! Enquanto aguarda confirmação, um email será enviado ao moderador."
+msgstr "AVISO! Enquanto aguarda confirmação, um email será enviado ao moderador."
 
 #: invenio/legacy/websubmit/templates.py:2153
 #, fuzzy
@@ -12530,10 +12570,11 @@ msgstr "Seleccione um moderador"
 
 #: invenio/legacy/websubmit/templates.py:2278
 msgid ""
-"The referee has sent his final recommendations to the publication committee "
-"on the "
+"The referee has sent his final recommendations to the publication "
+"committee on the "
 msgstr ""
-"O moderador enviou as suas recomendaçoes finais ao comite de publicação em "
+"O moderador enviou as suas recomendaçoes finais ao comite de publicação "
+"em "
 
 #: invenio/legacy/websubmit/templates.py:2281
 #: invenio/legacy/websubmit/templates.py:2342
@@ -12551,11 +12592,11 @@ msgstr "Enviar recomendação"
 #: invenio/legacy/websubmit/templates.py:2288
 #: invenio/legacy/websubmit/templates.py:2356
 msgid ""
-"The publication committee has sent his final recommendations to the project "
-"leader on the "
+"The publication committee has sent his final recommendations to the "
+"project leader on the "
 msgstr ""
-"O comite de publicaçoes enviou as suas recomendaçoes finais para o gestor do "
-"projecto em "
+"O comite de publicaçoes enviou as suas recomendaçoes finais para o gestor"
+" do projecto em "
 
 #: invenio/legacy/websubmit/templates.py:2291
 #: invenio/legacy/websubmit/templates.py:2358
@@ -12595,8 +12636,7 @@ msgid "Take a decision"
 msgstr "Tomar uma decisao"
 
 #: invenio/legacy/websubmit/templates.py:2321
-msgid ""
-"An editorial board has been selected by the publication committee on the "
+msgid "An editorial board has been selected by the publication committee on the "
 msgstr "Uma comissao editorial foi seleccionada pelo comite de publicaçoes em "
 
 #: invenio/legacy/websubmit/templates.py:2323
@@ -12618,14 +12658,16 @@ msgstr "O moderador foi seleccionado pela comissao editorial em"
 
 #: invenio/legacy/websubmit/templates.py:2340
 msgid ""
-"The referee has sent his final recommendations to the editorial board on the "
+"The referee has sent his final recommendations to the editorial board on "
+"the "
 msgstr ""
-"O moderador enviou as suas recomendaçoes finais para a comissao editorial em "
+"O moderador enviou as suas recomendaçoes finais para a comissao editorial"
+" em "
 
 #: invenio/legacy/websubmit/templates.py:2348
 msgid ""
-"The editorial board has sent his final recommendations to the publication "
-"committee on the "
+"The editorial board has sent his final recommendations to the publication"
+" committee on the "
 msgstr ""
 "A comissao editorial enviou as suas recomendaçoes finais para o comite "
 "depublicaçoes em "
@@ -12748,9 +12790,10 @@ msgstr ""
 
 #: invenio/legacy/websubmit/functions/Shared_Functions.py:208
 msgid ""
-"Because of a human intervention or a temporary problem, the task queue is "
-"currently set to the manual mode. Your submission is well registered but may "
-"take longer than usual before it is fully integrated and searchable.\n"
+"Because of a human intervention or a temporary problem, the task queue is"
+" currently set to the manual mode. Your submission is well registered but"
+" may take longer than usual before it is fully integrated and searchable."
+"\n"
 msgstr ""
 
 #: invenio/legacy/websubmit/web/approve.py:53
@@ -12825,7 +12868,8 @@ msgstr ""
 #: invenio/legacy/websubmit/web/publiline.py:856
 msgid "too many qualified users, specify more narrow search."
 msgstr ""
-"demasiados utilizadores qualificados, seja mais espefico(a) na sua pesquisa."
+"demasiados utilizadores qualificados, seja mais espefico(a) na sua "
+"pesquisa."
 
 #: invenio/legacy/websubmit/web/publiline.py:733
 #: invenio/legacy/websubmit/web/publiline.py:856
@@ -13042,8 +13086,8 @@ msgstr ""
 
 #: invenio/modules/access/templates/access/admin/rolearea_base.html:56
 msgid ""
-"see all the information attached to a role and decide if you want to delete "
-"it."
+"see all the information attached to a role and decide if you want to "
+"delete it."
 msgstr ""
 
 #: invenio/modules/access/templates/access/admin/rolearea_base.html:74
@@ -13086,6 +13130,11 @@ msgstr "conectado"
 #, fuzzy
 msgid "Role details"
 msgstr "Artigo"
+
+#: invenio/modules/access/templates/access/admin/showroledetails_base.html:52
+#, fuzzy
+msgid "Id"
+msgstr "Ocultar"
 
 #: invenio/modules/access/templates/access/admin/showroledetails_base.html:58
 msgid "Firewall like role definition"
@@ -13201,8 +13250,8 @@ msgstr "O endereço de email fornecido %s já existe na base de dados."
 #: invenio/modules/accounts/forms.py:94
 #, python-format
 msgid ""
-"Note that if you have changed your email address, you                 will "
-"have to <a href=%(link)s>reset</a> your password anew."
+"Note that if you have changed your email address, you                 "
+"will have to <a href=%(link)s>reset</a> your password anew."
 msgstr ""
 
 #: invenio/modules/accounts/forms.py:117
@@ -13267,8 +13316,9 @@ msgstr ""
 #: invenio/modules/accounts/templates/accounts/logout_base.html:26
 #, python-format
 msgid ""
-"You are still recognized by the centralized %(x_fmt_open)sSSO%(x_fmt_close)s "
-"system. You can %(x_url_open)slogout from SSO%(x_url_close)s, too."
+"You are still recognized by the centralized "
+"%(x_fmt_open)sSSO%(x_fmt_close)s system. You can %(x_url_open)slogout "
+"from SSO%(x_url_close)s, too."
 msgstr ""
 
 #: invenio/modules/accounts/templates/accounts/logout_base.html:34
@@ -13294,8 +13344,8 @@ msgstr "Definir nova palavra-passe"
 #: invenio/modules/accounts/templates/accounts/settings/lost_base.html:26
 #, fuzzy
 msgid ""
-"Please enter your email address. You will receive a link to create a  new "
-"password via email."
+"Please enter your email address. You will receive a link to create a  new"
+" password via email."
 msgstr ""
 "É favor indicar o seu endereço de email e o nome de utilizador e palavra-"
 "passe desejados."
@@ -13370,7 +13420,8 @@ msgstr "Edição de definições falhou"
 
 #: invenio/modules/accounts/views/accounts.py:322
 msgid ""
-"Your email address has been validated, and you can now proceed to  sign-in."
+"Your email address has been validated, and you can now proceed to  sign-"
+"in."
 msgstr ""
 
 #: invenio/modules/accounts/views/accounts.py:328
@@ -13442,12 +13493,13 @@ msgstr ""
 
 #: invenio/modules/annotations/noteutils.py:58
 msgid ""
-"To add an annotation use the following syntax:<br>P.1: an annotation on page "
-"one<br>P.1,2,3: an annotation on pages one to three<br>F.2a: an annotation "
-"on subfigure 2a<br>S.1.2: an annotation on subsection 1.2<br>P.1: T.2: L.3: "
-"an annotation on the third line of table two, which appears on the first "
-"page<br>G: an annotation on the general aspect of the paper<br>R.[Ellis98]: "
-"an annotation on a reference<br><br>The available markers are:"
+"To add an annotation use the following syntax:<br>P.1: an annotation on "
+"page one<br>P.1,2,3: an annotation on pages one to three<br>F.2a: an "
+"annotation on subfigure 2a<br>S.1.2: an annotation on subsection "
+"1.2<br>P.1: T.2: L.3: an annotation on the third line of table two, which"
+" appears on the first page<br>G: an annotation on the general aspect of "
+"the paper<br>R.[Ellis98]: an annotation on a reference<br><br>The "
+"available markers are:"
 msgstr ""
 
 #: invenio/modules/annotations/views.py:94
@@ -13456,9 +13508,9 @@ msgstr ""
 
 #: invenio/modules/annotations/views.py:182
 msgid ""
-"This is a summary of all the comments that includes only "
-"the                  existing annotations. The full discussion is "
-"available                  <a href=\"\">here</a>."
+"This is a summary of all the comments that includes only the"
+"                  existing annotations. The full discussion is available"
+"                  <a href=\"\">here</a>."
 msgstr ""
 
 #: invenio/modules/annotations/static/js/annotations/pdf_notes_helpers.js:95
@@ -13635,7 +13687,8 @@ msgstr "colecções"
 #: invenio/modules/cloudconnector/views.py:49
 #, python-format
 msgid ""
-"Click <a href=\"%(url)s\">here</a> to connect your account with %(service)s."
+"Click <a href=\"%(url)s\">here</a> to connect your account with "
+"%(service)s."
 msgstr ""
 
 #: invenio/modules/cloudconnector/views.py:59
@@ -13725,8 +13778,8 @@ msgstr ""
 
 #: invenio/modules/comments/api.py:283
 msgid ""
-"You have been subscribed to this discussion. From now on, you will receive "
-"an email whenever a new comment is posted."
+"You have been subscribed to this discussion. From now on, you will "
+"receive an email whenever a new comment is posted."
 msgstr ""
 
 #: invenio/modules/comments/api.py:290
@@ -13820,11 +13873,11 @@ msgstr ""
 #: invenio/modules/comments/forms.py:38 invenio/modules/messages/forms.py:80
 #, fuzzy
 msgid ""
-"Your message is too long, please edit it. Maximum size allowed is %{length}i "
-"characters."
+"Your message is too long, please edit it. Maximum size allowed is "
+"%{length}i characters."
 msgstr ""
-"A sua mensagem é demasiado grande, por favor modifique-a. O tamanho maximo "
-"permitido é %i caracteres."
+"A sua mensagem é demasiado grande, por favor modifique-a. O tamanho "
+"maximo permitido é %i caracteres."
 
 #: invenio/modules/comments/forms.py:55
 #, fuzzy
@@ -13925,8 +13978,9 @@ msgstr ""
 
 #: invenio/modules/communities/forms.py:96
 msgid ""
-"Required. Only letters, numbers and dash are allowed. The identifier is used "
-"in the URL for the community collection, and cannot be modified later."
+"Required. Only letters, numbers and dash are allowed. The identifier is "
+"used in the URL for the community collection, and cannot be modified "
+"later."
 msgstr ""
 
 #: invenio/modules/communities/forms.py:102
@@ -13945,8 +13999,8 @@ msgstr ""
 
 #: invenio/modules/communities/forms.py:122
 msgid ""
-"Optional. Please describe short and precise the policy by which you accepted/"
-"reject new uploads in this community."
+"Optional. Please describe short and precise the policy by which you "
+"accepted/reject new uploads in this community."
 msgstr ""
 
 #: invenio/modules/communities/forms.py:128
@@ -14012,7 +14066,8 @@ msgstr "análise critica"
 #, python-format
 msgid ""
 "This is a preview of your upload. The public version is available on "
-"%(x_link)s. If you want to remove your upload, please contact %(x_contact)s"
+"%(x_link)s. If you want to remove your upload, please contact "
+"%(x_contact)s"
 msgstr ""
 
 #: invenio/modules/deposit/templates/deposit/deposition_type_base.html:27
@@ -14052,7 +14107,8 @@ msgstr ""
 #: invenio/modules/deposit/templates/deposit/edit_action_bar_base.html:24
 #: invenio/modules/deposit/templates/deposit/run_action_bar_base.html:25
 msgid ""
-"Press \"Save\" to save your upload for editing later, as many times you like."
+"Press \"Save\" to save your upload for editing later, as many times you "
+"like."
 msgstr ""
 
 #: invenio/modules/deposit/templates/deposit/edit_action_bar_base.html:25
@@ -14181,6 +14237,11 @@ msgstr ""
 msgid "Checking status"
 msgstr "estado actual"
 
+#: invenio/modules/editor/templates/editor/ticketsmenu.html:22
+#, fuzzy
+msgid "Tickets"
+msgstr "Os seus cestos"
+
 #: invenio/modules/editor/templates/editor/ticketsmenu.html:26
 #, fuzzy
 msgid "loading"
@@ -14215,8 +14276,8 @@ msgstr ""
 #: invenio/modules/encoder/batch_engine.py:125
 #, python-format
 msgid ""
-"You might want to take a look at  %(guidelines_url)s and modify or redo your "
-"submission."
+"You might want to take a look at  %(guidelines_url)s and modify or redo "
+"your submission."
 msgstr ""
 
 #: invenio/modules/encoder/batch_engine.py:136
@@ -14237,8 +14298,8 @@ msgstr "Nenhum índice de palavras está disponível para"
 #: invenio/modules/encoder/batch_engine.py:166
 #, python-format
 msgid ""
-"If the videos quality is not as expected, you might want to take a look at "
-"%(guidelines_url)s and modify or redo your submission."
+"If the videos quality is not as expected, you might want to take a look "
+"at %(guidelines_url)s and modify or redo your submission."
 msgstr ""
 
 #: invenio/modules/formatter/engine.py:374
@@ -14254,7 +14315,8 @@ msgstr "Validação do Formato do Elemento %s"
 #: invenio/modules/formatter/engine.py:878
 #, python-format
 msgid ""
-"Error when evaluating format element %(x_name)s with parameters %(x_params)s."
+"Error when evaluating format element %(x_name)s with parameters "
+"%(x_params)s."
 msgstr ""
 
 #: invenio/modules/formatter/engine.py:887
@@ -14479,6 +14541,10 @@ msgstr "análise critica"
 msgid "Authors"
 msgstr "autor"
 
+#: invenio/modules/formatter/templates/format/record/Video_HTML_detailed.tpl:45
+msgid "by"
+msgstr ""
+
 #: invenio/modules/formatter/templates/format/record/Video_HTML_detailed.tpl:54
 #, fuzzy
 msgid "Download Video"
@@ -14571,8 +14637,8 @@ msgstr "Gerir direitos do grupo"
 #: invenio/modules/groups/views.py:223
 #, fuzzy, python-format
 msgid ""
-"Sorry, you don't have enough right to be able to manage the group \"%(name)s"
-"\""
+"Sorry, you don't have enough right to be able to manage the group "
+"\"%(name)s\""
 msgstr "Voce não possui direitos suficientes para ver o conteudo deste cesto."
 
 #: invenio/modules/groups/views.py:279
@@ -14774,8 +14840,7 @@ msgstr "Escreva uma mensagem"
 #: invenio/modules/messages/views.py:254
 #, fuzzy
 msgid "Could not empty your mailbox."
-msgstr ""
-"Tem a certeza que deseja esvaziar a sua caixa de correio na totalidade?"
+msgstr "Tem a certeza que deseja esvaziar a sua caixa de correio na totalidade?"
 
 #: invenio/modules/messages/templates/messages/menu_base.html:23
 #, fuzzy
@@ -14814,9 +14879,9 @@ msgstr "Tipo de documento desconhecido"
 #: invenio/modules/oauth2server/forms.py:151
 msgid ""
 "Select confidential if your application is capable of keeping the issued "
-"client secret confidential (e.g. a web application), select public if your "
-"application cannot (e.g. a browser-based JavaScript application). If you "
-"select public, your application MUST validate the redirect URI."
+"client secret confidential (e.g. a web application), select public if "
+"your application cannot (e.g. a browser-based JavaScript application). If"
+" you select public, your application MUST validate the redirect URI."
 msgstr ""
 
 #: invenio/modules/oauth2server/forms.py:158
@@ -14900,8 +14965,8 @@ msgstr ""
 #: invenio/modules/oauthclient/templates/oauthclient/signup_base.html:34
 #, fuzzy
 msgid ""
-"Fill in your details to complete your registration. You only have to do this "
-"once."
+"Fill in your details to complete your registration. You only have to do "
+"this once."
 msgstr "Se pretende completar o registo da sua conta, va a:"
 
 #: invenio/modules/oauthclient/templates/oauthclient/signup_base.html:44
@@ -15378,6 +15443,11 @@ msgstr ""
 msgid "Saving..."
 msgstr ""
 
+#: invenio/modules/tags/templates/tags/tag_popover_content_base.html:46
+#, fuzzy
+msgid "Done"
+msgstr "Feito"
+
 #: invenio/modules/tags/templates/tags/tag_popover_title_base.html:24
 #, fuzzy
 msgid "(browse tagged records)"
@@ -15419,7 +15489,8 @@ msgstr "Opções de pesquisa:"
 
 #: invenio/modules/workflows/templates/workflows/index.html:25
 msgid ""
-"Here is a list of actions remaining to be resolved grouped by type of action"
+"Here is a list of actions remaining to be resolved grouped by type of "
+"action"
 msgstr ""
 
 #: invenio/modules/workflows/templates/workflows/index.html:25
@@ -15702,1094 +15773,3 @@ msgstr "qualquer ano"
 #, fuzzy
 msgid " years ago"
 msgstr "ano"
-
-# msgstr "Registros similares"
-#~ msgid "BibCheck Admin"
-#~ msgstr "Administração BibFormat"
-
-#~ msgid "Not authorized"
-#~ msgstr "autor"
-
-#~ msgid "Really delete"
-#~ msgstr "apagado com sucesso"
-
-#~ msgid "Verify problem"
-#~ msgstr "Problema na Base de Dados"
-
-#~ msgid "File"
-#~ msgstr "título"
-
-#~ msgid "niceName"
-#~ msgstr "Nome"
-
-#~ msgid "Id"
-#~ msgstr "Id"
-
-#~ msgid "Tickets"
-#~ msgstr "Tempo"
-
-#~ msgid "by"
-#~ msgstr "por"
-
-# msgstr "Mostrar resultados:"
-#~ msgid "Done"
-#~ msgstr "Feito"
-
-#~ msgid "Warning: Please, select a valid time"
-#~ msgstr "É favor escolher uma categoria"
-
-#~ msgid "Warning: Please, select a valid file"
-#~ msgstr "cestas"
-
-#~ msgid "Warning: Please, select a valid date"
-#~ msgstr "É favor escolher uma categoria"
-
-#~ msgid " or return to your %(x_url_open)ssearch%(x_url_close)s"
-#~ msgstr "Pode agora aceder à sua %(x_url_open)sconta%(x_url_close)s."
-
-#~ msgid "*** basket name ***"
-#~ msgstr "Nome do Cesto"
-
-#~ msgid "Additional Citation Metrics"
-#~ msgstr "ficheiros adicionais"
-
-#~ msgid "Sorry, you must log in to perform this action."
-#~ msgstr "Desculpa, mas tem de se autenticar para realizar essa acção."
-
-#~ msgid "Please log in first."
-#~ msgstr "É favor autenticar-se primeiro."
-
-#~ msgid "Use the top-right menu to log in."
-#~ msgstr "Utilize o menu no canto superior direito para se autenticar."
-
-#~ msgid "record"
-#~ msgstr "registos"
-
-#~ msgid "document"
-#~ msgstr "documento"
-
-#~ msgid "Sorry parameter missing..."
-#~ msgstr "Falta parâmetro docid"
-
-#~ msgid "Next Step"
-#~ msgstr "próxima página"
-
-#~ msgid "Acquisitions"
-#~ msgstr "Acções"
-
-#~ msgid "List of ordered books"
-#~ msgstr "Lista de documentos sob moderação"
-
-#~ msgid "Order new book"
-#~ msgstr "Criar um novo tópico"
-
-#~ msgid "Renewalls"
-#~ msgstr "análises criticas"
-
-#~ msgid "A new loan has been registered."
-#~ msgstr "Uma nova conta foi criada em"
-
-#~ msgid "Order new copy"
-#~ msgstr "Criar um novo tópico"
-
-#~ msgid "Book Information"
-#~ msgstr "Informação"
-
-#~ msgid "EAN"
-#~ msgstr "E"
-
-#~ msgid "Publication place"
-#~ msgstr "Cesto Público"
-
-#~ msgid "Number of pages"
-#~ msgstr "Número de vistas"
-
-#~ msgid "Sub-library"
-#~ msgstr "Biblioteca"
-
-#~ msgid "Price"
-#~ msgstr "Artigo"
-
-#~ msgid "now"
-#~ msgstr "não"
-
-#~ msgid "ERROR: %s does not exist"
-#~ msgstr "O utilizador %s não existe."
-
-#~ msgid "File %s already exists."
-#~ msgstr "O utilizador %s não existe."
-
-#~ msgid "File %s: written OK."
-#~ msgstr "Escrito por"
-
-#~ msgid "File %s: write failed."
-#~ msgstr "Apagar cesto"
-
-#~ msgid "File %s deleted."
-#~ msgstr "O utilizador %s não existe."
-
-#~ msgid "File %s: delete failed."
-#~ msgstr "Apagar cesto"
-
-#~ msgid "Guests are not authorized to run batchuploader"
-#~ msgstr "Não está autorizado a aceder a funções de administração."
-
-#~ msgid "The user '%s' is not authorized to run batchuploader"
-#~ msgstr "Não está autorizado a aceder a funções de administração."
-
-#~ msgid "Open Tickets"
-#~ msgstr "Os seus cestos"
-
-#~ msgid "Additional Data for this Person"
-#~ msgstr "ficheiros adicionais"
-
-#~ msgid "Forget decision"
-#~ msgstr "Tomar uma decisao"
-
-#~ msgid "Rejected!"
-#~ msgstr "Rejeitado"
-
-#~ msgid "Forget decision!"
-#~ msgstr "Tomar uma decisao"
-
-#~ msgid "Forget decision."
-#~ msgstr "Tomar uma decisao"
-
-#~ msgid "Your papers"
-#~ msgstr "Os seus avisos"
-
-#~ msgid "Not your papers"
-#~ msgstr "Esqueceu a sua palavra-passe?"
-
-#~ msgid "These are mine!"
-#~ msgstr "Existem %i cestos"
-
-#~ msgid "These are not mine!"
-#~ msgstr "Existem %i cestos"
-
-#~ msgid "Not Mine."
-#~ msgstr "Nota"
-
-#~ msgid "Not Mine!"
-#~ msgstr "Nota"
-
-# msgstr "Formato de saída:"
-#~ msgid "Request Tickets"
-#~ msgstr "Regras"
-
-#~ msgid "Submit Attribution Information"
-#~ msgstr "Informações Gerais"
-
-#~ msgid "Please review your actions"
-#~ msgstr "É favor escolher uma categoria"
-
-#~ msgid "You are about to attribute the following paper"
-#~ msgstr "É membro dos seguintes grupos:"
-
-#~ msgid "Navigation:"
-#~ msgstr "Histórico de citações:"
-
-#~ msgid "Person Interface FAQ"
-#~ msgstr "Erro Interno"
-
-# msgstr "Esta sita também está disponível nos seguintes idiomas:"
-#~ msgid "Person Search"
-#~ msgstr "Pesquisar"
-
-#~ msgid "Open tickets"
-#~ msgstr "Tempo"
-
-# msgstr "pesquisar"
-#~ msgid "Sorry."
-#~ msgstr "Desculpe"
-
-#~ msgid "Please provide at least one transaction."
-#~ msgstr "Por favor autentique-se para realizar esta acção."
-
-#~ msgid "Error:"
-#~ msgstr "Erro"
-
-#~ msgid "Create a new Person for your search"
-#~ msgstr "Não foram encontrados resultados."
-
-#~ msgid "A %s has been added."
-#~ msgstr "Grupo %s foi apagado"
-
-#~ msgid "Barcoce"
-#~ msgstr "Explorar"
-
-#~ msgid "No fulltext"
-#~ msgstr "No fulltext"
-
-#~ msgid "last note on"
-#~ msgstr "último comentário"
-
-#~ msgid ", no notes yet"
-#~ msgstr "Nota"
-
-#~ msgid "HTML brief"
-#~ msgstr "HTML simples"
-
-#~ msgid "deleted"
-#~ msgstr "Apagar"
-
-#~ msgid "in their rules and descriptions"
-#~ msgstr "Mostrar os items mais recentes"
-
-#~ msgid "No such knowledge base"
-#~ msgstr "Base de Conhecimento Desconhecida"
-
-#~ msgid "Date:"
-#~ msgstr "Data"
-
-#~ msgid "Time:"
-#~ msgstr "Tempo"
-
-#~ msgid "Example:"
-#~ msgstr "Exemplo"
-
-#~ msgid "are mandatory"
-#~ msgstr "obrigatório"
-
-#~ msgid "are mandatory."
-#~ msgstr "obrigatório"
-
-#~ msgid "Check the"
-#~ msgstr "Clique aqui"
-
-#~ msgid "Configure Bibknowledge"
-#~ msgstr "Configurar BibIndex"
-
-#~ msgid "creating a new basket"
-#~ msgstr "Criar um novo cesto"
-
-#~ msgid "on"
-#~ msgstr "em"
-
-#~ msgid "basket"
-#~ msgstr "cestos"
-
-#~ msgid "previous basket"
-#~ msgstr "Grupos de cestos"
-
-#~ msgid "Adding"
-#~ msgstr "Pendente"
-
-#~ msgid "Please choose a basket"
-#~ msgstr "É favor escolher uma categoria"
-
-#~ msgid "Editing basket"
-#~ msgstr "Editar cesto"
-
-#~ msgid "Editing topic"
-#~ msgstr "Editar cesto"
-
-#~ msgid "Apply Changes"
-#~ msgstr "Guardar Alterações"
-
-#~ msgid "Edit this item"
-#~ msgstr "Editar Instituto"
-
-#~ msgid "return_date"
-#~ msgstr "Data de criação"
-
-#~ msgid "Record %s - Add a field"
-#~ msgstr "Registo %s - Adicione um campo"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s"
-#~ msgstr "Editar registo %(x_recid)s, campo %(x_field)s"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s - Add a subfield"
-#~ msgstr "Editar registo %(x_recid)s, campo %(x_field)s - Adicionar subcampo"
-
-#~ msgid "Submit and save record %s"
-#~ msgstr "Submeter e guardar o registo %s"
-
-#~ msgid "updated on"
-#~ msgstr "Última atualização"
-
-#~ msgid "records"
-#~ msgstr "Registos"
-
-#~ msgid "Number of views"
-#~ msgstr "Número de vistas"
-
-#~ msgid "Non-shared basket"
-#~ msgstr "Cesto não-partilhado"
-
-#~ msgid "Group-shared basket"
-#~ msgstr "Grupo de cestos partilhados"
-
-#~ msgid "last"
-#~ msgstr "último"
-
-#~ msgid "There is a total of %i comments"
-#~ msgstr "Existe(m) no total %i comentários"
-
-#~ msgid "Select basket"
-#~ msgstr "Seleccionar cesto"
-
-#~ msgid "Add to a personal basket"
-#~ msgstr "Adicionar ao cesto pessoal"
-
-#~ msgid "%i baskets"
-#~ msgstr "%i cestos"
-
-#~ msgid "Add to a group-shared basket"
-#~ msgstr "Adicionar a um grupo de cestos partilhado"
-
-#~ msgid "Adding %i records to these baskets"
-#~ msgstr "Adicionando %i registos aos seguintes cestos"
-
-#~ msgid "No records were added to the selected baskets."
-#~ msgstr "Nenhum registo foi adicionado aos cestos seleccionados"
-
-#~ msgid "Add records to baskets"
-#~ msgstr "Adicionar registos aos cestos"
-
-#~ msgid "Subscribe to this discussion"
-#~ msgstr "Registar-se neste cesto"
-
-#~ msgid "Delete comment(s) or supress abuse report(s)"
-#~ msgstr "Suprimir relatórios de abuso"
-
-#~ msgid "Delete Comments"
-#~ msgstr "Apagar comentário"
-
-#~ msgid "ADD TO BASKET"
-#~ msgstr "ADICIONAR À CESTA"
-
-#~ msgid "Frequently publishes in:"
-#~ msgstr "submissões"
-
-#~ msgid "The collection to which this file belong is restricted: "
-#~ msgstr "O conteúdo desta coleção é restrito."
-
-# msgstr "O registro foi apagado."
-#~ msgid "This record does not exist. Please try another record ID."
-#~ msgstr "Por favor tente outro ID de registo"
-
-#~ msgid "Cannot edit deleted record.\""
-#~ msgstr "Não é possível editar um registo apagado"
-
-#~ msgid "The record will be deleted as soon as the task queue is empty."
-#~ msgstr "O registo será apagado assim que a fila de tarefas esteja vazia"
-
-#~ msgid "Please enter the ID of the record you want to edit"
-#~ msgstr "Por favor indique o ID do registo que pretende editar"
-
-#~ msgid "Move up"
-#~ msgstr "Mover item para cima"
-
-#~ msgid "Move down"
-#~ msgstr "Mover item para baixo"
-
-#~ msgid "Add Subfield"
-#~ msgstr "Adicionar Sub-campo"
-
-#~ msgid "Edit institute"
-#~ msgstr "Editar Instituto"
-
-#~ msgid "Add Field"
-#~ msgstr "Adicionar Campo"
-
-#~ msgid "Verbose"
-#~ msgstr "Visionar"
-
-#~ msgid "Your changes are TEMPORARY."
-#~ msgstr "As suas alterações são TEMPORÁRIAS"
-
-#~ msgid "To save this record, please click on submit."
-#~ msgstr "Para guardar este registo, por favor escolha submeter"
-
-#~ msgid "Revision %(revdate)s"
-#~ msgstr "Editar registo %(x_recid)s, campo %(x_field)s"
-
-#~ msgid "current version"
-#~ msgstr "Membros actuais"
-
-#~ msgid "Edit current version"
-#~ msgstr "cestas"
-
-#~ msgid "View revision"
-#~ msgstr "divisão"
-
-#~ msgid "Back to BibEdit"
-#~ msgstr "Voltar aos cestos"
-
-#~ msgid "select_from1"
-#~ msgstr "seleccionar utilizador"
-
-#~ msgid "select_to1"
-#~ msgstr "Seleccionar tópico"
-
-#~ msgid "No more requests are waiting."
-#~ msgstr "Alguns documentos estão pendentes."
-
-#~ msgid "next page >>>"
-#~ msgstr "próxima página"
-
-#~ msgid "<<< previous page"
-#~ msgstr "página anterior"
-
-#~ msgid "last page >>|"
-#~ msgstr "Última actualização"
-
-#~ msgid "from"
-#~ msgstr "De:"
-
-#~ msgid "There are record revisions not yet synchronized with the database."
-#~ msgstr "O endereço de email indicado não existe na base de dados."
-
-#~ msgid "View all reported reviews"
-#~ msgstr "Ver todas as análises criticas reportadas"
-
-#~ msgid "Delete a specific comment/review (by ID)"
-#~ msgstr "Apagar um(a) comentário/análise critica especifico(a) (por ID)"
-
-#~ msgid "session"
-#~ msgstr "sessão"
-
-#~ msgid "alerts"
-#~ msgstr "avisos"
-
-#~ msgid "account"
-#~ msgstr "conta"
-
-#~ msgid "messages"
-#~ msgstr "mensagens"
-
-#~ msgid "groups"
-#~ msgstr "grupos"
-
-#~ msgid "approvals"
-#~ msgstr "aprovações"
-
-#~ msgid "Unknown form field found on one of the submission pages."
-#~ msgstr "Campo desconhecido encontrado em uma das paginas de submissao."
-
-#~ msgid "List of direct approval categories"
-#~ msgstr "Lista de categorias de aprovação directa"
-
-#~ msgid "link"
-#~ msgstr "link"
-
-#~ msgid "CERN %(link_or_links)s"
-#~ msgstr "CERN %(link_or_links)s"
-
-#~ msgid "External %(link_or_links)s"
-#~ msgstr "%(link_or_links)s externo(s)"
-
-#~ msgid "Sort:"
-#~ msgstr "Ordenar por:"
-
-#~ msgid "We need you to login"
-#~ msgstr "Deve autenticar-se"
-
-#~ msgid "Alert sent successfully!"
-#~ msgstr "Aviso enviado com sucesso!"
-
-#~ msgid "Webjournal Administration Interface"
-#~ msgstr "Interface de Administração Webjournal"
-
-#~ msgid "Available journals"
-#~ msgstr "Jornais disponiveis"
-
-#~ msgid "Username/Email"
-#~ msgstr "Nome de utilizador/Email"
-
-#~ msgid "Please select the type of document you want to submit."
-#~ msgstr "É favor escolher o tipo de documento que pretende submeter."
-
-# msgstr "Última atualização"
-#~ msgid "WebSubmit Administration"
-#~ msgstr "Administração de Submições"
-
-#~ msgid "Submit Help"
-#~ msgstr "Ajuda sobre Envio"
-
-# msgstr "Fevereiro"
-#~ msgid "Agenda"
-#~ msgstr "Agenda"
-
-#~ msgid "Bulletin"
-#~ msgstr "Boletins"
-
-# msgstr "coleções"
-#~ msgid "Search Help"
-#~ msgstr "Ajuda sobre Pesquisa"
-
-#~ msgid "Migrate BibFormat Settings"
-#~ msgstr "Parâmetros de Migração BibFormat"
-
-#~ msgid "Migrate Knowledge Bases"
-#~ msgstr "Migrar Bases de Conhecimento"
-
-#~ msgid "Migrate Behaviours"
-#~ msgstr "Migrar Comportamentos"
-
-#~ msgid "Migrate Formats"
-#~ msgstr "Migrar Formatos"
-
-#~ msgid "Downloads history"
-#~ msgstr "Histórico de downloads:"
-
-#~ msgid "Quota used: %i messages out of max. %i"
-#~ msgstr "Quota utilizada: %i mensagens para além do maximo. %i"
-
-#~ msgid "You have %s new messages out of %s messages"
-#~ msgstr "Você tem %s mensagens novas de %s mensagens"
-
-#~ msgid "Format:"
-#~ msgstr "Formato:"
-
-#~ msgid "Send lost password"
-#~ msgstr "Enviar palavra-passe esquecida"
-
-#~ msgid "Hello"
-#~ msgstr "Olá"
-
-#~ msgid "Here are your user credentials for"
-#~ msgstr "Aqui estão as suas credenciais de utilizador para"
-
-#~ msgid "username"
-#~ msgstr "nome de utilizador"
-
-#~ msgid "password"
-#~ msgstr "palavra-passe"
-
-#~ msgid "Okay, password has been emailed to %s."
-#~ msgstr "Ok, a palavra-passe foi enviado por email para %s."
-
-#~ msgid "You are no longer recognized."
-#~ msgstr "Já não é reconhecido pelo sistema."
-
-#~ msgid "You seem to be %(x_role)s."
-#~ msgstr "Você parece ser %(x_role)s."
-
-#~ msgid "Credentials for"
-#~ msgstr "Credenciais para"
-
-#~ msgid "Lost password sent"
-#~ msgstr "Palavra-passe esquecida enviada"
-
-#~ msgid "Cannot find submission directory."
-#~ msgstr "Não consegue encontrar directório de submissão."
-
-#~ msgid "Unable to find file."
-#~ msgstr "Não é possível encontrar o ficheiro."
-
-#~ msgid "This file is restricted!"
-#~ msgstr "Este ficheiro é restricto!"
-
-#~ msgid "Try your search on..."
-#~ msgstr "Tentar sua pesquisa em..."
-
-#~ msgid "%(num)s results found"
-#~ msgstr "pesquisar %s registros por:"
-
-#~ msgid "No result found"
-#~ msgstr "A coleção %s não foi encontrada"
-
-#~ msgid "user #%i"
-#~ msgstr "avisos"
-
-#~ msgid "Sort by"
-#~ msgstr "Ordenar por:"
-
-#~ msgid "Please Select:"
-#~ msgstr "cestas"
-
-#~ msgid "All of the words"
-#~ msgstr "Todas as palavras:"
-
-#~ msgid "Any of the words"
-#~ msgstr "Qualquer das palavras:"
-
-#~ msgid "Exact phrase"
-#~ msgstr "Expressão exata:"
-
-#~ msgid "Partial phrase"
-#~ msgstr "Expressão aproximada:"
-
-#~ msgid "Regular expression"
-#~ msgstr "Expressão regular:"
-
-#~ msgid "Added since"
-#~ msgstr "Adicionada desde:"
-
-#~ msgid "your submissions"
-#~ msgstr "envios"
-
-#~ msgid "your approvals"
-#~ msgstr "aprovações"
-
-#~ msgid "Create New Group"
-#~ msgstr "cestas"
-
-#~ msgid "Submission no(1)"
-#~ msgstr "envios"
-
-#~ msgid " version #%s"
-#~ msgstr "sessão"
-
-#~ msgid "pending"
-#~ msgstr "Agenda"
-
-#~ msgid "Detailed record #%s"
-#~ msgstr "Registro detalhado"
-
-#~ msgid "Search term <em>%s</em>"
-#~ msgstr "Termo de pesquisa <em>%s</em>"
-
-#~ msgid "inside <em>%s</em> index"
-#~ msgstr "no <em>%s</em> índice"
-
-#~ msgid "Article:"
-#~ msgstr "Abril"
-
-#~ msgid "(Report abuse)"
-#~ msgstr "Setembro"
-
-#~ msgid "detailed list"
-#~ msgstr "detalhado"
-
-#~ msgid "your searches"
-#~ msgstr "Tentar sua pesquisa em..."
-
-#~ msgid "%i others' baskets"
-#~ msgstr "cestas"
-
-#~ msgid "   Username/Email: %s\n"
-#~ msgstr "avisos"
-
-#~ msgid "Article Error"
-#~ msgstr "Abril"
-
-#~ msgid "%s Personalize, Main page"
-#~ msgstr "Personalizar"
-
-#~ msgid "%s , personalize"
-#~ msgstr "Personalizar"
-
-#~ msgid "Export as"
-#~ msgstr "Exportar como"
-
-#~ msgid "Search Services"
-#~ msgstr "Sugestões de pesquisa"
-
-#~ msgid "Citation Metrics"
-#~ msgstr "Histórico de citações:"
-
-#~ msgid "WebSearch Admin Guide"
-#~ msgstr "Guia de Administracao WebSearch"
-
-#~ msgid "Submit Guide"
-#~ msgstr "Ajuda sobre Submissao"
-
-#~ msgid "Add to personal basket"
-#~ msgstr "Adicionar ao cesto pessoal"
-
-#~ msgid "WebSubmit Admin Guide"
-#~ msgstr "Guia de Administração WebSubmit"
-
-#~ msgid "Quit searching."
-#~ msgstr "Executar pesquisa"
-
-#~ msgid "Cancel merging"
-#~ msgstr "Cancelado"
-
-#~ msgid "Search for a person to assign the paper to"
-#~ msgstr "É membro dos seguintes grupos:"
-
-#~ msgid "Select All"
-#~ msgstr "Apagar tudo"
-
-#~ msgid "Select None"
-#~ msgstr "Seleccione um resultado"
-
-#~ msgid "Invert Selection"
-#~ msgstr "Selecção de moderador"
-
-#~ msgid "Author Name"
-#~ msgstr "Autor:"
-
-#~ msgid "Experiment"
-#~ msgstr "experimente"
-
-#~ msgid "Not assigned"
-#~ msgstr "Nota"
-
-#~ msgid "No status information found."
-#~ msgstr "Mais informação:"
-
-#~ msgid "Review Transaction"
-#~ msgstr "divisão"
-
-#~ msgid "On all pages"
-#~ msgstr "Guardar alterações"
-
-#~ msgid "With selected do"
-#~ msgstr "Foi rejeitado em:"
-
-#~ msgid "View name variants"
-#~ msgstr "ver comentários"
-
-#~ msgid "The author has an internal ID!"
-#~ msgstr "Ocorreu um erro interno"
-
-#~ msgid "No comments"
-#~ msgstr "comentários"
-
-#~ msgid "Not Available"
-#~ msgstr "Nenhum índice de palavras está disponível para"
-
-#~ msgid " Delete this ticket"
-#~ msgstr "Apagar cesto"
-
-#~ msgid "No title available"
-#~ msgstr "Nenhum índice de palavras está disponível para"
-
-#~ msgid "Select name for"
-#~ msgstr "Seleccione um resultado"
-
-#~ msgid "Paper title: "
-#~ msgstr "Página:"
-
-# msgstr "O registro foi apagado."
-#~ msgid "The following names have been automatically chosen:"
-#~ msgstr "Foram encontrados os seguintes erros"
-
-#~ msgid "Selected name on paper"
-#~ msgstr "Seleccione um resultado"
-
-#~ msgid "Please provide your information"
-#~ msgstr "Mais informação:"
-
-#~ msgid "Please provide your first name"
-#~ msgstr "É favor autenticar-se primeiro."
-
-#~ msgid "Your last name:"
-#~ msgstr "Os seus empréstimos"
-
-#~ msgid "Your eMail:"
-#~ msgstr "Os seus avisos"
-
-#~ msgid "!Delete the entire request!"
-#~ msgstr "Apagar as análises criticas seleccionadas"
-
-#~ msgid "Mark as your documents"
-#~ msgstr "todos od tipos de documento"
-
-#~ msgid "Mark as their documents"
-#~ msgstr "Voltar ao documento"
-
-#~ msgid "Mark as _not_ their documents"
-#~ msgstr "Voltar ao documento"
-
-#~ msgid "Create a new Person"
-#~ msgstr "ou criar um novo"
-
-#~ msgid "Add to merge list"
-#~ msgstr "Adicionar aos utilizadores"
-
-#~ msgid "Recent Papers"
-#~ msgstr "Página:"
-
-#~ msgid "most recent documents:"
-#~ msgstr "Lista de documentos sob moderação"
-
-# msgstr "Formato de saída:"
-#~ msgid "Manage your profile"
-#~ msgstr "Gerir Formato dos Templates"
-
-#~ msgid "Choose your profile"
-#~ msgstr "Escolher tópico"
-
-#~ msgid "Manage publication list"
-#~ msgstr "Data de criação"
-
-#~ msgid "add external id"
-#~ msgstr "%(link_or_links)s externo(s)"
-
-#~ msgid "suggest missing ids"
-#~ msgstr "submissões"
-
-#~ msgid "Choose system"
-#~ msgstr "Escolher tópico"
-
-#~ msgid "Fatal: You are not allowed to access this functionality."
-#~ msgstr "Não está autorizado a aceder a funções de administração."
-
-#~ msgid "Claim this paper"
-#~ msgstr "adicionar este utilizador"
-
-#~ msgid "Weighted %s keywords:"
-#~ msgstr "Citado por: %s registos"
-
-#~ msgid "Revision"
-#~ msgstr "divisão"
-
-#~ msgid "Modify Template Attributes"
-#~ msgstr "Modificar Atributos do Template"
-
-#~ msgid "Template Editor"
-#~ msgstr "Editor de Template"
-
-#~ msgid "Check Dependencies"
-#~ msgstr "Verificar Depedências"
-
-# msgstr "sessão"
-#~ msgid "Update Format Attributes"
-#~ msgstr "Actualizar Atributos do Formato"
-
-#~ msgid "Show Documentation"
-#~ msgstr "Mostrar Documentação"
-
-# msgstr "conta"
-#~ msgid "Hide Documentation"
-#~ msgstr "Ocultar Documentação"
-
-#~ msgid "Last Modification Date"
-#~ msgstr "Data da Última Modificação"
-
-#~ msgid "Manage Output Formats"
-#~ msgstr "Gerir Saída dos Formatos"
-
-# msgstr "Formato de saída:"
-#~ msgid "Manage Format Templates"
-#~ msgstr "Gerir Formato dos Templates"
-
-#~ msgid "Format Elements Documentation"
-#~ msgstr "Documentação dos Elementos do Formato"
-
-#~ msgid "Add New Format Template"
-#~ msgstr "Adicionar um novo Formato de Template"
-
-#~ msgid "Check Format Templates Extensively"
-#~ msgstr "Verificar Formato dos Templates Exaustivamente"
-
-#~ msgid "Code"
-#~ msgstr "Código"
-
-#~ msgid "Add New Output Format"
-#~ msgstr "Adicionar Novo Formato de Saída"
-
-# msgstr "Formato de saída:"
-#~ msgid "menu"
-#~ msgstr "menu"
-
-#~ msgid "Close Output Format"
-#~ msgstr "Fechar Formato de Saída"
-
-# msgstr "Formato de saída:"
-#~ msgid "Rules"
-#~ msgstr "Regras"
-
-# msgstr "visitante"
-#~ msgid "Modify Output Format Attributes"
-#~ msgstr "Alterar Atributos do Formato de Saída"
-
-#~ msgid "Remove Rule"
-#~ msgstr "Remover Regras"
-
-# msgstr "mais"
-#~ msgid "Add New Rule"
-#~ msgstr "Adicionar Nova Regra"
-
-#~ msgid "No problem found with format"
-#~ msgstr "Nenhum problema encontrado relativo ao formato"
-
-#~ msgid "An error has been found"
-#~ msgstr "Foi encontrado um erro."
-
-# msgstr "O registro foi apagado."
-#~ msgid "The following errors have been found"
-#~ msgstr "Foram encontrados os seguintes erros"
-
-# msgstr "Registros similares"
-#~ msgid "BibFormat Admin"
-#~ msgstr "Administração BibFormat"
-
-# msgstr "Registro detalhado"
-#~ msgid "Enter a search query here."
-#~ msgstr "Introduza aqui o termo a pesquisar"
-
-#~ msgid "No Record Found for %s."
-#~ msgstr "Registo não encontrado"
-
-#~ msgid "Template \"%s\" does not exist at line %s."
-#~ msgstr "O utilizador %s não existe."
-
-# msgstr "Formato de saída:"
-#~ msgid "Output format %s cannot not be read. %s"
-#~ msgstr "Atributos %s do Formato de Saída"
-
-#~ msgid "Format template %s calls undefined element \"%s\"."
-#~ msgstr "Dependências %s do Formato do Template"
-
-#~ msgid "Error in format element %s. %s."
-#~ msgstr "Validação do Formato do Elemento %s"
-
-# msgstr "conta"
-#~ msgid "Format element %s cannot not be read. %s"
-#~ msgstr "Dependências %s do Formato do Elemento"
-
-#~ msgid "Restricted Output Format"
-#~ msgstr "Formato de Saída Restricto "
-
-#~ msgid "Output Format %s Rules"
-#~ msgstr "Regras %s do Formato de Saída"
-
-# msgstr "Formato de saída:"
-#~ msgid "Output Format %s Attributes"
-#~ msgstr "Atributos %s do Formato de Saída"
-
-#~ msgid "Output Format %s Dependencies"
-#~ msgstr "Dependências %s do Formato de Saída "
-
-#~ msgid "Delete Output Format"
-#~ msgstr "Apagar Formato de Saída"
-
-#~ msgid "Cannot create output format"
-#~ msgstr "Gerir Saída dos Formatos"
-
-#~ msgid "Format template %s cannot not be read. %s"
-#~ msgstr "Atributos %s do Formato do Template"
-
-# msgstr "Formato de saída:"
-#~ msgid "Restricted Format Template"
-#~ msgstr "Formato do Template Restricto"
-
-#~ msgid "Format Template %s"
-#~ msgstr "Formato do Template %s"
-
-#~ msgid "Format Template %s Attributes"
-#~ msgstr "Atributos %s do Formato do Template"
-
-#~ msgid "Format Template %s Dependencies"
-#~ msgstr "Dependências %s do Formato do Template"
-
-#~ msgid "Delete Format Template"
-#~ msgstr "Apagar Formato do Template"
-
-# msgstr "conta"
-#~ msgid "Format Element %s Dependencies"
-#~ msgstr "Dependências %s do Formato do Elemento"
-
-#~ msgid "Test Format Element %s"
-#~ msgstr "Testar Formato do Elemento %s"
-
-# msgstr "cestas"
-#~ msgid "Validation of Output Format %s"
-#~ msgstr "Validação do Formato de Saída %s"
-
-#~ msgid "Validation of Format Template %s"
-#~ msgstr "Validação do Formato do Template %s"
-
-#~ msgid "Restricted Format Element"
-#~ msgstr "Formato do Elemento Restricto"
-
-#~ msgid "Validation of Format Element %s"
-#~ msgstr "Validação do Formato do Elemento %s"
-
-#~ msgid "Format Validation"
-#~ msgstr "Validação do Formato"
-
-#~ msgid "Knowledge Base %s"
-#~ msgstr "Base de Conhecimento %s"
-
-#~ msgid "Not Set"
-#~ msgstr "Nota"
-
-# msgstr "Administração de Envios"
-#~ msgid "never"
-#~ msgstr "Converter"
-
-#~ msgid "times"
-#~ msgstr "Tempo"
-
-#~ msgid "Papers"
-#~ msgstr "Página:"
-
-#~ msgid "No Keywords"
-#~ msgstr "palavra chave"
-
-#~ msgid "No Subject categories"
-#~ msgstr "Lista de categorias de publicaçoes"
-
-#~ msgid "No Collaborations"
-#~ msgstr "Colecções"
-
-#~ msgid "unknown affiliation"
-#~ msgstr "Acção desconhecida"
-
-#~ msgid "No Affiliations"
-#~ msgstr "Histórico de citações:"
-
-#~ msgid "Affiliations"
-#~ msgstr "Histórico de citações:"
-
-#~ msgid "Citations%s"
-#~ msgstr "Histórico de citações:"
-
-#~ msgid "No Publication Graph"
-#~ msgstr "Data de criação"
-
-#~ msgid "<strong> Publications list </strong>"
-#~ msgstr "Data de criação"
-
-#~ msgid "No publications available"
-#~ msgstr "Nenhum índice de palavras está disponível para"
-
-#~ msgid "Cited by 1 record"
-#~ msgstr "Citado por: %s registos"
-
-#~ msgid "%i comments"
-#~ msgstr "comentários"
-
-#~ msgid "%i reviews"
-#~ msgstr "análise critica"
-
-#~ msgid "No Papers"
-#~ msgstr "Página:"
-
-#~ msgid "Citations:"
-#~ msgstr "Histórico de citações:"
-
-#~ msgid "No Citation Information available"
-#~ msgstr "Nenhum índice de palavras está disponível para"
-
-#~ msgid "Discussion"
-#~ msgstr "sessão"
-
-#~ msgid "Your alerts"
-#~ msgstr "Os seus avisos"
-
-#~ msgid "Your approvals"
-#~ msgstr "As suas aprovações"
-
-#~ msgid "Your baskets"
-#~ msgstr "Os seus cestos"
-
-#~ msgid "Your loans"
-#~ msgstr "Os seus empréstimos"
-
-#~ msgid "Your submissions"
-#~ msgstr "As suas submissões"
-
-#~ msgid "Statistics"
-#~ msgstr "estatisticas"
-
-#~ msgid "Group: %s"
-#~ msgstr "Grupos: %s"
-
-#~ msgid "Page %s Not Found"
-#~ msgstr "A pagina %s não foi encontrada"
-
-#~ msgid "The field %s is mandatory."
-#~ msgstr "O campo %s é obrigatório."
-
-#~ msgid ""
-#~ "Unable to delete field at position %s from page %s of submission '%s'"
-#~ msgstr "Não é possivel determinar o número de páginas da submissão."
