@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014, 2015 CERN.
+# Copyright (C) 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,15 +17,23 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Define base Blueprint."""
+"""Unit tests for the inveniomanage script."""
 
-from flask import Blueprint, Response
-
-blueprint = Blueprint('base', __name__, template_folder='templates',
-                      static_folder='static')
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 
-@blueprint.route('/ping')
-def ping():
-    """Response with health status."""
-    return Response('OK', mimetype='text/plain')
+class ViewsTest(InvenioTestCase):
+
+    """Test base views."""
+
+    def test_ping_view(self):
+        """Test /ping endpoint."""
+        response = self.client.get("/ping")
+
+        assert 'OK' == response.data
+
+
+TEST_SUITE = make_test_suite(ViewsTest)
+
+if __name__ == "__main__":
+    run_test_suite(TEST_SUITE)
