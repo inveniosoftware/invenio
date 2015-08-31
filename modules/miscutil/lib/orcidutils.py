@@ -67,13 +67,6 @@ except ImportError:
 
 ORCID_ENDPOINT_PUBLIC = CFG_OAUTH2_CONFIGURATIONS['orcid']['public_url']
 
-ORCID_JSON_TO_XML_EXT_ID = {
-    'ARXIV': 'arxiv',
-    'DOI': 'doi',
-    'ISBN': 'isbn',
-    'OTHER_ID': 'other-id'
-}
-
 ORCID_SINGLE_REQUEST_WORKS = 1
 MAX_COAUTHORS = 25
 MAX_DESCRIPTION_LENGTH = 4500
@@ -135,10 +128,10 @@ def _get_extids_from_orcid(orcid_id):
                          CFG_OAUTH2_CONFIGURATIONS['orcid']['member_url'])
 
     ext_ids_dict = {
-        'DOI': set(),
-        'ARXIV': set(),
-        'ISBN': set(),
-        'OTHER_ID': set()
+        'doi': set(),
+        'arxiv': set(),
+        'isbn': set(),
+        'other-id': set()
     }
 
     orcid_profile = None
@@ -155,10 +148,11 @@ def _get_extids_from_orcid(orcid_id):
         for work in orcid_profile['works']['group']:
             try:
                 for identifier in work['identifiers']['identifier']:
-                    identifier_type = identifier['external-identifier-type']
+                    identifier_type = identifier['external-identifier-type'
+                                                 ].lower()
                     value = identifier['external-identifier-id']
                     if identifier_type in ext_ids_dict:
-                        if identifier_type == "DOI":
+                        if identifier_type == "doi":
                             ext_ids_dict[identifier_type].add(get_doi(value))
                         ext_ids_dict[identifier_type].add(value)
             except KeyError:
@@ -204,9 +198,9 @@ def get_dois_from_orcid(orcid_id, get_titles=False):
                 if work['identifiers']:
                     for identifier in work['identifiers']['identifier']:
                         identifier_type = \
-                            identifier['external-identifier-type']
+                            identifier['external-identifier-type'].lower()
                         value = identifier['external-identifier-id']
-                        if identifier_type == "DOI":
+                        if identifier_type == "doi":
                             doi = get_doi(value)
                             if doi:
                                 current_dois = doi.split(",")
@@ -642,7 +636,7 @@ def _get_external_ids(recid, url, recstruct, old_external_ids, orcid):
     record_ext_ids = record_get_field_instances(recstruct, '037')
     if doi:
         for single_doi in doi:
-            if single_doi in old_external_ids['DOI'] or \
+            if single_doi in old_external_ids['doi'] or \
                     single_doi in blacklist.get(orcid, []):
                 raise OrcidRecordExisting
             encoded = encode_for_jinja_and_xml(single_doi)
@@ -656,11 +650,11 @@ def _get_external_ids(recid, url, recstruct, old_external_ids, orcid):
             else:
                 external_ids.append(('doi', encoded))
     if isbn:
-        if isbn in old_external_ids['ISBN']:
+        if isbn in old_external_ids['isbn']:
             raise OrcidRecordExisting
         external_ids.append(('isbn', encode_for_jinja_and_xml(isbn)))
     if isbn2:
-        if isbn2 in old_external_ids['ISBN']:
+        if isbn2 in old_external_ids['isbn']:
             raise OrcidRecordExisting
         external_ids.append(('isbn', encode_for_jinja_and_xml(isbn2)))
 
@@ -673,7 +667,7 @@ def _get_external_ids(recid, url, recstruct, old_external_ids, orcid):
             elif field[0] == 'a':
                 the_id = field[1]
         if arxiv:
-            if the_id in old_external_ids['ARXIV']:
+            if the_id in old_external_ids['arxiv']:
                 raise OrcidRecordExisting
             encoded = encode_for_jinja_and_xml(the_id)
             if encoded in [x for (y, x) in external_ids if y == 'arxiv']:
@@ -687,7 +681,7 @@ def _get_external_ids(recid, url, recstruct, old_external_ids, orcid):
             else:
                 external_ids.append(('arxiv', encoded))
 
-    if url in old_external_ids['OTHER_ID']:
+    if url in old_external_ids['other-id']:
         raise OrcidRecordExisting
     if len(external_ids) == 0:
         external_ids.append(('other-id', url))
