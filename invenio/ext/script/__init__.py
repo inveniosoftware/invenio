@@ -144,7 +144,7 @@ def check_for_software_updates(flash_message=False):
                         'download. You may want to visit '
                         '<a href="%(wiki)s">%()s</a>',
                         wiki='<a href=\"http://invenio-software.org/wiki/'
-                             '/Installation/Download'), 'warning')
+                             '/Installation/Download'), 'warning(html_safe)')
 
             return False
     except Exception as e:
