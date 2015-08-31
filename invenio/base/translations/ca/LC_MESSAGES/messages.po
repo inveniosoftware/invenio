@@ -1,5 +1,5 @@
 # # This file is part of Invenio.
-# # Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+# # Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2015 CERN.
 # #
 # # Invenio is free software; you can redistribute it and/or
 # # modify it under the terms of the GNU General Public License as
@@ -16,15 +16,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Invenio 1.1.1\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2015-03-04 16:44+0100\n"
-"PO-Revision-Date: 2013-02-25 11:41+0100\n"
+"POT-Creation-Date: 2015-08-27 15:26+0200\n"
+"PO-Revision-Date: 2015-08-27 17:47+0200\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: CA <info@invenio-software.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.0\n"
 
 #: invenio/base/decorators.py:133
 #, python-format
@@ -205,7 +205,7 @@ msgstr ""
 
 #: invenio/base/templates/mail_html.tpl:20
 #: invenio/base/templates/mail_text.tpl:20
-#: invenio/legacy/webcomment/templates.py:2256
+#: invenio/legacy/webcomment/templates.py:2255
 msgid "Hello:"
 msgstr "Hola:"
 
@@ -262,48 +262,53 @@ msgstr ""
 msgid "Error in sending email from %(x_from)s to %(x_to)s with body%(x_body)s."
 msgstr "Error a l'enviar un missatge de %s, a %s, amb el text %s."
 
-#: invenio/ext/login/__init__.py:68
+#: invenio/ext/login/__init__.py:61
+#, fuzzy
+msgid "Provided data is not valid"
+msgstr "La url que heu donat no és vàlida."
+
+#: invenio/ext/login/__init__.py:73
 #: invenio/legacy/websession/webinterface.py:679
 msgid "Password reset request for"
 msgstr "Petició de reiniciar la contrasenya de"
 
-#: invenio/ext/login/__init__.py:124
+#: invenio/ext/login/__init__.py:129
 #, fuzzy, python-format
 msgid "You are not authorized to use '%(x_login_method)s' login method."
 msgstr "No esteu autoritzats a fer servir el préstec."
 
-#: invenio/ext/login/__init__.py:130
+#: invenio/ext/login/__init__.py:135
 #, python-format
 msgid ""
 "You have not yet confirmed the email address for the             "
 "'%(login_method)s' authentication method."
 msgstr ""
 
-#: invenio/ext/login/__init__.py:148 invenio/modules/annotations/views.py:156
+#: invenio/ext/login/__init__.py:153 invenio/modules/annotations/views.py:156
 #: invenio/modules/comments/views.py:204 invenio/modules/comments/views.py:238
 #: invenio/modules/records/views.py:80
 #, fuzzy
 msgid "Authorization failure"
 msgstr "Ha fallat l'alta"
 
-#: invenio/ext/login/__init__.py:154
+#: invenio/ext/login/__init__.py:159
 #, fuzzy
 msgid "Please sign in to continue."
 msgstr "Seleccioneu-ne un o més:"
 
-#: invenio/ext/login/__init__.py:158
+#: invenio/ext/login/__init__.py:163
 #, fuzzy
 msgid "Authorization failure."
 msgstr "Petició de rol d'autorització"
 
-#: invenio/ext/script/__init__.py:116
+#: invenio/ext/script/__init__.py:143
 #, fuzzy, python-format
 msgid ""
 "A newer version of Invenio is available for download. You may want to "
 "visit <a href=\"%(wiki)s\">%()s</a>"
 msgstr "Podeu baixar-vos una versió més nova d'Invenio.  Visiteu "
 
-#: invenio/ext/script/__init__.py:126
+#: invenio/ext/script/__init__.py:153
 #, python-format
 msgid "Cannot download or parse release notes from %(release_notes)s"
 msgstr ""
@@ -819,7 +824,7 @@ msgstr "Id"
 #: invenio/legacy/websubmit/functions/Create_Upload_Files_Interface.py:467
 #: invenio/modules/access/templates/access/admin/showroledetails_base.html:54
 #: invenio/modules/groups/forms.py:46
-#: invenio/modules/oauth2server/models.py:142
+#: invenio/modules/oauth2server/models.py:143
 #: invenio/modules/search/admin_forms.py:34 invenio/modules/tags/forms.py:162
 #: invenio/modules/tags/forms.py:262
 msgid "Name"
@@ -861,8 +866,8 @@ msgstr "Teniu %i tasques."
 
 #: invenio/legacy/bibcatalog/templates.py:52
 #: invenio/legacy/bibknowledge/templates.py:170
-#: invenio/legacy/webcomment/templates.py:900
-#: invenio/legacy/webcomment/templates.py:2586
+#: invenio/legacy/webcomment/templates.py:899
+#: invenio/legacy/webcomment/templates.py:2585
 #: invenio/legacy/websearch/templates.py:2038
 msgid "Previous"
 msgstr "Anterior"
@@ -877,8 +882,8 @@ msgstr "tancar"
 
 #: invenio/legacy/bibcatalog/templates.py:74
 #: invenio/legacy/bibknowledge/templates.py:168
-#: invenio/legacy/webcomment/templates.py:916
-#: invenio/legacy/webcomment/templates.py:2610
+#: invenio/legacy/webcomment/templates.py:915
+#: invenio/legacy/webcomment/templates.py:2609
 msgid "Next"
 msgstr "Següent"
 
@@ -904,7 +909,7 @@ msgstr ""
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:325
 #, fuzzy
 msgid "Not authorized"
-msgstr "autor"
+msgstr "No esteu autoritzats a fer servir el préstec interbibliotecari."
 
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:79
 #, fuzzy, python-format
@@ -1465,11 +1470,11 @@ msgstr "S'ha enregistrat correctament la nueva petició."
 #: invenio/legacy/bibcirculation/adminlib.py:3543
 #: invenio/legacy/bibcirculation/adminlib.py:3587
 #: invenio/legacy/webbasket/templates.py:1839
-#: invenio/legacy/webcomment/templates.py:253
-#: invenio/legacy/webcomment/templates.py:714
-#: invenio/legacy/webcomment/templates.py:2114
-#: invenio/legacy/webcomment/templates.py:2138
-#: invenio/legacy/webcomment/templates.py:2164
+#: invenio/legacy/webcomment/templates.py:252
+#: invenio/legacy/webcomment/templates.py:713
+#: invenio/legacy/webcomment/templates.py:2113
+#: invenio/legacy/webcomment/templates.py:2137
+#: invenio/legacy/webcomment/templates.py:2163
 #: invenio/legacy/webmessage/templates.py:508
 #: invenio/legacy/websession/templates.py:2236
 #: invenio/legacy/websession/templates.py:2276
@@ -1480,11 +1485,11 @@ msgstr "Sí"
 #: invenio/legacy/bibcirculation/adminlib.py:2434
 #: invenio/legacy/bibcirculation/adminlib.py:3548
 #: invenio/legacy/webalert/templates.py:320
-#: invenio/legacy/webcomment/templates.py:254
-#: invenio/legacy/webcomment/templates.py:716
-#: invenio/legacy/webcomment/templates.py:2114
-#: invenio/legacy/webcomment/templates.py:2138
-#: invenio/legacy/webcomment/templates.py:2164
+#: invenio/legacy/webcomment/templates.py:253
+#: invenio/legacy/webcomment/templates.py:715
+#: invenio/legacy/webcomment/templates.py:2113
+#: invenio/legacy/webcomment/templates.py:2137
+#: invenio/legacy/webcomment/templates.py:2163
 #: invenio/legacy/webmessage/templates.py:509
 #: invenio/legacy/websession/templates.py:2237
 #: invenio/legacy/websession/templates.py:2277
@@ -1645,9 +1650,9 @@ msgstr ""
 #: invenio/legacy/bibdocfile/webinterface.py:145
 #: invenio/legacy/search_engine/__init__.py:2223
 #: invenio/legacy/search_engine/__init__.py:2232
-#: invenio/legacy/search_engine/__init__.py:5972
-#: invenio/legacy/search_engine/__init__.py:6034
-#: invenio/legacy/search_engine/__init__.py:6125
+#: invenio/legacy/search_engine/__init__.py:5978
+#: invenio/legacy/search_engine/__init__.py:6040
+#: invenio/legacy/search_engine/__init__.py:6131
 msgid "Requested record does not seem to exist."
 msgstr "El registre que sol·liciteu no existeix."
 
@@ -2308,7 +2313,7 @@ msgstr "Lloc"
 #: invenio/legacy/websubmit/functions/Create_Upload_Files_Interface.py:471
 #: invenio/modules/access/templates/access/admin/showroledetails_base.html:56
 #: invenio/modules/groups/forms.py:50
-#: invenio/modules/oauth2server/models.py:153
+#: invenio/modules/oauth2server/models.py:154
 msgid "Description"
 msgstr "Descripció"
 
@@ -2832,7 +2837,7 @@ msgstr "Reiniciar"
 #: invenio/legacy/bibcirculation/templates.py:1772
 #: invenio/legacy/bibexport/templates.py:494
 #: invenio/legacy/bibexport/templates.py:557
-#: invenio/legacy/webcomment/templates.py:2061
+#: invenio/legacy/webcomment/templates.py:2060
 msgid "OK"
 msgstr "D'acord"
 
@@ -3303,8 +3308,8 @@ msgstr "Bústia"
 #: invenio/legacy/bibcirculation/templates.py:15749
 #: invenio/legacy/bibcirculation/templates.py:16003
 #: invenio/legacy/bibcirculation/utils.py:455
-#: invenio/legacy/webcomment/templates.py:1738
-#: invenio/legacy/webcomment/templates.py:1770
+#: invenio/legacy/webcomment/templates.py:1737
+#: invenio/legacy/webcomment/templates.py:1769
 msgid "Email"
 msgstr "Adreça electrònica"
 
@@ -4581,15 +4586,15 @@ msgid ""
 msgstr ""
 
 #: invenio/legacy/bibcirculation/webinterface.py:854
-#: invenio/legacy/search_engine/__init__.py:4757
-#: invenio/legacy/search_engine/__init__.py:5117
-#: invenio/legacy/search_engine/__init__.py:5311
-#: invenio/legacy/search_engine/__init__.py:5334
-#: invenio/legacy/search_engine/__init__.py:5342
-#: invenio/legacy/search_engine/__init__.py:5350
-#: invenio/legacy/search_engine/__init__.py:5396
-#: invenio/legacy/webcomment/templates.py:199
-#: invenio/legacy/webcomment/templates.py:2511
+#: invenio/legacy/search_engine/__init__.py:4763
+#: invenio/legacy/search_engine/__init__.py:5123
+#: invenio/legacy/search_engine/__init__.py:5317
+#: invenio/legacy/search_engine/__init__.py:5340
+#: invenio/legacy/search_engine/__init__.py:5348
+#: invenio/legacy/search_engine/__init__.py:5356
+#: invenio/legacy/search_engine/__init__.py:5402
+#: invenio/legacy/webcomment/templates.py:198
+#: invenio/legacy/webcomment/templates.py:2510
 #: invenio/modules/comments/api.py:1862
 msgid "The record has been deleted."
 msgstr "El registre ha estat suprimit."
@@ -4689,10 +4694,10 @@ msgstr "Escolliu el fitxer"
 #: invenio/legacy/bibdocfile/managedocfiles.py:404
 #: invenio/legacy/bibexport/templates.py:347
 #: invenio/legacy/bibexport/templates.py:401
-#: invenio/legacy/webcomment/templates.py:1024
-#: invenio/legacy/webcomment/templates.py:1343
-#: invenio/legacy/webcomment/templates.py:1791
-#: invenio/legacy/webcomment/templates.py:2028
+#: invenio/legacy/webcomment/templates.py:1023
+#: invenio/legacy/webcomment/templates.py:1342
+#: invenio/legacy/webcomment/templates.py:1790
+#: invenio/legacy/webcomment/templates.py:2027
 #: invenio/legacy/websubmit/templates.py:2505
 #: invenio/legacy/websubmit/functions/Create_Upload_Files_Interface.py:475
 msgid "Comment"
@@ -5304,7 +5309,7 @@ msgid "Total"
 msgstr "Total"
 
 #: invenio/legacy/bibexport/templates.py:652
-#: invenio/legacy/webcomment/templates.py:2031
+#: invenio/legacy/webcomment/templates.py:2030
 msgid "Select"
 msgstr "Seleccionar"
 
@@ -5623,7 +5628,7 @@ msgstr "Dependències de la base de coneixements"
 #: invenio/legacy/bibknowledge/templates.py:329
 #: invenio/legacy/bibknowledge/templates.py:589
 #: invenio/legacy/bibknowledge/templates.py:658
-#: invenio/legacy/webcomment/templates.py:1619
+#: invenio/legacy/webcomment/templates.py:1618
 #: invenio/legacy/webjournal/templates.py:203
 #: invenio/legacy/webjournal/templates.py:575
 #: invenio/legacy/webjournal/templates.py:716
@@ -6002,8 +6007,8 @@ msgstr ""
 
 #: invenio/legacy/search_engine/__init__.py:935
 #: invenio/legacy/search_engine/__init__.py:968
-#: invenio/legacy/search_engine/__init__.py:6020
-#: invenio/legacy/search_engine/__init__.py:6114
+#: invenio/legacy/search_engine/__init__.py:6026
+#: invenio/legacy/search_engine/__init__.py:6120
 msgid "Search Results"
 msgstr "Resultats de la cerca"
 
@@ -6228,7 +6233,7 @@ msgstr ""
 "parèntesis de la cerca.  Si així no funciona, repasseu la vostra cerca i "
 "torneu-ho a provar."
 
-#: invenio/legacy/search_engine/__init__.py:3232
+#: invenio/legacy/search_engine/__init__.py:3238
 #, fuzzy, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other collections gave "
@@ -6238,7 +6243,7 @@ msgstr ""
 "altres col·leccions públicas donen %(x_url_open)s%(x_nb_hits)d "
 "resultats%(x_url_close)s."
 
-#: invenio/legacy/search_engine/__init__.py:3249
+#: invenio/legacy/search_engine/__init__.py:3255
 #, fuzzy
 msgid ""
 "No public collection matched your query. If you were looking for a hidden"
@@ -6247,7 +6252,7 @@ msgstr ""
 "No s'ha trobat cap coincidència en col·leccions públiques. Si esteu "
 "cercant documents no públics, escolliu primer la col·lecció restringida."
 
-#: invenio/legacy/search_engine/__init__.py:3253
+#: invenio/legacy/search_engine/__init__.py:3259
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
@@ -6255,40 +6260,40 @@ msgstr ""
 "No s'ha trobat cap coincidència en col·leccions públiques. Si esteu "
 "cercant documents no públics, escolliu primer la col·lecció restringida."
 
-#: invenio/legacy/search_engine/__init__.py:3360
+#: invenio/legacy/search_engine/__init__.py:3366
 msgid "Your search did not match any records.  Please try again."
 msgstr "La vostra cerca no ha trobat cap registre. Torneu-ho a provar."
 
-#: invenio/legacy/search_engine/__init__.py:3369
+#: invenio/legacy/search_engine/__init__.py:3375
 msgid "No match found, please enter different search terms."
 msgstr "No s'ha trobat res. Useu termes diferents de cerca."
 
-#: invenio/legacy/search_engine/__init__.py:3375
+#: invenio/legacy/search_engine/__init__.py:3381
 #, fuzzy, python-format
 msgid "There are no records referring to %(x_rec)s."
 msgstr "No hi ha registres que es refereixin a %s."
 
-#: invenio/legacy/search_engine/__init__.py:3377
+#: invenio/legacy/search_engine/__init__.py:3383
 #, fuzzy, python-format
 msgid "There are no records modified by %(x_rec)s."
 msgstr "No hi ha registres citats per %s."
 
-#: invenio/legacy/search_engine/__init__.py:3379
+#: invenio/legacy/search_engine/__init__.py:3385
 #, fuzzy, python-format
 msgid "There are no records cited by %(x_rec)s."
 msgstr "No hi ha registres citats per %s."
 
-#: invenio/legacy/search_engine/__init__.py:3385
+#: invenio/legacy/search_engine/__init__.py:3391
 #, fuzzy, python-format
 msgid "No word index is available for %(x_name)s."
 msgstr "No hi ha cap índex de paraules disponible per a %s."
 
-#: invenio/legacy/search_engine/__init__.py:3396
+#: invenio/legacy/search_engine/__init__.py:3402
 #, fuzzy, python-format
 msgid "No phrase index is available for %(x_name)s."
 msgstr "No hi ha cap índex de frases disponible per a %s."
 
-#: invenio/legacy/search_engine/__init__.py:3434
+#: invenio/legacy/search_engine/__init__.py:3440
 #, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record."
@@ -6297,7 +6302,7 @@ msgstr ""
 "El terme de cerca %(x_term)s dins l'índex %(x_index)s no s'ha trobat en "
 "cap registre. Els termes aproximats, a qualsevol col·lecció, són:"
 
-#: invenio/legacy/search_engine/__init__.py:3439
+#: invenio/legacy/search_engine/__init__.py:3445
 #, fuzzy, python-format
 msgid ""
 "Search term %(x_name)s did not match any record. Nearest terms in any "
@@ -6306,14 +6311,14 @@ msgstr ""
 "El terme de cerca %s no s'ha trobat en cap registre. Els termes "
 "aproximats, a qualsevol col·lecció, són:"
 
-#: invenio/legacy/search_engine/__init__.py:4340
+#: invenio/legacy/search_engine/__init__.py:4346
 #, fuzzy, python-format
 msgid ""
 "Sorry, %(x_option)s does not seem to be a valid sort option. The records "
 "will not be sorted."
 msgstr "No és possible ordenar per %s.  No s'rodenaran els registres."
 
-#: invenio/legacy/search_engine/__init__.py:4468
+#: invenio/legacy/search_engine/__init__.py:4474
 #, fuzzy, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %(x_name)d records only. Using"
@@ -6322,24 +6327,24 @@ msgstr ""
 "Només es permet ordenar en conjunts de fins a %d registres.  Ordenat per "
 "defecte (\"primer els més recents\")."
 
-#: invenio/legacy/search_engine/__init__.py:4480
+#: invenio/legacy/search_engine/__init__.py:4486
 #, fuzzy, python-format
 msgid ""
 "Sorry, %(x_name)s does not seem to be a valid sort option. The records "
 "will not be sorted."
 msgstr "No és possible ordenar per %s.  No s'rodenaran els registres."
 
-#: invenio/legacy/search_engine/__init__.py:4760
-#: invenio/legacy/search_engine/__init__.py:5121
+#: invenio/legacy/search_engine/__init__.py:4766
+#: invenio/legacy/search_engine/__init__.py:5127
 #, fuzzy, python-format
 msgid "The record %(x_rec)d replaces it."
 msgstr "El registre %d el reemplaça."
 
-#: invenio/legacy/search_engine/__init__.py:4986
+#: invenio/legacy/search_engine/__init__.py:4992
 msgid "Use different search terms."
 msgstr "Useu termes diferents de cerca."
 
-#: invenio/legacy/search_engine/__init__.py:5982
+#: invenio/legacy/search_engine/__init__.py:5988
 #: invenio/legacy/websearch/templates.py:813
 #: invenio/legacy/websearch/templates.py:891
 #: invenio/legacy/websearch/templates.py:1014
@@ -6353,13 +6358,13 @@ msgstr "Useu termes diferents de cerca."
 msgid "Browse"
 msgstr "Índex"
 
-#: invenio/legacy/search_engine/__init__.py:6413
+#: invenio/legacy/search_engine/__init__.py:6419
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "No s'ha trobat cap coincidència en l'intèrval de temps especificat. "
 "Descartant aquesta condició..."
 
-#: invenio/legacy/search_engine/__init__.py:6447
+#: invenio/legacy/search_engine/__init__.py:6453
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "No s'ha trobat cap coincidència en les limitacions que heu especificat. "
@@ -6676,7 +6681,7 @@ msgstr "Les vostres cerques"
 #: invenio/legacy/webbasket/webinterface.py:1026
 #: invenio/legacy/webbasket/webinterface.py:1116
 #: invenio/legacy/webbasket/webinterface.py:1260
-#: invenio/legacy/webcomment/webinterface.py:922
+#: invenio/legacy/webcomment/webinterface.py:928
 #: invenio/legacy/webmessage/templates.py:466
 #: invenio/legacy/websession/templates.py:774
 #: invenio/legacy/websession/templates.py:2350
@@ -6740,7 +6745,7 @@ msgstr "%s personalitza, defineix una nova alerta"
 #: invenio/legacy/webalert/webinterface.py:475
 #: invenio/legacy/webalert/webinterface.py:523
 #: invenio/legacy/webalert/webinterface.py:551
-#: invenio/legacy/webcomment/webinterface.py:925
+#: invenio/legacy/webcomment/webinterface.py:931
 #: invenio/legacy/websession/webinterface.py:231
 #: invenio/legacy/websession/webinterface.py:254
 #: invenio/legacy/websession/webinterface.py:340
@@ -7416,7 +7421,7 @@ msgid "This functionality is forbidden to guest users."
 msgstr "Aquesta funcionalitat no està permesa als usuaris visitants."
 
 #: invenio/legacy/webbasket/templates.py:2184
-#: invenio/legacy/webcomment/templates.py:1011
+#: invenio/legacy/webcomment/templates.py:1010
 msgid "Back to search results"
 msgstr "Torna als resultats de la cerca"
 
@@ -7578,7 +7583,7 @@ msgstr "Afegir nota"
 
 #: invenio/legacy/webbasket/templates.py:3221
 #: invenio/legacy/webbasket/templates.py:4025
-#: invenio/legacy/webcomment/templates.py:409
+#: invenio/legacy/webcomment/templates.py:408
 #: invenio/legacy/webmessage/templates.py:111
 #: invenio/modules/messages/templates/messages/view_base.html:55
 msgid "Reply"
@@ -7710,209 +7715,209 @@ msgstr "El comentari %s no existeix."
 msgid "Record ID %(x_rec)s does not exist."
 msgstr "El registre %s no existeix."
 
-#: invenio/legacy/webcomment/templates.py:83
-#: invenio/legacy/webcomment/templates.py:938
+#: invenio/legacy/webcomment/templates.py:82
+#: invenio/legacy/webcomment/templates.py:937
 #: invenio/legacy/websubmit/templates.py:2451
 #: invenio/modules/formatter/templates/format/record/Video_HTML_detailed.tpl:58
 msgid "Write a comment"
 msgstr "Escriviu un comentari"
 
-#: invenio/legacy/webcomment/templates.py:99
+#: invenio/legacy/webcomment/templates.py:98
 #, python-format
 msgid "%(x_nb)i Comments for round \"%(x_name)s\""
 msgstr "%(x_nb)i comentaris per la volta «%(x_name)s»"
 
-#: invenio/legacy/webcomment/templates.py:102
+#: invenio/legacy/webcomment/templates.py:101
 #, python-format
 msgid "%(x_nb)i Comments"
 msgstr "%(x_nb)i comentaris"
 
-#: invenio/legacy/webcomment/templates.py:140
+#: invenio/legacy/webcomment/templates.py:139
 #, fuzzy, python-format
 msgid "Showing the latest %(x_num)i comments:"
 msgstr "Mostrar els darrers %i comentaris:"
 
-#: invenio/legacy/webcomment/templates.py:153
-#: invenio/legacy/webcomment/templates.py:179
+#: invenio/legacy/webcomment/templates.py:152
+#: invenio/legacy/webcomment/templates.py:178
 msgid "Discuss this document"
 msgstr "Comenteu aquest document"
 
-#: invenio/legacy/webcomment/templates.py:180
-#: invenio/legacy/webcomment/templates.py:951
+#: invenio/legacy/webcomment/templates.py:179
+#: invenio/legacy/webcomment/templates.py:950
 msgid "Start a discussion about any aspect of this document."
 msgstr "Enceteu un debat sobre qualsevol aspecte d'aquest document."
 
-#: invenio/legacy/webcomment/templates.py:197
+#: invenio/legacy/webcomment/templates.py:196
 #, fuzzy, python-format
 msgid "Sorry, the record %(x_rec)s does not seem to exist."
 msgstr "Sembla que el registre %s no existeix."
 
-#: invenio/legacy/webcomment/templates.py:201
+#: invenio/legacy/webcomment/templates.py:200
 #, fuzzy, python-format
 msgid "Sorry, %(x_rec)s is not a valid ID value."
 msgstr "%s no és un identificador vàlid."
 
-#: invenio/legacy/webcomment/templates.py:203
+#: invenio/legacy/webcomment/templates.py:202
 msgid "Sorry, no record ID was provided."
 msgstr "No heu donat el número de registre."
 
-#: invenio/legacy/webcomment/templates.py:207
+#: invenio/legacy/webcomment/templates.py:206
 #, fuzzy, python-format
 msgid "You may want to start browsing from %(x_link)s"
 msgstr "Podeu començar a visualitzar des de %s"
 
-#: invenio/legacy/webcomment/templates.py:265
-#: invenio/legacy/webcomment/templates.py:756
-#: invenio/legacy/webcomment/templates.py:766
+#: invenio/legacy/webcomment/templates.py:264
+#: invenio/legacy/webcomment/templates.py:755
+#: invenio/legacy/webcomment/templates.py:765
 #, python-format
 msgid "%(x_nb)i comments for round \"%(x_name)s\""
 msgstr "%(x_nb)i comentaris per la volta «%(x_name)s»"
 
-#: invenio/legacy/webcomment/templates.py:295
-#: invenio/legacy/webcomment/templates.py:861
+#: invenio/legacy/webcomment/templates.py:294
+#: invenio/legacy/webcomment/templates.py:860
 msgid "Was this review helpful?"
 msgstr "Ha estat útil aquesta ressenya?"
 
-#: invenio/legacy/webcomment/templates.py:306
-#: invenio/legacy/webcomment/templates.py:342
-#: invenio/legacy/webcomment/templates.py:938
+#: invenio/legacy/webcomment/templates.py:305
+#: invenio/legacy/webcomment/templates.py:341
+#: invenio/legacy/webcomment/templates.py:937
 #: invenio/modules/comments/templates/comments/add_review_base.html:54
 msgid "Write a review"
 msgstr "Escriviu-ne una ressenya"
 
-#: invenio/legacy/webcomment/templates.py:313
-#: invenio/legacy/webcomment/templates.py:925
-#: invenio/legacy/webcomment/templates.py:2185
+#: invenio/legacy/webcomment/templates.py:312
+#: invenio/legacy/webcomment/templates.py:924
+#: invenio/legacy/webcomment/templates.py:2184
 #, python-format
 msgid "Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews"
 msgstr "Puntuació mitjana: %(x_nb_score)s, basada en %(x_nb_reviews)s ressenyes"
 
-#: invenio/legacy/webcomment/templates.py:316
+#: invenio/legacy/webcomment/templates.py:315
 #, fuzzy, python-format
 msgid "Readers found the following %(x_name)s reviews to be most helpful."
 msgstr "Els lectors han trobat que les següents %s ressenyes són les més útils."
 
-#: invenio/legacy/webcomment/templates.py:318
-#: invenio/legacy/webcomment/templates.py:341
+#: invenio/legacy/webcomment/templates.py:317
+#: invenio/legacy/webcomment/templates.py:340
 #, fuzzy, python-format
 msgid "View all %(x_name)s reviews"
 msgstr "Visualitzar totes les %s ressenyes"
 
-#: invenio/legacy/webcomment/templates.py:337
-#: invenio/legacy/webcomment/templates.py:359
-#: invenio/legacy/webcomment/templates.py:2226
+#: invenio/legacy/webcomment/templates.py:336
+#: invenio/legacy/webcomment/templates.py:358
+#: invenio/legacy/webcomment/templates.py:2225
 msgid "Rate this document"
 msgstr "Valoreu aquest document"
 
-#: invenio/legacy/webcomment/templates.py:360
+#: invenio/legacy/webcomment/templates.py:359
 msgid "Be the first to review this document.</div>"
 msgstr "Sigueu el primer a escriure una ressenya d'aquest document.</div>"
 
-#: invenio/legacy/webcomment/templates.py:404
-#: invenio/legacy/webcomment/templates.py:465
-#: invenio/legacy/webcomment/templates.py:807
+#: invenio/legacy/webcomment/templates.py:403
+#: invenio/legacy/webcomment/templates.py:464
+#: invenio/legacy/webcomment/templates.py:806
 #: invenio/modules/workflows/templates/workflows/actions/approval_main.html:23
 msgid "Close"
 msgstr "Tanca"
 
-#: invenio/legacy/webcomment/templates.py:411
-#: invenio/legacy/webcomment/templates.py:862
+#: invenio/legacy/webcomment/templates.py:410
+#: invenio/legacy/webcomment/templates.py:861
 msgid "Report abuse"
 msgstr "Denuncieu-ne un abús"
 
-#: invenio/legacy/webcomment/templates.py:425
+#: invenio/legacy/webcomment/templates.py:424
 msgid "Undelete comment"
 msgstr "Recupera el comentari suprimit"
 
-#: invenio/legacy/webcomment/templates.py:434
-#: invenio/legacy/webcomment/templates.py:436
+#: invenio/legacy/webcomment/templates.py:433
+#: invenio/legacy/webcomment/templates.py:435
 msgid "Delete comment"
 msgstr "Suprimeix el comentari"
 
-#: invenio/legacy/webcomment/templates.py:442
+#: invenio/legacy/webcomment/templates.py:441
 msgid "Unreport comment"
 msgstr "Suprimeix la denúncia al comentari"
 
-#: invenio/legacy/webcomment/templates.py:453
+#: invenio/legacy/webcomment/templates.py:452
 msgid "Attached file"
 msgstr "Fitxer adjunt"
 
-#: invenio/legacy/webcomment/templates.py:453
+#: invenio/legacy/webcomment/templates.py:452
 msgid "Attached files"
 msgstr "Fitxers adjunts"
 
-#: invenio/legacy/webcomment/templates.py:465
-#: invenio/legacy/webcomment/templates.py:806
+#: invenio/legacy/webcomment/templates.py:464
+#: invenio/legacy/webcomment/templates.py:805
 msgid "Open"
 msgstr "Obre"
 
-#: invenio/legacy/webcomment/templates.py:534
+#: invenio/legacy/webcomment/templates.py:533
 #, python-format
 msgid "Reviewed by %(x_nickname)s on %(x_date)s"
 msgstr "Ressenyat per %(x_nickname)s el %(x_date)s"
 
-#: invenio/legacy/webcomment/templates.py:538
+#: invenio/legacy/webcomment/templates.py:537
 #, python-format
 msgid "%(x_nb_people)s out of %(x_nb_total)s people found this review useful"
 msgstr ""
 "%(x_nb_people)s de %(x_nb_total)s persones han trobat aquesta ressenya  "
 "útil"
 
-#: invenio/legacy/webcomment/templates.py:560
+#: invenio/legacy/webcomment/templates.py:559
 msgid "Undelete review"
 msgstr "Recupera la ressenya suprimida"
 
-#: invenio/legacy/webcomment/templates.py:569
+#: invenio/legacy/webcomment/templates.py:568
 msgid "Delete review"
 msgstr "Suprimeix la ressenya"
 
-#: invenio/legacy/webcomment/templates.py:575
+#: invenio/legacy/webcomment/templates.py:574
 msgid "Unreport review"
 msgstr "Suprimeix la denúncia a la ressenya"
 
-#: invenio/legacy/webcomment/templates.py:682
-#: invenio/legacy/webcomment/templates.py:698
-#: invenio/legacy/webcomment/webinterface.py:248
-#: invenio/legacy/webcomment/webinterface.py:466
+#: invenio/legacy/webcomment/templates.py:681
+#: invenio/legacy/webcomment/templates.py:697
+#: invenio/legacy/webcomment/webinterface.py:252
+#: invenio/legacy/webcomment/webinterface.py:472
 #: invenio/legacy/websearch/adminlib.py:3406
 #: invenio/legacy/websubmit/templates.py:2449
 #: invenio/modules/comments/views.py:188
 msgid "Comments"
 msgstr "Comentaris"
 
-#: invenio/legacy/webcomment/templates.py:683
-#: invenio/legacy/webcomment/templates.py:699
-#: invenio/legacy/webcomment/webinterface.py:248
-#: invenio/legacy/webcomment/webinterface.py:466
+#: invenio/legacy/webcomment/templates.py:682
+#: invenio/legacy/webcomment/templates.py:698
+#: invenio/legacy/webcomment/webinterface.py:252
+#: invenio/legacy/webcomment/webinterface.py:472
 #: invenio/legacy/websearch/adminlib.py:3407
 #: invenio/modules/comments/views.py:222
 msgid "Reviews"
 msgstr "Ressenyes"
 
-#: invenio/legacy/webcomment/templates.py:942
+#: invenio/legacy/webcomment/templates.py:941
 #, fuzzy, python-format
 msgid "There is a total of %(x_num)s reviews"
 msgstr "Hi ha un total de %s ressenyes"
 
-#: invenio/legacy/webcomment/templates.py:944
+#: invenio/legacy/webcomment/templates.py:943
 #, fuzzy, python-format
 msgid "There is a total of %(x_num)s comments"
 msgstr "Hi ha un total de %s comentaris"
 
-#: invenio/legacy/webcomment/templates.py:956
+#: invenio/legacy/webcomment/templates.py:955
 msgid "Be the first to review this document."
 msgstr "Sigueu el primer a escriure una ressenya d'aquest document."
 
-#: invenio/legacy/webcomment/templates.py:975
+#: invenio/legacy/webcomment/templates.py:974
 msgid "Subscribe"
 msgstr "Subscriure's"
 
-#: invenio/legacy/webcomment/templates.py:993
+#: invenio/legacy/webcomment/templates.py:992
 msgid "Unsubscribe"
 msgstr "Donar-se de baixa"
 
-#: invenio/legacy/webcomment/templates.py:1010
-#: invenio/legacy/webcomment/templates.py:1787
+#: invenio/legacy/webcomment/templates.py:1009
+#: invenio/legacy/webcomment/templates.py:1786
 #: invenio/legacy/websearch/templates.py:548
 #: invenio/modules/comments/templates/comments/subscriptions_base.html:40
 #: invenio/modules/editor/templates/editor/recordmenu.html:22
@@ -7921,34 +7926,34 @@ msgstr "Donar-se de baixa"
 msgid "Record"
 msgstr "Registre"
 
-#: invenio/legacy/webcomment/templates.py:1020
-#: invenio/legacy/webcomment/templates.py:1088
+#: invenio/legacy/webcomment/templates.py:1019
+#: invenio/legacy/webcomment/templates.py:1087
 msgid "review"
 msgstr "ressenya"
 
-#: invenio/legacy/webcomment/templates.py:1020
-#: invenio/legacy/webcomment/templates.py:1088
+#: invenio/legacy/webcomment/templates.py:1019
+#: invenio/legacy/webcomment/templates.py:1087
 msgid "comment"
 msgstr "comentari"
 
-#: invenio/legacy/webcomment/templates.py:1023
-#: invenio/legacy/webcomment/templates.py:2028
+#: invenio/legacy/webcomment/templates.py:1022
+#: invenio/legacy/webcomment/templates.py:2027
 msgid "Review"
 msgstr "Ressenya"
 
-#: invenio/legacy/webcomment/templates.py:1086
+#: invenio/legacy/webcomment/templates.py:1085
 msgid "Viewing"
 msgstr "Visualització"
 
-#: invenio/legacy/webcomment/templates.py:1087
+#: invenio/legacy/webcomment/templates.py:1086
 msgid "Page:"
 msgstr "Pàgina:"
 
-#: invenio/legacy/webcomment/templates.py:1101
+#: invenio/legacy/webcomment/templates.py:1100
 msgid "You are not authorized to comment or review."
 msgstr "No esteu autoritzats a fer comentaris o ressenyes."
 
-#: invenio/legacy/webcomment/templates.py:1271
+#: invenio/legacy/webcomment/templates.py:1270
 #, fuzzy, python-format
 msgid ""
 "Note: Your nickname, %(nick)s, will be displayed as author of this "
@@ -7957,8 +7962,8 @@ msgstr ""
 "Vigileu: El vostre àlies, %s, serà el que es mostri com autor d'aquest "
 "comentari"
 
-#: invenio/legacy/webcomment/templates.py:1276
-#: invenio/legacy/webcomment/templates.py:1393
+#: invenio/legacy/webcomment/templates.py:1275
+#: invenio/legacy/webcomment/templates.py:1392
 #, python-format
 msgid ""
 "Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. "
@@ -7968,48 +7973,48 @@ msgstr ""
 "àlies%(x_url_close)s. %(x_nickname)s s'usarà temporalment com a autor "
 "d'aquest comentari."
 
-#: invenio/legacy/webcomment/templates.py:1293
+#: invenio/legacy/webcomment/templates.py:1292
 msgid "Once logged in, authorized users can also attach files."
 msgstr ""
 "Un cop identificats, els usuaris autoritzats també hi poden adjuntar "
 "fitxers."
 
-#: invenio/legacy/webcomment/templates.py:1308
+#: invenio/legacy/webcomment/templates.py:1307
 msgid "Optionally, attach a file to this comment"
 msgstr "Opcionalment, afegiu-hi un fitxer a aquest comentari"
 
-#: invenio/legacy/webcomment/templates.py:1309
+#: invenio/legacy/webcomment/templates.py:1308
 msgid "Optionally, attach files to this comment"
 msgstr "Opcionalment, afegiu-hi fitxers a aquest comentari"
 
-#: invenio/legacy/webcomment/templates.py:1310
+#: invenio/legacy/webcomment/templates.py:1309
 msgid "Max one file"
 msgstr "Màxim un fitxer"
 
-#: invenio/legacy/webcomment/templates.py:1311
+#: invenio/legacy/webcomment/templates.py:1310
 #, fuzzy, python-format
 msgid "Max %(maxfiles)i files"
 msgstr "Màxim %i fitxers"
 
-#: invenio/legacy/webcomment/templates.py:1312
+#: invenio/legacy/webcomment/templates.py:1311
 #, python-format
 msgid "Max %(x_nb_bytes)s per file"
 msgstr "Màxim %(x_nb_bytes)s per fitxer"
 
-#: invenio/legacy/webcomment/templates.py:1327
+#: invenio/legacy/webcomment/templates.py:1326
 msgid "Send me an email when a new comment is posted"
 msgstr "Envieu-me un email quan es publiqui un nou comentari"
 
-#: invenio/legacy/webcomment/templates.py:1342
-#: invenio/legacy/webcomment/templates.py:1464
+#: invenio/legacy/webcomment/templates.py:1341
+#: invenio/legacy/webcomment/templates.py:1463
 msgid "Article"
 msgstr "Article"
 
-#: invenio/legacy/webcomment/templates.py:1344
+#: invenio/legacy/webcomment/templates.py:1343
 msgid "Add comment"
 msgstr "Afegeix un comentari"
 
-#: invenio/legacy/webcomment/templates.py:1389
+#: invenio/legacy/webcomment/templates.py:1388
 #, fuzzy, python-format
 msgid ""
 "Note: Your nickname, %(x_name)s, will be displayed as the author of this "
@@ -8018,44 +8023,44 @@ msgstr ""
 "Vigileu: El vostre àlies, %s, serà el que es mostri com a autor d'aquesta"
 " ressenya."
 
-#: invenio/legacy/webcomment/templates.py:1465
+#: invenio/legacy/webcomment/templates.py:1464
 msgid "Rate this article"
 msgstr "Valoreu aquest article"
 
-#: invenio/legacy/webcomment/templates.py:1466
+#: invenio/legacy/webcomment/templates.py:1465
 msgid "Select a score"
 msgstr "Seleccioneu una puntuació"
 
-#: invenio/legacy/webcomment/templates.py:1467
+#: invenio/legacy/webcomment/templates.py:1466
 msgid "Give a title to your review"
 msgstr "Doneu un títol a la vostra ressenya"
 
-#: invenio/legacy/webcomment/templates.py:1468
+#: invenio/legacy/webcomment/templates.py:1467
 msgid "Write your review"
 msgstr "Escriviu la vostra ressenya"
 
-#: invenio/legacy/webcomment/templates.py:1473
+#: invenio/legacy/webcomment/templates.py:1472
 msgid "Add review"
 msgstr "Afegiu la vostra ressenya"
 
-#: invenio/legacy/webcomment/templates.py:1483
-#: invenio/legacy/webcomment/webinterface.py:511
+#: invenio/legacy/webcomment/templates.py:1482
+#: invenio/legacy/webcomment/webinterface.py:517
 msgid "Add Review"
 msgstr "Afegiu la vostra ressenya"
 
-#: invenio/legacy/webcomment/templates.py:1505
+#: invenio/legacy/webcomment/templates.py:1504
 msgid "Your review was successfully added."
 msgstr "La vostra ressenya ha estat afegida correctament."
 
-#: invenio/legacy/webcomment/templates.py:1507
+#: invenio/legacy/webcomment/templates.py:1506
 msgid "Your comment was successfully added."
 msgstr "El vostre comentari ha estat afegit correctament."
 
-#: invenio/legacy/webcomment/templates.py:1510
+#: invenio/legacy/webcomment/templates.py:1509
 msgid "Back to record"
 msgstr "Torna al registre"
 
-#: invenio/legacy/webcomment/templates.py:1512
+#: invenio/legacy/webcomment/templates.py:1511
 #, fuzzy, python-format
 msgid ""
 "You can also view all the comments you have submitted so far on "
@@ -8064,49 +8069,49 @@ msgstr ""
 "Podeu consultar la llista de les %(x_url_open)svostres "
 "tasques%(x_url_close)s."
 
-#: invenio/legacy/webcomment/templates.py:1592
+#: invenio/legacy/webcomment/templates.py:1591
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:171
 msgid "View most commented records"
 msgstr "Visualitza els registres més comentats"
 
-#: invenio/legacy/webcomment/templates.py:1594
+#: invenio/legacy/webcomment/templates.py:1593
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:207
 msgid "View latest commented records"
 msgstr "Visualitza els registres amb els comentaris més recents"
 
-#: invenio/legacy/webcomment/templates.py:1596
+#: invenio/legacy/webcomment/templates.py:1595
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:140
 msgid "View all comments reported as abuse"
 msgstr "Visualitzar tots els comentaris denunciats"
 
-#: invenio/legacy/webcomment/templates.py:1600
+#: invenio/legacy/webcomment/templates.py:1599
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:170
 msgid "View most reviewed records"
 msgstr "Visualitza els registres amb més ressenyes"
 
-#: invenio/legacy/webcomment/templates.py:1602
+#: invenio/legacy/webcomment/templates.py:1601
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:206
 msgid "View latest reviewed records"
 msgstr "Visualitza els registres amb les ressenyes més recents"
 
-#: invenio/legacy/webcomment/templates.py:1604
+#: invenio/legacy/webcomment/templates.py:1603
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:140
 msgid "View all reviews reported as abuse"
 msgstr "Visualitzar totes les ressenyes denunciades"
 
-#: invenio/legacy/webcomment/templates.py:1612
+#: invenio/legacy/webcomment/templates.py:1611
 msgid "View all users who have been reported"
 msgstr "Visualitzar tots els usuaris que han estat denunciats"
 
-#: invenio/legacy/webcomment/templates.py:1614
+#: invenio/legacy/webcomment/templates.py:1613
 msgid "Guide"
 msgstr "Guia"
 
-#: invenio/legacy/webcomment/templates.py:1616
+#: invenio/legacy/webcomment/templates.py:1615
 msgid "Comments and reviews are disabled"
 msgstr "Els comentaris i les ressenyes estan desactivades"
 
-#: invenio/legacy/webcomment/templates.py:1636
+#: invenio/legacy/webcomment/templates.py:1635
 msgid ""
 "Please enter the ID of the comment/review so that you can view it before "
 "deciding whether to delete it or not"
@@ -8114,39 +8119,39 @@ msgstr ""
 "Introduiu el número del comentari o ressenya, per poder visualitzar-ho "
 "abans de decidir de suprimir-lo o no"
 
-#: invenio/legacy/webcomment/templates.py:1660
+#: invenio/legacy/webcomment/templates.py:1659
 msgid "Comment ID:"
 msgstr "Número del comentari:"
 
-#: invenio/legacy/webcomment/templates.py:1661
+#: invenio/legacy/webcomment/templates.py:1660
 msgid "Or enter a record ID to list all the associated comments/reviews:"
 msgstr ""
 "O entreu el número de registre per veure tots els comentaris i ressenyes "
 "associades:"
 
-#: invenio/legacy/webcomment/templates.py:1662
+#: invenio/legacy/webcomment/templates.py:1661
 msgid "Record ID:"
 msgstr "Registre :"
 
-#: invenio/legacy/webcomment/templates.py:1664
+#: invenio/legacy/webcomment/templates.py:1663
 msgid "View Comment"
 msgstr "Visualitzar el comentari"
 
-#: invenio/legacy/webcomment/templates.py:1685
+#: invenio/legacy/webcomment/templates.py:1684
 msgid "There have been no reports so far."
 msgstr "Encara no hi ha denúncies."
 
-#: invenio/legacy/webcomment/templates.py:1689
+#: invenio/legacy/webcomment/templates.py:1688
 #, fuzzy, python-format
 msgid "View all %(x_name)s reported comments"
 msgstr "Visualitzar tots els %s comentaris denunciats"
 
-#: invenio/legacy/webcomment/templates.py:1692
+#: invenio/legacy/webcomment/templates.py:1691
 #, fuzzy, python-format
 msgid "View all %(x_name)s reported reviews"
 msgstr "Visualitzar totes les %s ressenyes denunciades"
 
-#: invenio/legacy/webcomment/templates.py:1729
+#: invenio/legacy/webcomment/templates.py:1728
 msgid ""
 "Here is a list, sorted by total number of reports, of all users who have "
 "had a comment reported at least once."
@@ -8154,284 +8159,284 @@ msgstr ""
 "Aquesta és la llista, ordenada per número de denúncies, dels usuaris que "
 "han tingut al menys una denúncia a algun dels seus comentaris."
 
-#: invenio/legacy/webcomment/templates.py:1737
-#: invenio/legacy/webcomment/templates.py:1766
+#: invenio/legacy/webcomment/templates.py:1736
+#: invenio/legacy/webcomment/templates.py:1765
 #: invenio/legacy/websession/templates.py:272
 #: invenio/legacy/websession/templates.py:1221
 #: invenio/modules/accounts/forms.py:46 invenio/modules/accounts/forms.py:164
 msgid "Nickname"
 msgstr "Àlies"
 
-#: invenio/legacy/webcomment/templates.py:1739
-#: invenio/legacy/webcomment/templates.py:1768
+#: invenio/legacy/webcomment/templates.py:1738
+#: invenio/legacy/webcomment/templates.py:1767
 msgid "User ID"
 msgstr "Número d'usuari"
 
-#: invenio/legacy/webcomment/templates.py:1741
+#: invenio/legacy/webcomment/templates.py:1740
 msgid "Number positive votes"
 msgstr "Nombre de vots positius"
 
-#: invenio/legacy/webcomment/templates.py:1742
+#: invenio/legacy/webcomment/templates.py:1741
 msgid "Number negative votes"
 msgstr "Nombre de vots negatius"
 
-#: invenio/legacy/webcomment/templates.py:1743
+#: invenio/legacy/webcomment/templates.py:1742
 msgid "Total number votes"
 msgstr "Nombre total de vots"
 
-#: invenio/legacy/webcomment/templates.py:1744
+#: invenio/legacy/webcomment/templates.py:1743
 msgid "Total number of reports"
 msgstr "Nombre total de denúncies"
 
-#: invenio/legacy/webcomment/templates.py:1745
+#: invenio/legacy/webcomment/templates.py:1744
 msgid "View all user's reported comments/reviews"
 msgstr "Visualitza tots els comentaris/ressenyes denunciades d'aquest usuari"
 
-#: invenio/legacy/webcomment/templates.py:1778
+#: invenio/legacy/webcomment/templates.py:1777
 #, fuzzy, python-format
 msgid "This review has been reported %(x_num)i times"
 msgstr "Aquesta ressenya ha estat denunciada %i cops"
 
-#: invenio/legacy/webcomment/templates.py:1780
+#: invenio/legacy/webcomment/templates.py:1779
 #, fuzzy, python-format
 msgid "This comment has been reported %(x_num)i times"
 msgstr "Aquest comentari ha estat denunciat %i vegades"
 
-#: invenio/legacy/webcomment/templates.py:2029
+#: invenio/legacy/webcomment/templates.py:2028
 msgid "Written by"
 msgstr "Escrit per"
 
-#: invenio/legacy/webcomment/templates.py:2030
+#: invenio/legacy/webcomment/templates.py:2029
 msgid "General informations"
 msgstr "Informacions generals"
 
-#: invenio/legacy/webcomment/templates.py:2045
+#: invenio/legacy/webcomment/templates.py:2044
 msgid "Delete selected reviews"
 msgstr "Suprimeix les ressenyes seleccionades"
 
-#: invenio/legacy/webcomment/templates.py:2046
-#: invenio/legacy/webcomment/templates.py:2053
+#: invenio/legacy/webcomment/templates.py:2045
+#: invenio/legacy/webcomment/templates.py:2052
 msgid "Suppress selected abuse report"
 msgstr "Suprimeix l'informe d'abús seleccionat"
 
-#: invenio/legacy/webcomment/templates.py:2047
+#: invenio/legacy/webcomment/templates.py:2046
 msgid "Undelete selected reviews"
 msgstr "Recupera les ressenyes eliminades"
 
-#: invenio/legacy/webcomment/templates.py:2051
+#: invenio/legacy/webcomment/templates.py:2050
 msgid "Undelete selected comments"
 msgstr "Recupera els comentaris eliminats"
 
-#: invenio/legacy/webcomment/templates.py:2052
+#: invenio/legacy/webcomment/templates.py:2051
 msgid "Delete selected comments"
 msgstr "Suprimeix els comentaris seleccionats"
 
-#: invenio/legacy/webcomment/templates.py:2067
+#: invenio/legacy/webcomment/templates.py:2066
 #, fuzzy, python-format
 msgid "Here are the reported reviews of user %(x_name)s"
 msgstr "Aquestes són les ressenyes denunciades de l'usuari %s"
 
-#: invenio/legacy/webcomment/templates.py:2069
+#: invenio/legacy/webcomment/templates.py:2068
 #, fuzzy, python-format
 msgid "Here are the reported comments of user %(x_name)s"
 msgstr "Aquests són els comentaris denunciats de l'usuari %s"
 
-#: invenio/legacy/webcomment/templates.py:2073
+#: invenio/legacy/webcomment/templates.py:2072
 #, fuzzy, python-format
 msgid "Here is review %(x_name)s"
 msgstr "Aquesta és la ressenya %s"
 
-#: invenio/legacy/webcomment/templates.py:2075
+#: invenio/legacy/webcomment/templates.py:2074
 #, fuzzy, python-format
 msgid "Here is comment %(x_name)s"
 msgstr "Aquest és el comentari %s"
 
-#: invenio/legacy/webcomment/templates.py:2078
+#: invenio/legacy/webcomment/templates.py:2077
 #, python-format
 msgid "Here is review %(x_cmtID)s written by user %(x_user)s"
 msgstr "Aquesta és la ressenya %(x_cmtID)s escrita per l'usuari %(x_user)s"
 
-#: invenio/legacy/webcomment/templates.py:2080
+#: invenio/legacy/webcomment/templates.py:2079
 #, python-format
 msgid "Here is comment %(x_cmtID)s written by user %(x_user)s"
 msgstr "Aquest és el comentari %(x_cmtID)s escrit per l'usuari %(x_user)s"
 
-#: invenio/legacy/webcomment/templates.py:2086
+#: invenio/legacy/webcomment/templates.py:2085
 msgid "Here are all reported reviews sorted by the most reported"
 msgstr "Aquestes són totes les ressenyes denunciades, ordenades de més a menys"
 
-#: invenio/legacy/webcomment/templates.py:2088
+#: invenio/legacy/webcomment/templates.py:2087
 msgid "Here are all reported comments sorted by the most reported"
 msgstr "Aquests són tots els comentaris denunciats, ordenats de més a menys"
 
-#: invenio/legacy/webcomment/templates.py:2093
+#: invenio/legacy/webcomment/templates.py:2092
 #, fuzzy, python-format
 msgid "Here are all reviews for record %(x_num)i, sorted by the most reported"
 msgstr "Ressenyes del registre %i, ordenades de més a menys denúncies"
 
-#: invenio/legacy/webcomment/templates.py:2094
+#: invenio/legacy/webcomment/templates.py:2093
 msgid "Show comments"
 msgstr "Visualitza els comentaris"
 
-#: invenio/legacy/webcomment/templates.py:2096
+#: invenio/legacy/webcomment/templates.py:2095
 #, fuzzy, python-format
 msgid "Here are all comments for record %(x_num)i, sorted by the most reported"
 msgstr "Comentaris al registre %i, ordenats de més a menys denúncies"
 
-#: invenio/legacy/webcomment/templates.py:2097
+#: invenio/legacy/webcomment/templates.py:2096
 msgid "Show reviews"
 msgstr "Visualitza les ressenyes"
 
-#: invenio/legacy/webcomment/templates.py:2122
-#: invenio/legacy/webcomment/templates.py:2146
-#: invenio/legacy/webcomment/templates.py:2172
+#: invenio/legacy/webcomment/templates.py:2121
+#: invenio/legacy/webcomment/templates.py:2145
+#: invenio/legacy/webcomment/templates.py:2171
 msgid "comment ID"
 msgstr "número de comentari"
 
-#: invenio/legacy/webcomment/templates.py:2122
+#: invenio/legacy/webcomment/templates.py:2121
 msgid "successfully deleted"
 msgstr "suprimit correctament"
 
-#: invenio/legacy/webcomment/templates.py:2146
+#: invenio/legacy/webcomment/templates.py:2145
 msgid "successfully undeleted"
 msgstr "recuperat correctament"
 
-#: invenio/legacy/webcomment/templates.py:2172
+#: invenio/legacy/webcomment/templates.py:2171
 msgid "successfully suppressed abuse report"
 msgstr "eliminat correctament l'informa d'abús"
 
-#: invenio/legacy/webcomment/templates.py:2189
+#: invenio/legacy/webcomment/templates.py:2188
 msgid "Not yet reviewed"
 msgstr "Sense cap ressenya"
 
-#: invenio/legacy/webcomment/templates.py:2257
+#: invenio/legacy/webcomment/templates.py:2256
 #, python-format
 msgid "The following review was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
 msgstr "S'ha enviat aquesta ressenya a %(CFG_SITE_NAME)s per %(user_nickname)s:"
 
-#: invenio/legacy/webcomment/templates.py:2258
+#: invenio/legacy/webcomment/templates.py:2257
 #, python-format
 msgid "The following comment was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
 msgstr "S'ha enviat aquest comentari a %(CFG_SITE_NAME)s per %(user_nickname)s:"
 
-#: invenio/legacy/webcomment/templates.py:2285
+#: invenio/legacy/webcomment/templates.py:2284
 msgid "This is an automatic message, please don't reply to it."
 msgstr "Aquest és un missatge automàtic, no el responeu."
 
-#: invenio/legacy/webcomment/templates.py:2287
+#: invenio/legacy/webcomment/templates.py:2286
 #, python-format
 msgid "To post another comment, go to <%(x_url)s> instead."
 msgstr "Per publicar un altre comentari, aneu a <%(x_url)s>."
 
-#: invenio/legacy/webcomment/templates.py:2292
+#: invenio/legacy/webcomment/templates.py:2291
 #, python-format
 msgid "To specifically reply to this comment, go to <%(x_url)s>"
 msgstr "Per contestar específicament a aquest comentari, aneu a <%(x_url)s>."
 
-#: invenio/legacy/webcomment/templates.py:2297
+#: invenio/legacy/webcomment/templates.py:2296
 #, python-format
 msgid "To unsubscribe from this discussion, go to <%(x_url)s>"
 msgstr "Per donar-vos de baixa d'aquesta discussió, aneu a <%(x_url)s>."
 
-#: invenio/legacy/webcomment/templates.py:2301
+#: invenio/legacy/webcomment/templates.py:2300
 #, python-format
 msgid "For any question, please use <%(CFG_SITE_SUPPORT_EMAIL)s>"
 msgstr ""
 "Per resoldre dubtes, poseu-vos en contacte amb "
 "<%(CFG_SITE_SUPPORT_EMAIL)s>"
 
-#: invenio/legacy/webcomment/templates.py:2368
+#: invenio/legacy/webcomment/templates.py:2367
 msgid "Your comment will be lost."
 msgstr "El vostre comentari es perderà."
 
-#: invenio/legacy/webcomment/templates.py:2406
+#: invenio/legacy/webcomment/templates.py:2405
 #, fuzzy
 msgid "Oldest comment first"
 msgstr "Suprimeix els comentaris"
 
-#: invenio/legacy/webcomment/templates.py:2407
+#: invenio/legacy/webcomment/templates.py:2406
 #, fuzzy
 msgid "Latest comment first"
 msgstr "el darrer primer"
 
-#: invenio/legacy/webcomment/templates.py:2408
+#: invenio/legacy/webcomment/templates.py:2407
 msgid "Group by record, oldest commented first"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2409
+#: invenio/legacy/webcomment/templates.py:2408
 #, fuzzy
 msgid "Group by record, latest commented first"
 msgstr "Visualitza els registres amb els comentaris més recents"
 
-#: invenio/legacy/webcomment/templates.py:2411
+#: invenio/legacy/webcomment/templates.py:2410
 #, fuzzy
 msgid "Records and comments"
 msgstr "afegir comentaris"
 
-#: invenio/legacy/webcomment/templates.py:2412
+#: invenio/legacy/webcomment/templates.py:2411
 #, fuzzy
 msgid "Records only"
 msgstr "registres trobats"
 
-#: invenio/legacy/webcomment/templates.py:2413
+#: invenio/legacy/webcomment/templates.py:2412
 #, fuzzy
 msgid "Comments only"
 msgstr "Comentaris"
 
+#: invenio/legacy/webcomment/templates.py:2414
 #: invenio/legacy/webcomment/templates.py:2415
 #: invenio/legacy/webcomment/templates.py:2416
 #: invenio/legacy/webcomment/templates.py:2417
-#: invenio/legacy/webcomment/templates.py:2418
 #, fuzzy, python-format
 msgid "%(x_i)s items"
 msgstr "%i items"
 
-#: invenio/legacy/webcomment/templates.py:2419
+#: invenio/legacy/webcomment/templates.py:2418
 #, fuzzy
 msgid "All items"
 msgstr "Afegir items"
 
-#: invenio/legacy/webcomment/templates.py:2422
+#: invenio/legacy/webcomment/templates.py:2421
 msgid "Below is the list of the comments you have submitted so far."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2426
+#: invenio/legacy/webcomment/templates.py:2425
 msgid "You have not yet submitted any comment in the document \"discussion\" tab."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2429
-#: invenio/legacy/webcomment/templates.py:2437
-#: invenio/legacy/webcomment/templates.py:2445
+#: invenio/legacy/webcomment/templates.py:2428
+#: invenio/legacy/webcomment/templates.py:2436
+#: invenio/legacy/webcomment/templates.py:2444
 msgid "You might find other comments here: "
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2457
+#: invenio/legacy/webcomment/templates.py:2456
 msgid ""
 "You have not yet submitted any comment. Browse documents from the search "
 "interface and take part to discussions!"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2485
+#: invenio/legacy/webcomment/templates.py:2484
 #, fuzzy
 msgid "Display"
 msgstr "Mostra les alertes"
 
-#: invenio/legacy/webcomment/templates.py:2486
+#: invenio/legacy/webcomment/templates.py:2485
 #, fuzzy
 msgid "Order by"
 msgstr "Data de comanda"
 
-#: invenio/legacy/webcomment/templates.py:2487
+#: invenio/legacy/webcomment/templates.py:2486
 #, fuzzy
 msgid "Per page"
 msgstr "Pàgina següent"
 
-#: invenio/legacy/webcomment/templates.py:2491
+#: invenio/legacy/webcomment/templates.py:2490
 #, fuzzy
 msgid "Display options"
 msgstr "Mostra les alertes"
 
-#: invenio/legacy/webcomment/templates.py:2492
+#: invenio/legacy/webcomment/templates.py:2491
 #: invenio/legacy/webjournal/adminlib.py:328
 #: invenio/legacy/webjournal/adminlib.py:345
 #: invenio/legacy/webjournal/templates.py:457
@@ -8439,51 +8444,51 @@ msgstr "Mostra les alertes"
 msgid "Refresh"
 msgstr "Refresca"
 
-#: invenio/legacy/webcomment/templates.py:2521
+#: invenio/legacy/webcomment/templates.py:2520
 msgid "Comment deleted by the moderator"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2523
+#: invenio/legacy/webcomment/templates.py:2522
 msgid "You have deleted this comment: it is not visible by other users"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2530
+#: invenio/legacy/webcomment/templates.py:2529
 #, fuzzy
 msgid "(in reply to a comment)"
 msgstr "Suprimeix la denúncia al comentari"
 
-#: invenio/legacy/webcomment/templates.py:2535
+#: invenio/legacy/webcomment/templates.py:2534
 msgid "See comment on discussion page"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2574
+#: invenio/legacy/webcomment/templates.py:2573
 #, python-format
 msgid "%(x_num)i comments found in total (not shown on this page)"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2576
+#: invenio/legacy/webcomment/templates.py:2575
 #, fuzzy, python-format
 msgid "%(x_num)i items found in total"
 msgstr "%i items trobats"
 
-#: invenio/legacy/webcomment/webinterface.py:272
-#: invenio/legacy/webcomment/webinterface.py:530
+#: invenio/legacy/webcomment/webinterface.py:276
+#: invenio/legacy/webcomment/webinterface.py:536
 msgid "Record Not Found"
 msgstr "No s'ha trobat el registre"
 
-#: invenio/legacy/webcomment/webinterface.py:350
-#: invenio/legacy/webcomment/webinterface.py:591
-#: invenio/legacy/webcomment/webinterface.py:668
+#: invenio/legacy/webcomment/webinterface.py:354
+#: invenio/legacy/webcomment/webinterface.py:597
+#: invenio/legacy/webcomment/webinterface.py:674
 msgid "Specified comment does not belong to this record"
 msgstr "El comentari especificat no pertany a aquest registre"
 
-#: invenio/legacy/webcomment/webinterface.py:359
-#: invenio/legacy/webcomment/webinterface.py:597
-#: invenio/legacy/webcomment/webinterface.py:674
+#: invenio/legacy/webcomment/webinterface.py:363
+#: invenio/legacy/webcomment/webinterface.py:603
+#: invenio/legacy/webcomment/webinterface.py:680
 msgid "You do not have access to the specified comment"
 msgstr "No teniu accés al comentari especificat"
 
-#: invenio/legacy/webcomment/webinterface.py:431
+#: invenio/legacy/webcomment/webinterface.py:437
 #, fuzzy, python-format
 msgid ""
 "The size of file \\\"%(x_file)s\\\" (%(x_size)s) is larger than maximum "
@@ -8492,50 +8497,50 @@ msgstr ""
 "El tamany del fitxer \\\"%s\\\" (%s) és més gran que el màxim permès "
 "(%s). Torneu a seleccionar els fitxers."
 
-#: invenio/legacy/webcomment/webinterface.py:513
+#: invenio/legacy/webcomment/webinterface.py:519
 #: invenio/legacy/websubmit/templates.py:2445
 #: invenio/legacy/websubmit/templates.py:2446
 msgid "Add Comment"
 msgstr "Afegeix un comentari"
 
-#: invenio/legacy/webcomment/webinterface.py:602
+#: invenio/legacy/webcomment/webinterface.py:608
 msgid "You cannot vote for a deleted comment"
 msgstr "No podeu votar un comentari esborrat"
 
-#: invenio/legacy/webcomment/webinterface.py:679
+#: invenio/legacy/webcomment/webinterface.py:685
 msgid "You cannot report a deleted comment"
 msgstr "No podeu denunciar un comentari esborrat"
 
-#: invenio/legacy/webcomment/webinterface.py:826
-#: invenio/legacy/webcomment/webinterface.py:866
+#: invenio/legacy/webcomment/webinterface.py:832
+#: invenio/legacy/webcomment/webinterface.py:872
 msgid "Page Not Found"
 msgstr "No s'ha trobat la pàgina"
 
-#: invenio/legacy/webcomment/webinterface.py:827
+#: invenio/legacy/webcomment/webinterface.py:833
 msgid "The requested comment could not be found"
 msgstr "No s'ha trobat el comentari sol·licitat"
 
-#: invenio/legacy/webcomment/webinterface.py:847
+#: invenio/legacy/webcomment/webinterface.py:853
 msgid "You cannot access files of a deleted comment"
 msgstr "No podeu accedir als fitxers d'un comentari esborrat"
 
-#: invenio/legacy/webcomment/webinterface.py:867
+#: invenio/legacy/webcomment/webinterface.py:873
 msgid "The requested file could not be found"
 msgstr "No s'ha trobat el fitxer sol·licitat"
 
-#: invenio/legacy/webcomment/webinterface.py:910
+#: invenio/legacy/webcomment/webinterface.py:916
 #, fuzzy
 msgid "You are not authorized to use comments."
 msgstr "No esteu autoritzats a fer servir el préstec."
 
-#: invenio/legacy/webcomment/webinterface.py:912
+#: invenio/legacy/webcomment/webinterface.py:918
 #: invenio/legacy/websession/templates.py:635
 #: invenio/legacy/websession/templates.py:788
 #, fuzzy
 msgid "Your Comments"
 msgstr "Comentaris"
 
-#: invenio/legacy/webcomment/webinterface.py:924
+#: invenio/legacy/webcomment/webinterface.py:930
 #, python-format
 msgid "%(x_name)s View your previously submitted comments"
 msgstr ""
@@ -13056,7 +13061,7 @@ msgid "Problem with login."
 msgstr "Comparar amb l'original"
 
 #: invenio/modules/accounts/views/accounts.py:138
-#, fuzzy, python-format
+#, fuzzy
 msgid "You can now access your account."
 msgstr "Ja podeu accedir al vostre %(x_url_open)scompte%(x_url_close)s."
 
@@ -13553,7 +13558,7 @@ msgid "Record ID %(recid)s is not a number."
 msgstr "El registro %s no és numèric."
 
 #: invenio/modules/comments/forms.py:38 invenio/modules/messages/forms.py:80
-#, fuzzy, python-format
+#, fuzzy
 msgid ""
 "Your message is too long, please edit it. Maximum size allowed is "
 "%{length}i characters."
@@ -13602,12 +13607,12 @@ msgid "Review was sent"
 msgstr "Escriviu un comentari"
 
 #: invenio/modules/comments/views.py:263
-#, fuzzy, python-format
+#, fuzzy
 msgid "Comment has been reported."
 msgstr "Aquest comentari ha estat denunciat %i vegades"
 
 #: invenio/modules/comments/views.py:265
-#, fuzzy, python-format
+#, fuzzy
 msgid "Comment has been already reported."
 msgstr "Aquest comentari ha estat denunciat %i vegades"
 
@@ -13692,7 +13697,7 @@ msgid ""
 msgstr ""
 
 #: invenio/modules/communities/forms.py:150
-#, fuzzy, python-format
+#, fuzzy
 msgid "The identifier already exists. Please choose a different one."
 msgstr "Ja existeix un fitxer amb el nom %s.  Escolliu-ne un altre, si us plau."
 
@@ -13837,7 +13842,7 @@ msgid "Invalid deposition type."
 msgstr ""
 
 #: invenio/modules/deposit/views/deposit.py:76
-#, fuzzy, python-format
+#, fuzzy
 msgid "Deposition does not exists."
 msgstr "La funció %s no existeix."
 
@@ -14134,7 +14139,7 @@ msgstr "Mostra tots els %i autors"
 msgid "Manage Files of This Record"
 msgstr "Gestioneu els fitxers d'aquest registre"
 
-#: invenio/modules/formatter/format_elements/bfe_edit_record.py:47
+#: invenio/modules/formatter/format_elements/bfe_edit_record.py:52
 msgid "Edit This Record"
 msgstr "Editeu aquest registre"
 
@@ -14342,12 +14347,12 @@ msgstr "No sou administrador de cap grup."
 msgid "Members"
 msgstr "Sense membres."
 
-#: invenio/modules/indexer/admin.py:78
+#: invenio/modules/indexer/admin.py:79
 #, fuzzy
 msgid "Knowledge base name"
 msgstr "Falta el nom de la base de coneixement"
 
-#: invenio/modules/indexer/admin.py:81 invenio/modules/indexer/admin.py:93
+#: invenio/modules/indexer/admin.py:82 invenio/modules/indexer/admin.py:93
 #: invenio/modules/knowledge/forms.py:74
 #, fuzzy
 msgid "-None-"
@@ -14357,11 +14362,11 @@ msgstr "Cap"
 msgid "Stemming language"
 msgstr ""
 
-#: invenio/modules/indexer/admin.py:99
+#: invenio/modules/indexer/admin.py:98
 msgid "Tokenizer"
 msgstr ""
 
-#: invenio/modules/indexer/admin.py:105
+#: invenio/modules/indexer/admin.py:104
 #, fuzzy
 msgid "Index fields"
 msgstr "qualsevol camp"
@@ -14407,13 +14412,14 @@ msgid "Create KB \"Dynamic\""
 msgstr ""
 
 #: invenio/modules/knowledge/templates/knowledge/list.html:34
-#, fuzzy, python-format
+#, fuzzy
 msgid "Create new record \"Written As\""
 msgstr "No hi ha registres citats per %s."
 
 #: invenio/modules/knowledge/templates/knowledge/list.html:34
-msgid "Create KB \"Writtes As\""
-msgstr ""
+#, fuzzy
+msgid "Create KB \"Written As\""
+msgstr "No hi ha registres citats per %s."
 
 #: invenio/modules/knowledge/templates/knowledge/list.html:70
 #, fuzzy
@@ -14578,19 +14584,19 @@ msgstr ""
 msgid "Confidential"
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:143
+#: invenio/modules/oauth2server/models.py:144
 msgid "Name of application (displayed to users)."
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:154
+#: invenio/modules/oauth2server/models.py:155
 msgid "Optional. Description of the application (displayed to users)."
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:163
+#: invenio/modules/oauth2server/models.py:164
 msgid "Website URL"
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:164
+#: invenio/modules/oauth2server/models.py:165
 msgid "URL of your application (displayed to users)."
 msgstr ""
 
@@ -15030,7 +15036,7 @@ msgid "Tag name"
 msgstr "Àlies"
 
 #: invenio/modules/tags/views.py:199
-#, fuzzy, python-format
+#, fuzzy
 msgid "is already in use."
 msgstr "L'àlies %s ja està en ús."
 
@@ -15246,7 +15252,7 @@ msgid "Identifiers"
 msgstr ""
 
 #: invenio/modules/workflows/templates/workflows/styles/harvesting_record.html:45
-#, fuzzy, python-format
+#, fuzzy
 msgid "Categories"
 msgstr "Pàgines de %(category)s"
 
@@ -15393,7 +15399,7 @@ msgid "just now"
 msgstr "Ara heu de"
 
 #: invenio/utils/date.py:555
-#, fuzzy, python-format
+#, fuzzy
 msgid " seconds ago"
 msgstr "%s segons"
 
@@ -15451,1652 +15457,3 @@ msgstr "qualsevol any"
 #, fuzzy
 msgid " years ago"
 msgstr "any"
-
-#~ msgid "Warning: Please, select a valid time"
-#~ msgstr "Atenció: seleccioneu un temps vàlid"
-
-#~ msgid "Warning: Please, select a valid file"
-#~ msgstr "Atenció: seleccioneu un fitxer vàlid"
-
-#~ msgid "Warning: The date format is not correct"
-#~ msgstr "Atenció: el format de la data no és correcte"
-
-#~ msgid "Warning: Please, select a valid date"
-#~ msgstr "Atenció: seleccioneu una data vàlida"
-
-#~ msgid ""
-#~ msgstr ""
-
-#~ msgid "Invalid MARCXML"
-#~ msgstr "MARCXML no vàlid"
-
-#~ msgid " or return to your %(x_url_open)ssearch%(x_url_close)s"
-#~ msgstr " o torneu a la vostra %(x_url_open)scerca%(x_url_close)s."
-
-#~ msgid "*** basket name ***"
-#~ msgstr "*** nom del cistell ***"
-
-#~ msgid "<div class=\"webcomment_comment_round_header\">%(x_nb)i Comments"
-#~ msgstr "<div class=\"webcomment_comment_round_header\">%(x_nb)i Comentaris"
-
-#~ msgid "%(x_name)s"
-#~ msgstr "%(x_name)s"
-
-#~ msgid "Total number of citations excluding self-citations:"
-#~ msgstr "Nombre total de citacions excloent les autocites:"
-
-#~ msgid "Average citations per paper excluding self-citations:"
-#~ msgstr "Mitja de cites per article excloent les autocites:"
-
-#~ msgid "Additional Citation Metrics"
-#~ msgstr "Altres mètriques de citacions"
-
-#~ msgid "Sorry, you must log in to perform this action."
-#~ msgstr "Heu d'identificar-vos per a executar aquesta acció."
-
-#~ msgid "Please log in first."
-#~ msgstr "Primer cal que us identifiqueu."
-
-#~ msgid "Use the top-right menu to log in."
-#~ msgstr "Useu el menú de dalt a la dreta per a entrar."
-
-#~ msgid "record"
-#~ msgstr "registre"
-
-#~ msgid "document"
-#~ msgstr "document"
-
-#~ msgid "Sorry parameter missing..."
-#~ msgstr "Hi falta el paràmetre..."
-
-#~ msgid "Next Step"
-#~ msgstr "Pas següent"
-
-#~ msgid "Ordered books"
-#~ msgstr "Data de comanda"
-
-#~ msgid "Acquisitions"
-#~ msgstr "Accions"
-
-#~ msgid "Order new book"
-#~ msgstr "Demanar-ne una altra còpia"
-
-#~ msgid "Renewalls"
-#~ msgstr "Renovacions"
-
-#~ msgid "A new loan has been registered."
-#~ msgstr "S'ha enregistrat un nou préstec."
-
-#~ msgid "Associate barcode"
-#~ msgstr "Associeu el codi de barres"
-
-#~ msgid "No hold requests waiting."
-#~ msgstr "No hi ha reserves pendents."
-
-#~ msgid "Select hold request"
-#~ msgstr "Seleccioneu una petició de reserva"
-
-#~ msgid "Barcode(s)"
-#~ msgstr "Codi de barres"
-
-#~ msgid "Order new copy"
-#~ msgstr "Demanar-ne una altra còpia"
-
-#~ msgid "Book Information"
-#~ msgstr "Informació del llibre"
-
-#~ msgid "EAN"
-#~ msgstr "EAN"
-
-#~ msgid "Publication place"
-#~ msgstr "Lloc de publicació"
-
-#~ msgid "Number of pages"
-#~ msgstr "Pàgines"
-
-#~ msgid "Sub-library"
-#~ msgstr "Sub-biblioteca"
-
-#~ msgid "CERN Central Library"
-#~ msgstr "Biblioteca Central del CERN"
-
-#~ msgid "This item has been updated."
-#~ msgstr "Aquest ítem ha estat actualitzat."
-
-#~ msgid "Order details"
-#~ msgstr "Detalls de la comanda"
-
-#~ msgid "Price"
-#~ msgstr "Preu"
-
-#~ msgid "Ordered date"
-#~ msgstr "Data de comanda"
-
-#~ msgid "Notes about acquisition"
-#~ msgstr "Notes sobre l'adquisició"
-
-#~ msgid "A new ILL request has been registered with success."
-#~ msgstr "S'ha registrat correctament una nova petició PI."
-
-#~ msgid "Purchase information updated with success."
-#~ msgstr "S'ha actualitzat la informació de compra."
-
-#~ msgid "the beginning"
-#~ msgstr "el principi"
-
-#~ msgid "now"
-#~ msgstr "ara"
-
-#~ msgid "BibCheck Admin"
-#~ msgstr "Administració de BibCheck"
-
-#~ msgid "Not authorized"
-#~ msgstr "No autoritzat"
-
-#~ msgid "ERROR: %s does not exist"
-#~ msgstr "ERROR: %s no existeix"
-
-#~ msgid "ERROR: %s is not a directory"
-#~ msgstr "ERROR: %s no és un directori"
-
-#~ msgid "ERROR: %s is not writable"
-#~ msgstr "ERROR: no teniu permís d'escriptura a %s"
-
-#~ msgid "Limit to knowledge bases containing string:"
-#~ msgstr "Limitar-ho a les bases de coneixement amb el text:"
-
-#~ msgid "Really delete"
-#~ msgstr "Confirmació per a eliminar"
-
-#~ msgid "Verify syntax"
-#~ msgstr "Verifiqueu la sintaxi"
-
-#~ msgid "File %s does not exist."
-#~ msgstr "El fitxer %s no existeix"
-
-#~ msgid "Calling bibcheck -verify failed."
-#~ msgstr "La invocació bibcheck -verify ha fallat."
-
-#~ msgid "Verify BibCheck config file"
-#~ msgstr "Verifiqueu el fitxer de configuració de BibCheck"
-
-#~ msgid "Verify problem"
-#~ msgstr "Problema de verificació"
-
-#~ msgid "File"
-#~ msgstr "Fitxer"
-
-#~ msgid "Edit BibCheck config file"
-#~ msgstr "Editar el fitxer de configuració de BibCheck"
-
-#~ msgid "File %s already exists."
-#~ msgstr "El fitxer %s ja existeix"
-
-#~ msgid "File %s: written OK."
-#~ msgstr "Fitxer %s escrit correctament."
-
-#~ msgid "File %s: write failed."
-#~ msgstr "Fitxer %s: no s'ha pogut escriure."
-
-#~ msgid "Save BibCheck config file"
-#~ msgstr "Desar el fitxer de configuració de BibCheck"
-
-#~ msgid "File %s deleted."
-#~ msgstr "Fitxer %s eliminat."
-
-#~ msgid "File %s: delete failed."
-#~ msgstr "Fitxer %s: no s'ha pogut eliminar."
-
-#~ msgid "Delete BibCheck config file"
-#~ msgstr "Suprimir el fitxer de configuració de BibCheck"
-
-#~ msgid "Guests are not authorized to run batchuploader"
-#~ msgstr ""
-
-#~ msgid "The user '%s' is not authorized to run batchuploader"
-#~ msgstr "L'usuari «%s» no està autoritzat a fer càrregues massives"
-
-#~ msgid "Papers removed from this profile"
-#~ msgstr "Documents eliminats d'aquest perfil"
-
-#~ msgid "Papers in need of review"
-#~ msgstr "Documents que necessiten revisió"
-
-#~ msgid "Open Tickets"
-#~ msgstr "Tasques obertes"
-
-#~ msgid "Papers of this Person"
-#~ msgstr "Documents d'aquesta persona"
-
-#~ msgid "Papers _not_ of this Person"
-#~ msgstr "Documents _no_ d'aquesta persona"
-
-#~ msgid "Tickets for this Person"
-#~ msgstr "Tasques per a aquesta persona"
-
-#~ msgid "Additional Data for this Person"
-#~ msgstr "Altres dades d'aquesta persona"
-
-#~ msgid "Yes, those papers are by this person."
-#~ msgstr "Sí, aquests documents són d'aquesta persona."
-
-#~ msgid "No, those papers are not by this person"
-#~ msgstr "No, aquests documents no són d'aquesta persona."
-
-#~ msgid "Assign to other person"
-#~ msgstr "Assignar-los a una altra persona"
-
-#~ msgid "Forget decision"
-#~ msgstr "Oblidar la decissió"
-
-#~ msgid "Confirm!"
-#~ msgstr "Confirmar!"
-
-#~ msgid "Yes, this paper is by this person."
-#~ msgstr "Sí, aquest document és d'aquesta persona."
-
-#~ msgid "Rejected!"
-#~ msgstr "Rebutjat!"
-
-#~ msgid "No, this paper is <i>not</i> by this person"
-#~ msgstr "No, aquest documento <i>no</i> és d'aquesta persona."
-
-#~ msgid "To other person!"
-#~ msgstr "A una altra persona!"
-
-#~ msgid "Confirmed."
-#~ msgstr "Confirmat."
-
-#~ msgid "Marked as this person's paper"
-#~ msgstr "Marcat com a d'aquesta persona"
-
-#~ msgid "Forget decision!"
-#~ msgstr "Oblidar la decissió!"
-
-#~ msgid "Forget decision."
-#~ msgstr "Oblidar la decissió."
-
-#~ msgid "Repeal!"
-#~ msgstr "Anul·la!"
-
-#~ msgid "But it's <i>not</i> this person's paper."
-#~ msgstr "Però <i>no</i> és el document d'aquesta persona."
-
-#~ msgid "But it <i>is</i> this person's paper."
-#~ msgstr "Però <i>sí</i> que és un document d'aquesta persona."
-
-#~ msgid "Repealed"
-#~ msgstr "Anul·lat"
-
-#~ msgid "Marked as not this person's paper"
-#~ msgstr "Marcat com que no és d'aquesta persona"
-
-#~ msgid "Your papers"
-#~ msgstr "Els vostres documents"
-
-#~ msgid "Not your papers"
-#~ msgstr "Documents no vostres"
-
-#~ msgid "These are mine!"
-#~ msgstr "Aquests són meus!"
-
-#~ msgid "These are not mine!"
-#~ msgstr "Aquests no són meus!"
-
-#~ msgid "It's not mine, but I know whose it is!"
-#~ msgstr "No és meu, però sé de qui es"
-
-#~ msgid "Mine!"
-#~ msgstr "Meu!"
-
-#~ msgid "This is not my paper!"
-#~ msgstr "Aquest document no és meu!"
-
-#~ msgid "Not Mine."
-#~ msgstr "No és pas meu."
-
-#~ msgid "Marked as my paper!"
-#~ msgstr "Marcat com a meu"
-
-#~ msgid "Forget assignment decision"
-#~ msgstr "Oblida la decissió d'assignació"
-
-#~ msgid "Not Mine!"
-#~ msgstr "No és pas meu!"
-
-#~ msgid "But this is mine!"
-#~ msgstr "Però aquest és meu!"
-
-#~ msgid "But this is my paper!"
-#~ msgstr "Però aquest document és meu!"
-
-#~ msgid "Marked as not your paper."
-#~ msgstr "Marcat com que no és vostre."
-
-#~ msgid "Tickes you created about this person"
-#~ msgstr "Tasques que heu creat sobre aquesta persona"
-
-#~ msgid "Tickets"
-#~ msgstr "Tasques"
-
-#~ msgid "Request Tickets"
-#~ msgstr "Peticions"
-
-#~ msgid "Submit Attribution Information"
-#~ msgstr "Enviar la informació d'atribució"
-
-#~ msgid "Please review your actions"
-#~ msgstr "Si us plau, reviseu les vostres accions"
-
-#~ msgid "Person search for assignment in progress!"
-#~ msgstr "S'està executant la cerca de la persona per l'assignació."
-
-#~ msgid "You are searching for a person to assign the following papers:"
-#~ msgstr "Esteu cercant una persona per assignar-li aquests documents:"
-
-#~ msgid "You are going to claim papers for: %s"
-#~ msgstr "Esteu a punt de reivindicar documents en nom de: %s"
-
-#~ msgid "Welcome!"
-#~ msgstr "Benvinguts!"
-
-#~ msgid "You are about to attribute the following paper"
-#~ msgstr "Esteu a punt d'atribuir aquest document"
-
-#~ msgid "Info"
-#~ msgstr "Informació"
-
-#~ msgid "Names variants:"
-#~ msgstr "Variants del nom:"
-
-#~ msgid "... This tab is currently under construction ... "
-#~ msgstr "... Aquesta pestanya està encara en construcció... "
-
-#~ msgid "Please select an author for the records in question."
-#~ msgstr "Seleccioneu un autor per als registres en qüestió."
-
-#~ msgid "Boxes not selected will be ignored in the process."
-#~ msgstr "Les caselles no seleccionades seran ignorades en el procés."
-
-#~ msgid "Navigation:"
-#~ msgstr "Navegació:"
-
-#~ msgid "Run paper attribution for another author"
-#~ msgstr "Executa l'atribució de documents per a un altre autor"
-
-#~ msgid "Person Interface FAQ"
-#~ msgstr "Preguntes més freqüents sobre la interfície de persones"
-
-#~ msgid "Person Search"
-#~ msgstr "Cerca persones"
-
-#~ msgid "Open tickets"
-#~ msgstr "Tasques obertes"
-
-#~ msgid "Please Check your entries"
-#~ msgstr "Comproveu les vostres entrades"
-
-#~ msgid "Sorry."
-#~ msgstr "Ho sentim."
-
-#~ msgid "Please provide at least one transaction."
-#~ msgstr "Seleccioneu al menys una transacció."
-
-#~ msgid "Error:"
-#~ msgstr "Error:"
-
-#~ msgid "We do not have a publication list for '%s'."
-#~ msgstr "No tenim cap llista de publicacions de '%s'."
-
-#~ msgid "Create a new Person for your search"
-#~ msgstr "Crear una nova persona per a la vostra cerca"
-
-#~ msgid "YES!"
-#~ msgstr "SÍ!"
-
-#~ msgid " Attribute Papers To "
-#~ msgstr " Atribuir els documents a "
-
-#~ msgid "Correct my publication lists!"
-#~ msgstr "Corregiu la meva llista de publicacions"
-
-#~ msgid "Tickets you created about this person"
-#~ msgstr "Tasques que heu creat sobre aquesta persona"
-
-#~ msgid "0 borrower(s) found."
-#~ msgstr "No s'ha trobat cap usuari."
-
-#~ msgid "You can see your loans "
-#~ msgstr "Podeu veure els vostres préstecs "
-
-#~ msgid "."
-#~ msgstr "."
-
-#~ msgid "There %s request(s) on the book who has been returned."
-#~ msgstr "Hi ha %s reserve(s) pel llibre retornat."
-
-#~ msgid "There are no requests waiting on the item <strong>%s</strong>."
-#~ msgstr "No hi ha reserves pendents per a l'ítem <strong>%s</strong>."
-
-#~ msgid "Hold requests and loans overview on"
-#~ msgstr "Reserves i préstecs per"
-
-#~ msgid "Library(ies)"
-#~ msgstr "Biblioteques"
-
-#~ msgid "new copy"
-#~ msgstr "nova còpia"
-
-#~ msgid "A %s has been added."
-#~ msgstr "S'ha afegit un %s."
-
-#~ msgid "0 library(ies) found."
-#~ msgstr "No s'ha trobat cap biblioteca"
-
-#~ msgid "Back borrower's loans"
-#~ msgstr "Tornar als préstecs"
-
-#~ msgid "Borrower wants only this edition?"
-#~ msgstr "Vol només aquesta edició, el lector?"
-
-#~ msgid "Volume, Issue, Page"
-#~ msgstr "Volum, número, pàgina"
-
-#~ msgid "Barcoce"
-#~ msgstr "Codi de barres"
-
-#~ msgid "An ILL request has been updated with success."
-#~ msgstr "S'ha actualitzat la petició de PI."
-
-#~ msgid "Book does not exists on Invenio."
-#~ msgstr "Aquest llibre no existeix a Invenio."
-
-#~ msgid "Check if the book already exists on Invenio,"
-#~ msgstr "Comproveu si el llibre existeix en Invenio,"
-
-#~ msgid "Book does not exists on Invenio. Please fill the following form."
-#~ msgstr ""
-
-#~ msgid "This book is sent to you ..."
-#~ msgstr "S'us ha enviat aquest llibre..."
-
-#~ msgid "Id"
-#~ msgstr "Identificador"
-
-#~ msgid "More than one templates found in the document. No format found."
-#~ msgstr ""
-
-#~ msgid "Note for programmer: you have not implemented operator %s."
-#~ msgstr "Nota per al programador: no heu implementat l'operador %s."
-
-#~ msgid "Name %s is not recognised as a valid operator name."
-#~ msgstr "El nom %s no és un operador reconegut."
-
-#~ msgid "Duplicate name: %s."
-#~ msgstr "Nom duplicat: %s."
-
-#~ msgid "No name defined for the template."
-#~ msgstr "No s'ha definit cap nom per a la plantilla."
-
-#~ msgid "No description entered for the template."
-#~ msgstr "No s'ha entrat cap descripció per a la plantilla."
-
-#~ msgid "No content type specified for the template. Using default: text/xml."
-#~ msgstr ""
-
-#~ msgid "Missing attribute \"name\" in TEMPLATE_REF."
-#~ msgstr "Falta l'atribut \"name\" a TEMPLATE_REF."
-
-#~ msgid "Missing attribute \"name\" in ELEMENT."
-#~ msgstr "Falta l'atribut \"name\" a ELEMENT."
-
-#~ msgid "Missing attribute \"name\" in FIELD."
-#~ msgstr "Falta l'atribut \"name\" a FIELD."
-
-#~ msgid "Field %s is not defined."
-#~ msgstr "El camp %s no està definit."
-
-#~ msgid "Missing attribute \"value\" in TEXT."
-#~ msgstr "Falta l'atribut \"name\" a TEXT."
-
-#~ msgid "Missing attribute \"object\" in LOOP."
-#~ msgstr "Falta l'atribut \"name\" a LOOP."
-
-#~ msgid "Missing attrbute \"name\" in IF."
-#~ msgstr "Falta l'atribut \"name\" a IF."
-
-#~ msgid "Invalid regular expression: %s."
-#~ msgstr "Expressió regular no vàlida: %s"
-
-#~ msgid "Invalid syntax of IF statement."
-#~ msgstr "Sintaxi no vàlida per al condicional IF."
-
-#~ msgid "Invalid address: %s %s"
-#~ msgstr "Adreça no vàlida: %s %s"
-
-#~ msgid "Repeating subfield codes in the same instance!"
-#~ msgstr "Codis de subcamp repetits a la mateixa instància!"
-
-#~ msgid "Output format %s cannot not be read. %s."
-#~ msgstr "No s'ha pogut llegir el format de sortida %s. %s."
-
-#~ msgid "Please enter a name for the source."
-#~ msgstr "Introduiu un nom per a la font."
-
-#~ msgid "Please enter a metadata prefix."
-#~ msgstr "Introduiu el prefixe de metadades."
-
-#~ msgid "Please enter a base url."
-#~ msgstr "Untroduiu la url base."
-
-#~ msgid "Please choose a frequency of harvesting"
-#~ msgstr "Escolliu una freqüència de recol·lecta"
-
-#~ msgid "You selected a postprocess mode which involves conversion."
-#~ msgstr "Heu seleccionat un modus de postprocés que involucra conversió."
-
-#~ msgid "You selected a postprocess mode which involves filtering."
-#~ msgstr "Heu seleccionat un modus de postprocés que involucra filtratge."
-
-#~ msgid "Please choose the harvesting starting date"
-#~ msgstr "Escolliu la data d'inici de la recolecta"
-
-#~ msgid "Papers written alone"
-#~ msgstr "Articles com a autor individual"
-
-#~ msgid "period_of_interest_from"
-#~ msgstr "període_d'interès_des_de"
-
-#~ msgid "jsCal3"
-#~ msgstr "jsCal3"
-
-#~ msgid "period_of_interest_to"
-#~ msgstr "període_d'interès_fins"
-
-#~ msgid "jsCal4"
-#~ msgstr "jsCal4"
-
-#~ msgid "jsCal1"
-#~ msgstr "jsCal1"
-
-#~ msgid "jsCal2"
-#~ msgstr "jsCal2"
-
-#~ msgid "No fulltext"
-#~ msgstr "Sense text complet"
-
-#~ msgid "last note on"
-#~ msgstr "darrera nota el"
-
-#~ msgid ", no notes yet"
-#~ msgstr ", sense notes"
-
-#~ msgid "HTML brief"
-#~ msgstr "HTML breu"
-
-#~ msgid "You have "
-#~ msgstr "Teniu "
-
-#~ msgid "when field equals"
-#~ msgstr "quan el camp és igual a"
-
-#~ msgid "ERROR"
-#~ msgstr "ERROR"
-
-#~ msgid "already exists."
-#~ msgstr "ja existeix"
-
-#~ msgid "deleted"
-#~ msgstr "Suprimit"
-
-#~ msgid "in their rules and descriptions"
-#~ msgstr "en les seves regles i descripcions"
-
-#~ msgid "The left side of the rule "
-#~ msgstr "La banda esquerra de la regla"
-
-#~ msgid "The right side of the rule "
-#~ msgstr "La banda dreta de la regla"
-
-#~ msgid "upload is a file"
-#~ msgstr "penjar aquest fitxer"
-
-#~ msgid "No such knowledge base"
-#~ msgstr "No existeix aquesta base de coneixement"
-
-#~ msgid "Export as"
-#~ msgstr "Anomena i desa"
-
-#~ msgid "Search Services"
-#~ msgstr "Consells de cerca"
-
-#~ msgid "Citation Metrics"
-#~ msgstr "Mètrica de citacions"
-
-#~ msgid "WebSearch Admin Guide"
-#~ msgstr "Guia d'administració de WebSearch"
-
-#~ msgid "Submit Guide"
-#~ msgstr "Ajuda per als lliuraments"
-
-#~ msgid "Add to personal basket"
-#~ msgstr "Afegeix-lo al cistell personal"
-
-#~ msgid "WebSubmit Admin Guide"
-#~ msgstr "Guia d'administració de WebSubmit"
-
-#~ msgid "Click here to review the transactions."
-#~ msgstr "Feu click aquí per a revisar les transaccions."
-
-#~ msgid "Quit searching."
-#~ msgstr "Abandona la cerca"
-
-#~ msgid ""
-#~ "When you merge a set of profiles,"
-#~ " all the information stored will be"
-#~ " assigned to the primary profile. "
-#~ "This includes papers, ids or citations."
-#~ " After merging, only the primary "
-#~ "profile will remain in the system, "
-#~ "all other profiles will be automatically"
-#~ " deleted.</br>"
-#~ msgstr ""
-
-#~ msgid "Cancel merging"
-#~ msgstr "Cancel·lat"
-
-#~ msgid "Merge profiles"
-#~ msgstr ""
-
-#~ msgid "Claim for yourself"
-#~ msgstr ""
-
-#~ msgid "Assign to"
-#~ msgstr ""
-
-#~ msgid "Search for a person to assign the paper to"
-#~ msgstr " Cercar una persona per a atribuir-li el document"
-
-#~ msgid "Select All"
-#~ msgstr "Seleccionar-los tots"
-
-#~ msgid "Select None"
-#~ msgstr "No seleccionar-ne cap"
-
-#~ msgid "Invert Selection"
-#~ msgstr "Invertir la selecció"
-
-#~ msgid "Hide successful claims"
-#~ msgstr "Amagar les reivindicacions satisfetes"
-
-#~ msgid "Paper Short Info"
-#~ msgstr ""
-
-#~ msgid "Author Name"
-#~ msgstr "Autor"
-
-#~ msgid "Experiment"
-#~ msgstr "experiment"
-
-#~ msgid "Not assigned"
-#~ msgstr "No és pas meu!"
-
-#~ msgid "No status information found."
-#~ msgstr "No s'ha trobat informació de l'estat."
-
-#~ msgid "Operator review of user actions pending"
-#~ msgstr "Revisió per part de l'operador de les accions d'usuari pendents"
-
-#~ msgid "Sorry, there are currently no records to be found in this category."
-#~ msgstr "No hi ha cap registre d'aquesta categoria."
-
-#~ msgid "Review Transaction"
-#~ msgstr "Reviseu la transacció"
-
-#~ msgid "On all pages"
-#~ msgstr " A tots els documents: "
-
-#~ msgid "With selected do"
-#~ msgstr "Va ser rebutjat el:"
-
-#~ msgid "View name variants"
-#~ msgstr "Variants del nom"
-
-#~ msgid "The author has an internal ID!"
-#~ msgstr "Hi ha hagut un error intern"
-
-#~ msgid "These records have been marked as not being from this person."
-#~ msgstr "Aqusts registres s'han marcat com que no són d'aquesta persona."
-
-#~ msgid "They will be regarded in the next run of the author "
-#~ msgstr "Es tindran en compte la propera execució de l'algoritme "
-
-#~ msgid "disambiguation algorithm and might disappear from this listing."
-#~ msgstr "de desambiguació d'autors i podran desaparèixer d'aquesta llista."
-
-#~ msgid "No comments"
-#~ msgstr "Sense comentaris"
-
-#~ msgid "Not Available"
-#~ msgstr "No disponible"
-
-#~ msgid " Delete this ticket"
-#~ msgstr " Suprimeix aquesta tasca"
-
-#~ msgid " Commit this entire ticket"
-#~ msgstr " Donar per bona tota aquesta tasca"
-
-#~ msgid "No title available"
-#~ msgstr "No disponible"
-
-#~ msgid "Make sure we match the right names!"
-#~ msgstr "Assegureu-vos que els noms es corresponguin!"
-
-#~ msgid "Please select an author on each of the records that will be assigned."
-#~ msgstr "Seleccioneu un autor per a cadascun dels registres que se li assignin."
-
-#~ msgid "Papers without a name selected will be ignored in the process."
-#~ msgstr "En el procés, s'ignoraran els documents sense un nom seleccionat."
-
-#~ msgid "Claim for person with id"
-#~ msgstr ""
-
-#~ msgid "This seems to be an empty profile without names associated to it yet"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "(the names will be automatically "
-#~ "gathered when the first paper is "
-#~ "claimed to this profile)."
-#~ msgstr ""
-
-#~ msgid "Select name for"
-#~ msgstr "Seleccioneu el nom per"
-
-#~ msgid "Error retrieving record title"
-#~ msgstr "Error en recuperar el registre"
-
-#~ msgid "Paper title: "
-#~ msgstr "Títol del document: "
-
-#~ msgid "Ignore"
-#~ msgstr "Ignora"
-
-#~ msgid "The following names have been automatically chosen:"
-#~ msgstr "S'han escollit automàticament aquests noms:"
-
-#~ msgid " --  With name: "
-#~ msgstr " -- Amb el nom:"
-
-#~ msgid "Symbols legend: "
-#~ msgstr "Llegenda: "
-
-#~ msgid "Everything is shiny, captain!"
-#~ msgstr "Tot va de conya, capità!"
-
-#~ msgid "The result of this request will be visible immediately"
-#~ msgstr "El resultat d'aquesta petició serà visible immediatament"
-
-#~ msgid "Confirmation needed to continue"
-#~ msgstr "Cal la confirmació per a continuar"
-
-#~ msgid ""
-#~ "The result of this request will be"
-#~ " visible immediately but we need your"
-#~ " confirmation to do so for this "
-#~ "paper has been manually claimed before"
-#~ msgstr ""
-#~ "El resultat d'aquesta petició serà "
-#~ "visible immediatament, però ens cal la"
-#~ " vostra confirmació per fer-ho, "
-#~ "perquè aquest document ja havia estat"
-#~ " reivindicat manualment"
-
-#~ msgid "This will create a change request for the operators"
-#~ msgstr "Això crearà una petició de canvi als operadors"
-
-#~ msgid ""
-#~ "The result of this request will be"
-#~ " visible upon confirmation through an "
-#~ "operator"
-#~ msgstr ""
-#~ "El resultat d'aquesta petició serà "
-#~ "visible immediatament un cop sigui "
-#~ "confirmat per un operador"
-
-#~ msgid "Selected name on paper"
-#~ msgstr "Nom seleccionat en el document"
-
-#~ msgid "Verification needed to continue"
-#~ msgstr "Cal la verificació per a continuar"
-
-#~ msgid "This will create a request for the operators"
-#~ msgstr "Això crearà una petició als operadors"
-
-#~ msgid "Please provide your information"
-#~ msgstr "Introduiu les vostres dades"
-
-#~ msgid "Please provide your first name"
-#~ msgstr "Introduiu el vostre nom de pila"
-
-#~ msgid "Your first name:"
-#~ msgstr "El vostre nom de pila:"
-
-#~ msgid "Please provide your last name"
-#~ msgstr "Els vostres cognoms"
-
-#~ msgid "Your last name:"
-#~ msgstr "Els vostres cognoms:"
-
-#~ msgid "Please provide your eMail address"
-#~ msgstr "La vostra adreça de correu electrònic"
-
-#~ msgid ""
-#~ "This eMail address is reserved by "
-#~ "a user. Please log in or provide"
-#~ " an alternative eMail address"
-#~ msgstr ""
-#~ "Aquesta adreça de correu electrònic està"
-#~ " reservada per un usuari.  Si us "
-#~ "plau, doneu-vos d'alta o doneu una"
-#~ " adreça alternativa"
-
-#~ msgid "Your eMail:"
-#~ msgstr "La vostra adreça de correu electrònic:"
-
-#~ msgid "You may leave a comment (optional)"
-#~ msgstr "Podeu deixar un comentari (opcional)"
-
-#~ msgid "Continue claiming*"
-#~ msgstr "Continuar amb les reivindicacions*"
-
-#~ msgid "Confirm these changes**"
-#~ msgstr "Confirmeu aquests canvis**"
-
-#~ msgid "!Delete the entire request!"
-#~ msgstr "Elimina tota la petició!"
-
-#~ msgid "Mark as your documents"
-#~ msgstr "Marcar-ho com a documents vostres"
-
-#~ msgid "Mark as _not_ your documents"
-#~ msgstr "Marcats com a documents _no_ vostres"
-
-#~ msgid "Nothing staged as not yours"
-#~ msgstr "Nada pendiente como no vostre"
-
-#~ msgid "Mark as their documents"
-#~ msgstr "Marcar-ho com a documents seus"
-
-#~ msgid "Nothing staged in this category"
-#~ msgstr "Res pendent en aquesta categoria"
-
-#~ msgid "Mark as _not_ their documents"
-#~ msgstr "Marcar-ho com a documents _no_ seus"
-
-#~ msgid "  * You can come back to this page later. Nothing will be lost. <br />"
-#~ msgstr "  * Podeu tornar a aquesta pàgina més tard.  No es perderà res. <br />"
-
-#~ msgid ""
-#~ "  ** Performs all requested changes. "
-#~ "Changes subject to permission restrictions "
-#~ "will be submitted to an operator "
-#~ "for manual review."
-#~ msgstr ""
-#~ "  ** Ejecuta todas las peticiones "
-#~ "pendentes.  Los cambios que tengan "
-#~ "restricción de permisos se enviarán a"
-#~ " un operador para su revisión manual."
-
-#~ msgid "Create a new Person"
-#~ msgstr "Crear un nou grup"
-
-#~ msgid "This is my profile"
-#~ msgstr "Aquest és el meu document!"
-
-#~ msgid "Assign paper"
-#~ msgstr "Assignar-lo a una altra persona"
-
-#~ msgid "Add to merge list"
-#~ msgstr "Afegir als usuaris"
-
-#~ msgid ""
-#~ "We do not have a publication list"
-#~ " for '%s'. Try using a less "
-#~ "specific author name, or check back "
-#~ "in a few days as attributions are"
-#~ " updated frequently.  Or you can send"
-#~ " us feedback, at "
-#~ msgstr ""
-
-#~ msgid "Recent Papers"
-#~ msgstr "Documents recents"
-
-#~ msgid "Showing the"
-#~ msgstr "Es mostren"
-
-#~ msgid "most recent documents:"
-#~ msgstr "els documents més recents"
-
-#~ msgid "The following profile is the one you were viewing before logging in: "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Out of %s paper(s) claimed to your"
-#~ " arXiv account, %s match this "
-#~ "profile: "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If none of the options suggested "
-#~ "above apply, you can look for "
-#~ "other possible options from the list "
-#~ "below:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span title=\"Login through arXiv is "
-#~ "needed to verify this is your "
-#~ "profile. When you log in your "
-#~ "publication list will automatically update "
-#~ "with all your arXiv publications.\n"
-#~ "You may also continue as a guest."
-#~ " In this case your input will "
-#~ "be processed by our staff and will"
-#~ " take longer to display.\"><strong> Login"
-#~ " with your arXiv.org account "
-#~ "</strong></span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "You have succesfully logged in via "
-#~ "arXiv. </br> You can now manage "
-#~ "your profile.</br>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "You have succesfully logged in via "
-#~ "arXiv.</br><div> <font color='red'>However the "
-#~ "profile you are viewing is not "
-#~ "your profile.</br></br></font>"
-#~ msgstr ""
-
-#~ msgid "Manage your profile"
-#~ msgstr "Gestionar els fitxers dels documents"
-
-#~ msgid ""
-#~ "You have succesfully logged in, but "
-#~ "</br><div><font color='red'> you are not "
-#~ "associated to a person yet. Please "
-#~ "use the button below to choose "
-#~ "your profile </br></br></font>"
-#~ msgstr ""
-
-#~ msgid "Choose your profile"
-#~ msgstr "Escolliu el fitxer"
-
-#~ msgid "Please log in through arXiv to manage your profile.</br>"
-#~ msgstr ""
-
-#~ msgid "Login into Inspire through arXiv.org"
-#~ msgstr ""
-
-#~ msgid ""
-#~ " <span title=\"ORCiD (Open Researcher "
-#~ "and Contributor ID) is a unique "
-#~ "researcher identifier that distinguishes you"
-#~ " from other researchers.\n"
-#~ "It holds a record of all your "
-#~ "research activities. You can add your"
-#~ " ORCiD to all your works to "
-#~ "make sure they are associated with "
-#~ "you. \">\n"
-#~ "        <strong> Connect this profile to an ORCiD </strong> <span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "This profile is already connected to "
-#~ "the following ORCiD: <strong>%s</strong></br>"
-#~ msgstr ""
-
-#~ msgid "Import your publications from ORCID"
-#~ msgstr ""
-
-#~ msgid "Visit your profile in ORCID"
-#~ msgstr ""
-
-#~ msgid "Connect an ORCiD to this profile"
-#~ msgstr ""
-
-#~ msgid "Suggest an ORCiD for this profile:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span title=\"When you add more "
-#~ "publications you make sure your "
-#~ "publication list and citations appear "
-#~ "correctly on your profile.\n"
-#~ "You can also assign publications to "
-#~ "other authors. This will help INSPIRE"
-#~ " provide more accurate publication and "
-#~ "citation statistics. \"><strong> Manage "
-#~ "publications </strong><span>"
-#~ msgstr ""
-
-#~ msgid "Manage publication list"
-#~ msgstr "Llista de publicacions"
-
-#~ msgid "<strong> Person identifiers, internal and external </strong>"
-#~ msgstr ""
-
-#~ msgid "add external id"
-#~ msgstr "enllaç extern"
-
-#~ msgid "Harvest missing external ids from claimed papers"
-#~ msgstr ""
-
-#~ msgid "suggest external id to add"
-#~ msgstr ""
-
-#~ msgid "suggest selected ids to delete"
-#~ msgstr ""
-
-#~ msgid "suggest missing ids"
-#~ msgstr ""
-
-#~ msgid "Choose system"
-#~ msgstr "Escolliu una plantilla"
-
-#~ msgid ""
-#~ "<span title=\"You don’t need to add all your publications one by one.\n"
-#~ "This list contains all your publications"
-#~ " that were automatically assigned to "
-#~ "your INSPIRE profile through arXiv and"
-#~ " ORCiD. \"><strong> Automatically assigned "
-#~ "publications </strong> </span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span id=\"autoClaimMessage\">Please wait as "
-#~ "we are assigning %s papers from "
-#~ "external systems to your Inspire "
-#~ "profile</span></br>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The following publications have been "
-#~ "successfully assigned to your profile:"
-#~ msgstr "Fitxers que estan correctament a la cua:"
-
-#~ msgid "Get help!"
-#~ msgstr ""
-
-#~ msgid "<strong> Contact </strong>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Please contact our user support in "
-#~ "case you need help or you just "
-#~ "want to suggest some new ideas. We"
-#~ " will get back to you. </br>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span title=\"It sometimes happens that "
-#~ "somebody's publications are scattered among"
-#~ " two or more profiles for various "
-#~ "reasons\n"
-#~ "(different spelling, change of name, "
-#~ "multiple people with the same name). "
-#~ "You can merge a set of profiles"
-#~ " together.\n"
-#~ "This will assign all the information "
-#~ "(including publications, IDs and citations)"
-#~ " to the profile you choose as a"
-#~ " primary profile.\n"
-#~ "After the merging only the primary "
-#~ "profile will exist in the system "
-#~ "and all others will be automatically "
-#~ "deleted. \"><strong> Merge profiles "
-#~ "</strong><span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If your or somebody else's publications"
-#~ " in INSPIRE exist in multiple "
-#~ "profiles, you can fix that here. "
-#~ "</br>"
-#~ msgstr ""
-
-#~ msgid "Fatal: Author ID capabilities are disabled on this system."
-#~ msgstr ""
-#~ "Fatal: no estan habilitades les opcions"
-#~ " d'identificació d'autor (Author ID) en "
-#~ "aquest sistema."
-
-#~ msgid "Fatal: You are not allowed to access this functionality."
-#~ msgstr "Fatal: no esteu autoritzat a accedir a aquesta funcionalitat."
-
-#~ msgid "Claim this paper"
-#~ msgstr "Reivindicar aquest document"
-
-#~ msgid ""
-#~ "<p>We're sorry. An error occurred while"
-#~ " handling your request. Please find "
-#~ "more information below:</p>"
-#~ msgstr ""
-#~ "<p>Malauradament, hi ha hagut un error"
-#~ " mentre es gestionava la vostra "
-#~ "petició.  Vegeu aquí més informació:</p>"
-
-#~ msgid "This page is not accessible directly."
-#~ msgstr "No podeu accedir a aquesta pàgina directament."
-
-#~ msgid "Profile management"
-#~ msgstr ""
-
-#~ msgid "The publication date of this book is %s."
-#~ msgstr ""
-
-#~ msgid "The given barcode <strong>%s</strong> is already in use."
-#~ msgstr ""
-
-#~ msgid "The barcode <strong>%s</strong> was not found"
-#~ msgstr ""
-
-#~ msgid "The copy with barcode <strong>%s</strong> has been deleted."
-#~ msgstr ""
-
-#~ msgid "It was NOT possible to delete the copy with barcode <strong>%s</strong>"
-#~ msgstr ""
-
-#~ msgid "Barcode <strong>%s</strong> not found"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated, but the"
-#~ " <strong>status was not modified</strong>."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated, but the"
-#~ " <strong>barcode was not modified</strong> "
-#~ "because it is already in use."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated to "
-#~ "<strong>[%s]</strong> with success."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated, but the"
-#~ " <strong>barcode was not modified</strong> "
-#~ "because it was not found (!?)."
-#~ msgstr ""
-
-#~ msgid "Weighted %s keywords:"
-#~ msgstr "Paraules clau sospesades de tipus %s"
-
-#~ msgid "Comparison of:"
-#~ msgstr "Comparació entre:"
-
-#~ msgid "Revision"
-#~ msgstr "Revisió"
-
-#~ msgid "Failed to create a ticket"
-#~ msgstr "No s'ha pogut crear un ticket"
-
-#~ msgid "Format element %s has no function named \"format\"."
-#~ msgstr "L'element de format %s no té cap funció que es digui \"format\"."
-
-#~ msgid "Modify Template Attributes"
-#~ msgstr "Modifica els atributs de la plantilla"
-
-#~ msgid "Template Editor"
-#~ msgstr "Editor de plantilles"
-
-#~ msgid "Check Dependencies"
-#~ msgstr "Comprova les dependències"
-
-#~ msgid "Update Format Attributes"
-#~ msgstr "Actualitza els atributs del format"
-
-#~ msgid "Show Documentation"
-#~ msgstr "Mostra la documentació"
-
-#~ msgid "Hide Documentation"
-#~ msgstr "Amagar la documentació"
-
-#~ msgid "Last Modification Date"
-#~ msgstr "Data de la darrera modificació"
-
-#~ msgid "Manage Output Formats"
-#~ msgstr "Gestiona els formats de sortida"
-
-#~ msgid "Manage Format Templates"
-#~ msgstr "Gestiona les plantilles dels formats"
-
-#~ msgid "Format Elements Documentation"
-#~ msgstr "Documentació dels elements dels formats"
-
-#~ msgid "Add New Format Template"
-#~ msgstr "Afegeix una nova plantilla de format"
-
-#~ msgid "Check Format Templates Extensively"
-#~ msgstr "Comprova les plantilles de format extensivament"
-
-#~ msgid "Code"
-#~ msgstr "Codi"
-
-#~ msgid "Add New Output Format"
-#~ msgstr "Afegeix un nou format de sortida"
-
-#~ msgid "menu"
-#~ msgstr "menú"
-
-#~ msgid "Close Output Format"
-#~ msgstr "Tancar format de sortida"
-
-#~ msgid "Rules"
-#~ msgstr "Regles"
-
-#~ msgid "Modify Output Format Attributes"
-#~ msgstr "Modifica els atributs del format de sortida"
-
-#~ msgid "Remove Rule"
-#~ msgstr "Elimina la regla"
-
-#~ msgid "Add New Rule"
-#~ msgstr "Afegeix una nova regla"
-
-#~ msgid "No problem found with format"
-#~ msgstr "No s'ha trobat cap problema amb el format"
-
-#~ msgid "An error has been found"
-#~ msgstr "S'ha trobat un error"
-
-#~ msgid "The following errors have been found"
-#~ msgstr "S'han trobat els següents errors"
-
-#~ msgid "BibFormat Admin"
-#~ msgstr "Administració de BibFormat"
-
-#~ msgid "Enter a search query here."
-#~ msgstr "Introduiu una cerca aquí."
-
-#~ msgid "No Record Found for %s."
-#~ msgstr "No s'ha trobat cap registre per %s."
-
-#~ msgid "Tag specification \"%s\" must end with column \":\" at line %s."
-#~ msgstr ""
-#~ "L'especificació per a l'etiqueta \"%s\" "
-#~ "ha d'acabar a la columna \":\", "
-#~ "línia %s."
-
-#~ msgid "Tag specification \"%s\" must start with \"tag\" at line %s."
-#~ msgstr ""
-#~ "L'especificació per a l'etiqueta \"%s\" "
-#~ "ha de començar amb \"tag\", línia "
-#~ "%s."
-
-#~ msgid "\"tag\" must be lowercase in \"%s\" at line %s."
-#~ msgstr "\"tag\" ha d'estar en minúscula a \"%s\", línia %s."
-
-#~ msgid "Should be \"tag field_number:\" at line %s."
-#~ msgstr "Hauria de ser \"tag field_number:\", línia %s."
-
-#~ msgid "Invalid tag \"%s\" at line %s."
-#~ msgstr "Etiqueta \"%s\" no vàlida, línia %s."
-
-#~ msgid "Condition \"%s\" is outside a tag specification at line %s."
-#~ msgstr "La condició \"%s\" és fora d'una especificació d'etiqueta, línia %s."
-
-#~ msgid "Condition \"%s\" can only have a single separator --- at line %s."
-#~ msgstr "La condició \"%s\" només pot tenir un sol caràcter, línia %s."
-
-#~ msgid "Template \"%s\" does not exist at line %s."
-#~ msgstr "La plantilla \"%s\" no existeix, línia %s."
-
-#~ msgid "Missing column \":\" after \"default\" in \"%s\" at line %s."
-#~ msgstr "Falta la columna \":\" després de \"default\" a \"%s\", línia %s."
-
-#~ msgid ""
-#~ "Default template specification \"%s\" must "
-#~ "start with \"default :\" at line "
-#~ "%s."
-#~ msgstr ""
-#~ "L'especificació de la plantilla per "
-#~ "defecte \"%s\" ha de començar per "
-#~ "\"default :\", línia %s."
-
-#~ msgid "\"default\" keyword must be lowercase in \"%s\" at line %s."
-#~ msgstr "La paraula \"default\" ha de ser en minúscules a \"%s\", línia %s."
-
-#~ msgid "Line %s could not be understood at line %s."
-#~ msgstr "No es pot entendre la línia %s, línia %s."
-
-#~ msgid "Output format %s cannot not be read. %s"
-#~ msgstr "No s'ha pogut llegir el format de sortida %s. %s"
-
-#~ msgid ""
-#~ "Could not find a name specified in"
-#~ " tag \"<name>\" inside format template "
-#~ "%s."
-#~ msgstr ""
-#~ "No s'ha pogut trobar el nom "
-#~ "especificat a l'etiqueta \"<name>\" a la"
-#~ " plantilla de format %s."
-
-#~ msgid ""
-#~ "Could not find a description specified"
-#~ " in tag \"<description>\" inside format "
-#~ "template %s."
-#~ msgstr ""
-#~ "No s'ha pogut trobar la descripció "
-#~ "especificada a l'etiqueta \"<description>\" a"
-#~ " la plantilla de format %s."
-
-#~ msgid "Format template %s calls undefined element \"%s\"."
-#~ msgstr "La plantilla de format %s crida l'element no definit \"%s\"."
-
-#~ msgid ""
-#~ "Format template %s calls unreadable "
-#~ "element \"%s\". Check element file "
-#~ "permissions."
-#~ msgstr ""
-#~ "La plantilla de format %s crida a"
-#~ " l'element il·legible \"%s\". Comproveu els"
-#~ " permisos de fitxer de l'element."
-
-#~ msgid "Cannot load element \"%s\" in template %s. Check element code."
-#~ msgstr ""
-#~ "No s'ha pogut carregar l'element \"%s\""
-#~ " a la plantilla %s. Comproveu el "
-#~ "codi de l'element."
-
-#~ msgid "Format element %s uses unknown parameter \"%s\" in format template %s."
-#~ msgstr ""
-#~ "L'element de format %s usa el "
-#~ "paràmetre desconegut \"%s\" a la "
-#~ "plantilla de format %s."
-
-#~ msgid "Could not read format template named %s. %s"
-#~ msgstr "No s'ha pogut llegir la plantilla de format %s. %s"
-
-#~ msgid "Error in format element %s. %s."
-#~ msgstr "Error a l'element de format %s. %s."
-
-#~ msgid "Format element %s cannot not be read. %s"
-#~ msgstr "No s'ha pogut llegir l'element de format %s. %s"
-
-#~ msgid ""
-#~ "Cannot write in etc/bibformat dir of "
-#~ "your Invenio installation. Check directory "
-#~ "permission."
-#~ msgstr ""
-#~ "No s'ha pogut escriure al directori "
-#~ "etc/bibformat de la vostra instal·lació "
-#~ "d'Invenio. Comproveu els permisos del "
-#~ "directori."
-
-#~ msgid "Restricted Output Format"
-#~ msgstr "Format de sortida restringit"
-
-#~ msgid "Output Format %s Rules"
-#~ msgstr "Regles del format de sortida %s"
-
-#~ msgid "Output Format %s Attributes"
-#~ msgstr "Atributs del format de sortida %s"
-
-#~ msgid "Output Format %s Dependencies"
-#~ msgstr "Dependències del format de sortida %s"
-
-#~ msgid "Delete Output Format"
-#~ msgstr "Suprimeix el format de sortida"
-
-#~ msgid "Cannot create output format"
-#~ msgstr "No ha estat possible crear el format de sortida"
-
-#~ msgid "Format template %s cannot not be read. %s"
-#~ msgstr "No s'ha pogut llegir la plantilla de format %s. %s"
-
-#~ msgid "Restricted Format Template"
-#~ msgstr "Plantilla de format restringit"
-
-#~ msgid "Format Template %s"
-#~ msgstr "Plantilla de format %s"
-
-#~ msgid "Format Template %s Attributes"
-#~ msgstr "Atributs de la plantilla de format %s"
-
-#~ msgid "Format Template %s Dependencies"
-#~ msgstr "Dependències de la plantilla de format %s"
-
-#~ msgid "Delete Format Template"
-#~ msgstr "Suprimeix la plantilla de format"
-
-#~ msgid "Format Element %s Dependencies"
-#~ msgstr "Dependències de l'element de format %s"
-
-#~ msgid "Test Format Element %s"
-#~ msgstr "Prova l'element de format %s"
-
-#~ msgid "Validation of Output Format %s"
-#~ msgstr "Valida del format de sortida %s"
-
-#~ msgid "Validation of Format Template %s"
-#~ msgstr "Valida de la plantilla de format %s"
-
-#~ msgid "Restricted Format Element"
-#~ msgstr "Element de format restringit"
-
-#~ msgid "Validation of Format Element %s"
-#~ msgstr "Valida de l'element de format %s"
-
-#~ msgid "No format specified for validation. Please specify one."
-#~ msgstr "No heu especificat cap format per a la validació.  Especifiqueu-ne un."
-
-#~ msgid "Format Validation"
-#~ msgstr "Validació del format"
-
-#~ msgid "Knowledge Base %s"
-#~ msgstr "Base de coneixement %s"
-
-#~ msgid ""
-#~ "Error in connecting to the SMPT "
-#~ "server waiting %s seconds. Exception is"
-#~ " %s, while sending email from %s "
-#~ "to %s with body %s."
-#~ msgstr ""
-#~ "Error en la conexió amb el "
-#~ "servidor SMPT esperant %s segons. "
-#~ "L'excepció és %s, a l'intentar enviar"
-#~ " el missatge de %s a %s con "
-#~ "el text %s."
-
-#~ msgid "Error while sending an email: %s"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "Error while sending an email.\n"
-#~ "Reason: %s\n"
-#~ "Details: %s\n"
-#~ "Sender: \"%s\"\n"
-#~ "Recipient(s): \"%s\"\n"
-#~ "\n"
-#~ "The content of the mail was as follows:\n"
-#~ "%s"
-#~ msgstr ""
-
-#~ msgid "Not Set"
-#~ msgstr "Sense definir"
-
-#~ msgid "never"
-#~ msgstr "mai"
-
-#~ msgid ""
-#~ "Do you want to touch the OAI "
-#~ "set %s? Note that this will force"
-#~ " all clients to re-harvest the "
-#~ "whole set."
-#~ msgstr ""
-
-#~ msgid "OAI set %s touched."
-#~ msgstr ""
-
-#~ msgid "Name variants"
-#~ msgstr "Variants del nom"
-
-#~ msgid "No Name Variants"
-#~ msgstr "Sense noms variants"
-
-#~ msgid "times"
-#~ msgstr "vegades"
-
-#~ msgid "Papers"
-#~ msgstr "Documents:"
-
-#~ msgid "No Keywords"
-#~ msgstr "Sense paraules clau"
-
-#~ msgid "Frequent keywords"
-#~ msgstr "Paraules claus freqüents"
-
-#~ msgid "No Subject categories"
-#~ msgstr ""
-
-#~ msgid "Subject categories"
-#~ msgstr ""
-
-#~ msgid "No Collaborations"
-#~ msgstr "Sense col·laboracions"
-
-#~ msgid "unknown affiliation"
-#~ msgstr "afiliació desconeguda"
-
-#~ msgid "No Affiliations"
-#~ msgstr "Sense afiliacions"
-
-#~ msgid "Affiliations"
-#~ msgstr "Afiliacions"
-
-#~ msgid "Frequent co-authors (excluding collaborations)"
-#~ msgstr "Coautors freqüentes (excloent-hi col·laboracions)"
-
-#~ msgid "No Frequent Co-authors"
-#~ msgstr "Co-autors poc freqüents"
-
-#~ msgid "Citations%s"
-#~ msgstr "Citacions%s:"
-
-#~ msgid "<strong> Publications per year </strong>"
-#~ msgstr ""
-
-#~ msgid "No Publication Graph"
-#~ msgstr "Data de publicació"
-
-#~ msgid "<strong> Publications list </strong>"
-#~ msgstr "Llista de publicacions"
-
-#~ msgid "No publications available"
-#~ msgstr "No hi ha informació disponible"
-
-#~ msgid "Recompute Now!"
-#~ msgstr "Recalcula ara!"
-
-#~ msgid "%i comments found in total (not shown on this page)"
-#~ msgstr ""
-
-#~ msgid "%s View your previously submitted comments"
-#~ msgstr ""
-
-#~ msgid "Linkbacks%s: %s"
-#~ msgstr ""
-
-#~ msgid "Cited by 1 record"
-#~ msgstr "Citat per 1 registre"
-
-#~ msgid "%i comments"
-#~ msgstr "%i comentaris"
-
-#~ msgid "%i reviews"
-#~ msgstr "%i ressenyes"
-
-#~ msgid "%s of"
-#~ msgstr "%s de"
-
-#~ msgid "No Papers"
-#~ msgstr "Cap document"
-
-#~ msgid "Frequent co-authors"
-#~ msgstr "Co-autors freqüents"
-
-#~ msgid "This is me.  Verify my publication list."
-#~ msgstr "Sóc jo mateix.  Verifiqueu la meva llista de publicacions."
-
-#~ msgid "Citations:"
-#~ msgstr "Citacions:"
-
-#~ msgid "No Citation Information available"
-#~ msgstr "No hi ha informació de citacions disponible"
-
-#~ msgid "<p><a href=\"%(url)s\">%(msg)s</a></p>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "For some unknown reason multiple records"
-#~ " matching the specified DOI \"%s\" "
-#~ "have been found."
-#~ msgstr ""
-
-#~ msgid "Found multiple records matching DOI %s"
-#~ msgstr ""
-
-#~ msgid "Discussion"
-#~ msgstr "Discussió"
-
-#~ msgid "Please inform the <a href='mailto%s'>administator</a>"
-#~ msgstr ""
-
-#~ msgid "Your alerts"
-#~ msgstr "Les vostres alertes"
-
-#~ msgid "Your approvals"
-#~ msgstr "Les vostres aprovacions"
-
-#~ msgid "Your baskets"
-#~ msgstr "Els vostres cistells"
-
-#~ msgid "Your loans"
-#~ msgstr "Els vostres préstecs"
-
-#~ msgid "Your submissions"
-#~ msgstr "Els vostres lliuraments"
-
-#~ msgid "Statistics"
-#~ msgstr "Estadístiques"
-
-#~ msgid "Group: %s"
-#~ msgstr "Grup: %s"
-
-#~ msgid ""
-#~ "Your e-mail is auto-generated by "
-#~ "the system. Please change your e-mail"
-#~ " from <a href='%s/youraccount/edit?ln=%s'>account "
-#~ "settings</a>."
-#~ msgstr ""
-
-#~ msgid "Page %s Not Found"
-#~ msgstr "No s'ha trobat la pàgina %s"
-
-#~ msgid "The field %s is mandatory."
-#~ msgstr "El camp %s és obligatori."
-
-#~ msgid "Unable to delete field at position %s from page %s of submission '%s'"
-#~ msgstr ""
-#~ "No ha estat possible eliminar el "
-#~ "camp a la posició %s de la "
-#~ "pàgina %s del lliurament '%s'."
-

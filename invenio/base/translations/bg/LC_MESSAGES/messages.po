@@ -1,5 +1,5 @@
 # # This file is part of Invenio.
-# # Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+# # Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2015 CERN.
 # #
 # # Invenio is free software; you can redistribute it and/or
 # # modify it under the terms of the GNU General Public License as
@@ -16,15 +16,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Invenio 1.2.0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2015-03-04 16:44+0100\n"
-"PO-Revision-Date: 2008-03-27 02:25+0200\n"
+"POT-Creation-Date: 2015-08-27 15:26+0200\n"
+"PO-Revision-Date: 2015-08-27 20:09+0200\n"
 "Last-Translator: Nikolay Dyankov <ndyankov@gmail.com>\n"
 "Language-Team: BG <info@invenio-software.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.0\n"
 
 #: invenio/base/decorators.py:133
 #, python-format
@@ -205,7 +205,7 @@ msgstr ""
 
 #: invenio/base/templates/mail_html.tpl:20
 #: invenio/base/templates/mail_text.tpl:20
-#: invenio/legacy/webcomment/templates.py:2256
+#: invenio/legacy/webcomment/templates.py:2255
 msgid "Hello:"
 msgstr "Здравей:"
 
@@ -262,48 +262,53 @@ msgstr ""
 msgid "Error in sending email from %(x_from)s to %(x_to)s with body%(x_body)s."
 msgstr ""
 
-#: invenio/ext/login/__init__.py:68
+#: invenio/ext/login/__init__.py:61
+#, fuzzy
+msgid "Provided data is not valid"
+msgstr "Записът не съществува."
+
+#: invenio/ext/login/__init__.py:73
 #: invenio/legacy/websession/webinterface.py:679
 msgid "Password reset request for"
 msgstr ""
 
-#: invenio/ext/login/__init__.py:124
+#: invenio/ext/login/__init__.py:129
 #, fuzzy, python-format
 msgid "You are not authorized to use '%(x_login_method)s' login method."
 msgstr "Вие не сте упълномощен да разглеждате тази зона"
 
-#: invenio/ext/login/__init__.py:130
+#: invenio/ext/login/__init__.py:135
 #, python-format
 msgid ""
 "You have not yet confirmed the email address for the             "
 "'%(login_method)s' authentication method."
 msgstr ""
 
-#: invenio/ext/login/__init__.py:148 invenio/modules/annotations/views.py:156
+#: invenio/ext/login/__init__.py:153 invenio/modules/annotations/views.py:156
 #: invenio/modules/comments/views.py:204 invenio/modules/comments/views.py:238
 #: invenio/modules/records/views.py:80
 #, fuzzy
 msgid "Authorization failure"
 msgstr "Грешка при регистрация"
 
-#: invenio/ext/login/__init__.py:154
+#: invenio/ext/login/__init__.py:159
 #, fuzzy
 msgid "Please sign in to continue."
 msgstr "Моля, изберете един или повече:"
 
-#: invenio/ext/login/__init__.py:158
+#: invenio/ext/login/__init__.py:163
 #, fuzzy
 msgid "Authorization failure."
 msgstr "Грешка при регистрация"
 
-#: invenio/ext/script/__init__.py:116
+#: invenio/ext/script/__init__.py:143
 #, python-format
 msgid ""
 "A newer version of Invenio is available for download. You may want to "
 "visit <a href=\"%(wiki)s\">%()s</a>"
 msgstr ""
 
-#: invenio/ext/script/__init__.py:126
+#: invenio/ext/script/__init__.py:153
 #, python-format
 msgid "Cannot download or parse release notes from %(release_notes)s"
 msgstr ""
@@ -827,7 +832,7 @@ msgstr ""
 #: invenio/legacy/websubmit/functions/Create_Upload_Files_Interface.py:467
 #: invenio/modules/access/templates/access/admin/showroledetails_base.html:54
 #: invenio/modules/groups/forms.py:46
-#: invenio/modules/oauth2server/models.py:142
+#: invenio/modules/oauth2server/models.py:143
 #: invenio/modules/search/admin_forms.py:34 invenio/modules/tags/forms.py:162
 #: invenio/modules/tags/forms.py:262
 msgid "Name"
@@ -870,8 +875,8 @@ msgstr "Вашите кошници"
 
 #: invenio/legacy/bibcatalog/templates.py:52
 #: invenio/legacy/bibknowledge/templates.py:170
-#: invenio/legacy/webcomment/templates.py:900
-#: invenio/legacy/webcomment/templates.py:2586
+#: invenio/legacy/webcomment/templates.py:899
+#: invenio/legacy/webcomment/templates.py:2585
 #: invenio/legacy/websearch/templates.py:2038
 msgid "Previous"
 msgstr "Предишен"
@@ -887,8 +892,8 @@ msgstr "Точки"
 
 #: invenio/legacy/bibcatalog/templates.py:74
 #: invenio/legacy/bibknowledge/templates.py:168
-#: invenio/legacy/webcomment/templates.py:916
-#: invenio/legacy/webcomment/templates.py:2610
+#: invenio/legacy/webcomment/templates.py:915
+#: invenio/legacy/webcomment/templates.py:2609
 msgid "Next"
 msgstr "Следващ"
 
@@ -914,7 +919,7 @@ msgstr ""
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:325
 #, fuzzy
 msgid "Not authorized"
-msgstr "автор"
+msgstr "Вие не сте упълномощен да разглеждате тази зона"
 
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:79
 #, fuzzy, python-format
@@ -1458,11 +1463,11 @@ msgstr "Създадена е нова сметка в"
 #: invenio/legacy/bibcirculation/adminlib.py:3543
 #: invenio/legacy/bibcirculation/adminlib.py:3587
 #: invenio/legacy/webbasket/templates.py:1839
-#: invenio/legacy/webcomment/templates.py:253
-#: invenio/legacy/webcomment/templates.py:714
-#: invenio/legacy/webcomment/templates.py:2114
-#: invenio/legacy/webcomment/templates.py:2138
-#: invenio/legacy/webcomment/templates.py:2164
+#: invenio/legacy/webcomment/templates.py:252
+#: invenio/legacy/webcomment/templates.py:713
+#: invenio/legacy/webcomment/templates.py:2113
+#: invenio/legacy/webcomment/templates.py:2137
+#: invenio/legacy/webcomment/templates.py:2163
 #: invenio/legacy/webmessage/templates.py:508
 #: invenio/legacy/websession/templates.py:2236
 #: invenio/legacy/websession/templates.py:2276
@@ -1473,11 +1478,11 @@ msgstr "Да"
 #: invenio/legacy/bibcirculation/adminlib.py:2434
 #: invenio/legacy/bibcirculation/adminlib.py:3548
 #: invenio/legacy/webalert/templates.py:320
-#: invenio/legacy/webcomment/templates.py:254
-#: invenio/legacy/webcomment/templates.py:716
-#: invenio/legacy/webcomment/templates.py:2114
-#: invenio/legacy/webcomment/templates.py:2138
-#: invenio/legacy/webcomment/templates.py:2164
+#: invenio/legacy/webcomment/templates.py:253
+#: invenio/legacy/webcomment/templates.py:715
+#: invenio/legacy/webcomment/templates.py:2113
+#: invenio/legacy/webcomment/templates.py:2137
+#: invenio/legacy/webcomment/templates.py:2163
 #: invenio/legacy/webmessage/templates.py:509
 #: invenio/legacy/websession/templates.py:2237
 #: invenio/legacy/websession/templates.py:2277
@@ -1640,9 +1645,9 @@ msgstr ""
 #: invenio/legacy/bibdocfile/webinterface.py:145
 #: invenio/legacy/search_engine/__init__.py:2223
 #: invenio/legacy/search_engine/__init__.py:2232
-#: invenio/legacy/search_engine/__init__.py:5972
-#: invenio/legacy/search_engine/__init__.py:6034
-#: invenio/legacy/search_engine/__init__.py:6125
+#: invenio/legacy/search_engine/__init__.py:5978
+#: invenio/legacy/search_engine/__init__.py:6040
+#: invenio/legacy/search_engine/__init__.py:6131
 msgid "Requested record does not seem to exist."
 msgstr "Желаният запис не съществува."
 
@@ -2306,7 +2311,7 @@ msgstr "Действие"
 #: invenio/legacy/websubmit/functions/Create_Upload_Files_Interface.py:471
 #: invenio/modules/access/templates/access/admin/showroledetails_base.html:56
 #: invenio/modules/groups/forms.py:50
-#: invenio/modules/oauth2server/models.py:153
+#: invenio/modules/oauth2server/models.py:154
 msgid "Description"
 msgstr "Описание"
 
@@ -2846,7 +2851,7 @@ msgstr "Отхвърляне"
 #: invenio/legacy/bibcirculation/templates.py:1772
 #: invenio/legacy/bibexport/templates.py:494
 #: invenio/legacy/bibexport/templates.py:557
-#: invenio/legacy/webcomment/templates.py:2061
+#: invenio/legacy/webcomment/templates.py:2060
 msgid "OK"
 msgstr "OK"
 
@@ -3328,8 +3333,8 @@ msgstr ""
 #: invenio/legacy/bibcirculation/templates.py:15749
 #: invenio/legacy/bibcirculation/templates.py:16003
 #: invenio/legacy/bibcirculation/utils.py:455
-#: invenio/legacy/webcomment/templates.py:1738
-#: invenio/legacy/webcomment/templates.py:1770
+#: invenio/legacy/webcomment/templates.py:1737
+#: invenio/legacy/webcomment/templates.py:1769
 msgid "Email"
 msgstr "E-mail"
 
@@ -4667,15 +4672,15 @@ msgid ""
 msgstr ""
 
 #: invenio/legacy/bibcirculation/webinterface.py:854
-#: invenio/legacy/search_engine/__init__.py:4757
-#: invenio/legacy/search_engine/__init__.py:5117
-#: invenio/legacy/search_engine/__init__.py:5311
-#: invenio/legacy/search_engine/__init__.py:5334
-#: invenio/legacy/search_engine/__init__.py:5342
-#: invenio/legacy/search_engine/__init__.py:5350
-#: invenio/legacy/search_engine/__init__.py:5396
-#: invenio/legacy/webcomment/templates.py:199
-#: invenio/legacy/webcomment/templates.py:2511
+#: invenio/legacy/search_engine/__init__.py:4763
+#: invenio/legacy/search_engine/__init__.py:5123
+#: invenio/legacy/search_engine/__init__.py:5317
+#: invenio/legacy/search_engine/__init__.py:5340
+#: invenio/legacy/search_engine/__init__.py:5348
+#: invenio/legacy/search_engine/__init__.py:5356
+#: invenio/legacy/search_engine/__init__.py:5402
+#: invenio/legacy/webcomment/templates.py:198
+#: invenio/legacy/webcomment/templates.py:2510
 #: invenio/modules/comments/api.py:1862
 msgid "The record has been deleted."
 msgstr "Записът е изтрит."
@@ -4765,10 +4770,10 @@ msgstr "Избери тема"
 #: invenio/legacy/bibdocfile/managedocfiles.py:404
 #: invenio/legacy/bibexport/templates.py:347
 #: invenio/legacy/bibexport/templates.py:401
-#: invenio/legacy/webcomment/templates.py:1024
-#: invenio/legacy/webcomment/templates.py:1343
-#: invenio/legacy/webcomment/templates.py:1791
-#: invenio/legacy/webcomment/templates.py:2028
+#: invenio/legacy/webcomment/templates.py:1023
+#: invenio/legacy/webcomment/templates.py:1342
+#: invenio/legacy/webcomment/templates.py:1790
+#: invenio/legacy/webcomment/templates.py:2027
 #: invenio/legacy/websubmit/templates.py:2505
 #: invenio/legacy/websubmit/functions/Create_Upload_Files_Interface.py:475
 msgid "Comment"
@@ -5389,7 +5394,7 @@ msgid "Total"
 msgstr "изборен"
 
 #: invenio/legacy/bibexport/templates.py:652
-#: invenio/legacy/webcomment/templates.py:2031
+#: invenio/legacy/webcomment/templates.py:2030
 msgid "Select"
 msgstr "Избери"
 
@@ -5707,7 +5712,7 @@ msgstr "Зависимости на базата от знания"
 #: invenio/legacy/bibknowledge/templates.py:329
 #: invenio/legacy/bibknowledge/templates.py:589
 #: invenio/legacy/bibknowledge/templates.py:658
-#: invenio/legacy/webcomment/templates.py:1619
+#: invenio/legacy/webcomment/templates.py:1618
 #: invenio/legacy/webjournal/templates.py:203
 #: invenio/legacy/webjournal/templates.py:575
 #: invenio/legacy/webjournal/templates.py:716
@@ -6094,8 +6099,8 @@ msgstr ""
 
 #: invenio/legacy/search_engine/__init__.py:935
 #: invenio/legacy/search_engine/__init__.py:968
-#: invenio/legacy/search_engine/__init__.py:6020
-#: invenio/legacy/search_engine/__init__.py:6114
+#: invenio/legacy/search_engine/__init__.py:6026
+#: invenio/legacy/search_engine/__init__.py:6120
 msgid "Search Results"
 msgstr "Резултати от търсенето"
 
@@ -6312,7 +6317,7 @@ msgid ""
 "this doesn't help, please check your search and try again."
 msgstr ""
 
-#: invenio/legacy/search_engine/__init__.py:3232
+#: invenio/legacy/search_engine/__init__.py:3238
 #, fuzzy, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other collections gave "
@@ -6321,7 +6326,7 @@ msgstr ""
 "Не беше намерено съвпадение в колекцията %(x_collection)s. Други публични"
 " колекции дадоха %(x_url_open)s%(x_nb_hits)d поапдения%(x_url_close)s."
 
-#: invenio/legacy/search_engine/__init__.py:3249
+#: invenio/legacy/search_engine/__init__.py:3255
 #, fuzzy
 msgid ""
 "No public collection matched your query. If you were looking for a hidden"
@@ -6330,7 +6335,7 @@ msgstr ""
 "Вашата заявка не съвпадна с нито една обща колекция. Ако търсите частен "
 "документ, моля, първо изберете желаната ограничена колекция."
 
-#: invenio/legacy/search_engine/__init__.py:3253
+#: invenio/legacy/search_engine/__init__.py:3259
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
@@ -6338,44 +6343,44 @@ msgstr ""
 "Вашата заявка не съвпадна с нито една обща колекция. Ако търсите частен "
 "документ, моля, първо изберете желаната ограничена колекция."
 
-#: invenio/legacy/search_engine/__init__.py:3360
+#: invenio/legacy/search_engine/__init__.py:3366
 #, fuzzy
 msgid "Your search did not match any records.  Please try again."
 msgstr ""
 "Търсенето на %s не съвпадна с нито един запис. Най-близките попадения във"
 " всички колекции са:"
 
-#: invenio/legacy/search_engine/__init__.py:3369
+#: invenio/legacy/search_engine/__init__.py:3375
 #, fuzzy
 msgid "No match found, please enter different search terms."
 msgstr "Използвайте други думи за търсене."
 
-#: invenio/legacy/search_engine/__init__.py:3375
+#: invenio/legacy/search_engine/__init__.py:3381
 #, fuzzy, python-format
 msgid "There are no records referring to %(x_rec)s."
 msgstr "Има %i кошници"
 
-#: invenio/legacy/search_engine/__init__.py:3377
+#: invenio/legacy/search_engine/__init__.py:3383
 #, fuzzy, python-format
 msgid "There are no records modified by %(x_rec)s."
 msgstr "Има %i кошници"
 
-#: invenio/legacy/search_engine/__init__.py:3379
+#: invenio/legacy/search_engine/__init__.py:3385
 #, fuzzy, python-format
 msgid "There are no records cited by %(x_rec)s."
 msgstr "Има %i кошници"
 
-#: invenio/legacy/search_engine/__init__.py:3385
+#: invenio/legacy/search_engine/__init__.py:3391
 #, fuzzy, python-format
 msgid "No word index is available for %(x_name)s."
 msgstr "Индексът за думата не е наличен за"
 
-#: invenio/legacy/search_engine/__init__.py:3396
+#: invenio/legacy/search_engine/__init__.py:3402
 #, fuzzy, python-format
 msgid "No phrase index is available for %(x_name)s."
 msgstr "Индексът за фразата не е наличен за"
 
-#: invenio/legacy/search_engine/__init__.py:3434
+#: invenio/legacy/search_engine/__init__.py:3440
 #, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record."
@@ -6384,7 +6389,7 @@ msgstr ""
 "Търсенето на %(x_term)s в индекса %(x_index)s не съвпадна с нито един "
 "запис. Най-близките до него попадения в коя да е колекция са:"
 
-#: invenio/legacy/search_engine/__init__.py:3439
+#: invenio/legacy/search_engine/__init__.py:3445
 #, fuzzy, python-format
 msgid ""
 "Search term %(x_name)s did not match any record. Nearest terms in any "
@@ -6393,7 +6398,7 @@ msgstr ""
 "Търсенето на %s не съвпадна с нито един запис. Най-близките попадения във"
 " всички колекции са:"
 
-#: invenio/legacy/search_engine/__init__.py:4340
+#: invenio/legacy/search_engine/__init__.py:4346
 #, fuzzy, python-format
 msgid ""
 "Sorry, %(x_option)s does not seem to be a valid sort option. The records "
@@ -6402,7 +6407,7 @@ msgstr ""
 "Съжаляваме, %s не е валидна опция за сортиране. Използване на сортиране "
 "по заглавие."
 
-#: invenio/legacy/search_engine/__init__.py:4468
+#: invenio/legacy/search_engine/__init__.py:4474
 #, fuzzy, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %(x_name)d records only. Using"
@@ -6411,7 +6416,7 @@ msgstr ""
 "Съжаляваме, сортирането е позволено само на множества от най-много %d "
 "записа. Използване на ред по подразбиране."
 
-#: invenio/legacy/search_engine/__init__.py:4480
+#: invenio/legacy/search_engine/__init__.py:4486
 #, fuzzy, python-format
 msgid ""
 "Sorry, %(x_name)s does not seem to be a valid sort option. The records "
@@ -6420,17 +6425,17 @@ msgstr ""
 "Съжаляваме, %s не е валидна опция за сортиране. Използване на сортиране "
 "по заглавие."
 
-#: invenio/legacy/search_engine/__init__.py:4760
-#: invenio/legacy/search_engine/__init__.py:5121
+#: invenio/legacy/search_engine/__init__.py:4766
+#: invenio/legacy/search_engine/__init__.py:5127
 #, fuzzy, python-format
 msgid "The record %(x_rec)d replaces it."
 msgstr "Записът не съществува."
 
-#: invenio/legacy/search_engine/__init__.py:4986
+#: invenio/legacy/search_engine/__init__.py:4992
 msgid "Use different search terms."
 msgstr "Използвайте други думи за търсене."
 
-#: invenio/legacy/search_engine/__init__.py:5982
+#: invenio/legacy/search_engine/__init__.py:5988
 #: invenio/legacy/websearch/templates.py:813
 #: invenio/legacy/websearch/templates.py:891
 #: invenio/legacy/websearch/templates.py:1014
@@ -6444,13 +6449,13 @@ msgstr "Използвайте други думи за търсене."
 msgid "Browse"
 msgstr "Преглеждане"
 
-#: invenio/legacy/search_engine/__init__.py:6413
+#: invenio/legacy/search_engine/__init__.py:6419
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "Няма съвпадения, удовлетворяващи зададените от вас критерии за време, "
 "премахване на това условие..."
 
-#: invenio/legacy/search_engine/__init__.py:6447
+#: invenio/legacy/search_engine/__init__.py:6453
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "Няма съвпадения, удовлетворящи зададените от вас граници за търсене, "
@@ -6771,7 +6776,7 @@ msgstr "Вашите търсения"
 #: invenio/legacy/webbasket/webinterface.py:1026
 #: invenio/legacy/webbasket/webinterface.py:1116
 #: invenio/legacy/webbasket/webinterface.py:1260
-#: invenio/legacy/webcomment/webinterface.py:922
+#: invenio/legacy/webcomment/webinterface.py:928
 #: invenio/legacy/webmessage/templates.py:466
 #: invenio/legacy/websession/templates.py:774
 #: invenio/legacy/websession/templates.py:2350
@@ -6835,7 +6840,7 @@ msgstr ""
 #: invenio/legacy/webalert/webinterface.py:475
 #: invenio/legacy/webalert/webinterface.py:523
 #: invenio/legacy/webalert/webinterface.py:551
-#: invenio/legacy/webcomment/webinterface.py:925
+#: invenio/legacy/webcomment/webinterface.py:931
 #: invenio/legacy/websession/webinterface.py:231
 #: invenio/legacy/websession/webinterface.py:254
 #: invenio/legacy/websession/webinterface.py:340
@@ -7524,7 +7529,7 @@ msgid "This functionality is forbidden to guest users."
 msgstr "Тази функционалност е забранена за гости."
 
 #: invenio/legacy/webbasket/templates.py:2184
-#: invenio/legacy/webcomment/templates.py:1011
+#: invenio/legacy/webcomment/templates.py:1010
 msgid "Back to search results"
 msgstr "Обратно към резултатите от търсенето"
 
@@ -7699,7 +7704,7 @@ msgstr "Добавяне към потребителите"
 
 #: invenio/legacy/webbasket/templates.py:3221
 #: invenio/legacy/webbasket/templates.py:4025
-#: invenio/legacy/webcomment/templates.py:409
+#: invenio/legacy/webcomment/templates.py:408
 #: invenio/legacy/webmessage/templates.py:111
 #: invenio/modules/messages/templates/messages/view_base.html:55
 msgid "Reply"
@@ -7846,219 +7851,219 @@ msgstr "Потребителят %s не съществува."
 msgid "Record ID %(x_rec)s does not exist."
 msgstr "Потребителят %s не съществува."
 
-#: invenio/legacy/webcomment/templates.py:83
-#: invenio/legacy/webcomment/templates.py:938
+#: invenio/legacy/webcomment/templates.py:82
+#: invenio/legacy/webcomment/templates.py:937
 #: invenio/legacy/websubmit/templates.py:2451
 #: invenio/modules/formatter/templates/format/record/Video_HTML_detailed.tpl:58
 msgid "Write a comment"
 msgstr "Написване на коментар"
 
-#: invenio/legacy/webcomment/templates.py:99
+#: invenio/legacy/webcomment/templates.py:98
 #, fuzzy, python-format
 msgid "%(x_nb)i Comments for round \"%(x_name)s\""
 msgstr "%(x_name)s написа на %(x_date)s:"
 
-#: invenio/legacy/webcomment/templates.py:102
+#: invenio/legacy/webcomment/templates.py:101
 #, fuzzy, python-format
 msgid "%(x_nb)i Comments"
 msgstr "коментари"
 
-#: invenio/legacy/webcomment/templates.py:140
+#: invenio/legacy/webcomment/templates.py:139
 #, fuzzy, python-format
 msgid "Showing the latest %(x_num)i comments:"
 msgstr "Показване на последните %i коментара:"
 
-#: invenio/legacy/webcomment/templates.py:153
-#: invenio/legacy/webcomment/templates.py:179
+#: invenio/legacy/webcomment/templates.py:152
+#: invenio/legacy/webcomment/templates.py:178
 msgid "Discuss this document"
 msgstr "Обсъждане на документа:"
 
-#: invenio/legacy/webcomment/templates.py:180
-#: invenio/legacy/webcomment/templates.py:951
+#: invenio/legacy/webcomment/templates.py:179
+#: invenio/legacy/webcomment/templates.py:950
 msgid "Start a discussion about any aspect of this document."
 msgstr "Започни обсъждане относно кой да е аспект на този документ."
 
-#: invenio/legacy/webcomment/templates.py:197
+#: invenio/legacy/webcomment/templates.py:196
 #, fuzzy, python-format
 msgid "Sorry, the record %(x_rec)s does not seem to exist."
 msgstr "Съжаляваме, записът %s не съществува."
 
-#: invenio/legacy/webcomment/templates.py:201
+#: invenio/legacy/webcomment/templates.py:200
 #, fuzzy, python-format
 msgid "Sorry, %(x_rec)s is not a valid ID value."
 msgstr "Съжаляваме, %s не е валидна стойност за ID."
 
-#: invenio/legacy/webcomment/templates.py:203
+#: invenio/legacy/webcomment/templates.py:202
 msgid "Sorry, no record ID was provided."
 msgstr "Съжаляваме, не беше зададен ID на записа."
 
-#: invenio/legacy/webcomment/templates.py:207
+#: invenio/legacy/webcomment/templates.py:206
 #, fuzzy, python-format
 msgid "You may want to start browsing from %(x_link)s"
 msgstr "Може да започнете да преглеждате от  %s"
 
-#: invenio/legacy/webcomment/templates.py:265
-#: invenio/legacy/webcomment/templates.py:756
-#: invenio/legacy/webcomment/templates.py:766
+#: invenio/legacy/webcomment/templates.py:264
+#: invenio/legacy/webcomment/templates.py:755
+#: invenio/legacy/webcomment/templates.py:765
 #, fuzzy, python-format
 msgid "%(x_nb)i comments for round \"%(x_name)s\""
 msgstr "%(x_name)s написа на %(x_date)s:"
 
-#: invenio/legacy/webcomment/templates.py:295
-#: invenio/legacy/webcomment/templates.py:861
+#: invenio/legacy/webcomment/templates.py:294
+#: invenio/legacy/webcomment/templates.py:860
 msgid "Was this review helpful?"
 msgstr "Беше ли ви полезен този преглед?"
 
-#: invenio/legacy/webcomment/templates.py:306
-#: invenio/legacy/webcomment/templates.py:342
-#: invenio/legacy/webcomment/templates.py:938
+#: invenio/legacy/webcomment/templates.py:305
+#: invenio/legacy/webcomment/templates.py:341
+#: invenio/legacy/webcomment/templates.py:937
 #: invenio/modules/comments/templates/comments/add_review_base.html:54
 msgid "Write a review"
 msgstr "Написване на преглед"
 
-#: invenio/legacy/webcomment/templates.py:313
-#: invenio/legacy/webcomment/templates.py:925
-#: invenio/legacy/webcomment/templates.py:2185
+#: invenio/legacy/webcomment/templates.py:312
+#: invenio/legacy/webcomment/templates.py:924
+#: invenio/legacy/webcomment/templates.py:2184
 #, python-format
 msgid "Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews"
 msgstr ""
 "Среден брой точки от прегледи: %(x_nb_score)s базирано на "
 "%(x_nb_reviews)s прегледа"
 
-#: invenio/legacy/webcomment/templates.py:316
+#: invenio/legacy/webcomment/templates.py:315
 #, fuzzy, python-format
 msgid "Readers found the following %(x_name)s reviews to be most helpful."
 msgstr "Читателите счетоха следните %s прегледи за най-полезни."
 
-#: invenio/legacy/webcomment/templates.py:318
-#: invenio/legacy/webcomment/templates.py:341
+#: invenio/legacy/webcomment/templates.py:317
+#: invenio/legacy/webcomment/templates.py:340
 #, fuzzy, python-format
 msgid "View all %(x_name)s reviews"
 msgstr "Преглед на всички %s прегледа"
 
-#: invenio/legacy/webcomment/templates.py:337
-#: invenio/legacy/webcomment/templates.py:359
-#: invenio/legacy/webcomment/templates.py:2226
+#: invenio/legacy/webcomment/templates.py:336
+#: invenio/legacy/webcomment/templates.py:358
+#: invenio/legacy/webcomment/templates.py:2225
 msgid "Rate this document"
 msgstr "Оценка на документа"
 
-#: invenio/legacy/webcomment/templates.py:360
+#: invenio/legacy/webcomment/templates.py:359
 #, fuzzy
 msgid "Be the first to review this document.</div>"
 msgstr "Бъдете първия, който ще оцени този документ."
 
-#: invenio/legacy/webcomment/templates.py:404
-#: invenio/legacy/webcomment/templates.py:465
-#: invenio/legacy/webcomment/templates.py:807
+#: invenio/legacy/webcomment/templates.py:403
+#: invenio/legacy/webcomment/templates.py:464
+#: invenio/legacy/webcomment/templates.py:806
 #: invenio/modules/workflows/templates/workflows/actions/approval_main.html:23
 #, fuzzy
 msgid "Close"
 msgstr "Точки"
 
-#: invenio/legacy/webcomment/templates.py:411
-#: invenio/legacy/webcomment/templates.py:862
+#: invenio/legacy/webcomment/templates.py:410
+#: invenio/legacy/webcomment/templates.py:861
 msgid "Report abuse"
 msgstr "Докладване на обида"
 
-#: invenio/legacy/webcomment/templates.py:425
+#: invenio/legacy/webcomment/templates.py:424
 #, fuzzy
 msgid "Undelete comment"
 msgstr "изтриване на коментарите"
 
-#: invenio/legacy/webcomment/templates.py:434
-#: invenio/legacy/webcomment/templates.py:436
+#: invenio/legacy/webcomment/templates.py:433
+#: invenio/legacy/webcomment/templates.py:435
 msgid "Delete comment"
 msgstr "Изтриване на коментар"
 
-#: invenio/legacy/webcomment/templates.py:442
+#: invenio/legacy/webcomment/templates.py:441
 #, fuzzy
 msgid "Unreport comment"
 msgstr "Изтриване на коментар"
 
-#: invenio/legacy/webcomment/templates.py:453
+#: invenio/legacy/webcomment/templates.py:452
 msgid "Attached file"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:453
+#: invenio/legacy/webcomment/templates.py:452
 msgid "Attached files"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:465
-#: invenio/legacy/webcomment/templates.py:806
+#: invenio/legacy/webcomment/templates.py:464
+#: invenio/legacy/webcomment/templates.py:805
 msgid "Open"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:534
+#: invenio/legacy/webcomment/templates.py:533
 #, python-format
 msgid "Reviewed by %(x_nickname)s on %(x_date)s"
 msgstr "Прегледано от %(x_nickname)s на %(x_date)s"
 
-#: invenio/legacy/webcomment/templates.py:538
+#: invenio/legacy/webcomment/templates.py:537
 #, fuzzy, python-format
 msgid "%(x_nb_people)s out of %(x_nb_total)s people found this review useful"
 msgstr ""
 "%(x_nb_people)i от общо %(x_nb_total)i човека оцениха този преглед за "
 "полезен"
 
-#: invenio/legacy/webcomment/templates.py:560
+#: invenio/legacy/webcomment/templates.py:559
 #, fuzzy
 msgid "Undelete review"
 msgstr "Изтриване на избраните отзиви"
 
-#: invenio/legacy/webcomment/templates.py:569
+#: invenio/legacy/webcomment/templates.py:568
 #, fuzzy
 msgid "Delete review"
 msgstr "Изтриване на избраните отзиви"
 
-#: invenio/legacy/webcomment/templates.py:575
+#: invenio/legacy/webcomment/templates.py:574
 #, fuzzy
 msgid "Unreport review"
 msgstr "Напишете вашия преглед"
 
-#: invenio/legacy/webcomment/templates.py:682
-#: invenio/legacy/webcomment/templates.py:698
-#: invenio/legacy/webcomment/webinterface.py:248
-#: invenio/legacy/webcomment/webinterface.py:466
+#: invenio/legacy/webcomment/templates.py:681
+#: invenio/legacy/webcomment/templates.py:697
+#: invenio/legacy/webcomment/webinterface.py:252
+#: invenio/legacy/webcomment/webinterface.py:472
 #: invenio/legacy/websearch/adminlib.py:3406
 #: invenio/legacy/websubmit/templates.py:2449
 #: invenio/modules/comments/views.py:188
 msgid "Comments"
 msgstr "Коментари"
 
-#: invenio/legacy/webcomment/templates.py:683
-#: invenio/legacy/webcomment/templates.py:699
-#: invenio/legacy/webcomment/webinterface.py:248
-#: invenio/legacy/webcomment/webinterface.py:466
+#: invenio/legacy/webcomment/templates.py:682
+#: invenio/legacy/webcomment/templates.py:698
+#: invenio/legacy/webcomment/webinterface.py:252
+#: invenio/legacy/webcomment/webinterface.py:472
 #: invenio/legacy/websearch/adminlib.py:3407
 #: invenio/modules/comments/views.py:222
 msgid "Reviews"
 msgstr "Прегледи"
 
-#: invenio/legacy/webcomment/templates.py:942
+#: invenio/legacy/webcomment/templates.py:941
 #, fuzzy, python-format
 msgid "There is a total of %(x_num)s reviews"
 msgstr "Има общо %s прегледа"
 
-#: invenio/legacy/webcomment/templates.py:944
+#: invenio/legacy/webcomment/templates.py:943
 #, fuzzy, python-format
 msgid "There is a total of %(x_num)s comments"
 msgstr "Има общо %s коментара"
 
-#: invenio/legacy/webcomment/templates.py:956
+#: invenio/legacy/webcomment/templates.py:955
 msgid "Be the first to review this document."
 msgstr "Бъдете първия, който ще оцени този документ."
 
-#: invenio/legacy/webcomment/templates.py:975
+#: invenio/legacy/webcomment/templates.py:974
 msgid "Subscribe"
 msgstr "Абониране"
 
-#: invenio/legacy/webcomment/templates.py:993
+#: invenio/legacy/webcomment/templates.py:992
 #, fuzzy
 msgid "Unsubscribe"
 msgstr "Абониране"
 
-#: invenio/legacy/webcomment/templates.py:1010
-#: invenio/legacy/webcomment/templates.py:1787
+#: invenio/legacy/webcomment/templates.py:1009
+#: invenio/legacy/webcomment/templates.py:1786
 #: invenio/legacy/websearch/templates.py:548
 #: invenio/modules/comments/templates/comments/subscriptions_base.html:40
 #: invenio/modules/editor/templates/editor/recordmenu.html:22
@@ -8067,43 +8072,43 @@ msgstr "Абониране"
 msgid "Record"
 msgstr "Запис"
 
-#: invenio/legacy/webcomment/templates.py:1020
-#: invenio/legacy/webcomment/templates.py:1088
+#: invenio/legacy/webcomment/templates.py:1019
+#: invenio/legacy/webcomment/templates.py:1087
 msgid "review"
 msgstr "преглед"
 
-#: invenio/legacy/webcomment/templates.py:1020
-#: invenio/legacy/webcomment/templates.py:1088
+#: invenio/legacy/webcomment/templates.py:1019
+#: invenio/legacy/webcomment/templates.py:1087
 msgid "comment"
 msgstr "коментар"
 
-#: invenio/legacy/webcomment/templates.py:1023
-#: invenio/legacy/webcomment/templates.py:2028
+#: invenio/legacy/webcomment/templates.py:1022
+#: invenio/legacy/webcomment/templates.py:2027
 msgid "Review"
 msgstr "Преглед"
 
-#: invenio/legacy/webcomment/templates.py:1086
+#: invenio/legacy/webcomment/templates.py:1085
 msgid "Viewing"
 msgstr "Преглеждане"
 
-#: invenio/legacy/webcomment/templates.py:1087
+#: invenio/legacy/webcomment/templates.py:1086
 msgid "Page:"
 msgstr "Страница: "
 
-#: invenio/legacy/webcomment/templates.py:1101
+#: invenio/legacy/webcomment/templates.py:1100
 #, fuzzy
 msgid "You are not authorized to comment or review."
 msgstr "Вие не сте упълномощен да разглеждате тази зона"
 
-#: invenio/legacy/webcomment/templates.py:1271
+#: invenio/legacy/webcomment/templates.py:1270
 #, fuzzy, python-format
 msgid ""
 "Note: Your nickname, %(nick)s, will be displayed as author of this "
 "comment."
 msgstr "Забележка: Вашият прякор, %s, ще бъде показан като автор на този документ"
 
-#: invenio/legacy/webcomment/templates.py:1276
-#: invenio/legacy/webcomment/templates.py:1393
+#: invenio/legacy/webcomment/templates.py:1275
+#: invenio/legacy/webcomment/templates.py:1392
 #, python-format
 msgid ""
 "Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. "
@@ -8112,91 +8117,91 @@ msgstr ""
 "Забележка: не сте %(x_url_open)sзадали своя прякор%(x_url_close)s. "
 "%(x_nickname)s ще бъде показан като автор на този коментар."
 
-#: invenio/legacy/webcomment/templates.py:1293
+#: invenio/legacy/webcomment/templates.py:1292
 msgid "Once logged in, authorized users can also attach files."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1308
+#: invenio/legacy/webcomment/templates.py:1307
 msgid "Optionally, attach a file to this comment"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1309
+#: invenio/legacy/webcomment/templates.py:1308
 msgid "Optionally, attach files to this comment"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1310
+#: invenio/legacy/webcomment/templates.py:1309
 #, fuzzy
 msgid "Max one file"
 msgstr "Добавяне на ново правило"
 
-#: invenio/legacy/webcomment/templates.py:1311
+#: invenio/legacy/webcomment/templates.py:1310
 #, fuzzy, python-format
 msgid "Max %(maxfiles)i files"
 msgstr "Главн(и) файл(ове)"
 
-#: invenio/legacy/webcomment/templates.py:1312
+#: invenio/legacy/webcomment/templates.py:1311
 #, python-format
 msgid "Max %(x_nb_bytes)s per file"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1327
+#: invenio/legacy/webcomment/templates.py:1326
 msgid "Send me an email when a new comment is posted"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1342
-#: invenio/legacy/webcomment/templates.py:1464
+#: invenio/legacy/webcomment/templates.py:1341
+#: invenio/legacy/webcomment/templates.py:1463
 msgid "Article"
 msgstr "Статия"
 
-#: invenio/legacy/webcomment/templates.py:1344
+#: invenio/legacy/webcomment/templates.py:1343
 msgid "Add comment"
 msgstr "Добавяне на коментар"
 
-#: invenio/legacy/webcomment/templates.py:1389
+#: invenio/legacy/webcomment/templates.py:1388
 #, fuzzy, python-format
 msgid ""
 "Note: Your nickname, %(x_name)s, will be displayed as the author of this "
 "review."
 msgstr "Забележка: Вашият прякор, %s, ще бъде показан като автор на този преглед."
 
-#: invenio/legacy/webcomment/templates.py:1465
+#: invenio/legacy/webcomment/templates.py:1464
 msgid "Rate this article"
 msgstr "Оцени статията"
 
-#: invenio/legacy/webcomment/templates.py:1466
+#: invenio/legacy/webcomment/templates.py:1465
 msgid "Select a score"
 msgstr "Избери точки"
 
-#: invenio/legacy/webcomment/templates.py:1467
+#: invenio/legacy/webcomment/templates.py:1466
 msgid "Give a title to your review"
 msgstr "Озаглавете вашия преглед"
 
-#: invenio/legacy/webcomment/templates.py:1468
+#: invenio/legacy/webcomment/templates.py:1467
 msgid "Write your review"
 msgstr "Напишете вашия преглед"
 
-#: invenio/legacy/webcomment/templates.py:1473
+#: invenio/legacy/webcomment/templates.py:1472
 msgid "Add review"
 msgstr "Добавяне на преглед"
 
-#: invenio/legacy/webcomment/templates.py:1483
-#: invenio/legacy/webcomment/webinterface.py:511
+#: invenio/legacy/webcomment/templates.py:1482
+#: invenio/legacy/webcomment/webinterface.py:517
 msgid "Add Review"
 msgstr "Добавете преглед"
 
-#: invenio/legacy/webcomment/templates.py:1505
+#: invenio/legacy/webcomment/templates.py:1504
 msgid "Your review was successfully added."
 msgstr "Вашият преглед беше успешно добавен."
 
-#: invenio/legacy/webcomment/templates.py:1507
+#: invenio/legacy/webcomment/templates.py:1506
 msgid "Your comment was successfully added."
 msgstr "Вашият коментар беше успешно добавен."
 
-#: invenio/legacy/webcomment/templates.py:1510
+#: invenio/legacy/webcomment/templates.py:1509
 msgid "Back to record"
 msgstr "Обратно към записа"
 
-#: invenio/legacy/webcomment/templates.py:1512
+#: invenio/legacy/webcomment/templates.py:1511
 #, fuzzy, python-format
 msgid ""
 "You can also view all the comments you have submitted so far on "
@@ -8205,55 +8210,55 @@ msgstr ""
 "Може да направите справка със списъка на %(x_url_open)sвашите "
 "групи%(x_url_close)s."
 
-#: invenio/legacy/webcomment/templates.py:1592
+#: invenio/legacy/webcomment/templates.py:1591
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:171
 #, fuzzy
 msgid "View most commented records"
 msgstr "преглед на коментарите"
 
-#: invenio/legacy/webcomment/templates.py:1594
+#: invenio/legacy/webcomment/templates.py:1593
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:207
 #, fuzzy
 msgid "View latest commented records"
 msgstr "преглед на коментарите"
 
-#: invenio/legacy/webcomment/templates.py:1596
+#: invenio/legacy/webcomment/templates.py:1595
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:140
 #, fuzzy
 msgid "View all comments reported as abuse"
 msgstr "Преглед на всички потребители, за които е гласувано"
 
-#: invenio/legacy/webcomment/templates.py:1600
+#: invenio/legacy/webcomment/templates.py:1599
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:170
 #, fuzzy
 msgid "View most reviewed records"
 msgstr "премахване на записите"
 
-#: invenio/legacy/webcomment/templates.py:1602
+#: invenio/legacy/webcomment/templates.py:1601
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:206
 #, fuzzy
 msgid "View latest reviewed records"
 msgstr "Преглед на всички %s прегледа"
 
-#: invenio/legacy/webcomment/templates.py:1604
+#: invenio/legacy/webcomment/templates.py:1603
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:140
 #, fuzzy
 msgid "View all reviews reported as abuse"
 msgstr "Преглед на всички потребители, за които е гласувано"
 
-#: invenio/legacy/webcomment/templates.py:1612
+#: invenio/legacy/webcomment/templates.py:1611
 msgid "View all users who have been reported"
 msgstr "Преглед на всички потребители, които са дали коментар"
 
-#: invenio/legacy/webcomment/templates.py:1614
+#: invenio/legacy/webcomment/templates.py:1613
 msgid "Guide"
 msgstr "Ръководство"
 
-#: invenio/legacy/webcomment/templates.py:1616
+#: invenio/legacy/webcomment/templates.py:1615
 msgid "Comments and reviews are disabled"
 msgstr "Коментарите и прегледите не са активирани"
 
-#: invenio/legacy/webcomment/templates.py:1636
+#: invenio/legacy/webcomment/templates.py:1635
 msgid ""
 "Please enter the ID of the comment/review so that you can view it before "
 "deciding whether to delete it or not"
@@ -8261,38 +8266,38 @@ msgstr ""
 "Моля въведете ID на коментара/прегледа за да може да го прегледате преди "
 "да решите дали да го изтриете"
 
-#: invenio/legacy/webcomment/templates.py:1660
+#: invenio/legacy/webcomment/templates.py:1659
 msgid "Comment ID:"
 msgstr "ID на коментара:"
 
-#: invenio/legacy/webcomment/templates.py:1661
+#: invenio/legacy/webcomment/templates.py:1660
 msgid "Or enter a record ID to list all the associated comments/reviews:"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1662
+#: invenio/legacy/webcomment/templates.py:1661
 #, fuzzy
 msgid "Record ID:"
 msgstr "ID на записа"
 
-#: invenio/legacy/webcomment/templates.py:1664
+#: invenio/legacy/webcomment/templates.py:1663
 msgid "View Comment"
 msgstr "Преглед на коментар"
 
-#: invenio/legacy/webcomment/templates.py:1685
+#: invenio/legacy/webcomment/templates.py:1684
 msgid "There have been no reports so far."
 msgstr "До сега няма коментари."
 
-#: invenio/legacy/webcomment/templates.py:1689
+#: invenio/legacy/webcomment/templates.py:1688
 #, fuzzy, python-format
 msgid "View all %(x_name)s reported comments"
 msgstr "Преглед на всички %s коментари"
 
-#: invenio/legacy/webcomment/templates.py:1692
+#: invenio/legacy/webcomment/templates.py:1691
 #, fuzzy, python-format
 msgid "View all %(x_name)s reported reviews"
 msgstr "Преглед на всички %s прегледи"
 
-#: invenio/legacy/webcomment/templates.py:1729
+#: invenio/legacy/webcomment/templates.py:1728
 msgid ""
 "Here is a list, sorted by total number of reports, of all users who have "
 "had a comment reported at least once."
@@ -8300,295 +8305,295 @@ msgstr ""
 "Това е списък, сортиран по общия брой отзиви, на всички потребители, "
 "които са имали поне един отзив на някой от техните коментари."
 
-#: invenio/legacy/webcomment/templates.py:1737
-#: invenio/legacy/webcomment/templates.py:1766
+#: invenio/legacy/webcomment/templates.py:1736
+#: invenio/legacy/webcomment/templates.py:1765
 #: invenio/legacy/websession/templates.py:272
 #: invenio/legacy/websession/templates.py:1221
 #: invenio/modules/accounts/forms.py:46 invenio/modules/accounts/forms.py:164
 msgid "Nickname"
 msgstr "Псевдоним"
 
-#: invenio/legacy/webcomment/templates.py:1739
-#: invenio/legacy/webcomment/templates.py:1768
+#: invenio/legacy/webcomment/templates.py:1738
+#: invenio/legacy/webcomment/templates.py:1767
 msgid "User ID"
 msgstr "ID на потребителя"
 
-#: invenio/legacy/webcomment/templates.py:1741
+#: invenio/legacy/webcomment/templates.py:1740
 msgid "Number positive votes"
 msgstr "Брой на положителните гласове"
 
-#: invenio/legacy/webcomment/templates.py:1742
+#: invenio/legacy/webcomment/templates.py:1741
 msgid "Number negative votes"
 msgstr "Брой на отрицателните гласове"
 
-#: invenio/legacy/webcomment/templates.py:1743
+#: invenio/legacy/webcomment/templates.py:1742
 msgid "Total number votes"
 msgstr "Пълен брой на гласовете"
 
-#: invenio/legacy/webcomment/templates.py:1744
+#: invenio/legacy/webcomment/templates.py:1743
 msgid "Total number of reports"
 msgstr "Пълен брой отзиви"
 
-#: invenio/legacy/webcomment/templates.py:1745
+#: invenio/legacy/webcomment/templates.py:1744
 msgid "View all user's reported comments/reviews"
 msgstr "Преглеждане на всички коментари на потребителя"
 
-#: invenio/legacy/webcomment/templates.py:1778
+#: invenio/legacy/webcomment/templates.py:1777
 #, fuzzy, python-format
 msgid "This review has been reported %(x_num)i times"
 msgstr "За този преглед е гласувано %i пъти"
 
-#: invenio/legacy/webcomment/templates.py:1780
+#: invenio/legacy/webcomment/templates.py:1779
 #, fuzzy, python-format
 msgid "This comment has been reported %(x_num)i times"
 msgstr "За този коментар е гласувано %i пъти"
 
-#: invenio/legacy/webcomment/templates.py:2029
+#: invenio/legacy/webcomment/templates.py:2028
 msgid "Written by"
 msgstr "Написано от"
 
-#: invenio/legacy/webcomment/templates.py:2030
+#: invenio/legacy/webcomment/templates.py:2029
 msgid "General informations"
 msgstr "Обща информация"
 
-#: invenio/legacy/webcomment/templates.py:2045
+#: invenio/legacy/webcomment/templates.py:2044
 msgid "Delete selected reviews"
 msgstr "Изтриване на избраните отзиви"
 
-#: invenio/legacy/webcomment/templates.py:2046
-#: invenio/legacy/webcomment/templates.py:2053
+#: invenio/legacy/webcomment/templates.py:2045
+#: invenio/legacy/webcomment/templates.py:2052
 msgid "Suppress selected abuse report"
 msgstr "Забрана на избраното сведение за обида"
 
-#: invenio/legacy/webcomment/templates.py:2047
+#: invenio/legacy/webcomment/templates.py:2046
 #, fuzzy
 msgid "Undelete selected reviews"
 msgstr "Изтриване на избраните отзиви"
 
-#: invenio/legacy/webcomment/templates.py:2051
+#: invenio/legacy/webcomment/templates.py:2050
 #, fuzzy
 msgid "Undelete selected comments"
 msgstr "Изтриване на избраните коментари"
 
-#: invenio/legacy/webcomment/templates.py:2052
+#: invenio/legacy/webcomment/templates.py:2051
 msgid "Delete selected comments"
 msgstr "Изтриване на избраните коментари"
 
-#: invenio/legacy/webcomment/templates.py:2067
+#: invenio/legacy/webcomment/templates.py:2066
 #, fuzzy, python-format
 msgid "Here are the reported reviews of user %(x_name)s"
 msgstr "Това са прегледите на потребител %s"
 
-#: invenio/legacy/webcomment/templates.py:2069
+#: invenio/legacy/webcomment/templates.py:2068
 #, fuzzy, python-format
 msgid "Here are the reported comments of user %(x_name)s"
 msgstr "Това са коментарите на потребител %s"
 
-#: invenio/legacy/webcomment/templates.py:2073
+#: invenio/legacy/webcomment/templates.py:2072
 #, fuzzy, python-format
 msgid "Here is review %(x_name)s"
 msgstr "Това е коментар/преглед %s"
 
-#: invenio/legacy/webcomment/templates.py:2075
+#: invenio/legacy/webcomment/templates.py:2074
 #, fuzzy, python-format
 msgid "Here is comment %(x_name)s"
 msgstr "Това е коментар/преглед %s"
 
-#: invenio/legacy/webcomment/templates.py:2078
+#: invenio/legacy/webcomment/templates.py:2077
 #, fuzzy, python-format
 msgid "Here is review %(x_cmtID)s written by user %(x_user)s"
 msgstr "Това е коментар/преглед %(x_cmtID)s написан от %(x_user)s"
 
-#: invenio/legacy/webcomment/templates.py:2080
+#: invenio/legacy/webcomment/templates.py:2079
 #, fuzzy, python-format
 msgid "Here is comment %(x_cmtID)s written by user %(x_user)s"
 msgstr "Това е коментар/преглед %(x_cmtID)s написан от %(x_user)s"
 
-#: invenio/legacy/webcomment/templates.py:2086
+#: invenio/legacy/webcomment/templates.py:2085
 msgid "Here are all reported reviews sorted by the most reported"
 msgstr ""
 "Това са всички прегледи, за които е гласувано, сортирани по тези, за "
 "които е гласувано най-много"
 
-#: invenio/legacy/webcomment/templates.py:2088
+#: invenio/legacy/webcomment/templates.py:2087
 msgid "Here are all reported comments sorted by the most reported"
 msgstr ""
 "Това са всички коментари, за които е гласувано, сортирани по тези, за "
 "които е гласувано най-много"
 
-#: invenio/legacy/webcomment/templates.py:2093
+#: invenio/legacy/webcomment/templates.py:2092
 #, fuzzy, python-format
 msgid "Here are all reviews for record %(x_num)i, sorted by the most reported"
 msgstr ""
 "Това са всички прегледи, за които е гласувано, сортирани по тези, за "
 "които е гласувано най-много"
 
-#: invenio/legacy/webcomment/templates.py:2094
+#: invenio/legacy/webcomment/templates.py:2093
 #, fuzzy
 msgid "Show comments"
 msgstr "преглед на коментарите"
 
-#: invenio/legacy/webcomment/templates.py:2096
+#: invenio/legacy/webcomment/templates.py:2095
 #, fuzzy, python-format
 msgid "Here are all comments for record %(x_num)i, sorted by the most reported"
 msgstr ""
 "Това са всички коментари, за които е гласувано, сортирани по тези, за "
 "които е гласувано най-много"
 
-#: invenio/legacy/webcomment/templates.py:2097
+#: invenio/legacy/webcomment/templates.py:2096
 #, fuzzy
 msgid "Show reviews"
 msgstr "преглед"
 
-#: invenio/legacy/webcomment/templates.py:2122
-#: invenio/legacy/webcomment/templates.py:2146
-#: invenio/legacy/webcomment/templates.py:2172
+#: invenio/legacy/webcomment/templates.py:2121
+#: invenio/legacy/webcomment/templates.py:2145
+#: invenio/legacy/webcomment/templates.py:2171
 msgid "comment ID"
 msgstr "ID на коментара"
 
-#: invenio/legacy/webcomment/templates.py:2122
+#: invenio/legacy/webcomment/templates.py:2121
 msgid "successfully deleted"
 msgstr "успешно изтрит"
 
-#: invenio/legacy/webcomment/templates.py:2146
+#: invenio/legacy/webcomment/templates.py:2145
 #, fuzzy
 msgid "successfully undeleted"
 msgstr "успешно изтрит"
 
-#: invenio/legacy/webcomment/templates.py:2172
+#: invenio/legacy/webcomment/templates.py:2171
 msgid "successfully suppressed abuse report"
 msgstr "успешно забранена обида"
 
-#: invenio/legacy/webcomment/templates.py:2189
+#: invenio/legacy/webcomment/templates.py:2188
 msgid "Not yet reviewed"
 msgstr "Все още не е прегледано"
 
-#: invenio/legacy/webcomment/templates.py:2257
+#: invenio/legacy/webcomment/templates.py:2256
 #, python-format
 msgid "The following review was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2258
+#: invenio/legacy/webcomment/templates.py:2257
 #, python-format
 msgid "The following comment was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2285
+#: invenio/legacy/webcomment/templates.py:2284
 msgid "This is an automatic message, please don't reply to it."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2287
+#: invenio/legacy/webcomment/templates.py:2286
 #, python-format
 msgid "To post another comment, go to <%(x_url)s> instead."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2292
+#: invenio/legacy/webcomment/templates.py:2291
 #, python-format
 msgid "To specifically reply to this comment, go to <%(x_url)s>"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2297
+#: invenio/legacy/webcomment/templates.py:2296
 #, python-format
 msgid "To unsubscribe from this discussion, go to <%(x_url)s>"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2301
+#: invenio/legacy/webcomment/templates.py:2300
 #, python-format
 msgid "For any question, please use <%(CFG_SITE_SUPPORT_EMAIL)s>"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2368
+#: invenio/legacy/webcomment/templates.py:2367
 #, fuzzy
 msgid "Your comment will be lost."
 msgstr "Вашият коментар е успешно публикуван"
 
-#: invenio/legacy/webcomment/templates.py:2406
+#: invenio/legacy/webcomment/templates.py:2405
 #, fuzzy
 msgid "Oldest comment first"
 msgstr "Изтриване на коментари"
 
-#: invenio/legacy/webcomment/templates.py:2407
+#: invenio/legacy/webcomment/templates.py:2406
 #, fuzzy
 msgid "Latest comment first"
 msgstr "първо най-новите"
 
-#: invenio/legacy/webcomment/templates.py:2408
+#: invenio/legacy/webcomment/templates.py:2407
 msgid "Group by record, oldest commented first"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2409
+#: invenio/legacy/webcomment/templates.py:2408
 #, fuzzy
 msgid "Group by record, latest commented first"
 msgstr "преглед на коментарите"
 
-#: invenio/legacy/webcomment/templates.py:2411
+#: invenio/legacy/webcomment/templates.py:2410
 #, fuzzy
 msgid "Records and comments"
 msgstr "Детайли и коментари"
 
-#: invenio/legacy/webcomment/templates.py:2412
+#: invenio/legacy/webcomment/templates.py:2411
 #, fuzzy
 msgid "Records only"
 msgstr "Намерени са %s записа"
 
-#: invenio/legacy/webcomment/templates.py:2413
+#: invenio/legacy/webcomment/templates.py:2412
 #, fuzzy
 msgid "Comments only"
 msgstr "Коментари"
 
+#: invenio/legacy/webcomment/templates.py:2414
 #: invenio/legacy/webcomment/templates.py:2415
 #: invenio/legacy/webcomment/templates.py:2416
 #: invenio/legacy/webcomment/templates.py:2417
-#: invenio/legacy/webcomment/templates.py:2418
 #, fuzzy, python-format
 msgid "%(x_i)s items"
 msgstr "Време"
 
-#: invenio/legacy/webcomment/templates.py:2419
+#: invenio/legacy/webcomment/templates.py:2418
 #, fuzzy
 msgid "All items"
 msgstr "Добавяне към потребителите"
 
-#: invenio/legacy/webcomment/templates.py:2422
+#: invenio/legacy/webcomment/templates.py:2421
 msgid "Below is the list of the comments you have submitted so far."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2426
+#: invenio/legacy/webcomment/templates.py:2425
 msgid "You have not yet submitted any comment in the document \"discussion\" tab."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2429
-#: invenio/legacy/webcomment/templates.py:2437
-#: invenio/legacy/webcomment/templates.py:2445
+#: invenio/legacy/webcomment/templates.py:2428
+#: invenio/legacy/webcomment/templates.py:2436
+#: invenio/legacy/webcomment/templates.py:2444
 msgid "You might find other comments here: "
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2457
+#: invenio/legacy/webcomment/templates.py:2456
 msgid ""
 "You have not yet submitted any comment. Browse documents from the search "
 "interface and take part to discussions!"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2485
+#: invenio/legacy/webcomment/templates.py:2484
 msgid "Display"
 msgstr "Показване"
 
-#: invenio/legacy/webcomment/templates.py:2486
+#: invenio/legacy/webcomment/templates.py:2485
 #, fuzzy
 msgid "Order by"
 msgstr "Дата на създаване"
 
-#: invenio/legacy/webcomment/templates.py:2487
+#: invenio/legacy/webcomment/templates.py:2486
 #, fuzzy
 msgid "Per page"
 msgstr "Следваща страница"
 
-#: invenio/legacy/webcomment/templates.py:2491
+#: invenio/legacy/webcomment/templates.py:2490
 #, fuzzy
 msgid "Display options"
 msgstr "Показване на известията"
 
-#: invenio/legacy/webcomment/templates.py:2492
+#: invenio/legacy/webcomment/templates.py:2491
 #: invenio/legacy/webjournal/adminlib.py:328
 #: invenio/legacy/webjournal/adminlib.py:345
 #: invenio/legacy/webjournal/templates.py:457
@@ -8597,106 +8602,106 @@ msgstr "Показване на известията"
 msgid "Refresh"
 msgstr "Референции"
 
-#: invenio/legacy/webcomment/templates.py:2521
+#: invenio/legacy/webcomment/templates.py:2520
 msgid "Comment deleted by the moderator"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2523
+#: invenio/legacy/webcomment/templates.py:2522
 msgid "You have deleted this comment: it is not visible by other users"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2530
+#: invenio/legacy/webcomment/templates.py:2529
 #, fuzzy
 msgid "(in reply to a comment)"
 msgstr "Изтриване на коментар"
 
-#: invenio/legacy/webcomment/templates.py:2535
+#: invenio/legacy/webcomment/templates.py:2534
 msgid "See comment on discussion page"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2574
+#: invenio/legacy/webcomment/templates.py:2573
 #, python-format
 msgid "%(x_num)i comments found in total (not shown on this page)"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2576
+#: invenio/legacy/webcomment/templates.py:2575
 #, fuzzy, python-format
 msgid "%(x_num)i items found in total"
 msgstr "Не бяха намерени стойности."
 
-#: invenio/legacy/webcomment/webinterface.py:272
-#: invenio/legacy/webcomment/webinterface.py:530
+#: invenio/legacy/webcomment/webinterface.py:276
+#: invenio/legacy/webcomment/webinterface.py:536
 msgid "Record Not Found"
 msgstr "Записът не е намерен"
 
-#: invenio/legacy/webcomment/webinterface.py:350
-#: invenio/legacy/webcomment/webinterface.py:591
-#: invenio/legacy/webcomment/webinterface.py:668
+#: invenio/legacy/webcomment/webinterface.py:354
+#: invenio/legacy/webcomment/webinterface.py:597
+#: invenio/legacy/webcomment/webinterface.py:674
 msgid "Specified comment does not belong to this record"
 msgstr ""
 
-#: invenio/legacy/webcomment/webinterface.py:359
-#: invenio/legacy/webcomment/webinterface.py:597
-#: invenio/legacy/webcomment/webinterface.py:674
+#: invenio/legacy/webcomment/webinterface.py:363
+#: invenio/legacy/webcomment/webinterface.py:603
+#: invenio/legacy/webcomment/webinterface.py:680
 #, fuzzy
 msgid "You do not have access to the specified comment"
 msgstr "Нямате достатъчно права за достъп до съдържанието на кошницата."
 
-#: invenio/legacy/webcomment/webinterface.py:431
+#: invenio/legacy/webcomment/webinterface.py:437
 #, python-format
 msgid ""
 "The size of file \\\"%(x_file)s\\\" (%(x_size)s) is larger than maximum "
 "allowed file size (%(x_max)s). Select files again."
 msgstr ""
 
-#: invenio/legacy/webcomment/webinterface.py:513
+#: invenio/legacy/webcomment/webinterface.py:519
 #: invenio/legacy/websubmit/templates.py:2445
 #: invenio/legacy/websubmit/templates.py:2446
 msgid "Add Comment"
 msgstr "Добавяне на коментар"
 
-#: invenio/legacy/webcomment/webinterface.py:602
+#: invenio/legacy/webcomment/webinterface.py:608
 msgid "You cannot vote for a deleted comment"
 msgstr ""
 
-#: invenio/legacy/webcomment/webinterface.py:679
+#: invenio/legacy/webcomment/webinterface.py:685
 #, fuzzy
 msgid "You cannot report a deleted comment"
 msgstr "Преглед на всички коментари"
 
-#: invenio/legacy/webcomment/webinterface.py:826
-#: invenio/legacy/webcomment/webinterface.py:866
+#: invenio/legacy/webcomment/webinterface.py:832
+#: invenio/legacy/webcomment/webinterface.py:872
 #, fuzzy
 msgid "Page Not Found"
 msgstr "Страницата %s не е намерена"
 
-#: invenio/legacy/webcomment/webinterface.py:827
+#: invenio/legacy/webcomment/webinterface.py:833
 #, fuzzy
 msgid "The requested comment could not be found"
 msgstr "Записът не съществува."
 
-#: invenio/legacy/webcomment/webinterface.py:847
+#: invenio/legacy/webcomment/webinterface.py:853
 msgid "You cannot access files of a deleted comment"
 msgstr ""
 
-#: invenio/legacy/webcomment/webinterface.py:867
+#: invenio/legacy/webcomment/webinterface.py:873
 #, fuzzy
 msgid "The requested file could not be found"
 msgstr "Записът не съществува."
 
-#: invenio/legacy/webcomment/webinterface.py:910
+#: invenio/legacy/webcomment/webinterface.py:916
 #, fuzzy
 msgid "You are not authorized to use comments."
 msgstr "Вие не сте упълномощен да разглеждате тази зона"
 
-#: invenio/legacy/webcomment/webinterface.py:912
+#: invenio/legacy/webcomment/webinterface.py:918
 #: invenio/legacy/websession/templates.py:635
 #: invenio/legacy/websession/templates.py:788
 #, fuzzy
 msgid "Your Comments"
 msgstr "Коментари"
 
-#: invenio/legacy/webcomment/webinterface.py:924
+#: invenio/legacy/webcomment/webinterface.py:930
 #, fuzzy, python-format
 msgid "%(x_name)s View your previously submitted comments"
 msgstr "Преглед на всички коментари"
@@ -13133,7 +13138,7 @@ msgid "Problem with login."
 msgstr ""
 
 #: invenio/modules/accounts/views/accounts.py:138
-#, fuzzy, python-format
+#, fuzzy
 msgid "You can now access your account."
 msgstr "Сега може да влезете във вашата %(x_url_open)sсметка%(x_url_close)s."
 
@@ -13628,7 +13633,7 @@ msgid "Record ID %(recid)s is not a number."
 msgstr ""
 
 #: invenio/modules/comments/forms.py:38 invenio/modules/messages/forms.py:80
-#, fuzzy, python-format
+#, fuzzy
 msgid ""
 "Your message is too long, please edit it. Maximum size allowed is "
 "%{length}i characters."
@@ -13677,12 +13682,12 @@ msgid "Review was sent"
 msgstr "Написване на коментар"
 
 #: invenio/modules/comments/views.py:263
-#, fuzzy, python-format
+#, fuzzy
 msgid "Comment has been reported."
 msgstr "За този коментар е гласувано %i пъти"
 
 #: invenio/modules/comments/views.py:265
-#, fuzzy, python-format
+#, fuzzy
 msgid "Comment has been already reported."
 msgstr "За този коментар е гласувано %i пъти"
 
@@ -13767,7 +13772,7 @@ msgid ""
 msgstr ""
 
 #: invenio/modules/communities/forms.py:150
-#, fuzzy, python-format
+#, fuzzy
 msgid "The identifier already exists. Please choose a different one."
 msgstr "Желаният псевдоним %s вече съществува в базата от данни."
 
@@ -13911,7 +13916,7 @@ msgid "Invalid deposition type."
 msgstr ""
 
 #: invenio/modules/deposit/views/deposit.py:76
-#, fuzzy, python-format
+#, fuzzy
 msgid "Deposition does not exists."
 msgstr "Функцията %s не съществува."
 
@@ -14193,7 +14198,7 @@ msgstr "Показване на всичките %i автора"
 msgid "Manage Files of This Record"
 msgstr ""
 
-#: invenio/modules/formatter/format_elements/bfe_edit_record.py:47
+#: invenio/modules/formatter/format_elements/bfe_edit_record.py:52
 #, fuzzy
 msgid "Edit This Record"
 msgstr "Редактиране на друг запис"
@@ -14405,12 +14410,12 @@ msgstr "Вие не сте администратор на никоя група
 msgid "Members"
 msgstr "Няма членове."
 
-#: invenio/modules/indexer/admin.py:78
+#: invenio/modules/indexer/admin.py:79
 #, fuzzy
 msgid "Knowledge base name"
 msgstr "Бази от знания"
 
-#: invenio/modules/indexer/admin.py:81 invenio/modules/indexer/admin.py:93
+#: invenio/modules/indexer/admin.py:82 invenio/modules/indexer/admin.py:93
 #: invenio/modules/knowledge/forms.py:74
 #, fuzzy
 msgid "-None-"
@@ -14420,11 +14425,11 @@ msgstr "Готово"
 msgid "Stemming language"
 msgstr ""
 
-#: invenio/modules/indexer/admin.py:99
+#: invenio/modules/indexer/admin.py:98
 msgid "Tokenizer"
 msgstr ""
 
-#: invenio/modules/indexer/admin.py:105
+#: invenio/modules/indexer/admin.py:104
 #, fuzzy
 msgid "Index fields"
 msgstr "всички"
@@ -14470,13 +14475,14 @@ msgid "Create KB \"Dynamic\""
 msgstr ""
 
 #: invenio/modules/knowledge/templates/knowledge/list.html:34
-#, fuzzy, python-format
+#, fuzzy
 msgid "Create new record \"Written As\""
 msgstr "Има %i кошници"
 
 #: invenio/modules/knowledge/templates/knowledge/list.html:34
-msgid "Create KB \"Writtes As\""
-msgstr ""
+#, fuzzy
+msgid "Create KB \"Written As\""
+msgstr "Има %i кошници"
 
 #: invenio/modules/knowledge/templates/knowledge/list.html:70
 #, fuzzy
@@ -14641,19 +14647,19 @@ msgstr ""
 msgid "Confidential"
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:143
+#: invenio/modules/oauth2server/models.py:144
 msgid "Name of application (displayed to users)."
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:154
+#: invenio/modules/oauth2server/models.py:155
 msgid "Optional. Description of the application (displayed to users)."
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:163
+#: invenio/modules/oauth2server/models.py:164
 msgid "Website URL"
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:164
+#: invenio/modules/oauth2server/models.py:165
 msgid "URL of your application (displayed to users)."
 msgstr ""
 
@@ -15089,7 +15095,7 @@ msgid "Tag name"
 msgstr "Псевдоним"
 
 #: invenio/modules/tags/views.py:199
-#, fuzzy, python-format
+#, fuzzy
 msgid "is already in use."
 msgstr "Желаният псевдоним %s вече съществува."
 
@@ -15448,7 +15454,7 @@ msgid "just now"
 msgstr "Сега трябва да"
 
 #: invenio/utils/date.py:555
-#, fuzzy, python-format
+#, fuzzy
 msgid " seconds ago"
 msgstr "%s секунди"
 
@@ -15506,1808 +15512,3 @@ msgstr "всички години"
 #, fuzzy
 msgid " years ago"
 msgstr "година"
-
-#~ msgid "Warning: Please, select a valid time"
-#~ msgstr "Моля, изберете категория"
-
-#~ msgid "Warning: Please, select a valid file"
-#~ msgstr "Моля, изберете категория"
-
-#~ msgid "Warning: Please, select a valid date"
-#~ msgstr "Моля, изберете категория"
-
-#~ msgid " or return to your %(x_url_open)ssearch%(x_url_close)s"
-#~ msgstr ""
-
-#~ msgid "*** basket name ***"
-#~ msgstr "Име на кошницата"
-
-#~ msgid ""
-#~ msgstr "На посочения адрес беше изпратен e-mail с информация за сметката."
-
-#~ msgid "Additional Citation Metrics"
-#~ msgstr "допълнителни файлове"
-
-#~ msgid "Sorry, you must log in to perform this action."
-#~ msgstr ""
-
-#~ msgid "Please log in first."
-#~ msgstr "Моля, първо влезте."
-
-#~ msgid "Use the top-right menu to log in."
-#~ msgstr "Използвайте менюто горе в дясно за вход в системата."
-
-#~ msgid "record"
-#~ msgstr "запис"
-
-#~ msgid "document"
-#~ msgstr "документ"
-
-#~ msgid "Sorry parameter missing..."
-#~ msgstr "Параметърът docid липсва"
-
-#~ msgid "Next Step"
-#~ msgstr "Следваща страница"
-
-#~ msgid "Acquisitions"
-#~ msgstr "Действия"
-
-#~ msgid "Order new book"
-#~ msgstr "Създаване на тема"
-
-#~ msgid "Renewalls"
-#~ msgstr "Прегледи"
-
-#~ msgid "A new loan has been registered."
-#~ msgstr "Създадена е нова сметка в"
-
-#~ msgid "Order new copy"
-#~ msgstr "Създаване на тема"
-
-#~ msgid "Book Information"
-#~ msgstr "Информация"
-
-#~ msgid "EAN"
-#~ msgstr "AND"
-
-#~ msgid "Publication place"
-#~ msgstr "Публична кошница"
-
-#~ msgid "Number of pages"
-#~ msgstr "Брой разглеждания"
-
-#~ msgid "Sub-library"
-#~ msgstr "Библиотека"
-
-#~ msgid "Price"
-#~ msgstr "Статия"
-
-#~ msgid "now"
-#~ msgstr "не"
-
-#~ msgid "BibCheck Admin"
-#~ msgstr "Администриране на BibFormat"
-
-#~ msgid "Not authorized"
-#~ msgstr "автор"
-
-#~ msgid "ERROR: %s does not exist"
-#~ msgstr "Потребителят %s не съществува."
-
-#~ msgid "Really delete"
-#~ msgstr "успешно изтрит"
-
-#~ msgid "Verify problem"
-#~ msgstr "Проблем с базата данни"
-
-#~ msgid "File"
-#~ msgstr "заглавие"
-
-#~ msgid "File %s already exists."
-#~ msgstr "Потребителят %s не съществува."
-
-#~ msgid "File %s: written OK."
-#~ msgstr "Написано от"
-
-#~ msgid "File %s: write failed."
-#~ msgstr "Изтриване на кошницата"
-
-#~ msgid "File %s deleted."
-#~ msgstr "Потребителят %s не съществува."
-
-#~ msgid "File %s: delete failed."
-#~ msgstr "Изтриване на кошницата"
-
-#~ msgid "Guests are not authorized to run batchuploader"
-#~ msgstr "Вие не сте упълномощен да разглеждате тази зона"
-
-#~ msgid "The user '%s' is not authorized to run batchuploader"
-#~ msgstr "Вие не сте упълномощен да разглеждате тази зона"
-
-#~ msgid "Open Tickets"
-#~ msgstr "Вашите кошници"
-
-#~ msgid "Additional Data for this Person"
-#~ msgstr "допълнителни файлове"
-
-#~ msgid "Forget decision"
-#~ msgstr "Настоящи членове"
-
-#~ msgid "Rejected!"
-#~ msgstr "Отхвърлен"
-
-#~ msgid "Your papers"
-#~ msgstr "Вашите известия"
-
-#~ msgid "Not your papers"
-#~ msgstr "Забравена парола?"
-
-#~ msgid "These are mine!"
-#~ msgstr "Има %i кошници"
-
-#~ msgid "These are not mine!"
-#~ msgstr "Има %i кошници"
-
-#~ msgid "Not Mine."
-#~ msgstr "Бележка"
-
-#~ msgid "Not Mine!"
-#~ msgstr "Бележка"
-
-#~ msgid "Tickets"
-#~ msgstr "Време"
-
-#~ msgid "Request Tickets"
-#~ msgstr "Правила"
-
-#~ msgid "Submit Attribution Information"
-#~ msgstr "Обща информация"
-
-#~ msgid "Please review your actions"
-#~ msgstr "Моля, изберете категория"
-
-#~ msgid "You are about to attribute the following paper"
-#~ msgstr "Вие сте член на следните групи:"
-
-#~ msgid "Navigation:"
-#~ msgstr "Цитирания"
-
-#~ msgid "Person Interface FAQ"
-#~ msgstr "Вътрешна грешка"
-
-#~ msgid "Person Search"
-#~ msgstr "Търсене"
-
-#~ msgid "Open tickets"
-#~ msgstr "Време"
-
-#~ msgid "Sorry."
-#~ msgstr "Извинете"
-
-#~ msgid "Please provide at least one transaction."
-#~ msgstr "Влезте в системата, за да извършите това действие."
-
-#~ msgid "Error:"
-#~ msgstr "Грешка"
-
-#~ msgid "Create a new Person for your search"
-#~ msgstr "Не са намерени резултати."
-
-#~ msgid "Id"
-#~ msgstr "Id"
-
-#~ msgid "A %s has been added."
-#~ msgstr "Групата %s е изтрита"
-
-#~ msgid "Barcoce"
-#~ msgstr "Преглеждане"
-
-#~ msgid "No fulltext"
-#~ msgstr "Пълен текст не е наличен"
-
-#~ msgid "last note on"
-#~ msgstr "последен коментар:"
-
-#~ msgid ", no notes yet"
-#~ msgstr "Бележка"
-
-#~ msgid "HTML brief"
-#~ msgstr "кратък HTML"
-
-#~ msgid "deleted"
-#~ msgstr "Изтриване"
-
-#~ msgid "in their rules and descriptions"
-#~ msgstr "Показване на клетката за последно добавени записи"
-
-#~ msgid "No such knowledge base"
-#~ msgstr "Непозната база от знания %s"
-
-#~ msgid "Date:"
-#~ msgstr "Дата"
-
-#~ msgid "Time:"
-#~ msgstr "Време"
-
-#~ msgid "Example:"
-#~ msgstr "Пример"
-
-#~ msgid "are mandatory"
-#~ msgstr "задължителен"
-
-#~ msgid "are mandatory."
-#~ msgstr "задължителен"
-
-#~ msgid "Check the"
-#~ msgstr "Натиснете тук"
-
-#~ msgid "Configure Bibknowledge"
-#~ msgstr "Конфигуриране на BibIndex"
-
-#~ msgid "creating a new basket"
-#~ msgstr "Създаване на кошница"
-
-#~ msgid "by"
-#~ msgstr "от"
-
-#~ msgid "on"
-#~ msgstr "на"
-
-#~ msgid "basket"
-#~ msgstr "кошници"
-
-#~ msgid "previous basket"
-#~ msgstr "Групови кошници"
-
-#~ msgid "Adding"
-#~ msgstr "Чакащ"
-
-#~ msgid "Please choose a basket"
-#~ msgstr "Моля, изберете категория"
-
-#~ msgid "Editing topic"
-#~ msgstr "Редактиране на кошница"
-
-#~ msgid "niceName"
-#~ msgstr "Име"
-
-#~ msgid "Apply Changes"
-#~ msgstr "Запазване на промените"
-
-#~ msgid "Edit this item"
-#~ msgstr "Редакция на институт"
-
-#~ msgid "return_date"
-#~ msgstr "Дата на създаване"
-
-#~ msgid "Record %s - Add a field"
-#~ msgstr "Запис %s - Добавяне на поле"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s"
-#~ msgstr "Редактиране на запис %(x_recid)s, поле %(x_field)s"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s - Add a subfield"
-#~ msgstr ""
-
-#~ msgid "Submit and save record %s"
-#~ msgstr "Изпращане и запазване на запис %s"
-
-#~ msgid "updated on"
-#~ msgstr "обновен на"
-
-#~ msgid "records"
-#~ msgstr "записи"
-
-#~ msgid "Number of views"
-#~ msgstr "Брой разглеждания"
-
-#~ msgid "Non-shared basket"
-#~ msgstr "Несподелена кошница"
-
-#~ msgid "Group-shared basket"
-#~ msgstr "Групово-споделена кошница"
-
-#~ msgid "last"
-#~ msgstr "последен"
-
-#~ msgid "There is a total of %i comments"
-#~ msgstr "Има общо %i коментари"
-
-#~ msgid "Select basket"
-#~ msgstr "Избор на кошница"
-
-#~ msgid "Add to a personal basket"
-#~ msgstr "Добавяне в лична кошница"
-
-#~ msgid "%i baskets"
-#~ msgstr "%i кошници"
-
-#~ msgid "Add to a group-shared basket"
-#~ msgstr "Добавяне към групово-споделена кошница"
-
-#~ msgid "Adding %i records to these baskets"
-#~ msgstr "Добавяне на %i записа в тези кошници"
-
-#~ msgid "No records were added to the selected baskets."
-#~ msgstr "В избраните кошници не бяха добавени записи."
-
-#~ msgid "Add records to baskets"
-#~ msgstr "Добавяне на записите към кошниците"
-
-#~ msgid "Subscribe to this discussion"
-#~ msgstr "Абониране за кошницата"
-
-#~ msgid "Delete comment(s) or supress abuse report(s)"
-#~ msgstr "Забрана на обидни коментари"
-
-#~ msgid "Delete Comments"
-#~ msgstr "Изтриване на коментар"
-
-#~ msgid "ADD TO BASKET"
-#~ msgstr "ДОБАВЯНЕ В КОШНИЦАТА"
-
-#~ msgid "Frequently publishes in:"
-#~ msgstr "публикации"
-
-#~ msgid "The collection to which this file belong is restricted: "
-#~ msgstr "Колекцията, към която файлът принадлежи, е с ограничен достъп."
-
-#~ msgid "This record does not exist. Please try another record ID."
-#~ msgstr "Моля опитайте с друг ID."
-
-#~ msgid "Cannot edit deleted record.\""
-#~ msgstr "Изтрити записи не могат да бъдат редактирани."
-
-#~ msgid "The record will be deleted as soon as the task queue is empty."
-#~ msgstr "Записът ще бъде изтрит веднага, щом опашката от задачи е празна."
-
-#~ msgid "Please enter the ID of the record you want to edit"
-#~ msgstr "Моля, въведете ID на записа, който желаете да редактирате"
-
-#~ msgid "Move up"
-#~ msgstr "Преместване нагоре"
-
-#~ msgid "Move down"
-#~ msgstr "Преместване надолу"
-
-#~ msgid "Add Subfield"
-#~ msgstr "Добавяне на подполе"
-
-#~ msgid "Edit institute"
-#~ msgstr "Редакция на институт"
-
-#~ msgid "Add Field"
-#~ msgstr "Добавяне на поле"
-
-#~ msgid "Verbose"
-#~ msgstr "Многословно"
-
-#~ msgid "Done"
-#~ msgstr "Готово"
-
-#~ msgid "Your changes are TEMPORARY."
-#~ msgstr "Вашите промени са ВРЕМЕННИ."
-
-#~ msgid "To save this record, please click on submit."
-#~ msgstr "За да запазите записа, моля натиснете 'изпращане'."
-
-#~ msgid "Revision %(revdate)s"
-#~ msgstr "Редактиране на запис %(x_recid)s, поле %(x_field)s"
-
-#~ msgid "Edit current version"
-#~ msgstr "Редактирай параметрите"
-
-#~ msgid "View revision"
-#~ msgstr "отдел"
-
-#~ msgid "Back to BibEdit"
-#~ msgstr "Обратно в кошниците"
-
-#~ msgid "select_from1"
-#~ msgstr "изберете потребител"
-
-#~ msgid "select_to1"
-#~ msgstr "Избор на тема"
-
-#~ msgid "No more requests are waiting."
-#~ msgstr "Някои от документите са чакащи."
-
-#~ msgid "next page >>>"
-#~ msgstr "Следваща страница"
-
-#~ msgid "<<< previous page"
-#~ msgstr "Предишна страница"
-
-#~ msgid "last page >>|"
-#~ msgstr "последно обновяване"
-
-#~ msgid "from"
-#~ msgstr "От:"
-
-#~ msgid "There are record revisions not yet synchronized with the database."
-#~ msgstr "Въведеният e-mail не съществува в базата от данни."
-
-#~ msgid "View all reported reviews"
-#~ msgstr "Преглед на всички прегледи"
-
-#~ msgid "Delete a specific comment/review (by ID)"
-#~ msgstr "Изтриване на определен коментар/преглед (по ID)"
-
-#~ msgid "session"
-#~ msgstr "сесия"
-
-#~ msgid "alerts"
-#~ msgstr "известия"
-
-#~ msgid "account"
-#~ msgstr "сметка"
-
-#~ msgid "messages"
-#~ msgstr "съобщения"
-
-#~ msgid "groups"
-#~ msgstr "групи"
-
-#~ msgid "approvals"
-#~ msgstr "одобрения"
-
-#~ msgid "Unknown form field found on one of the submission pages."
-#~ msgstr "Непознато поле в една от страниците за изпращане."
-
-#~ msgid "link"
-#~ msgstr "връзка"
-
-#~ msgid "Sort:"
-#~ msgstr "Сортиране:"
-
-#~ msgid "Alert sent successfully!"
-#~ msgstr "Известието e успешно изпратено!"
-
-#~ msgid "Webjournal Administration Interface"
-#~ msgstr "Администриране на Webjournal"
-
-#~ msgid "Available journals"
-#~ msgstr "Налични списания"
-
-#~ msgid "Please select the type of document you want to submit."
-#~ msgstr "Моля, изберете типа документ, който желаете да публикувате."
-
-#~ msgid "   Username/Email: %s\n"
-#~ msgstr "Потребител"
-
-#~ msgid "   Password: %s\n"
-#~ msgstr "Парола"
-
-#~ msgid "Migrate BibFormat Settings"
-#~ msgstr "Мигриране на настройките  на BibFormat"
-
-#~ msgid "Migrate Knowledge Bases"
-#~ msgstr "Мигриране на базите от знания"
-
-#~ msgid "Migrate Behaviours"
-#~ msgstr "Мигриране на поведения"
-
-#~ msgid "Migrate Formats"
-#~ msgstr "Мигриране на форматите"
-
-#~ msgid "Your account created on"
-#~ msgstr "Сметката беше създадена"
-
-#~ msgid "You have created a new account on"
-#~ msgstr "или създай нова"
-
-#~ msgid "Article Error"
-#~ msgstr "Статия"
-
-#~ msgid "%s Personalize, Main page"
-#~ msgstr "Персонализиране"
-
-#~ msgid "%s , personalize"
-#~ msgstr "Персонализиране"
-
-#~ msgid "Successfully featured record: %s"
-#~ msgstr "успешно забранена обида"
-
-#~ msgid "Agenda"
-#~ msgstr "Програма"
-
-#~ msgid "Webcast"
-#~ msgstr "Webcast"
-
-#~ msgid "Search Help"
-#~ msgstr "Търсене в помощ"
-
-#~ msgid "Format:"
-#~ msgstr "Формат:"
-
-#~ msgid "Send lost password"
-#~ msgstr "Изпрати паролата"
-
-#~ msgid "Here are your user credentials for"
-#~ msgstr "Това са вашите акредитации за"
-
-#~ msgid "username"
-#~ msgstr "потребителско име"
-
-#~ msgid "password"
-#~ msgstr "парола"
-
-#~ msgid "You seem to be %(x_role)s."
-#~ msgstr "Излгежда, че вие сте %(x_role)s."
-
-#~ msgid "Credentials for"
-#~ msgstr "Акредитации за"
-
-#~ msgid "Unable to find file."
-#~ msgstr "Файлът не може да бъде намерен."
-
-#~ msgid "Cannot find submission directory."
-#~ msgstr "Папката за публикуване не може да бъде намерена."
-
-#~ msgid "Login via:"
-#~ msgstr "Влизане през:"
-
-#~ msgid "Try your search on..."
-#~ msgstr "Пробвайте търсене на..."
-
-#~ msgid "Timeout"
-#~ msgstr "Време"
-
-#~ msgid "%(num)s results found"
-#~ msgstr "Намерени са %s записа"
-
-#~ msgid "No result found"
-#~ msgstr "Не бяха намерени заявки"
-
-#~ msgid "user #%i"
-#~ msgstr "потребител"
-
-#~ msgid "GROUP_DELETED"
-#~ msgstr "ИЗТРИВАНЕ"
-
-#~ msgid "MEMBER_DELETED"
-#~ msgstr "ИЗТРИВАНЕ"
-
-#~ msgid "Export as"
-#~ msgstr ""
-
-#~ msgid "Search Services"
-#~ msgstr "Съвети за търсене"
-
-#~ msgid "Citation Metrics"
-#~ msgstr "Цитирания"
-
-#~ msgid "WebSearch Admin Guide"
-#~ msgstr "Ръководство за администриране на WebSearch"
-
-#~ msgid "Submit Guide"
-#~ msgstr "Ръководство за публикуване"
-
-#~ msgid "Add to personal basket"
-#~ msgstr "Добавяне в личната кошница"
-
-#~ msgid "WebSubmit Admin Guide"
-#~ msgstr "Ръководство за администриране на WebSubmit"
-
-#~ msgid "Click here to review the transactions."
-#~ msgstr ""
-
-#~ msgid "Quit searching."
-#~ msgstr "Изпълняване на търсене"
-
-#~ msgid ""
-#~ "When you merge a set of profiles,"
-#~ " all the information stored will be"
-#~ " assigned to the primary profile. "
-#~ "This includes papers, ids or citations."
-#~ " After merging, only the primary "
-#~ "profile will remain in the system, "
-#~ "all other profiles will be automatically"
-#~ " deleted.</br>"
-#~ msgstr ""
-
-#~ msgid "Cancel merging"
-#~ msgstr "Отменено"
-
-#~ msgid "Merge profiles"
-#~ msgstr ""
-
-#~ msgid "Claim for yourself"
-#~ msgstr ""
-
-#~ msgid "Assign to"
-#~ msgstr ""
-
-#~ msgid "Search for a person to assign the paper to"
-#~ msgstr "Вие сте член на следните групи:"
-
-#~ msgid "Select All"
-#~ msgstr "Изтриване на всички"
-
-#~ msgid "Select None"
-#~ msgstr "Избери точки"
-
-#~ msgid "Invert Selection"
-#~ msgstr "Избери точки"
-
-#~ msgid "Hide successful claims"
-#~ msgstr ""
-
-#~ msgid "Paper Short Info"
-#~ msgstr ""
-
-#~ msgid "Author Name"
-#~ msgstr "Автор:"
-
-#~ msgid "Experiment"
-#~ msgstr "експеримент"
-
-#~ msgid "Not assigned"
-#~ msgstr "Бележка"
-
-#~ msgid "No status information found."
-#~ msgstr "Повече информация:"
-
-#~ msgid "Operator review of user actions pending"
-#~ msgstr ""
-
-#~ msgid "Sorry, there are currently no records to be found in this category."
-#~ msgstr ""
-
-#~ msgid "Review Transaction"
-#~ msgstr "отдел"
-
-#~ msgid "On all pages"
-#~ msgstr "Запазване на промените"
-
-#~ msgid "With selected do"
-#~ msgstr "Той е отхвърлен на:"
-
-#~ msgid "View name variants"
-#~ msgstr "преглед на коментарите"
-
-#~ msgid "The author has an internal ID!"
-#~ msgstr "Появи се вътрешна грешка"
-
-#~ msgid "These records have been marked as not being from this person."
-#~ msgstr ""
-
-#~ msgid "They will be regarded in the next run of the author "
-#~ msgstr ""
-
-#~ msgid "disambiguation algorithm and might disappear from this listing."
-#~ msgstr ""
-
-#~ msgid "No comments"
-#~ msgstr "коментари"
-
-#~ msgid "Not Available"
-#~ msgstr "Няма налични списания"
-
-#~ msgid " Delete this ticket"
-#~ msgstr "Изтриване на кошницата"
-
-#~ msgid " Commit this entire ticket"
-#~ msgstr ""
-
-#~ msgid "No title available"
-#~ msgstr "Няма налични списания"
-
-#~ msgid "Make sure we match the right names!"
-#~ msgstr ""
-
-#~ msgid "Please select an author on each of the records that will be assigned."
-#~ msgstr ""
-
-#~ msgid "Papers without a name selected will be ignored in the process."
-#~ msgstr ""
-
-#~ msgid "Claim for person with id"
-#~ msgstr ""
-
-#~ msgid "This seems to be an empty profile without names associated to it yet"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "(the names will be automatically "
-#~ "gathered when the first paper is "
-#~ "claimed to this profile)."
-#~ msgstr ""
-
-#~ msgid "Select name for"
-#~ msgstr "Избери точки"
-
-#~ msgid "Error retrieving record title"
-#~ msgstr ""
-
-#~ msgid "Paper title: "
-#~ msgstr "Страница: "
-
-#~ msgid "Ignore"
-#~ msgstr ""
-
-#~ msgid "The following names have been automatically chosen:"
-#~ msgstr "Намерени са следните грешки"
-
-#~ msgid " --  With name: "
-#~ msgstr ""
-
-#~ msgid "Symbols legend: "
-#~ msgstr ""
-
-#~ msgid "Everything is shiny, captain!"
-#~ msgstr ""
-
-#~ msgid "The result of this request will be visible immediately"
-#~ msgstr ""
-
-#~ msgid "Confirmation needed to continue"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The result of this request will be"
-#~ " visible immediately but we need your"
-#~ " confirmation to do so for this "
-#~ "paper has been manually claimed before"
-#~ msgstr ""
-
-#~ msgid "This will create a change request for the operators"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The result of this request will be"
-#~ " visible upon confirmation through an "
-#~ "operator"
-#~ msgstr ""
-
-#~ msgid "Selected name on paper"
-#~ msgstr "Избери точки"
-
-#~ msgid "Verification needed to continue"
-#~ msgstr ""
-
-#~ msgid "This will create a request for the operators"
-#~ msgstr ""
-
-#~ msgid "Please provide your information"
-#~ msgstr "Повече информация:"
-
-#~ msgid "Please provide your first name"
-#~ msgstr "Моля, първо влезте."
-
-#~ msgid "Your first name:"
-#~ msgstr ""
-
-#~ msgid "Please provide your last name"
-#~ msgstr ""
-
-#~ msgid "Your last name:"
-#~ msgstr "Заети от вас неща"
-
-#~ msgid "Please provide your eMail address"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "This eMail address is reserved by "
-#~ "a user. Please log in or provide"
-#~ " an alternative eMail address"
-#~ msgstr ""
-
-#~ msgid "Your eMail:"
-#~ msgstr "Вашите известия"
-
-#~ msgid "You may leave a comment (optional)"
-#~ msgstr ""
-
-#~ msgid "Continue claiming*"
-#~ msgstr ""
-
-#~ msgid "Confirm these changes**"
-#~ msgstr ""
-
-#~ msgid "!Delete the entire request!"
-#~ msgstr "Изтриване на избраните отзиви"
-
-#~ msgid "Mark as your documents"
-#~ msgstr "всички типове документи"
-
-#~ msgid "Mark as _not_ your documents"
-#~ msgstr ""
-
-#~ msgid "Nothing staged as not yours"
-#~ msgstr ""
-
-#~ msgid "Mark as their documents"
-#~ msgstr "Връщане към документа"
-
-#~ msgid "Nothing staged in this category"
-#~ msgstr ""
-
-#~ msgid "Mark as _not_ their documents"
-#~ msgstr "Връщане към документа"
-
-#~ msgid "  * You can come back to this page later. Nothing will be lost. <br />"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "  ** Performs all requested changes. "
-#~ "Changes subject to permission restrictions "
-#~ "will be submitted to an operator "
-#~ "for manual review."
-#~ msgstr ""
-
-#~ msgid "Create a new Person"
-#~ msgstr "или създай нова"
-
-#~ msgid "This is my profile"
-#~ msgstr ""
-
-#~ msgid "Assign paper"
-#~ msgstr ""
-
-#~ msgid "Add to merge list"
-#~ msgstr "Добавяне към потребителите"
-
-#~ msgid ""
-#~ "We do not have a publication list"
-#~ " for '%s'. Try using a less "
-#~ "specific author name, or check back "
-#~ "in a few days as attributions are"
-#~ " updated frequently.  Or you can send"
-#~ " us feedback, at "
-#~ msgstr ""
-
-#~ msgid "Recent Papers"
-#~ msgstr "Страница: "
-
-#~ msgid "Showing the"
-#~ msgstr ""
-
-#~ msgid "most recent documents:"
-#~ msgstr "Списък на рецензираните документи"
-
-#~ msgid "Sorry, there are no documents known for this person"
-#~ msgstr ""
-
-#~ msgid "The following profile is the one you were viewing before logging in: "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Out of %s paper(s) claimed to your"
-#~ " arXiv account, %s match this "
-#~ "profile: "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If none of the options suggested "
-#~ "above apply, you can look for "
-#~ "other possible options from the list "
-#~ "below:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span title=\"Login through arXiv is "
-#~ "needed to verify this is your "
-#~ "profile. When you log in your "
-#~ "publication list will automatically update "
-#~ "with all your arXiv publications.\n"
-#~ "You may also continue as a guest."
-#~ " In this case your input will "
-#~ "be processed by our staff and will"
-#~ " take longer to display.\"><strong> Login"
-#~ " with your arXiv.org account "
-#~ "</strong></span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "You have succesfully logged in via "
-#~ "arXiv. </br> You can now manage "
-#~ "your profile.</br>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "You have succesfully logged in via "
-#~ "arXiv.</br><div> <font color='red'>However the "
-#~ "profile you are viewing is not "
-#~ "your profile.</br></br></font>"
-#~ msgstr ""
-
-#~ msgid "Manage your profile"
-#~ msgstr "Управление на елементите"
-
-#~ msgid ""
-#~ "You have succesfully logged in, but "
-#~ "</br><div><font color='red'> you are not "
-#~ "associated to a person yet. Please "
-#~ "use the button below to choose "
-#~ "your profile </br></br></font>"
-#~ msgstr ""
-
-#~ msgid "Choose your profile"
-#~ msgstr "Избери тема"
-
-#~ msgid "Please log in through arXiv to manage your profile.</br>"
-#~ msgstr ""
-
-#~ msgid "Login into Inspire through arXiv.org"
-#~ msgstr ""
-
-#~ msgid ""
-#~ " <span title=\"ORCiD (Open Researcher "
-#~ "and Contributor ID) is a unique "
-#~ "researcher identifier that distinguishes you"
-#~ " from other researchers.\n"
-#~ "It holds a record of all your "
-#~ "research activities. You can add your"
-#~ " ORCiD to all your works to "
-#~ "make sure they are associated with "
-#~ "you. \">\n"
-#~ "        <strong> Connect this profile to an ORCiD </strong> <span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "This profile is already connected to "
-#~ "the following ORCiD: <strong>%s</strong></br>"
-#~ msgstr ""
-
-#~ msgid "Import your publications from ORCID"
-#~ msgstr ""
-
-#~ msgid "Visit your profile in ORCID"
-#~ msgstr ""
-
-#~ msgid "Connect an ORCiD to this profile"
-#~ msgstr ""
-
-#~ msgid "Suggest an ORCiD for this profile:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span title=\"When you add more "
-#~ "publications you make sure your "
-#~ "publication list and citations appear "
-#~ "correctly on your profile.\n"
-#~ "You can also assign publications to "
-#~ "other authors. This will help INSPIRE"
-#~ " provide more accurate publication and "
-#~ "citation statistics. \"><strong> Manage "
-#~ "publications </strong><span>"
-#~ msgstr ""
-
-#~ msgid "Manage publication list"
-#~ msgstr "Дата на създаване"
-
-#~ msgid "<strong> Person identifiers, internal and external </strong>"
-#~ msgstr ""
-
-#~ msgid "add external id"
-#~ msgstr "Общи настройки"
-
-#~ msgid "Harvest missing external ids from claimed papers"
-#~ msgstr ""
-
-#~ msgid "suggest external id to add"
-#~ msgstr ""
-
-#~ msgid "suggest selected ids to delete"
-#~ msgstr ""
-
-#~ msgid "suggest missing ids"
-#~ msgstr "публикации"
-
-#~ msgid "Choose system"
-#~ msgstr "Избери тема"
-
-#~ msgid ""
-#~ "<span title=\"You don’t need to add all your publications one by one.\n"
-#~ "This list contains all your publications"
-#~ " that were automatically assigned to "
-#~ "your INSPIRE profile through arXiv and"
-#~ " ORCiD. \"><strong> Automatically assigned "
-#~ "publications </strong> </span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span id=\"autoClaimMessage\">Please wait as "
-#~ "we are assigning %s papers from "
-#~ "external systems to your Inspire "
-#~ "profile</span></br>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The following publications have been "
-#~ "successfully assigned to your profile:"
-#~ msgstr "Намерени са следните грешки"
-
-#~ msgid "Get help!"
-#~ msgstr ""
-
-#~ msgid "<strong> Contact </strong>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Please contact our user support in "
-#~ "case you need help or you just "
-#~ "want to suggest some new ideas. We"
-#~ " will get back to you. </br>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span title=\"It sometimes happens that "
-#~ "somebody's publications are scattered among"
-#~ " two or more profiles for various "
-#~ "reasons\n"
-#~ "(different spelling, change of name, "
-#~ "multiple people with the same name). "
-#~ "You can merge a set of profiles"
-#~ " together.\n"
-#~ "This will assign all the information "
-#~ "(including publications, IDs and citations)"
-#~ " to the profile you choose as a"
-#~ " primary profile.\n"
-#~ "After the merging only the primary "
-#~ "profile will exist in the system "
-#~ "and all others will be automatically "
-#~ "deleted. \"><strong> Merge profiles "
-#~ "</strong><span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If your or somebody else's publications"
-#~ " in INSPIRE exist in multiple "
-#~ "profiles, you can fix that here. "
-#~ "</br>"
-#~ msgstr ""
-
-#~ msgid "Fatal: Author ID capabilities are disabled on this system."
-#~ msgstr ""
-
-#~ msgid "Fatal: You are not allowed to access this functionality."
-#~ msgstr "Нямате достъп до функциите за администриране."
-
-#~ msgid "Claim this paper"
-#~ msgstr "добавете този потребител"
-
-#~ msgid ""
-#~ "<p>We're sorry. An error occurred while"
-#~ " handling your request. Please find "
-#~ "more information below:</p>"
-#~ msgstr ""
-
-#~ msgid "This page is not accessible directly."
-#~ msgstr ""
-
-#~ msgid "Profile management"
-#~ msgstr ""
-
-#~ msgid "The due date has been updated. New due date: %s"
-#~ msgstr ""
-
-#~ msgid "Copies of %s"
-#~ msgstr ""
-
-#~ msgid "The given barcode <strong>%s</strong> is already in use."
-#~ msgstr ""
-
-#~ msgid "The barcode <strong>%s</strong> was not found"
-#~ msgstr ""
-
-#~ msgid "The copy with barcode <strong>%s</strong> has been deleted."
-#~ msgstr ""
-
-#~ msgid "It was NOT possible to delete the copy with barcode <strong>%s</strong>"
-#~ msgstr ""
-
-#~ msgid "Barcode <strong>%s</strong> not found"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated, but the"
-#~ " <strong>status was not modified</strong>."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated, but the"
-#~ " <strong>barcode was not modified</strong> "
-#~ "because it is already in use."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated to "
-#~ "<strong>[%s]</strong> with success."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated, but the"
-#~ " <strong>barcode was not modified</strong> "
-#~ "because it was not found (!?)."
-#~ msgstr ""
-
-#~ msgid "Weighted %s keywords:"
-#~ msgstr "Цитиран от: %s записа"
-
-#~ msgid ""
-#~ "The uploaded file is too small "
-#~ "(<%i o) and has therefore not been"
-#~ " considered"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The uploaded file is too big (>%i"
-#~ " o) and has therefore not been "
-#~ "considered"
-#~ msgstr ""
-
-#~ msgid "A file with format '%s' already exists. Please upload another format."
-#~ msgstr ""
-
-#~ msgid "The format %s does not exist for the given version: %s"
-#~ msgstr ""
-
-#~ msgid "Your modifications to record #%i have been submitted"
-#~ msgstr ""
-
-#~ msgid "Your modifications to record #%i have been cancelled"
-#~ msgstr ""
-
-#~ msgid "Comparison of:"
-#~ msgstr ""
-
-#~ msgid "Revision"
-#~ msgstr "отдел"
-
-#~ msgid "Comparing two record revisions"
-#~ msgstr ""
-
-#~ msgid "Failed to create a ticket"
-#~ msgstr ""
-
-#~ msgid "No template could be found for output format %s."
-#~ msgstr ""
-
-#~ msgid "Error when evaluating format element %s with parameters %s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Escape mode for format element %s "
-#~ "could not be retrieved. Using default"
-#~ " mode instead."
-#~ msgstr ""
-
-#~ msgid "\"nbMax\" parameter for %s must be an \"int\"."
-#~ msgstr ""
-
-#~ msgid "Could not read format template named %s. %s."
-#~ msgstr ""
-
-#~ msgid "Format element %s has no function named \"format\"."
-#~ msgstr ""
-
-#~ msgid "Modify Template Attributes"
-#~ msgstr "Промяна на атрибутите на шаблона"
-
-#~ msgid "Template Editor"
-#~ msgstr "Редактор на шаблони"
-
-#~ msgid "Check Dependencies"
-#~ msgstr "Проверка на зависимости"
-
-#~ msgid "Update Format Attributes"
-#~ msgstr "Обновяване на атрибутите на формата"
-
-#~ msgid "Show Documentation"
-#~ msgstr "Показване на документацията"
-
-#~ msgid "Hide Documentation"
-#~ msgstr "Скриване на документацията"
-
-#~ msgid "Last Modification Date"
-#~ msgstr "Последна промяна"
-
-#~ msgid "Manage Output Formats"
-#~ msgstr "Управление на форматите"
-
-#~ msgid "Manage Format Templates"
-#~ msgstr "Управление на елементите"
-
-#~ msgid "Format Elements Documentation"
-#~ msgstr "Документация на елементите"
-
-#~ msgid "Add New Format Template"
-#~ msgstr "Добавяне на нов шаблон"
-
-#~ msgid "Check Format Templates Extensively"
-#~ msgstr "Задълбочена проверка на шаблоните"
-
-#~ msgid "Code"
-#~ msgstr "Код"
-
-#~ msgid "Add New Output Format"
-#~ msgstr "Добавяне на нов формат"
-
-#~ msgid "menu"
-#~ msgstr "меню"
-
-#~ msgid "Close Output Format"
-#~ msgstr "Затваряне на изходния формат"
-
-#~ msgid "Rules"
-#~ msgstr "Правила"
-
-#~ msgid "Modify Output Format Attributes"
-#~ msgstr "Промяна на атрибутите на формата"
-
-#~ msgid "Remove Rule"
-#~ msgstr "Премахване на правило"
-
-#~ msgid "Add New Rule"
-#~ msgstr "Добавяне на ново правило"
-
-#~ msgid "No problem found with format"
-#~ msgstr "Не са намерени грешки с този формат"
-
-#~ msgid "An error has been found"
-#~ msgstr "Намерена е грешка"
-
-#~ msgid "The following errors have been found"
-#~ msgstr "Намерени са следните грешки"
-
-#~ msgid "BibFormat Admin"
-#~ msgstr "Администриране на BibFormat"
-
-#~ msgid "Enter a search query here."
-#~ msgstr "Въведете заявка за търсене."
-
-#~ msgid "No Record Found for %s."
-#~ msgstr "Записът не е намерен"
-
-#~ msgid "Tag specification \"%s\" must end with column \":\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Tag specification \"%s\" must start with \"tag\" at line %s."
-#~ msgstr ""
-
-#~ msgid "\"tag\" must be lowercase in \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Should be \"tag field_number:\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Invalid tag \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Condition \"%s\" is outside a tag specification at line %s."
-#~ msgstr ""
-
-#~ msgid "Condition \"%s\" can only have a single separator --- at line %s."
-#~ msgstr ""
-
-#~ msgid "Template \"%s\" does not exist at line %s."
-#~ msgstr "Потребителят %s не съществува."
-
-#~ msgid "Missing column \":\" after \"default\" in \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Default template specification \"%s\" must "
-#~ "start with \"default :\" at line "
-#~ "%s."
-#~ msgstr ""
-
-#~ msgid "\"default\" keyword must be lowercase in \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Line %s could not be understood at line %s."
-#~ msgstr ""
-
-#~ msgid "Output format %s cannot not be read. %s"
-#~ msgstr "Атрибути на формат %s"
-
-#~ msgid ""
-#~ "Could not find a name specified in"
-#~ " tag \"<name>\" inside format template "
-#~ "%s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Could not find a description specified"
-#~ " in tag \"<description>\" inside format "
-#~ "template %s."
-#~ msgstr ""
-
-#~ msgid "Format template %s calls undefined element \"%s\"."
-#~ msgstr "Зависимости на шаблон %s"
-
-#~ msgid ""
-#~ "Format template %s calls unreadable "
-#~ "element \"%s\". Check element file "
-#~ "permissions."
-#~ msgstr ""
-
-#~ msgid "Cannot load element \"%s\" in template %s. Check element code."
-#~ msgstr ""
-
-#~ msgid "Format element %s uses unknown parameter \"%s\" in format template %s."
-#~ msgstr ""
-
-#~ msgid "Could not read format template named %s. %s"
-#~ msgstr ""
-
-#~ msgid "Error in format element %s. %s."
-#~ msgstr "Валидиране на елемент %s"
-
-#~ msgid "Format element %s cannot not be read. %s"
-#~ msgstr "Зависимости на елемент %s"
-
-#~ msgid ""
-#~ "Cannot write in etc/bibformat dir of "
-#~ "your Invenio installation. Check directory "
-#~ "permission."
-#~ msgstr ""
-
-#~ msgid "Restricted Output Format"
-#~ msgstr "Ограничен изходен формат"
-
-#~ msgid "Output Format %s Rules"
-#~ msgstr "Правила на формат %s"
-
-#~ msgid "Output Format %s Attributes"
-#~ msgstr "Атрибути на формат %s"
-
-#~ msgid "Output Format %s Dependencies"
-#~ msgstr "Зависимости на формат %s"
-
-#~ msgid "Delete Output Format"
-#~ msgstr "Изтриване на изходния формат"
-
-#~ msgid "Cannot create output format"
-#~ msgstr "Управление на форматите"
-
-#~ msgid "Format template %s cannot not be read. %s"
-#~ msgstr "Атрибути на шаблон %s"
-
-#~ msgid "Restricted Format Template"
-#~ msgstr "Шаблон с ограничен достъп"
-
-#~ msgid "Format Template %s"
-#~ msgstr "Шаблон %s"
-
-#~ msgid "Format Template %s Attributes"
-#~ msgstr "Атрибути на шаблон %s"
-
-#~ msgid "Format Template %s Dependencies"
-#~ msgstr "Зависимости на шаблон %s"
-
-#~ msgid "Delete Format Template"
-#~ msgstr "Изтриване на форматния шаблон"
-
-#~ msgid "Format Element %s Dependencies"
-#~ msgstr "Зависимости на елемент %s"
-
-#~ msgid "Test Format Element %s"
-#~ msgstr "Тестване на елемент %s"
-
-#~ msgid "Validation of Output Format %s"
-#~ msgstr "Валидиране на формат %s"
-
-#~ msgid "Validation of Format Template %s"
-#~ msgstr "Валидиране на шаблон %s"
-
-#~ msgid "Restricted Format Element"
-#~ msgstr "Елемент с ограничен достъп"
-
-#~ msgid "Validation of Format Element %s"
-#~ msgstr "Валидиране на елемент %s"
-
-#~ msgid "No format specified for validation. Please specify one."
-#~ msgstr ""
-
-#~ msgid "Format Validation"
-#~ msgstr "Валидиране на формата"
-
-#~ msgid "The current taxonomy can be accessed with this URL: %s"
-#~ msgstr ""
-
-#~ msgid "Please upload the RDF file for taxonomy %s"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If the expression contains '%', like "
-#~ "'270__a:*%*',                          it will be"
-#~ " replaced by a search string when "
-#~ "the                          knowledge base is "
-#~ "used."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Example 2: Return the institute's name"
-#~ " (100__a) when the                          user"
-#~ " gives its postal code (270__a):"
-#~ "                          Set field to 100__a,"
-#~ " expression to 270__a:*%*."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The left side of the rule (%s) "
-#~ "already appears in these knowledge "
-#~ "bases:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The right side of the rule (%s)"
-#~ " already appears in these knowledge "
-#~ "bases:"
-#~ msgstr ""
-
-#~ msgid "File %s uploaded."
-#~ msgstr ""
-
-#~ msgid "Knowledge Base %s"
-#~ msgstr "База от знания %s"
-
-#~ msgid "No rights to upload to collection '%s'"
-#~ msgstr ""
-
-#~ msgid "<b>%s documents</b> have been found."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The system is not attempting to "
-#~ "send an email from %s, to %s, "
-#~ "with body %s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Error in connecting to the SMPT "
-#~ "server waiting %s seconds. Exception is"
-#~ " %s, while sending email from %s "
-#~ "to %s with body %s."
-#~ msgstr ""
-
-#~ msgid "Error while sending an email: %s"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "Error while sending an email.\n"
-#~ "Reason: %s\n"
-#~ "Details: %s\n"
-#~ "Sender: \"%s\"\n"
-#~ "Recipient(s): \"%s\"\n"
-#~ "\n"
-#~ "The content of the mail was as follows:\n"
-#~ "%s"
-#~ msgstr ""
-
-#~ msgid "Error in sending email from %s to %s with body %s."
-#~ msgstr ""
-
-#~ msgid "Not Set"
-#~ msgstr "Бележка"
-
-#~ msgid "never"
-#~ msgstr "Конвертиране"
-
-#~ msgid ""
-#~ "Do you want to touch the OAI "
-#~ "set %s? Note that this will force"
-#~ " all clients to re-harvest the "
-#~ "whole set."
-#~ msgstr ""
-
-#~ msgid "OAI set %s touched."
-#~ msgstr ""
-
-#~ msgid "%s Personalize, Display searches"
-#~ msgstr ""
-
-#~ msgid "%s Personalize, Set a new alert"
-#~ msgstr ""
-
-#~ msgid "%s Personalize, Modify alert settings"
-#~ msgstr ""
-
-#~ msgid "%s Personalize, Display alerts"
-#~ msgstr ""
-
-#~ msgid "Name variants"
-#~ msgstr ""
-
-#~ msgid "No Name Variants"
-#~ msgstr ""
-
-#~ msgid "downloaded"
-#~ msgstr ""
-
-#~ msgid "times"
-#~ msgstr "Време"
-
-#~ msgid "Papers"
-#~ msgstr "Страница: "
-
-#~ msgid "No Keywords"
-#~ msgstr "ключова дума"
-
-#~ msgid "Frequent keywords"
-#~ msgstr ""
-
-#~ msgid "No Subject categories"
-#~ msgstr ""
-
-#~ msgid "Subject categories"
-#~ msgstr ""
-
-#~ msgid "No Collaborations"
-#~ msgstr "Колекции"
-
-#~ msgid "unknown affiliation"
-#~ msgstr "Непознато действие"
-
-#~ msgid "No Affiliations"
-#~ msgstr "Цитирания"
-
-#~ msgid "Affiliations"
-#~ msgstr "Цитирания"
-
-#~ msgid "Frequent co-authors (excluding collaborations)"
-#~ msgstr ""
-
-#~ msgid "No Frequent Co-authors"
-#~ msgstr ""
-
-#~ msgid "Citations%s"
-#~ msgstr "Цитирания"
-
-#~ msgid "<strong> Publications per year </strong>"
-#~ msgstr ""
-
-#~ msgid "No Publication Graph"
-#~ msgstr "Дата на създаване"
-
-#~ msgid "<strong> Publications list </strong>"
-#~ msgstr "Дата на създаване"
-
-#~ msgid "No publications available"
-#~ msgstr "Няма налични списания"
-
-#~ msgid "Recompute Now!"
-#~ msgstr ""
-
-#~ msgid "%s is an invalid record ID"
-#~ msgstr ""
-
-#~ msgid "%s is an invalid user ID."
-#~ msgstr ""
-
-#~ msgid "Record ID %s is not a number."
-#~ msgstr ""
-
-#~ msgid "%i comments found in total (not shown on this page)"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The size of file \\\"%s\\\" (%s) "
-#~ "is larger than maximum allowed file "
-#~ "size (%s). Select files again."
-#~ msgstr ""
-
-#~ msgid "About your article at %(url)s"
-#~ msgstr ""
-
-#~ msgid "Administrate %(journal_name)s"
-#~ msgstr ""
-
-#~ msgid "Linkbacks%s: %s"
-#~ msgstr ""
-
-#~ msgid "There is no index %s.  Searching for %s in all fields."
-#~ msgstr ""
-
-#~ msgid "Instead searching %s."
-#~ msgstr ""
-
-#~ msgid "Cited by 1 record"
-#~ msgstr "Цитиран от: %s записа"
-
-#~ msgid "%i comments"
-#~ msgstr "коментари"
-
-#~ msgid "%i reviews"
-#~ msgstr "преглед"
-
-#~ msgid "%s of"
-#~ msgstr ""
-
-#~ msgid ".. of which self-citations: %s records"
-#~ msgstr ""
-
-#~ msgid "No Papers"
-#~ msgstr "Страница: "
-
-#~ msgid "Frequent co-authors"
-#~ msgstr ""
-
-#~ msgid "This is me.  Verify my publication list."
-#~ msgstr ""
-
-#~ msgid "Citations:"
-#~ msgstr "Цитирания"
-
-#~ msgid "No Citation Information available"
-#~ msgstr "Няма налични списания"
-
-#~ msgid "<p><a href=\"%(url)s\">%(msg)s</a></p>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "For some unknown reason multiple records"
-#~ " matching the specified DOI \"%s\" "
-#~ "have been found."
-#~ msgstr ""
-
-#~ msgid "Found multiple records matching DOI %s"
-#~ msgstr ""
-
-#~ msgid "Discussion"
-#~ msgstr "Дискусия"
-
-#~ msgid "Please inform the <a href='mailto%s'>administator</a>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Somebody (possibly you) coming from %(x_ip_address)s has asked\n"
-#~ "for a password reset at %(x_sitename)s\n"
-#~ "for the account \"%(x_email)s\"."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Somebody (possibly you) coming from %(x_ip_address)s has asked\n"
-#~ "to register a new account at %(x_sitename)s\n"
-#~ "for the email address \"%(x_email)s\"."
-#~ msgstr ""
-
-#~ msgid "Your alerts"
-#~ msgstr "Вашите известия"
-
-#~ msgid "Your approvals"
-#~ msgstr "Вашите одобрения"
-
-#~ msgid "Your baskets"
-#~ msgstr "Вашите кошници"
-
-#~ msgid "Your loans"
-#~ msgstr "Заети от вас неща"
-
-#~ msgid "Your submissions"
-#~ msgstr "Вашите публикации"
-
-#~ msgid "Statistics"
-#~ msgstr "Статистики за употреба"
-
-#~ msgid "Invitation to join \"%s\" group"
-#~ msgstr ""
-
-#~ msgid "Group: %s"
-#~ msgstr "Група: %s"
-
-#~ msgid ""
-#~ "Your e-mail is auto-generated by "
-#~ "the system. Please change your e-mail"
-#~ " from <a href='%s/youraccount/edit?ln=%s'>account "
-#~ "settings</a>."
-#~ msgstr ""
-
-#~ msgid "%s Personalize, Your Settings"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to switch to external login "
-#~ "method %s, because your email address"
-#~ " is unknown."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to switch to external login "
-#~ "method %s, because your email address"
-#~ " is unknown to the external login "
-#~ "system."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The external login method %s does "
-#~ "not support email address based logins."
-#~ "  Please contact the site administrators."
-#~ msgstr ""
-
-#~ msgid "%s  Personalize, Main page"
-#~ msgstr ""
-
-#~ msgid "Account registration at %s"
-#~ msgstr ""
-
-#~ msgid "This is the table of contents of the %(x_category)s pages."
-#~ msgstr ""
-
-#~ msgid "Page %s Not Found"
-#~ msgstr "Страницата %s не е намерена"
-
-#~ msgid ""
-#~ "The task queue is currently running "
-#~ "in automatic mode, and there are "
-#~ "currently %s tasks waiting to be "
-#~ "executed. Your record should be "
-#~ "available within a few minutes and "
-#~ "searchable within an hour or "
-#~ "thereabouts.\n"
-#~ msgstr ""
-
-#~ msgid "The field %s is mandatory."
-#~ msgstr "Полето %s е задължително."
-
-#~ msgid ""
-#~ "Unable to move field at position "
-#~ "%s to position %s on page %s "
-#~ "of submission '%s%s' - Invalid Field "
-#~ "Position Numbers"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to swap field at position "
-#~ "%s with field at position %s on"
-#~ " page %s of submission %s - "
-#~ "could not move field at position "
-#~ "%s to temporary field location"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to swap field at position "
-#~ "%s with field at position %s on"
-#~ " page %s of submission %s - "
-#~ "could not move field at position "
-#~ "%s to position %s. Please ask "
-#~ "Admin to check that a field was"
-#~ " not stranded in a temporary position"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to swap field at position "
-#~ "%s with field at position %s on"
-#~ " page %s of submission %s - "
-#~ "could not move field that was "
-#~ "located at position %s to position "
-#~ "%s from temporary position. Field is "
-#~ "now stranded in temporary position and"
-#~ " must be corrected manually by an "
-#~ "Admin"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to move field at position "
-#~ "%s to position %s on page %s "
-#~ "of submission %s - could not "
-#~ "decrement the position of the fields "
-#~ "below position %s. Tried to recover "
-#~ "- please check that field ordering "
-#~ "is not broken"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to move field at position "
-#~ "%s to position %s on page %s "
-#~ "of submission %s%s - could not "
-#~ "increment the position of the fields "
-#~ "at and below position %s. The "
-#~ "field that was at position %s is"
-#~ " now stranded in a temporary "
-#~ "position."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Moved field from position %s to "
-#~ "position %s on page %s of "
-#~ "submission '%s%s'."
-#~ msgstr ""
-
-#~ msgid "Unable to delete field at position %s from page %s of submission '%s'"
-#~ msgstr "Броят на страниците в публикацията не може да бъде определен."
-

@@ -1,5 +1,5 @@
 # # This file is part of Invenio.
-# # Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+# # Copyright (C) 2007, 2008, 2009, 2010, 2011, 2015 CERN.
 # #
 # # Invenio is free software; you can redistribute it and/or
 # # modify it under the terms of the GNU General Public License as
@@ -16,15 +16,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Invenio 1.2.0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2015-03-04 16:44+0100\n"
-"PO-Revision-Date: 2008-02-29 15:37+0100\n"
+"POT-Creation-Date: 2015-08-27 15:26+0200\n"
+"PO-Revision-Date: 2015-08-27 20:12+0200\n"
 "Last-Translator: Kam-ming Ku <kmku@hkusua.hku.hk>\n"
 "Language-Team: ZH_CN <info@invenio-software.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.0\n"
 
 #: invenio/base/decorators.py:133
 #, python-format
@@ -205,7 +205,7 @@ msgstr ""
 
 #: invenio/base/templates/mail_html.tpl:20
 #: invenio/base/templates/mail_text.tpl:20
-#: invenio/legacy/webcomment/templates.py:2256
+#: invenio/legacy/webcomment/templates.py:2255
 #, fuzzy
 msgid "Hello:"
 msgstr "您好"
@@ -263,48 +263,53 @@ msgstr ""
 msgid "Error in sending email from %(x_from)s to %(x_to)s with body%(x_body)s."
 msgstr ""
 
-#: invenio/ext/login/__init__.py:68
+#: invenio/ext/login/__init__.py:61
+#, fuzzy
+msgid "Provided data is not valid"
+msgstr "这记录并不存在。"
+
+#: invenio/ext/login/__init__.py:73
 #: invenio/legacy/websession/webinterface.py:679
 msgid "Password reset request for"
 msgstr ""
 
-#: invenio/ext/login/__init__.py:124
+#: invenio/ext/login/__init__.py:129
 #, fuzzy, python-format
 msgid "You are not authorized to use '%(x_login_method)s' login method."
 msgstr "您并不是这收藏篮的拥有者。"
 
-#: invenio/ext/login/__init__.py:130
+#: invenio/ext/login/__init__.py:135
 #, python-format
 msgid ""
 "You have not yet confirmed the email address for the             "
 "'%(login_method)s' authentication method."
 msgstr ""
 
-#: invenio/ext/login/__init__.py:148 invenio/modules/annotations/views.py:156
+#: invenio/ext/login/__init__.py:153 invenio/modules/annotations/views.py:156
 #: invenio/modules/comments/views.py:204 invenio/modules/comments/views.py:238
 #: invenio/modules/records/views.py:80
 #, fuzzy
 msgid "Authorization failure"
 msgstr "注册失败"
 
-#: invenio/ext/login/__init__.py:154
+#: invenio/ext/login/__init__.py:159
 #, fuzzy
 msgid "Please sign in to continue."
 msgstr "请选择："
 
-#: invenio/ext/login/__init__.py:158
+#: invenio/ext/login/__init__.py:163
 #, fuzzy
 msgid "Authorization failure."
 msgstr "注册失败"
 
-#: invenio/ext/script/__init__.py:116
+#: invenio/ext/script/__init__.py:143
 #, python-format
 msgid ""
 "A newer version of Invenio is available for download. You may want to "
 "visit <a href=\"%(wiki)s\">%()s</a>"
 msgstr ""
 
-#: invenio/ext/script/__init__.py:126
+#: invenio/ext/script/__init__.py:153
 #, python-format
 msgid "Cannot download or parse release notes from %(release_notes)s"
 msgstr ""
@@ -830,7 +835,7 @@ msgstr ""
 #: invenio/legacy/websubmit/functions/Create_Upload_Files_Interface.py:467
 #: invenio/modules/access/templates/access/admin/showroledetails_base.html:54
 #: invenio/modules/groups/forms.py:46
-#: invenio/modules/oauth2server/models.py:142
+#: invenio/modules/oauth2server/models.py:143
 #: invenio/modules/search/admin_forms.py:34 invenio/modules/tags/forms.py:162
 #: invenio/modules/tags/forms.py:262
 msgid "Name"
@@ -873,8 +878,8 @@ msgstr "收藏"
 
 #: invenio/legacy/bibcatalog/templates.py:52
 #: invenio/legacy/bibknowledge/templates.py:170
-#: invenio/legacy/webcomment/templates.py:900
-#: invenio/legacy/webcomment/templates.py:2586
+#: invenio/legacy/webcomment/templates.py:899
+#: invenio/legacy/webcomment/templates.py:2585
 #: invenio/legacy/websearch/templates.py:2038
 msgid "Previous"
 msgstr "前一个"
@@ -890,8 +895,8 @@ msgstr "评分"
 
 #: invenio/legacy/bibcatalog/templates.py:74
 #: invenio/legacy/bibknowledge/templates.py:168
-#: invenio/legacy/webcomment/templates.py:916
-#: invenio/legacy/webcomment/templates.py:2610
+#: invenio/legacy/webcomment/templates.py:915
+#: invenio/legacy/webcomment/templates.py:2609
 msgid "Next"
 msgstr "下一个"
 
@@ -917,7 +922,7 @@ msgstr ""
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:325
 #, fuzzy
 msgid "Not authorized"
-msgstr "作者"
+msgstr "您并不是这收藏篮的拥有者。"
 
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:79
 #, fuzzy, python-format
@@ -1461,11 +1466,11 @@ msgstr "帐号已建立。"
 #: invenio/legacy/bibcirculation/adminlib.py:3543
 #: invenio/legacy/bibcirculation/adminlib.py:3587
 #: invenio/legacy/webbasket/templates.py:1839
-#: invenio/legacy/webcomment/templates.py:253
-#: invenio/legacy/webcomment/templates.py:714
-#: invenio/legacy/webcomment/templates.py:2114
-#: invenio/legacy/webcomment/templates.py:2138
-#: invenio/legacy/webcomment/templates.py:2164
+#: invenio/legacy/webcomment/templates.py:252
+#: invenio/legacy/webcomment/templates.py:713
+#: invenio/legacy/webcomment/templates.py:2113
+#: invenio/legacy/webcomment/templates.py:2137
+#: invenio/legacy/webcomment/templates.py:2163
 #: invenio/legacy/webmessage/templates.py:508
 #: invenio/legacy/websession/templates.py:2236
 #: invenio/legacy/websession/templates.py:2276
@@ -1476,11 +1481,11 @@ msgstr "是"
 #: invenio/legacy/bibcirculation/adminlib.py:2434
 #: invenio/legacy/bibcirculation/adminlib.py:3548
 #: invenio/legacy/webalert/templates.py:320
-#: invenio/legacy/webcomment/templates.py:254
-#: invenio/legacy/webcomment/templates.py:716
-#: invenio/legacy/webcomment/templates.py:2114
-#: invenio/legacy/webcomment/templates.py:2138
-#: invenio/legacy/webcomment/templates.py:2164
+#: invenio/legacy/webcomment/templates.py:253
+#: invenio/legacy/webcomment/templates.py:715
+#: invenio/legacy/webcomment/templates.py:2113
+#: invenio/legacy/webcomment/templates.py:2137
+#: invenio/legacy/webcomment/templates.py:2163
 #: invenio/legacy/webmessage/templates.py:509
 #: invenio/legacy/websession/templates.py:2237
 #: invenio/legacy/websession/templates.py:2277
@@ -1643,9 +1648,9 @@ msgstr ""
 #: invenio/legacy/bibdocfile/webinterface.py:145
 #: invenio/legacy/search_engine/__init__.py:2223
 #: invenio/legacy/search_engine/__init__.py:2232
-#: invenio/legacy/search_engine/__init__.py:5972
-#: invenio/legacy/search_engine/__init__.py:6034
-#: invenio/legacy/search_engine/__init__.py:6125
+#: invenio/legacy/search_engine/__init__.py:5978
+#: invenio/legacy/search_engine/__init__.py:6040
+#: invenio/legacy/search_engine/__init__.py:6131
 #, fuzzy
 msgid "Requested record does not seem to exist."
 msgstr "对不起，记录 %s 并不存在。"
@@ -2310,7 +2315,7 @@ msgstr "行动"
 #: invenio/legacy/websubmit/functions/Create_Upload_Files_Interface.py:471
 #: invenio/modules/access/templates/access/admin/showroledetails_base.html:56
 #: invenio/modules/groups/forms.py:50
-#: invenio/modules/oauth2server/models.py:153
+#: invenio/modules/oauth2server/models.py:154
 msgid "Description"
 msgstr "描述"
 
@@ -2850,7 +2855,7 @@ msgstr "已拒绝"
 #: invenio/legacy/bibcirculation/templates.py:1772
 #: invenio/legacy/bibexport/templates.py:494
 #: invenio/legacy/bibexport/templates.py:557
-#: invenio/legacy/webcomment/templates.py:2061
+#: invenio/legacy/webcomment/templates.py:2060
 msgid "OK"
 msgstr "是"
 
@@ -3332,8 +3337,8 @@ msgstr ""
 #: invenio/legacy/bibcirculation/templates.py:15749
 #: invenio/legacy/bibcirculation/templates.py:16003
 #: invenio/legacy/bibcirculation/utils.py:455
-#: invenio/legacy/webcomment/templates.py:1738
-#: invenio/legacy/webcomment/templates.py:1770
+#: invenio/legacy/webcomment/templates.py:1737
+#: invenio/legacy/webcomment/templates.py:1769
 msgid "Email"
 msgstr "电邮"
 
@@ -4668,15 +4673,15 @@ msgid ""
 msgstr ""
 
 #: invenio/legacy/bibcirculation/webinterface.py:854
-#: invenio/legacy/search_engine/__init__.py:4757
-#: invenio/legacy/search_engine/__init__.py:5117
-#: invenio/legacy/search_engine/__init__.py:5311
-#: invenio/legacy/search_engine/__init__.py:5334
-#: invenio/legacy/search_engine/__init__.py:5342
-#: invenio/legacy/search_engine/__init__.py:5350
-#: invenio/legacy/search_engine/__init__.py:5396
-#: invenio/legacy/webcomment/templates.py:199
-#: invenio/legacy/webcomment/templates.py:2511
+#: invenio/legacy/search_engine/__init__.py:4763
+#: invenio/legacy/search_engine/__init__.py:5123
+#: invenio/legacy/search_engine/__init__.py:5317
+#: invenio/legacy/search_engine/__init__.py:5340
+#: invenio/legacy/search_engine/__init__.py:5348
+#: invenio/legacy/search_engine/__init__.py:5356
+#: invenio/legacy/search_engine/__init__.py:5402
+#: invenio/legacy/webcomment/templates.py:198
+#: invenio/legacy/webcomment/templates.py:2510
 #: invenio/modules/comments/api.py:1862
 msgid "The record has been deleted."
 msgstr "记录已被删除。"
@@ -4766,10 +4771,10 @@ msgstr "选择主题"
 #: invenio/legacy/bibdocfile/managedocfiles.py:404
 #: invenio/legacy/bibexport/templates.py:347
 #: invenio/legacy/bibexport/templates.py:401
-#: invenio/legacy/webcomment/templates.py:1024
-#: invenio/legacy/webcomment/templates.py:1343
-#: invenio/legacy/webcomment/templates.py:1791
-#: invenio/legacy/webcomment/templates.py:2028
+#: invenio/legacy/webcomment/templates.py:1023
+#: invenio/legacy/webcomment/templates.py:1342
+#: invenio/legacy/webcomment/templates.py:1790
+#: invenio/legacy/webcomment/templates.py:2027
 #: invenio/legacy/websubmit/templates.py:2505
 #: invenio/legacy/websubmit/functions/Create_Upload_Files_Interface.py:475
 msgid "Comment"
@@ -5392,7 +5397,7 @@ msgid "Total"
 msgstr "可选择的"
 
 #: invenio/legacy/bibexport/templates.py:652
-#: invenio/legacy/webcomment/templates.py:2031
+#: invenio/legacy/webcomment/templates.py:2030
 msgid "Select"
 msgstr "选择"
 
@@ -5712,7 +5717,7 @@ msgstr "知识库从属关系"
 #: invenio/legacy/bibknowledge/templates.py:329
 #: invenio/legacy/bibknowledge/templates.py:589
 #: invenio/legacy/bibknowledge/templates.py:658
-#: invenio/legacy/webcomment/templates.py:1619
+#: invenio/legacy/webcomment/templates.py:1618
 #: invenio/legacy/webjournal/templates.py:203
 #: invenio/legacy/webjournal/templates.py:575
 #: invenio/legacy/webjournal/templates.py:716
@@ -6100,8 +6105,8 @@ msgstr ""
 
 #: invenio/legacy/search_engine/__init__.py:935
 #: invenio/legacy/search_engine/__init__.py:968
-#: invenio/legacy/search_engine/__init__.py:6020
-#: invenio/legacy/search_engine/__init__.py:6114
+#: invenio/legacy/search_engine/__init__.py:6026
+#: invenio/legacy/search_engine/__init__.py:6120
 msgid "Search Results"
 msgstr "检索结果"
 
@@ -6316,7 +6321,7 @@ msgid ""
 "this doesn't help, please check your search and try again."
 msgstr ""
 
-#: invenio/legacy/search_engine/__init__.py:3232
+#: invenio/legacy/search_engine/__init__.py:3238
 #, fuzzy, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other collections gave "
@@ -6325,100 +6330,100 @@ msgstr ""
 "在专辑 %(x_collection)s 里没有匹配任何记录；但在其他的专辑里找到%(x_url_open)s%(x_nb_hits)d "
 "笔记录%(x_url_close)s。"
 
-#: invenio/legacy/search_engine/__init__.py:3249
+#: invenio/legacy/search_engine/__init__.py:3255
 #, fuzzy
 msgid ""
 "No public collection matched your query. If you were looking for a hidden"
 " document, please type the correct URL for this record."
 msgstr "没有在专辑里匹配任何记录。您可尝试在限制的专辑里找寻。"
 
-#: invenio/legacy/search_engine/__init__.py:3253
+#: invenio/legacy/search_engine/__init__.py:3259
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
 msgstr "没有在专辑里匹配任何记录。您可尝试在限制的专辑里找寻。"
 
-#: invenio/legacy/search_engine/__init__.py:3360
+#: invenio/legacy/search_engine/__init__.py:3366
 #, fuzzy
 msgid "Your search did not match any records.  Please try again."
 msgstr "匹配不到关於 %s 的任何记录。接近的短语是："
 
-#: invenio/legacy/search_engine/__init__.py:3369
+#: invenio/legacy/search_engine/__init__.py:3375
 #, fuzzy
 msgid "No match found, please enter different search terms."
 msgstr "用其他关键词。"
 
-#: invenio/legacy/search_engine/__init__.py:3375
+#: invenio/legacy/search_engine/__init__.py:3381
 #, fuzzy, python-format
 msgid "There are no records referring to %(x_rec)s."
 msgstr "总共有 %i 个收藏篮"
 
-#: invenio/legacy/search_engine/__init__.py:3377
+#: invenio/legacy/search_engine/__init__.py:3383
 #, fuzzy, python-format
 msgid "There are no records modified by %(x_rec)s."
 msgstr "总共有 %i 个收藏篮"
 
-#: invenio/legacy/search_engine/__init__.py:3379
+#: invenio/legacy/search_engine/__init__.py:3385
 #, fuzzy, python-format
 msgid "There are no records cited by %(x_rec)s."
 msgstr "总共有 %i 个收藏篮"
 
-#: invenio/legacy/search_engine/__init__.py:3385
+#: invenio/legacy/search_engine/__init__.py:3391
 #, fuzzy, python-format
 msgid "No word index is available for %(x_name)s."
 msgstr "没有可用的字索引给"
 
-#: invenio/legacy/search_engine/__init__.py:3396
+#: invenio/legacy/search_engine/__init__.py:3402
 #, fuzzy, python-format
 msgid "No phrase index is available for %(x_name)s."
 msgstr "没有可用的短语索引给"
 
-#: invenio/legacy/search_engine/__init__.py:3434
+#: invenio/legacy/search_engine/__init__.py:3440
 #, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record."
 " Nearest terms in any collection are:"
 msgstr "在索引 %(x_index)s 匹配不到关於 %(x_term)s 的任何记录。接近的短语是："
 
-#: invenio/legacy/search_engine/__init__.py:3439
+#: invenio/legacy/search_engine/__init__.py:3445
 #, fuzzy, python-format
 msgid ""
 "Search term %(x_name)s did not match any record. Nearest terms in any "
 "collection are:"
 msgstr "匹配不到关於 %s 的任何记录。接近的短语是："
 
-#: invenio/legacy/search_engine/__init__.py:4340
+#: invenio/legacy/search_engine/__init__.py:4346
 #, fuzzy, python-format
 msgid ""
 "Sorry, %(x_option)s does not seem to be a valid sort option. The records "
 "will not be sorted."
 msgstr "对不起，%s 不是一正确的排序选项，请选用标题排序。"
 
-#: invenio/legacy/search_engine/__init__.py:4468
+#: invenio/legacy/search_engine/__init__.py:4474
 #, fuzzy, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %(x_name)d records only. Using"
 " default sort order."
 msgstr "对不起，这排序功能只被允许在最多 %d 纪录中使用。请用正常排序。"
 
-#: invenio/legacy/search_engine/__init__.py:4480
+#: invenio/legacy/search_engine/__init__.py:4486
 #, fuzzy, python-format
 msgid ""
 "Sorry, %(x_name)s does not seem to be a valid sort option. The records "
 "will not be sorted."
 msgstr "对不起，%s 不是一正确的排序选项，请选用标题排序。"
 
-#: invenio/legacy/search_engine/__init__.py:4760
-#: invenio/legacy/search_engine/__init__.py:5121
+#: invenio/legacy/search_engine/__init__.py:4766
+#: invenio/legacy/search_engine/__init__.py:5127
 #, fuzzy, python-format
 msgid "The record %(x_rec)d replaces it."
 msgstr "这记录并不存在。"
 
-#: invenio/legacy/search_engine/__init__.py:4986
+#: invenio/legacy/search_engine/__init__.py:4992
 msgid "Use different search terms."
 msgstr "用其他关键词。"
 
-#: invenio/legacy/search_engine/__init__.py:5982
+#: invenio/legacy/search_engine/__init__.py:5988
 #: invenio/legacy/websearch/templates.py:813
 #: invenio/legacy/websearch/templates.py:891
 #: invenio/legacy/websearch/templates.py:1014
@@ -6432,11 +6437,11 @@ msgstr "用其他关键词。"
 msgid "Browse"
 msgstr "浏览"
 
-#: invenio/legacy/search_engine/__init__.py:6413
+#: invenio/legacy/search_engine/__init__.py:6419
 msgid "No match within your time limits, discarding this condition..."
 msgstr "没有在时限内匹配到记录, 放弃中..."
 
-#: invenio/legacy/search_engine/__init__.py:6447
+#: invenio/legacy/search_engine/__init__.py:6453
 msgid "No match within your search limits, discarding this condition..."
 msgstr "没有在找寻限制内匹配到记录, 放弃中..."
 
@@ -6743,7 +6748,7 @@ msgstr "您的搜寻结果"
 #: invenio/legacy/webbasket/webinterface.py:1026
 #: invenio/legacy/webbasket/webinterface.py:1116
 #: invenio/legacy/webbasket/webinterface.py:1260
-#: invenio/legacy/webcomment/webinterface.py:922
+#: invenio/legacy/webcomment/webinterface.py:928
 #: invenio/legacy/webmessage/templates.py:466
 #: invenio/legacy/websession/templates.py:774
 #: invenio/legacy/websession/templates.py:2350
@@ -6807,7 +6812,7 @@ msgstr "设置新警报"
 #: invenio/legacy/webalert/webinterface.py:475
 #: invenio/legacy/webalert/webinterface.py:523
 #: invenio/legacy/webalert/webinterface.py:551
-#: invenio/legacy/webcomment/webinterface.py:925
+#: invenio/legacy/webcomment/webinterface.py:931
 #: invenio/legacy/websession/webinterface.py:231
 #: invenio/legacy/websession/webinterface.py:254
 #: invenio/legacy/websession/webinterface.py:340
@@ -7488,7 +7493,7 @@ msgid "This functionality is forbidden to guest users."
 msgstr "游客是被禁止使用这功能。"
 
 #: invenio/legacy/webbasket/templates.py:2184
-#: invenio/legacy/webcomment/templates.py:1011
+#: invenio/legacy/webcomment/templates.py:1010
 msgid "Back to search results"
 msgstr "返回检索结果页"
 
@@ -7663,7 +7668,7 @@ msgstr "加入至用户"
 
 #: invenio/legacy/webbasket/templates.py:3221
 #: invenio/legacy/webbasket/templates.py:4025
-#: invenio/legacy/webcomment/templates.py:409
+#: invenio/legacy/webcomment/templates.py:408
 #: invenio/legacy/webmessage/templates.py:111
 #: invenio/modules/messages/templates/messages/view_base.html:55
 msgid "Reply"
@@ -7810,215 +7815,215 @@ msgstr "用户 %s 并不存在。"
 msgid "Record ID %(x_rec)s does not exist."
 msgstr "用户 %s 并不存在。"
 
-#: invenio/legacy/webcomment/templates.py:83
-#: invenio/legacy/webcomment/templates.py:938
+#: invenio/legacy/webcomment/templates.py:82
+#: invenio/legacy/webcomment/templates.py:937
 #: invenio/legacy/websubmit/templates.py:2451
 #: invenio/modules/formatter/templates/format/record/Video_HTML_detailed.tpl:58
 msgid "Write a comment"
 msgstr "撰写意见"
 
-#: invenio/legacy/webcomment/templates.py:99
+#: invenio/legacy/webcomment/templates.py:98
 #, fuzzy, python-format
 msgid "%(x_nb)i Comments for round \"%(x_name)s\""
 msgstr "%(x_name)s 在 %(x_date)s 写："
 
-#: invenio/legacy/webcomment/templates.py:102
+#: invenio/legacy/webcomment/templates.py:101
 #, fuzzy, python-format
 msgid "%(x_nb)i Comments"
 msgstr "意见"
 
-#: invenio/legacy/webcomment/templates.py:140
+#: invenio/legacy/webcomment/templates.py:139
 #, fuzzy, python-format
 msgid "Showing the latest %(x_num)i comments:"
 msgstr "显示最後的 %i 意见："
 
-#: invenio/legacy/webcomment/templates.py:153
-#: invenio/legacy/webcomment/templates.py:179
+#: invenio/legacy/webcomment/templates.py:152
+#: invenio/legacy/webcomment/templates.py:178
 msgid "Discuss this document"
 msgstr "讨论这评论"
 
-#: invenio/legacy/webcomment/templates.py:180
-#: invenio/legacy/webcomment/templates.py:951
+#: invenio/legacy/webcomment/templates.py:179
+#: invenio/legacy/webcomment/templates.py:950
 msgid "Start a discussion about any aspect of this document."
 msgstr "讨论这文件。"
 
-#: invenio/legacy/webcomment/templates.py:197
+#: invenio/legacy/webcomment/templates.py:196
 #, fuzzy, python-format
 msgid "Sorry, the record %(x_rec)s does not seem to exist."
 msgstr "对不起，记录 %s 并不存在。"
 
-#: invenio/legacy/webcomment/templates.py:201
+#: invenio/legacy/webcomment/templates.py:200
 #, fuzzy, python-format
 msgid "Sorry, %(x_rec)s is not a valid ID value."
 msgstr "对不起，%s 不是一有效数值。"
 
-#: invenio/legacy/webcomment/templates.py:203
+#: invenio/legacy/webcomment/templates.py:202
 msgid "Sorry, no record ID was provided."
 msgstr "对不起，并没有提供记录ID。"
 
-#: invenio/legacy/webcomment/templates.py:207
+#: invenio/legacy/webcomment/templates.py:206
 #, fuzzy, python-format
 msgid "You may want to start browsing from %(x_link)s"
 msgstr "您可以从%s开始浏览 "
 
-#: invenio/legacy/webcomment/templates.py:265
-#: invenio/legacy/webcomment/templates.py:756
-#: invenio/legacy/webcomment/templates.py:766
+#: invenio/legacy/webcomment/templates.py:264
+#: invenio/legacy/webcomment/templates.py:755
+#: invenio/legacy/webcomment/templates.py:765
 #, fuzzy, python-format
 msgid "%(x_nb)i comments for round \"%(x_name)s\""
 msgstr "%(x_name)s 在 %(x_date)s 写："
 
-#: invenio/legacy/webcomment/templates.py:295
-#: invenio/legacy/webcomment/templates.py:861
+#: invenio/legacy/webcomment/templates.py:294
+#: invenio/legacy/webcomment/templates.py:860
 msgid "Was this review helpful?"
 msgstr "这评论有用吗？"
 
-#: invenio/legacy/webcomment/templates.py:306
-#: invenio/legacy/webcomment/templates.py:342
-#: invenio/legacy/webcomment/templates.py:938
+#: invenio/legacy/webcomment/templates.py:305
+#: invenio/legacy/webcomment/templates.py:341
+#: invenio/legacy/webcomment/templates.py:937
 #: invenio/modules/comments/templates/comments/add_review_base.html:54
 msgid "Write a review"
 msgstr "撰写评论"
 
-#: invenio/legacy/webcomment/templates.py:313
-#: invenio/legacy/webcomment/templates.py:925
-#: invenio/legacy/webcomment/templates.py:2185
+#: invenio/legacy/webcomment/templates.py:312
+#: invenio/legacy/webcomment/templates.py:924
+#: invenio/legacy/webcomment/templates.py:2184
 #, python-format
 msgid "Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews"
 msgstr "平均评论得分：%(x_nb_score)s 基于 %(x_nb_reviews)s 条评论"
 
-#: invenio/legacy/webcomment/templates.py:316
+#: invenio/legacy/webcomment/templates.py:315
 #, fuzzy, python-format
 msgid "Readers found the following %(x_name)s reviews to be most helpful."
 msgstr "读者觉得以下 %s 评论是有用的。"
 
-#: invenio/legacy/webcomment/templates.py:318
-#: invenio/legacy/webcomment/templates.py:341
+#: invenio/legacy/webcomment/templates.py:317
+#: invenio/legacy/webcomment/templates.py:340
 #, fuzzy, python-format
 msgid "View all %(x_name)s reviews"
 msgstr "阅读全部%s评论"
 
-#: invenio/legacy/webcomment/templates.py:337
-#: invenio/legacy/webcomment/templates.py:359
-#: invenio/legacy/webcomment/templates.py:2226
+#: invenio/legacy/webcomment/templates.py:336
+#: invenio/legacy/webcomment/templates.py:358
+#: invenio/legacy/webcomment/templates.py:2225
 msgid "Rate this document"
 msgstr "评价这文件"
 
-#: invenio/legacy/webcomment/templates.py:360
+#: invenio/legacy/webcomment/templates.py:359
 #, fuzzy
 msgid "Be the first to review this document.</div>"
 msgstr "成为第一个读者去评论这文件。"
 
-#: invenio/legacy/webcomment/templates.py:404
-#: invenio/legacy/webcomment/templates.py:465
-#: invenio/legacy/webcomment/templates.py:807
+#: invenio/legacy/webcomment/templates.py:403
+#: invenio/legacy/webcomment/templates.py:464
+#: invenio/legacy/webcomment/templates.py:806
 #: invenio/modules/workflows/templates/workflows/actions/approval_main.html:23
 #, fuzzy
 msgid "Close"
 msgstr "评分"
 
-#: invenio/legacy/webcomment/templates.py:411
-#: invenio/legacy/webcomment/templates.py:862
+#: invenio/legacy/webcomment/templates.py:410
+#: invenio/legacy/webcomment/templates.py:861
 msgid "Report abuse"
 msgstr "举报滥用"
 
-#: invenio/legacy/webcomment/templates.py:425
+#: invenio/legacy/webcomment/templates.py:424
 #, fuzzy
 msgid "Undelete comment"
 msgstr "删除意见"
 
-#: invenio/legacy/webcomment/templates.py:434
-#: invenio/legacy/webcomment/templates.py:436
+#: invenio/legacy/webcomment/templates.py:433
+#: invenio/legacy/webcomment/templates.py:435
 msgid "Delete comment"
 msgstr "删除意见"
 
-#: invenio/legacy/webcomment/templates.py:442
+#: invenio/legacy/webcomment/templates.py:441
 #, fuzzy
 msgid "Unreport comment"
 msgstr "删除意见"
 
-#: invenio/legacy/webcomment/templates.py:453
+#: invenio/legacy/webcomment/templates.py:452
 msgid "Attached file"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:453
+#: invenio/legacy/webcomment/templates.py:452
 msgid "Attached files"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:465
-#: invenio/legacy/webcomment/templates.py:806
+#: invenio/legacy/webcomment/templates.py:464
+#: invenio/legacy/webcomment/templates.py:805
 msgid "Open"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:534
+#: invenio/legacy/webcomment/templates.py:533
 #, python-format
 msgid "Reviewed by %(x_nickname)s on %(x_date)s"
 msgstr "%(x_nickname)s 在 %(x_date)s 评论这文件"
 
-#: invenio/legacy/webcomment/templates.py:538
+#: invenio/legacy/webcomment/templates.py:537
 #, fuzzy, python-format
 msgid "%(x_nb_people)s out of %(x_nb_total)s people found this review useful"
 msgstr "%(x_nb_people)i/%(x_nb_total)i个读者评价这评论是有用的"
 
-#: invenio/legacy/webcomment/templates.py:560
+#: invenio/legacy/webcomment/templates.py:559
 #, fuzzy
 msgid "Undelete review"
 msgstr "删除已选择的评论"
 
-#: invenio/legacy/webcomment/templates.py:569
+#: invenio/legacy/webcomment/templates.py:568
 #, fuzzy
 msgid "Delete review"
 msgstr "删除已选择的评论"
 
-#: invenio/legacy/webcomment/templates.py:575
+#: invenio/legacy/webcomment/templates.py:574
 #, fuzzy
 msgid "Unreport review"
 msgstr "撰写评论"
 
-#: invenio/legacy/webcomment/templates.py:682
-#: invenio/legacy/webcomment/templates.py:698
-#: invenio/legacy/webcomment/webinterface.py:248
-#: invenio/legacy/webcomment/webinterface.py:466
+#: invenio/legacy/webcomment/templates.py:681
+#: invenio/legacy/webcomment/templates.py:697
+#: invenio/legacy/webcomment/webinterface.py:252
+#: invenio/legacy/webcomment/webinterface.py:472
 #: invenio/legacy/websearch/adminlib.py:3406
 #: invenio/legacy/websubmit/templates.py:2449
 #: invenio/modules/comments/views.py:188
 msgid "Comments"
 msgstr "意见"
 
-#: invenio/legacy/webcomment/templates.py:683
-#: invenio/legacy/webcomment/templates.py:699
-#: invenio/legacy/webcomment/webinterface.py:248
-#: invenio/legacy/webcomment/webinterface.py:466
+#: invenio/legacy/webcomment/templates.py:682
+#: invenio/legacy/webcomment/templates.py:698
+#: invenio/legacy/webcomment/webinterface.py:252
+#: invenio/legacy/webcomment/webinterface.py:472
 #: invenio/legacy/websearch/adminlib.py:3407
 #: invenio/modules/comments/views.py:222
 msgid "Reviews"
 msgstr "评论"
 
-#: invenio/legacy/webcomment/templates.py:942
+#: invenio/legacy/webcomment/templates.py:941
 #, fuzzy, python-format
 msgid "There is a total of %(x_num)s reviews"
 msgstr "总共有 %s 评论"
 
-#: invenio/legacy/webcomment/templates.py:944
+#: invenio/legacy/webcomment/templates.py:943
 #, fuzzy, python-format
 msgid "There is a total of %(x_num)s comments"
 msgstr "总共有 %s "
 
-#: invenio/legacy/webcomment/templates.py:956
+#: invenio/legacy/webcomment/templates.py:955
 msgid "Be the first to review this document."
 msgstr "成为第一个读者去评论这文件。"
 
-#: invenio/legacy/webcomment/templates.py:975
+#: invenio/legacy/webcomment/templates.py:974
 msgid "Subscribe"
 msgstr "订阅"
 
-#: invenio/legacy/webcomment/templates.py:993
+#: invenio/legacy/webcomment/templates.py:992
 #, fuzzy
 msgid "Unsubscribe"
 msgstr "订阅"
 
-#: invenio/legacy/webcomment/templates.py:1010
-#: invenio/legacy/webcomment/templates.py:1787
+#: invenio/legacy/webcomment/templates.py:1009
+#: invenio/legacy/webcomment/templates.py:1786
 #: invenio/legacy/websearch/templates.py:548
 #: invenio/modules/comments/templates/comments/subscriptions_base.html:40
 #: invenio/modules/editor/templates/editor/recordmenu.html:22
@@ -8027,515 +8032,515 @@ msgstr "订阅"
 msgid "Record"
 msgstr "记录"
 
-#: invenio/legacy/webcomment/templates.py:1020
-#: invenio/legacy/webcomment/templates.py:1088
+#: invenio/legacy/webcomment/templates.py:1019
+#: invenio/legacy/webcomment/templates.py:1087
 msgid "review"
 msgstr "评论"
 
-#: invenio/legacy/webcomment/templates.py:1020
-#: invenio/legacy/webcomment/templates.py:1088
+#: invenio/legacy/webcomment/templates.py:1019
+#: invenio/legacy/webcomment/templates.py:1087
 msgid "comment"
 msgstr "意见"
 
-#: invenio/legacy/webcomment/templates.py:1023
-#: invenio/legacy/webcomment/templates.py:2028
+#: invenio/legacy/webcomment/templates.py:1022
+#: invenio/legacy/webcomment/templates.py:2027
 msgid "Review"
 msgstr "评论"
 
-#: invenio/legacy/webcomment/templates.py:1086
+#: invenio/legacy/webcomment/templates.py:1085
 msgid "Viewing"
 msgstr "阅读"
 
-#: invenio/legacy/webcomment/templates.py:1087
+#: invenio/legacy/webcomment/templates.py:1086
 msgid "Page:"
 msgstr "页:"
 
-#: invenio/legacy/webcomment/templates.py:1101
+#: invenio/legacy/webcomment/templates.py:1100
 #, fuzzy
 msgid "You are not authorized to comment or review."
 msgstr "您并不是这收藏篮的拥有者。"
 
-#: invenio/legacy/webcomment/templates.py:1271
+#: invenio/legacy/webcomment/templates.py:1270
 #, fuzzy, python-format
 msgid ""
 "Note: Your nickname, %(nick)s, will be displayed as author of this "
 "comment."
 msgstr "注意：您的诨号 - %s - 将会成显示为文件的作者名称。"
 
-#: invenio/legacy/webcomment/templates.py:1276
-#: invenio/legacy/webcomment/templates.py:1393
+#: invenio/legacy/webcomment/templates.py:1275
+#: invenio/legacy/webcomment/templates.py:1392
 #, python-format
 msgid ""
 "Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. "
 "%(x_nickname)s will be displayed as the author of this comment."
 msgstr "注意：您并未%(x_url_open)s定义您的诨号%(x_url_close)s。%(x_nickname)s 是会成显示为文件的作者名称。"
 
-#: invenio/legacy/webcomment/templates.py:1293
+#: invenio/legacy/webcomment/templates.py:1292
 msgid "Once logged in, authorized users can also attach files."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1308
+#: invenio/legacy/webcomment/templates.py:1307
 msgid "Optionally, attach a file to this comment"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1309
+#: invenio/legacy/webcomment/templates.py:1308
 msgid "Optionally, attach files to this comment"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1310
+#: invenio/legacy/webcomment/templates.py:1309
 #, fuzzy
 msgid "Max one file"
 msgstr "增添规则"
 
-#: invenio/legacy/webcomment/templates.py:1311
+#: invenio/legacy/webcomment/templates.py:1310
 #, fuzzy, python-format
 msgid "Max %(maxfiles)i files"
 msgstr "文档"
 
-#: invenio/legacy/webcomment/templates.py:1312
+#: invenio/legacy/webcomment/templates.py:1311
 #, python-format
 msgid "Max %(x_nb_bytes)s per file"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1327
+#: invenio/legacy/webcomment/templates.py:1326
 msgid "Send me an email when a new comment is posted"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1342
-#: invenio/legacy/webcomment/templates.py:1464
+#: invenio/legacy/webcomment/templates.py:1341
+#: invenio/legacy/webcomment/templates.py:1463
 msgid "Article"
 msgstr "文章"
 
-#: invenio/legacy/webcomment/templates.py:1344
+#: invenio/legacy/webcomment/templates.py:1343
 #, fuzzy
 msgid "Add comment"
 msgstr "新增评论"
 
-#: invenio/legacy/webcomment/templates.py:1389
+#: invenio/legacy/webcomment/templates.py:1388
 #, fuzzy, python-format
 msgid ""
 "Note: Your nickname, %(x_name)s, will be displayed as the author of this "
 "review."
 msgstr "您的诨号 - %s - 将会成显示为评论的作者名称。"
 
-#: invenio/legacy/webcomment/templates.py:1465
+#: invenio/legacy/webcomment/templates.py:1464
 msgid "Rate this article"
 msgstr "评价这文章"
 
-#: invenio/legacy/webcomment/templates.py:1466
+#: invenio/legacy/webcomment/templates.py:1465
 msgid "Select a score"
 msgstr "选择评分"
 
-#: invenio/legacy/webcomment/templates.py:1467
+#: invenio/legacy/webcomment/templates.py:1466
 msgid "Give a title to your review"
 msgstr "输入评论标题"
 
-#: invenio/legacy/webcomment/templates.py:1468
+#: invenio/legacy/webcomment/templates.py:1467
 msgid "Write your review"
 msgstr "撰写评论"
 
-#: invenio/legacy/webcomment/templates.py:1473
+#: invenio/legacy/webcomment/templates.py:1472
 #, fuzzy
 msgid "Add review"
 msgstr "新增评论"
 
-#: invenio/legacy/webcomment/templates.py:1483
-#: invenio/legacy/webcomment/webinterface.py:511
+#: invenio/legacy/webcomment/templates.py:1482
+#: invenio/legacy/webcomment/webinterface.py:517
 msgid "Add Review"
 msgstr "新增评论"
 
-#: invenio/legacy/webcomment/templates.py:1505
+#: invenio/legacy/webcomment/templates.py:1504
 msgid "Your review was successfully added."
 msgstr "您的评论已被接受。"
 
-#: invenio/legacy/webcomment/templates.py:1507
+#: invenio/legacy/webcomment/templates.py:1506
 msgid "Your comment was successfully added."
 msgstr "您的意见已被接受。"
 
-#: invenio/legacy/webcomment/templates.py:1510
+#: invenio/legacy/webcomment/templates.py:1509
 msgid "Back to record"
 msgstr "返回记录"
 
-#: invenio/legacy/webcomment/templates.py:1512
+#: invenio/legacy/webcomment/templates.py:1511
 #, fuzzy, python-format
 msgid ""
 "You can also view all the comments you have submitted so far on "
 "\"%(x_url_open)sYour Comments%(x_url_close)s\" page."
 msgstr "您可直接在%(x_url_open)s这里%(x_url_close)s咨询您的组别名单。"
 
-#: invenio/legacy/webcomment/templates.py:1592
+#: invenio/legacy/webcomment/templates.py:1591
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:171
 #, fuzzy
 msgid "View most commented records"
 msgstr "阅读意见"
 
-#: invenio/legacy/webcomment/templates.py:1594
+#: invenio/legacy/webcomment/templates.py:1593
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:207
 #, fuzzy
 msgid "View latest commented records"
 msgstr "阅读意见"
 
-#: invenio/legacy/webcomment/templates.py:1596
+#: invenio/legacy/webcomment/templates.py:1595
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:140
 #, fuzzy
 msgid "View all comments reported as abuse"
 msgstr "查阅全部用户"
 
-#: invenio/legacy/webcomment/templates.py:1600
+#: invenio/legacy/webcomment/templates.py:1599
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:170
 #, fuzzy
 msgid "View most reviewed records"
 msgstr "移除记录"
 
-#: invenio/legacy/webcomment/templates.py:1602
+#: invenio/legacy/webcomment/templates.py:1601
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:206
 #, fuzzy
 msgid "View latest reviewed records"
 msgstr "阅读全部%s评论"
 
-#: invenio/legacy/webcomment/templates.py:1604
+#: invenio/legacy/webcomment/templates.py:1603
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:140
 #, fuzzy
 msgid "View all reviews reported as abuse"
 msgstr "查阅全部用户"
 
-#: invenio/legacy/webcomment/templates.py:1612
+#: invenio/legacy/webcomment/templates.py:1611
 msgid "View all users who have been reported"
 msgstr "查阅全部曾给予意见/评论的用户"
 
-#: invenio/legacy/webcomment/templates.py:1614
+#: invenio/legacy/webcomment/templates.py:1613
 msgid "Guide"
 msgstr "指南"
 
-#: invenio/legacy/webcomment/templates.py:1616
+#: invenio/legacy/webcomment/templates.py:1615
 msgid "Comments and reviews are disabled"
 msgstr "意见和评论已被禁止"
 
-#: invenio/legacy/webcomment/templates.py:1636
+#: invenio/legacy/webcomment/templates.py:1635
 msgid ""
 "Please enter the ID of the comment/review so that you can view it before "
 "deciding whether to delete it or not"
 msgstr "请输入意见/评论ID以便查阅，之後您可以决定是否删除它。"
 
-#: invenio/legacy/webcomment/templates.py:1660
+#: invenio/legacy/webcomment/templates.py:1659
 msgid "Comment ID:"
 msgstr "意见ID："
 
-#: invenio/legacy/webcomment/templates.py:1661
+#: invenio/legacy/webcomment/templates.py:1660
 msgid "Or enter a record ID to list all the associated comments/reviews:"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1662
+#: invenio/legacy/webcomment/templates.py:1661
 #, fuzzy
 msgid "Record ID:"
 msgstr "记录号"
 
-#: invenio/legacy/webcomment/templates.py:1664
+#: invenio/legacy/webcomment/templates.py:1663
 msgid "View Comment"
 msgstr "查阅意见"
 
-#: invenio/legacy/webcomment/templates.py:1685
+#: invenio/legacy/webcomment/templates.py:1684
 msgid "There have been no reports so far."
 msgstr "没有任何报告记录。"
 
-#: invenio/legacy/webcomment/templates.py:1689
+#: invenio/legacy/webcomment/templates.py:1688
 #, fuzzy, python-format
 msgid "View all %(x_name)s reported comments"
 msgstr "查阅全部 %s 意见"
 
-#: invenio/legacy/webcomment/templates.py:1692
+#: invenio/legacy/webcomment/templates.py:1691
 #, fuzzy, python-format
 msgid "View all %(x_name)s reported reviews"
 msgstr "查阅全部 %s 评论"
 
-#: invenio/legacy/webcomment/templates.py:1729
+#: invenio/legacy/webcomment/templates.py:1728
 msgid ""
 "Here is a list, sorted by total number of reports, of all users who have "
 "had a comment reported at least once."
 msgstr "这名单列出全部曾提交意见或评论的用户。"
 
-#: invenio/legacy/webcomment/templates.py:1737
-#: invenio/legacy/webcomment/templates.py:1766
+#: invenio/legacy/webcomment/templates.py:1736
+#: invenio/legacy/webcomment/templates.py:1765
 #: invenio/legacy/websession/templates.py:272
 #: invenio/legacy/websession/templates.py:1221
 #: invenio/modules/accounts/forms.py:46 invenio/modules/accounts/forms.py:164
 msgid "Nickname"
 msgstr "诨号"
 
-#: invenio/legacy/webcomment/templates.py:1739
-#: invenio/legacy/webcomment/templates.py:1768
+#: invenio/legacy/webcomment/templates.py:1738
+#: invenio/legacy/webcomment/templates.py:1767
 msgid "User ID"
 msgstr "用户ID"
 
-#: invenio/legacy/webcomment/templates.py:1741
+#: invenio/legacy/webcomment/templates.py:1740
 msgid "Number positive votes"
 msgstr "正面的投票"
 
-#: invenio/legacy/webcomment/templates.py:1742
+#: invenio/legacy/webcomment/templates.py:1741
 msgid "Number negative votes"
 msgstr "负面的投票"
 
-#: invenio/legacy/webcomment/templates.py:1743
+#: invenio/legacy/webcomment/templates.py:1742
 msgid "Total number votes"
 msgstr "全部投票数目"
 
-#: invenio/legacy/webcomment/templates.py:1744
+#: invenio/legacy/webcomment/templates.py:1743
 msgid "Total number of reports"
 msgstr "报告数目"
 
-#: invenio/legacy/webcomment/templates.py:1745
+#: invenio/legacy/webcomment/templates.py:1744
 msgid "View all user's reported comments/reviews"
 msgstr "查阅全部用户的意见和评论"
 
-#: invenio/legacy/webcomment/templates.py:1778
+#: invenio/legacy/webcomment/templates.py:1777
 #, fuzzy, python-format
 msgid "This review has been reported %(x_num)i times"
 msgstr "这评论已被报告了%i次"
 
-#: invenio/legacy/webcomment/templates.py:1780
+#: invenio/legacy/webcomment/templates.py:1779
 #, fuzzy, python-format
 msgid "This comment has been reported %(x_num)i times"
 msgstr "这意见已被报告了%i次"
 
-#: invenio/legacy/webcomment/templates.py:2029
+#: invenio/legacy/webcomment/templates.py:2028
 msgid "Written by"
 msgstr "作者："
 
-#: invenio/legacy/webcomment/templates.py:2030
+#: invenio/legacy/webcomment/templates.py:2029
 msgid "General informations"
 msgstr "一般资料"
 
-#: invenio/legacy/webcomment/templates.py:2045
+#: invenio/legacy/webcomment/templates.py:2044
 msgid "Delete selected reviews"
 msgstr "删除已选择的评论"
 
-#: invenio/legacy/webcomment/templates.py:2046
-#: invenio/legacy/webcomment/templates.py:2053
+#: invenio/legacy/webcomment/templates.py:2045
+#: invenio/legacy/webcomment/templates.py:2052
 msgid "Suppress selected abuse report"
 msgstr "查禁已选择的滥用报告"
 
-#: invenio/legacy/webcomment/templates.py:2047
+#: invenio/legacy/webcomment/templates.py:2046
 #, fuzzy
 msgid "Undelete selected reviews"
 msgstr "删除已选择的评论"
 
-#: invenio/legacy/webcomment/templates.py:2051
+#: invenio/legacy/webcomment/templates.py:2050
 #, fuzzy
 msgid "Undelete selected comments"
 msgstr "删除已选择的意见"
 
-#: invenio/legacy/webcomment/templates.py:2052
+#: invenio/legacy/webcomment/templates.py:2051
 msgid "Delete selected comments"
 msgstr "删除已选择的意见"
 
-#: invenio/legacy/webcomment/templates.py:2067
+#: invenio/legacy/webcomment/templates.py:2066
 #, fuzzy, python-format
 msgid "Here are the reported reviews of user %(x_name)s"
 msgstr "用户 %s 的评论："
 
-#: invenio/legacy/webcomment/templates.py:2069
+#: invenio/legacy/webcomment/templates.py:2068
 #, fuzzy, python-format
 msgid "Here are the reported comments of user %(x_name)s"
 msgstr "用户 %s 的意见："
 
-#: invenio/legacy/webcomment/templates.py:2073
+#: invenio/legacy/webcomment/templates.py:2072
 #, fuzzy, python-format
 msgid "Here is review %(x_name)s"
 msgstr "评论/意见 %s"
 
-#: invenio/legacy/webcomment/templates.py:2075
+#: invenio/legacy/webcomment/templates.py:2074
 #, fuzzy, python-format
 msgid "Here is comment %(x_name)s"
 msgstr "评论/意见 %s"
 
-#: invenio/legacy/webcomment/templates.py:2078
+#: invenio/legacy/webcomment/templates.py:2077
 #, fuzzy, python-format
 msgid "Here is review %(x_cmtID)s written by user %(x_user)s"
 msgstr "用户 %(x_user)s 的评论/意见 %(x_cmtID)s"
 
-#: invenio/legacy/webcomment/templates.py:2080
+#: invenio/legacy/webcomment/templates.py:2079
 #, fuzzy, python-format
 msgid "Here is comment %(x_cmtID)s written by user %(x_user)s"
 msgstr "用户 %(x_user)s 的评论/意见 %(x_cmtID)s"
 
-#: invenio/legacy/webcomment/templates.py:2086
+#: invenio/legacy/webcomment/templates.py:2085
 msgid "Here are all reported reviews sorted by the most reported"
 msgstr "全部评论 (以最多提供评论者排序)"
 
-#: invenio/legacy/webcomment/templates.py:2088
+#: invenio/legacy/webcomment/templates.py:2087
 msgid "Here are all reported comments sorted by the most reported"
 msgstr "全部意见 (以最多提供意见者排序)"
 
-#: invenio/legacy/webcomment/templates.py:2093
+#: invenio/legacy/webcomment/templates.py:2092
 #, fuzzy, python-format
 msgid "Here are all reviews for record %(x_num)i, sorted by the most reported"
 msgstr "全部评论 (以最多提供评论者排序)"
 
-#: invenio/legacy/webcomment/templates.py:2094
+#: invenio/legacy/webcomment/templates.py:2093
 #, fuzzy
 msgid "Show comments"
 msgstr "阅读意见"
 
-#: invenio/legacy/webcomment/templates.py:2096
+#: invenio/legacy/webcomment/templates.py:2095
 #, fuzzy, python-format
 msgid "Here are all comments for record %(x_num)i, sorted by the most reported"
 msgstr "全部意见 (以最多提供意见者排序)"
 
-#: invenio/legacy/webcomment/templates.py:2097
+#: invenio/legacy/webcomment/templates.py:2096
 #, fuzzy
 msgid "Show reviews"
 msgstr "评论"
 
-#: invenio/legacy/webcomment/templates.py:2122
-#: invenio/legacy/webcomment/templates.py:2146
-#: invenio/legacy/webcomment/templates.py:2172
+#: invenio/legacy/webcomment/templates.py:2121
+#: invenio/legacy/webcomment/templates.py:2145
+#: invenio/legacy/webcomment/templates.py:2171
 msgid "comment ID"
 msgstr "意见ID"
 
-#: invenio/legacy/webcomment/templates.py:2122
+#: invenio/legacy/webcomment/templates.py:2121
 msgid "successfully deleted"
 msgstr "成功删除"
 
-#: invenio/legacy/webcomment/templates.py:2146
+#: invenio/legacy/webcomment/templates.py:2145
 #, fuzzy
 msgid "successfully undeleted"
 msgstr "成功删除"
 
-#: invenio/legacy/webcomment/templates.py:2172
+#: invenio/legacy/webcomment/templates.py:2171
 msgid "successfully suppressed abuse report"
 msgstr "成功查禁滥用报告"
 
-#: invenio/legacy/webcomment/templates.py:2189
+#: invenio/legacy/webcomment/templates.py:2188
 #, fuzzy
 msgid "Not yet reviewed"
 msgstr "撰写评论"
 
-#: invenio/legacy/webcomment/templates.py:2257
+#: invenio/legacy/webcomment/templates.py:2256
 #, python-format
 msgid "The following review was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2258
+#: invenio/legacy/webcomment/templates.py:2257
 #, python-format
 msgid "The following comment was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2285
+#: invenio/legacy/webcomment/templates.py:2284
 msgid "This is an automatic message, please don't reply to it."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2287
+#: invenio/legacy/webcomment/templates.py:2286
 #, python-format
 msgid "To post another comment, go to <%(x_url)s> instead."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2292
+#: invenio/legacy/webcomment/templates.py:2291
 #, python-format
 msgid "To specifically reply to this comment, go to <%(x_url)s>"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2297
+#: invenio/legacy/webcomment/templates.py:2296
 #, python-format
 msgid "To unsubscribe from this discussion, go to <%(x_url)s>"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2301
+#: invenio/legacy/webcomment/templates.py:2300
 #, python-format
 msgid "For any question, please use <%(CFG_SITE_SUPPORT_EMAIL)s>"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2368
+#: invenio/legacy/webcomment/templates.py:2367
 #, fuzzy
 msgid "Your comment will be lost."
 msgstr "您的意见已被张贴。"
 
-#: invenio/legacy/webcomment/templates.py:2406
+#: invenio/legacy/webcomment/templates.py:2405
 #, fuzzy
 msgid "Oldest comment first"
 msgstr "删除意见"
 
-#: invenio/legacy/webcomment/templates.py:2407
+#: invenio/legacy/webcomment/templates.py:2406
 #, fuzzy
 msgid "Latest comment first"
 msgstr "时间"
 
-#: invenio/legacy/webcomment/templates.py:2408
+#: invenio/legacy/webcomment/templates.py:2407
 msgid "Group by record, oldest commented first"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2409
+#: invenio/legacy/webcomment/templates.py:2408
 #, fuzzy
 msgid "Group by record, latest commented first"
 msgstr "阅读意见"
 
-#: invenio/legacy/webcomment/templates.py:2411
+#: invenio/legacy/webcomment/templates.py:2410
 #, fuzzy
 msgid "Records and comments"
 msgstr "详细资料和意见"
 
-#: invenio/legacy/webcomment/templates.py:2412
+#: invenio/legacy/webcomment/templates.py:2411
 #, fuzzy
 msgid "Records only"
 msgstr "找到 %s 笔记录"
 
-#: invenio/legacy/webcomment/templates.py:2413
+#: invenio/legacy/webcomment/templates.py:2412
 #, fuzzy
 msgid "Comments only"
 msgstr "意见"
 
+#: invenio/legacy/webcomment/templates.py:2414
 #: invenio/legacy/webcomment/templates.py:2415
 #: invenio/legacy/webcomment/templates.py:2416
 #: invenio/legacy/webcomment/templates.py:2417
-#: invenio/legacy/webcomment/templates.py:2418
 #, fuzzy, python-format
 msgid "%(x_i)s items"
 msgstr "时间"
 
-#: invenio/legacy/webcomment/templates.py:2419
+#: invenio/legacy/webcomment/templates.py:2418
 #, fuzzy
 msgid "All items"
 msgstr "加入至用户"
 
-#: invenio/legacy/webcomment/templates.py:2422
+#: invenio/legacy/webcomment/templates.py:2421
 msgid "Below is the list of the comments you have submitted so far."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2426
+#: invenio/legacy/webcomment/templates.py:2425
 msgid "You have not yet submitted any comment in the document \"discussion\" tab."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2429
-#: invenio/legacy/webcomment/templates.py:2437
-#: invenio/legacy/webcomment/templates.py:2445
+#: invenio/legacy/webcomment/templates.py:2428
+#: invenio/legacy/webcomment/templates.py:2436
+#: invenio/legacy/webcomment/templates.py:2444
 msgid "You might find other comments here: "
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2457
+#: invenio/legacy/webcomment/templates.py:2456
 msgid ""
 "You have not yet submitted any comment. Browse documents from the search "
 "interface and take part to discussions!"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2485
+#: invenio/legacy/webcomment/templates.py:2484
 msgid "Display"
 msgstr "显示"
 
-#: invenio/legacy/webcomment/templates.py:2486
+#: invenio/legacy/webcomment/templates.py:2485
 #, fuzzy
 msgid "Order by"
 msgstr "创建日期"
 
-#: invenio/legacy/webcomment/templates.py:2487
+#: invenio/legacy/webcomment/templates.py:2486
 #, fuzzy
 msgid "Per page"
 msgstr "下一页"
 
-#: invenio/legacy/webcomment/templates.py:2491
+#: invenio/legacy/webcomment/templates.py:2490
 #, fuzzy
 msgid "Display options"
 msgstr "显示警报"
 
-#: invenio/legacy/webcomment/templates.py:2492
+#: invenio/legacy/webcomment/templates.py:2491
 #: invenio/legacy/webjournal/adminlib.py:328
 #: invenio/legacy/webjournal/adminlib.py:345
 #: invenio/legacy/webjournal/templates.py:457
@@ -8544,106 +8549,106 @@ msgstr "显示警报"
 msgid "Refresh"
 msgstr "参考"
 
-#: invenio/legacy/webcomment/templates.py:2521
+#: invenio/legacy/webcomment/templates.py:2520
 msgid "Comment deleted by the moderator"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2523
+#: invenio/legacy/webcomment/templates.py:2522
 msgid "You have deleted this comment: it is not visible by other users"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2530
+#: invenio/legacy/webcomment/templates.py:2529
 #, fuzzy
 msgid "(in reply to a comment)"
 msgstr "删除意见"
 
-#: invenio/legacy/webcomment/templates.py:2535
+#: invenio/legacy/webcomment/templates.py:2534
 msgid "See comment on discussion page"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2574
+#: invenio/legacy/webcomment/templates.py:2573
 #, python-format
 msgid "%(x_num)i comments found in total (not shown on this page)"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2576
+#: invenio/legacy/webcomment/templates.py:2575
 #, fuzzy, python-format
 msgid "%(x_num)i items found in total"
 msgstr "没有找到。"
 
-#: invenio/legacy/webcomment/webinterface.py:272
-#: invenio/legacy/webcomment/webinterface.py:530
+#: invenio/legacy/webcomment/webinterface.py:276
+#: invenio/legacy/webcomment/webinterface.py:536
 msgid "Record Not Found"
 msgstr "找不到记录"
 
-#: invenio/legacy/webcomment/webinterface.py:350
-#: invenio/legacy/webcomment/webinterface.py:591
-#: invenio/legacy/webcomment/webinterface.py:668
+#: invenio/legacy/webcomment/webinterface.py:354
+#: invenio/legacy/webcomment/webinterface.py:597
+#: invenio/legacy/webcomment/webinterface.py:674
 msgid "Specified comment does not belong to this record"
 msgstr ""
 
-#: invenio/legacy/webcomment/webinterface.py:359
-#: invenio/legacy/webcomment/webinterface.py:597
-#: invenio/legacy/webcomment/webinterface.py:674
+#: invenio/legacy/webcomment/webinterface.py:363
+#: invenio/legacy/webcomment/webinterface.py:603
+#: invenio/legacy/webcomment/webinterface.py:680
 #, fuzzy
 msgid "You do not have access to the specified comment"
 msgstr "您没有足够权限以读取这收藏篮。"
 
-#: invenio/legacy/webcomment/webinterface.py:431
+#: invenio/legacy/webcomment/webinterface.py:437
 #, python-format
 msgid ""
 "The size of file \\\"%(x_file)s\\\" (%(x_size)s) is larger than maximum "
 "allowed file size (%(x_max)s). Select files again."
 msgstr ""
 
-#: invenio/legacy/webcomment/webinterface.py:513
+#: invenio/legacy/webcomment/webinterface.py:519
 #: invenio/legacy/websubmit/templates.py:2445
 #: invenio/legacy/websubmit/templates.py:2446
 msgid "Add Comment"
 msgstr "新增评论"
 
-#: invenio/legacy/webcomment/webinterface.py:602
+#: invenio/legacy/webcomment/webinterface.py:608
 msgid "You cannot vote for a deleted comment"
 msgstr ""
 
-#: invenio/legacy/webcomment/webinterface.py:679
+#: invenio/legacy/webcomment/webinterface.py:685
 #, fuzzy
 msgid "You cannot report a deleted comment"
 msgstr "阅读所有意见"
 
-#: invenio/legacy/webcomment/webinterface.py:826
-#: invenio/legacy/webcomment/webinterface.py:866
+#: invenio/legacy/webcomment/webinterface.py:832
+#: invenio/legacy/webcomment/webinterface.py:872
 #, fuzzy
 msgid "Page Not Found"
 msgstr "找不到 %s 专辑"
 
-#: invenio/legacy/webcomment/webinterface.py:827
+#: invenio/legacy/webcomment/webinterface.py:833
 #, fuzzy
 msgid "The requested comment could not be found"
 msgstr "这记录并不存在。"
 
-#: invenio/legacy/webcomment/webinterface.py:847
+#: invenio/legacy/webcomment/webinterface.py:853
 msgid "You cannot access files of a deleted comment"
 msgstr ""
 
-#: invenio/legacy/webcomment/webinterface.py:867
+#: invenio/legacy/webcomment/webinterface.py:873
 #, fuzzy
 msgid "The requested file could not be found"
 msgstr "这记录并不存在。"
 
-#: invenio/legacy/webcomment/webinterface.py:910
+#: invenio/legacy/webcomment/webinterface.py:916
 #, fuzzy
 msgid "You are not authorized to use comments."
 msgstr "您并不是这收藏篮的拥有者。"
 
-#: invenio/legacy/webcomment/webinterface.py:912
+#: invenio/legacy/webcomment/webinterface.py:918
 #: invenio/legacy/websession/templates.py:635
 #: invenio/legacy/websession/templates.py:788
 #, fuzzy
 msgid "Your Comments"
 msgstr "意见"
 
-#: invenio/legacy/webcomment/webinterface.py:924
+#: invenio/legacy/webcomment/webinterface.py:930
 #, fuzzy, python-format
 msgid "%(x_name)s View your previously submitted comments"
 msgstr "阅读所有意见"
@@ -13021,7 +13026,7 @@ msgid "Problem with login."
 msgstr ""
 
 #: invenio/modules/accounts/views/accounts.py:138
-#, fuzzy, python-format
+#, fuzzy
 msgid "You can now access your account."
 msgstr "您可以使用您的%(x_url_open)s帐号%(x_url_close)s。"
 
@@ -13516,7 +13521,7 @@ msgid "Record ID %(recid)s is not a number."
 msgstr ""
 
 #: invenio/modules/comments/forms.py:38 invenio/modules/messages/forms.py:80
-#, fuzzy, python-format
+#, fuzzy
 msgid ""
 "Your message is too long, please edit it. Maximum size allowed is "
 "%{length}i characters."
@@ -13563,12 +13568,12 @@ msgid "Review was sent"
 msgstr "撰写意见"
 
 #: invenio/modules/comments/views.py:263
-#, fuzzy, python-format
+#, fuzzy
 msgid "Comment has been reported."
 msgstr "这意见已被报告了%i次"
 
 #: invenio/modules/comments/views.py:265
-#, fuzzy, python-format
+#, fuzzy
 msgid "Comment has been already reported."
 msgstr "这意见已被报告了%i次"
 
@@ -13653,7 +13658,7 @@ msgid ""
 msgstr ""
 
 #: invenio/modules/communities/forms.py:150
-#, fuzzy, python-format
+#, fuzzy
 msgid "The identifier already exists. Please choose a different one."
 msgstr "诨号 %s 已被使用。"
 
@@ -13797,7 +13802,7 @@ msgid "Invalid deposition type."
 msgstr ""
 
 #: invenio/modules/deposit/views/deposit.py:76
-#, fuzzy, python-format
+#, fuzzy
 msgid "Deposition does not exists."
 msgstr "功能 %s 并不存在。"
 
@@ -14079,7 +14084,7 @@ msgstr "显示全部 %i 名作者"
 msgid "Manage Files of This Record"
 msgstr ""
 
-#: invenio/modules/formatter/format_elements/bfe_edit_record.py:47
+#: invenio/modules/formatter/format_elements/bfe_edit_record.py:52
 #, fuzzy
 msgid "Edit This Record"
 msgstr "请使用其他记录ID重试。"
@@ -14292,12 +14297,12 @@ msgstr "您不是以下组别的管理人："
 msgid "Members"
 msgstr "没有成员"
 
-#: invenio/modules/indexer/admin.py:78
+#: invenio/modules/indexer/admin.py:79
 #, fuzzy
 msgid "Knowledge base name"
 msgstr "知识库对照"
 
-#: invenio/modules/indexer/admin.py:81 invenio/modules/indexer/admin.py:93
+#: invenio/modules/indexer/admin.py:82 invenio/modules/indexer/admin.py:93
 #: invenio/modules/knowledge/forms.py:74
 #, fuzzy
 msgid "-None-"
@@ -14307,11 +14312,11 @@ msgstr "完成"
 msgid "Stemming language"
 msgstr ""
 
-#: invenio/modules/indexer/admin.py:99
+#: invenio/modules/indexer/admin.py:98
 msgid "Tokenizer"
 msgstr ""
 
-#: invenio/modules/indexer/admin.py:105
+#: invenio/modules/indexer/admin.py:104
 #, fuzzy
 msgid "Index fields"
 msgstr "任何字段"
@@ -14357,13 +14362,14 @@ msgid "Create KB \"Dynamic\""
 msgstr ""
 
 #: invenio/modules/knowledge/templates/knowledge/list.html:34
-#, fuzzy, python-format
+#, fuzzy
 msgid "Create new record \"Written As\""
 msgstr "总共有 %i 个收藏篮"
 
 #: invenio/modules/knowledge/templates/knowledge/list.html:34
-msgid "Create KB \"Writtes As\""
-msgstr ""
+#, fuzzy
+msgid "Create KB \"Written As\""
+msgstr "总共有 %i 个收藏篮"
 
 #: invenio/modules/knowledge/templates/knowledge/list.html:70
 #, fuzzy
@@ -14528,19 +14534,19 @@ msgstr ""
 msgid "Confidential"
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:143
+#: invenio/modules/oauth2server/models.py:144
 msgid "Name of application (displayed to users)."
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:154
+#: invenio/modules/oauth2server/models.py:155
 msgid "Optional. Description of the application (displayed to users)."
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:163
+#: invenio/modules/oauth2server/models.py:164
 msgid "Website URL"
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:164
+#: invenio/modules/oauth2server/models.py:165
 msgid "URL of your application (displayed to users)."
 msgstr ""
 
@@ -14977,7 +14983,7 @@ msgid "Tag name"
 msgstr "诨号"
 
 #: invenio/modules/tags/views.py:199
-#, fuzzy, python-format
+#, fuzzy
 msgid "is already in use."
 msgstr "诨号 %s 正被使用中。"
 
@@ -15337,7 +15343,7 @@ msgid "just now"
 msgstr "您要先"
 
 #: invenio/utils/date.py:555
-#, fuzzy, python-format
+#, fuzzy
 msgid " seconds ago"
 msgstr "%s 秒"
 
@@ -15395,1735 +15401,3 @@ msgstr "任何年份"
 #, fuzzy
 msgid " years ago"
 msgstr "年份"
-
-#~ msgid "Warning: Please, select a valid time"
-#~ msgstr "请选择类别"
-
-#~ msgid "Warning: Please, select a valid file"
-#~ msgstr "请选择类别"
-
-#~ msgid "Warning: Please, select a valid date"
-#~ msgstr "请选择类别"
-
-#~ msgid " or return to your %(x_url_open)ssearch%(x_url_close)s"
-#~ msgstr "您可以使用您的%(x_url_open)s帐号%(x_url_close)s。"
-
-#~ msgid "*** basket name ***"
-#~ msgstr "收藏篮名称"
-
-#~ msgid ""
-#~ msgstr "我们已经发送有关帐号的电邮给您。"
-
-#~ msgid "Additional Citation Metrics"
-#~ msgstr "编辑登入资料"
-
-#~ msgid "Sorry, you must log in to perform this action."
-#~ msgstr "抱歉, 您必须先登入。"
-
-#~ msgid "Please log in first."
-#~ msgstr "您必须先登入。"
-
-#~ msgid "Use the top-right menu to log in."
-#~ msgstr "请用右上角的目录进行登入。"
-
-#~ msgid "record"
-#~ msgstr "记录"
-
-#~ msgid "document"
-#~ msgstr "文件"
-
-#~ msgid "Sorry parameter missing..."
-#~ msgstr "缺少 docid 参数"
-
-#~ msgid "Next Step"
-#~ msgstr "下一页"
-
-#~ msgid "Acquisitions"
-#~ msgstr "行动"
-
-#~ msgid "Order new book"
-#~ msgstr "创建主题"
-
-#~ msgid "Renewalls"
-#~ msgstr "评论"
-
-#~ msgid "A new loan has been registered."
-#~ msgstr "帐号已建立。"
-
-#~ msgid "Order new copy"
-#~ msgstr "创建主题"
-
-#~ msgid "Book Information"
-#~ msgstr "更多资料"
-
-#~ msgid "EAN"
-#~ msgstr "和"
-
-#~ msgid "Publication place"
-#~ msgstr "共享收藏篮"
-
-#~ msgid "Number of pages"
-#~ msgstr "阅读次数"
-
-#~ msgid "Sub-library"
-#~ msgstr "图书馆"
-
-#~ msgid "Price"
-#~ msgstr "文章"
-
-#~ msgid "now"
-#~ msgstr "否"
-
-#~ msgid "BibCheck Admin"
-#~ msgstr "BibFormat 管理"
-
-#~ msgid "Not authorized"
-#~ msgstr "作者"
-
-#~ msgid "ERROR: %s does not exist"
-#~ msgstr "用户 %s 并不存在。"
-
-#~ msgid "Really delete"
-#~ msgstr "成功删除"
-
-#~ msgid "Verify problem"
-#~ msgstr "数据库错误"
-
-#~ msgid "File"
-#~ msgstr "标题"
-
-#~ msgid "File %s already exists."
-#~ msgstr "用户 %s 并不存在。"
-
-#~ msgid "File %s: written OK."
-#~ msgstr "作者："
-
-#~ msgid "File %s: write failed."
-#~ msgstr "删除收藏篮"
-
-#~ msgid "File %s deleted."
-#~ msgstr "用户 %s 并不存在。"
-
-#~ msgid "File %s: delete failed."
-#~ msgstr "删除收藏篮"
-
-#~ msgid "Guests are not authorized to run batchuploader"
-#~ msgstr "您并不是这收藏篮的拥有者。"
-
-#~ msgid "The user '%s' is not authorized to run batchuploader"
-#~ msgstr "您并不是这收藏篮的拥有者。"
-
-#~ msgid "Open Tickets"
-#~ msgstr "收藏"
-
-#~ msgid "Additional Data for this Person"
-#~ msgstr "编辑登入资料"
-
-#~ msgid "Forget decision"
-#~ msgstr "现在成员"
-
-#~ msgid "Rejected!"
-#~ msgstr "已拒绝"
-
-#~ msgid "Your papers"
-#~ msgstr "警报"
-
-#~ msgid "Not your papers"
-#~ msgstr "忘记您的密码？"
-
-#~ msgid "These are mine!"
-#~ msgstr "总共有 %i 个收藏篮"
-
-#~ msgid "These are not mine!"
-#~ msgstr "总共有 %i 个收藏篮"
-
-#~ msgid "Not Mine."
-#~ msgstr "注意"
-
-#~ msgid "Not Mine!"
-#~ msgstr "注意"
-
-#~ msgid "Tickets"
-#~ msgstr "时间"
-
-#~ msgid "Request Tickets"
-#~ msgstr "规则"
-
-#~ msgid "Submit Attribution Information"
-#~ msgstr "一般资料"
-
-#~ msgid "Please review your actions"
-#~ msgstr "请选择类别"
-
-#~ msgid "You are about to attribute the following paper"
-#~ msgstr "您是以下组别的成员："
-
-#~ msgid "Navigation:"
-#~ msgstr "引用之历史记录"
-
-#~ msgid "Person Interface FAQ"
-#~ msgstr "内部错误"
-
-#~ msgid "Person Search"
-#~ msgstr "搜寻"
-
-#~ msgid "Open tickets"
-#~ msgstr "时间"
-
-#~ msgid "Sorry."
-#~ msgstr "对不起"
-
-#~ msgid "Please provide at least one transaction."
-#~ msgstr "抱歉, 您必须先登入。"
-
-#~ msgid "Error:"
-#~ msgstr "错误"
-
-#~ msgid "Create a new Person for your search"
-#~ msgstr "找寻不到记录"
-
-#~ msgid "Id"
-#~ msgstr "Id"
-
-#~ msgid "A %s has been added."
-#~ msgstr "组别 %s 已被删除"
-
-#~ msgid "Barcoce"
-#~ msgstr "浏览"
-
-#~ msgid "No fulltext"
-#~ msgstr "全文"
-
-#~ msgid "last note on"
-#~ msgstr "最新意见："
-
-#~ msgid ", no notes yet"
-#~ msgstr "注意"
-
-#~ msgid "HTML brief"
-#~ msgstr "简短的HTML"
-
-#~ msgid "deleted"
-#~ msgstr "删除"
-
-#~ msgid "in their rules and descriptions"
-#~ msgstr "显示最新的新增方块"
-
-#~ msgid "No such knowledge base"
-#~ msgstr "未知的知识库"
-
-#~ msgid "Date:"
-#~ msgstr "日期"
-
-#~ msgid "Time:"
-#~ msgstr "时间"
-
-#~ msgid "Example:"
-#~ msgstr "例子"
-
-#~ msgid "are mandatory"
-#~ msgstr "必须的"
-
-#~ msgid "are mandatory."
-#~ msgstr "必须的"
-
-#~ msgid "Check the"
-#~ msgstr "点击这"
-
-#~ msgid "Configure Bibknowledge"
-#~ msgstr "设定 BibIndex"
-
-#~ msgid "creating a new basket"
-#~ msgstr "创建收藏篮"
-
-#~ msgid "by"
-#~ msgstr "由"
-
-#~ msgid "on"
-#~ msgstr "在"
-
-#~ msgid "basket"
-#~ msgstr "收藏"
-
-#~ msgid "previous basket"
-#~ msgstr "群组收藏篮"
-
-#~ msgid "Adding"
-#~ msgstr "等待中"
-
-#~ msgid "Please choose a basket"
-#~ msgstr "请选择类别"
-
-#~ msgid "Editing topic"
-#~ msgstr "编辑收藏篮"
-
-#~ msgid "niceName"
-#~ msgstr "名称"
-
-#~ msgid "Apply Changes"
-#~ msgstr "储存"
-
-#~ msgid "Edit this item"
-#~ msgstr "编辑 %s 成员"
-
-#~ msgid "return_date"
-#~ msgstr "创建日期"
-
-#~ msgid "Record %s - Add a field"
-#~ msgstr "记录 %s - 加入栏位"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s"
-#~ msgstr "编辑记录 %(x_recid)s, 栏位 %(x_field)s"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s - Add a subfield"
-#~ msgstr "编辑记录 %(x_recid)s, 栏位 %(x_field)s - 加入副栏位"
-
-#~ msgid "Submit and save record %s"
-#~ msgstr "提交并储存记录 %s"
-
-#~ msgid "updated on"
-#~ msgstr "更新"
-
-#~ msgid "records"
-#~ msgstr "记录"
-
-#~ msgid "Number of views"
-#~ msgstr "阅读次数"
-
-#~ msgid "Non-shared basket"
-#~ msgstr "非共享收藏篮"
-
-#~ msgid "Group-shared basket"
-#~ msgstr "组别共享收藏篮"
-
-#~ msgid "last"
-#~ msgstr "最後"
-
-#~ msgid "There is a total of %i comments"
-#~ msgstr "总共有 %i 意见"
-
-#~ msgid "Select basket"
-#~ msgstr "选择收藏篮"
-
-#~ msgid "Add to a personal basket"
-#~ msgstr "加入个人收藏篮"
-
-#~ msgid "%i baskets"
-#~ msgstr "%i 收藏篮"
-
-#~ msgid "Add to a group-shared basket"
-#~ msgstr "新增至组别收藏篮"
-
-#~ msgid "Adding %i records to these baskets"
-#~ msgstr "新增 %i 记录至这些收藏篮"
-
-#~ msgid "No records were added to the selected baskets."
-#~ msgstr "没有记录被加进收藏篮。"
-
-#~ msgid "Add records to baskets"
-#~ msgstr "新增记录进收藏篮"
-
-#~ msgid "Subscribe to this discussion"
-#~ msgstr "订阅这收藏篮"
-
-#~ msgid "Delete comment(s) or supress abuse report(s)"
-#~ msgstr "查禁滥用报告"
-
-#~ msgid "Delete Comments"
-#~ msgstr "删除意见"
-
-#~ msgid "ADD TO BASKET"
-#~ msgstr "加入您的收藏篮"
-
-#~ msgid "Frequently publishes in:"
-#~ msgstr "提交"
-
-#~ msgid "The collection to which this file belong is restricted: "
-#~ msgstr "这是一个受限制的专辑."
-
-#~ msgid "This record does not exist. Please try another record ID."
-#~ msgstr "请使用其他记录ID重试。"
-
-#~ msgid "Cannot edit deleted record.\""
-#~ msgstr "不能编辑已删除的记录"
-
-#~ msgid "The record will be deleted as soon as the task queue is empty."
-#~ msgstr "这记录将会尽快处理。"
-
-#~ msgid "Please enter the ID of the record you want to edit"
-#~ msgstr "请输入记录ID"
-
-#~ msgid "Move up"
-#~ msgstr "上移"
-
-#~ msgid "Move down"
-#~ msgstr "下移"
-
-#~ msgid "Add Subfield"
-#~ msgstr "新增副栏位"
-
-#~ msgid "Add Field"
-#~ msgstr "新增栏位"
-
-#~ msgid "Verbose"
-#~ msgstr "详细"
-
-#~ msgid "Done"
-#~ msgstr "完成"
-
-#~ msgid "Your changes are TEMPORARY."
-#~ msgstr "这更改是临时性的"
-
-#~ msgid "To save this record, please click on submit."
-#~ msgstr "请按'提交'来储存记录。"
-
-#~ msgid "Revision %(revdate)s"
-#~ msgstr "编辑记录 %(x_recid)s, 栏位 %(x_field)s"
-
-#~ msgid "View revision"
-#~ msgstr "分类"
-
-#~ msgid "Back to BibEdit"
-#~ msgstr "返回收藏篮"
-
-#~ msgid "select_from1"
-#~ msgstr "选择收藏篮"
-
-#~ msgid "select_to1"
-#~ msgstr "选择主题"
-
-#~ msgid "No more requests are waiting."
-#~ msgstr "有文件在等待批核中。"
-
-#~ msgid "next page >>>"
-#~ msgstr "下一页"
-
-#~ msgid "<<< previous page"
-#~ msgstr "上一页"
-
-#~ msgid "last page >>|"
-#~ msgstr "最後更新"
-
-#~ msgid "from"
-#~ msgstr "送件者："
-
-#~ msgid "There are record revisions not yet synchronized with the database."
-#~ msgstr "输入的电邮并不存在。"
-
-#~ msgid "View all reported reviews"
-#~ msgstr "阅读所有评论"
-
-#~ msgid "Delete a specific comment/review (by ID)"
-#~ msgstr "删除某一意见/评论 (按照ID)"
-
-#~ msgid "session"
-#~ msgstr "連線階段"
-
-#~ msgid "alerts"
-#~ msgstr "警报"
-
-#~ msgid "account"
-#~ msgstr "帐号"
-
-#~ msgid "messages"
-#~ msgstr "讯息"
-
-#~ msgid "groups"
-#~ msgstr "组别"
-
-#~ msgid "approvals"
-#~ msgstr "批核"
-
-#~ msgid "Unknown form field found on one of the submission pages."
-#~ msgstr "不知名表格栏位。"
-
-#~ msgid "List of direct approval categories"
-#~ msgstr "类别名单"
-
-#~ msgid "link"
-#~ msgstr "在"
-
-#~ msgid "Sort:"
-#~ msgstr "排序"
-
-#~ msgid "Alert sent successfully!"
-#~ msgstr "这警报 %s 已成功被修改。"
-
-#~ msgid "Webjournal Administration Interface"
-#~ msgstr "WebSubmit 管理"
-
-#~ msgid "   Username/Email: %s\n"
-#~ msgstr "帐号"
-
-#~ msgid "   Password: %s\n"
-#~ msgstr "密码"
-
-#~ msgid "Migrate BibFormat Settings"
-#~ msgstr "转移BibFormat的设置"
-
-#~ msgid "Migrate Knowledge Bases"
-#~ msgstr "转移知识库"
-
-#~ msgid "Migrate Behaviours"
-#~ msgstr "转移习性"
-
-#~ msgid "Migrate Formats"
-#~ msgstr "转移格式"
-
-#~ msgid "Your account created on"
-#~ msgstr "帐号已建立"
-
-#~ msgid "You have created a new account on"
-#~ msgstr "或创建"
-
-#~ msgid "Article Error"
-#~ msgstr "文章"
-
-#~ msgid "%s Personalize, Main page"
-#~ msgstr "个人化"
-
-#~ msgid "%s , personalize"
-#~ msgstr "个人化"
-
-#~ msgid "Successfully featured record: %s"
-#~ msgstr "成功查禁滥用报告"
-
-#~ msgid "Agenda"
-#~ msgstr "议程"
-
-#~ msgid "Webcast"
-#~ msgstr "Webcast"
-
-#~ msgid "Search Help"
-#~ msgstr "搜索帮助"
-
-#~ msgid "Format:"
-#~ msgstr "格式:"
-
-#~ msgid "Send lost password"
-#~ msgstr "发送密码"
-
-#~ msgid "Here are your user credentials for"
-#~ msgstr "登入资料："
-
-#~ msgid "username"
-#~ msgstr "帐号"
-
-#~ msgid "password"
-#~ msgstr "密码"
-
-#~ msgid "You seem to be %(x_role)s."
-#~ msgstr "您的身分角色是%(x_role)s。"
-
-#~ msgid "Credentials for"
-#~ msgstr "登入资料："
-
-#~ msgid "Unable to find file."
-#~ msgstr "无法找到档案。"
-
-#~ msgid "Export as"
-#~ msgstr "举报滥用"
-
-#~ msgid "Search Services"
-#~ msgstr "搜索帮助"
-
-#~ msgid "Citation Metrics"
-#~ msgstr "引用之历史记录"
-
-#~ msgid "WebSearch Admin Guide"
-#~ msgstr ""
-
-#~ msgid "Submit Guide"
-#~ msgstr "提交帮助"
-
-#~ msgid "Add to personal basket"
-#~ msgstr "加入个人收藏篮"
-
-#~ msgid "WebSubmit Admin Guide"
-#~ msgstr "WebSubmit 管理"
-
-#~ msgid "Click here to review the transactions."
-#~ msgstr ""
-
-#~ msgid "Quit searching."
-#~ msgstr "执行搜索"
-
-#~ msgid ""
-#~ "When you merge a set of profiles,"
-#~ " all the information stored will be"
-#~ " assigned to the primary profile. "
-#~ "This includes papers, ids or citations."
-#~ " After merging, only the primary "
-#~ "profile will remain in the system, "
-#~ "all other profiles will be automatically"
-#~ " deleted.</br>"
-#~ msgstr ""
-
-#~ msgid "Cancel merging"
-#~ msgstr "取消"
-
-#~ msgid "Merge profiles"
-#~ msgstr ""
-
-#~ msgid "Claim for yourself"
-#~ msgstr ""
-
-#~ msgid "Assign to"
-#~ msgstr ""
-
-#~ msgid "Search for a person to assign the paper to"
-#~ msgstr "您是以下组别的成员："
-
-#~ msgid "Select All"
-#~ msgstr "全部删除"
-
-#~ msgid "Select None"
-#~ msgstr "选择评分"
-
-#~ msgid "Invert Selection"
-#~ msgstr "并没有参考"
-
-#~ msgid "Hide successful claims"
-#~ msgstr ""
-
-#~ msgid "Paper Short Info"
-#~ msgstr ""
-
-#~ msgid "Author Name"
-#~ msgstr "作者"
-
-#~ msgid "Experiment"
-#~ msgstr "实验"
-
-#~ msgid "Not assigned"
-#~ msgstr "注意"
-
-#~ msgid "No status information found."
-#~ msgstr "更多资料"
-
-#~ msgid "Operator review of user actions pending"
-#~ msgstr ""
-
-#~ msgid "Sorry, there are currently no records to be found in this category."
-#~ msgstr ""
-
-#~ msgid "Review Transaction"
-#~ msgstr "分类"
-
-#~ msgid "On all pages"
-#~ msgstr "储存更改"
-
-#~ msgid "With selected do"
-#~ msgstr "已被拒绝："
-
-#~ msgid "View name variants"
-#~ msgstr "阅读意见"
-
-#~ msgid "The author has an internal ID!"
-#~ msgstr ""
-
-#~ msgid "These records have been marked as not being from this person."
-#~ msgstr ""
-
-#~ msgid "They will be regarded in the next run of the author "
-#~ msgstr ""
-
-#~ msgid "disambiguation algorithm and might disappear from this listing."
-#~ msgstr ""
-
-#~ msgid "No comments"
-#~ msgstr "意见"
-
-#~ msgid "Not Available"
-#~ msgstr "没有可使用的文件种类。"
-
-#~ msgid " Delete this ticket"
-#~ msgstr "删除收藏篮"
-
-#~ msgid " Commit this entire ticket"
-#~ msgstr ""
-
-#~ msgid "No title available"
-#~ msgstr "没有可使用的文件种类。"
-
-#~ msgid "Make sure we match the right names!"
-#~ msgstr ""
-
-#~ msgid "Please select an author on each of the records that will be assigned."
-#~ msgstr ""
-
-#~ msgid "Papers without a name selected will be ignored in the process."
-#~ msgstr ""
-
-#~ msgid "Claim for person with id"
-#~ msgstr ""
-
-#~ msgid "This seems to be an empty profile without names associated to it yet"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "(the names will be automatically "
-#~ "gathered when the first paper is "
-#~ "claimed to this profile)."
-#~ msgstr ""
-
-#~ msgid "Select name for"
-#~ msgstr "选择评分"
-
-#~ msgid "Error retrieving record title"
-#~ msgstr ""
-
-#~ msgid "Paper title: "
-#~ msgstr "页:"
-
-#~ msgid "Ignore"
-#~ msgstr ""
-
-#~ msgid "The following names have been automatically chosen:"
-#~ msgstr "发现以下错误"
-
-#~ msgid " --  With name: "
-#~ msgstr ""
-
-#~ msgid "Symbols legend: "
-#~ msgstr ""
-
-#~ msgid "Everything is shiny, captain!"
-#~ msgstr ""
-
-#~ msgid "The result of this request will be visible immediately"
-#~ msgstr ""
-
-#~ msgid "Confirmation needed to continue"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The result of this request will be"
-#~ " visible immediately but we need your"
-#~ " confirmation to do so for this "
-#~ "paper has been manually claimed before"
-#~ msgstr ""
-
-#~ msgid "This will create a change request for the operators"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The result of this request will be"
-#~ " visible upon confirmation through an "
-#~ "operator"
-#~ msgstr ""
-
-#~ msgid "Selected name on paper"
-#~ msgstr "选择评分"
-
-#~ msgid "Verification needed to continue"
-#~ msgstr ""
-
-#~ msgid "This will create a request for the operators"
-#~ msgstr ""
-
-#~ msgid "Please provide your information"
-#~ msgstr "更多资料"
-
-#~ msgid "Please provide your first name"
-#~ msgstr "您必须先登入。"
-
-#~ msgid "Your first name:"
-#~ msgstr ""
-
-#~ msgid "Please provide your last name"
-#~ msgstr ""
-
-#~ msgid "Your last name:"
-#~ msgstr "外借"
-
-#~ msgid "Please provide your eMail address"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "This eMail address is reserved by "
-#~ "a user. Please log in or provide"
-#~ " an alternative eMail address"
-#~ msgstr ""
-
-#~ msgid "Your eMail:"
-#~ msgstr "警报"
-
-#~ msgid "You may leave a comment (optional)"
-#~ msgstr ""
-
-#~ msgid "Continue claiming*"
-#~ msgstr ""
-
-#~ msgid "Confirm these changes**"
-#~ msgstr ""
-
-#~ msgid "!Delete the entire request!"
-#~ msgstr "删除已选择的评论"
-
-#~ msgid "Mark as your documents"
-#~ msgstr "全部文件类型"
-
-#~ msgid "Mark as _not_ your documents"
-#~ msgstr ""
-
-#~ msgid "Nothing staged as not yours"
-#~ msgstr ""
-
-#~ msgid "Mark as their documents"
-#~ msgstr "评价这文件"
-
-#~ msgid "Nothing staged in this category"
-#~ msgstr ""
-
-#~ msgid "Mark as _not_ their documents"
-#~ msgstr "评价这文件"
-
-#~ msgid "  * You can come back to this page later. Nothing will be lost. <br />"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "  ** Performs all requested changes. "
-#~ "Changes subject to permission restrictions "
-#~ "will be submitted to an operator "
-#~ "for manual review."
-#~ msgstr ""
-
-#~ msgid "Create a new Person"
-#~ msgstr "或创建"
-
-#~ msgid "This is my profile"
-#~ msgstr ""
-
-#~ msgid "Assign paper"
-#~ msgstr ""
-
-#~ msgid "Add to merge list"
-#~ msgstr "加入至用户"
-
-#~ msgid ""
-#~ "We do not have a publication list"
-#~ " for '%s'. Try using a less "
-#~ "specific author name, or check back "
-#~ "in a few days as attributions are"
-#~ " updated frequently.  Or you can send"
-#~ " us feedback, at "
-#~ msgstr ""
-
-#~ msgid "Recent Papers"
-#~ msgstr "页:"
-
-#~ msgid "Showing the"
-#~ msgstr ""
-
-#~ msgid "most recent documents:"
-#~ msgstr "文件名单"
-
-#~ msgid "Sorry, there are no documents known for this person"
-#~ msgstr ""
-
-#~ msgid "The following profile is the one you were viewing before logging in: "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Out of %s paper(s) claimed to your"
-#~ " arXiv account, %s match this "
-#~ "profile: "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If none of the options suggested "
-#~ "above apply, you can look for "
-#~ "other possible options from the list "
-#~ "below:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span title=\"Login through arXiv is "
-#~ "needed to verify this is your "
-#~ "profile. When you log in your "
-#~ "publication list will automatically update "
-#~ "with all your arXiv publications.\n"
-#~ "You may also continue as a guest."
-#~ " In this case your input will "
-#~ "be processed by our staff and will"
-#~ " take longer to display.\"><strong> Login"
-#~ " with your arXiv.org account "
-#~ "</strong></span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "You have succesfully logged in via "
-#~ "arXiv. </br> You can now manage "
-#~ "your profile.</br>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "You have succesfully logged in via "
-#~ "arXiv.</br><div> <font color='red'>However the "
-#~ "profile you are viewing is not "
-#~ "your profile.</br></br></font>"
-#~ msgstr ""
-
-#~ msgid "Manage your profile"
-#~ msgstr "管理格式模板"
-
-#~ msgid ""
-#~ "You have succesfully logged in, but "
-#~ "</br><div><font color='red'> you are not "
-#~ "associated to a person yet. Please "
-#~ "use the button below to choose "
-#~ "your profile </br></br></font>"
-#~ msgstr ""
-
-#~ msgid "Choose your profile"
-#~ msgstr "选择主题"
-
-#~ msgid "Please log in through arXiv to manage your profile.</br>"
-#~ msgstr ""
-
-#~ msgid "Login into Inspire through arXiv.org"
-#~ msgstr ""
-
-#~ msgid ""
-#~ " <span title=\"ORCiD (Open Researcher "
-#~ "and Contributor ID) is a unique "
-#~ "researcher identifier that distinguishes you"
-#~ " from other researchers.\n"
-#~ "It holds a record of all your "
-#~ "research activities. You can add your"
-#~ " ORCiD to all your works to "
-#~ "make sure they are associated with "
-#~ "you. \">\n"
-#~ "        <strong> Connect this profile to an ORCiD </strong> <span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "This profile is already connected to "
-#~ "the following ORCiD: <strong>%s</strong></br>"
-#~ msgstr ""
-
-#~ msgid "Import your publications from ORCID"
-#~ msgstr ""
-
-#~ msgid "Visit your profile in ORCID"
-#~ msgstr ""
-
-#~ msgid "Connect an ORCiD to this profile"
-#~ msgstr ""
-
-#~ msgid "Suggest an ORCiD for this profile:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span title=\"When you add more "
-#~ "publications you make sure your "
-#~ "publication list and citations appear "
-#~ "correctly on your profile.\n"
-#~ "You can also assign publications to "
-#~ "other authors. This will help INSPIRE"
-#~ " provide more accurate publication and "
-#~ "citation statistics. \"><strong> Manage "
-#~ "publications </strong><span>"
-#~ msgstr ""
-
-#~ msgid "Manage publication list"
-#~ msgstr "创建日期"
-
-#~ msgid "<strong> Person identifiers, internal and external </strong>"
-#~ msgstr ""
-
-#~ msgid "add external id"
-#~ msgstr "一般设定"
-
-#~ msgid "Harvest missing external ids from claimed papers"
-#~ msgstr ""
-
-#~ msgid "suggest external id to add"
-#~ msgstr ""
-
-#~ msgid "suggest selected ids to delete"
-#~ msgstr ""
-
-#~ msgid "suggest missing ids"
-#~ msgstr "提交"
-
-#~ msgid "Choose system"
-#~ msgstr "选择主题"
-
-#~ msgid ""
-#~ "<span title=\"You don’t need to add all your publications one by one.\n"
-#~ "This list contains all your publications"
-#~ " that were automatically assigned to "
-#~ "your INSPIRE profile through arXiv and"
-#~ " ORCiD. \"><strong> Automatically assigned "
-#~ "publications </strong> </span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span id=\"autoClaimMessage\">Please wait as "
-#~ "we are assigning %s papers from "
-#~ "external systems to your Inspire "
-#~ "profile</span></br>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The following publications have been "
-#~ "successfully assigned to your profile:"
-#~ msgstr "发现以下错误"
-
-#~ msgid "Get help!"
-#~ msgstr ""
-
-#~ msgid "<strong> Contact </strong>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Please contact our user support in "
-#~ "case you need help or you just "
-#~ "want to suggest some new ideas. We"
-#~ " will get back to you. </br>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span title=\"It sometimes happens that "
-#~ "somebody's publications are scattered among"
-#~ " two or more profiles for various "
-#~ "reasons\n"
-#~ "(different spelling, change of name, "
-#~ "multiple people with the same name). "
-#~ "You can merge a set of profiles"
-#~ " together.\n"
-#~ "This will assign all the information "
-#~ "(including publications, IDs and citations)"
-#~ " to the profile you choose as a"
-#~ " primary profile.\n"
-#~ "After the merging only the primary "
-#~ "profile will exist in the system "
-#~ "and all others will be automatically "
-#~ "deleted. \"><strong> Merge profiles "
-#~ "</strong><span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If your or somebody else's publications"
-#~ " in INSPIRE exist in multiple "
-#~ "profiles, you can fix that here. "
-#~ "</br>"
-#~ msgstr ""
-
-#~ msgid "Fatal: Author ID capabilities are disabled on this system."
-#~ msgstr ""
-
-#~ msgid "Fatal: You are not allowed to access this functionality."
-#~ msgstr "您不能使用管理功能。"
-
-#~ msgid "Claim this paper"
-#~ msgstr "加入至用户"
-
-#~ msgid ""
-#~ "<p>We're sorry. An error occurred while"
-#~ " handling your request. Please find "
-#~ "more information below:</p>"
-#~ msgstr ""
-
-#~ msgid "This page is not accessible directly."
-#~ msgstr ""
-
-#~ msgid "Profile management"
-#~ msgstr ""
-
-#~ msgid "The due date has been updated. New due date: %s"
-#~ msgstr ""
-
-#~ msgid "Copies of %s"
-#~ msgstr ""
-
-#~ msgid "The given barcode <strong>%s</strong> is already in use."
-#~ msgstr ""
-
-#~ msgid "The barcode <strong>%s</strong> was not found"
-#~ msgstr ""
-
-#~ msgid "The copy with barcode <strong>%s</strong> has been deleted."
-#~ msgstr ""
-
-#~ msgid "It was NOT possible to delete the copy with barcode <strong>%s</strong>"
-#~ msgstr ""
-
-#~ msgid "Barcode <strong>%s</strong> not found"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated, but the"
-#~ " <strong>status was not modified</strong>."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated, but the"
-#~ " <strong>barcode was not modified</strong> "
-#~ "because it is already in use."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated to "
-#~ "<strong>[%s]</strong> with success."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated, but the"
-#~ " <strong>barcode was not modified</strong> "
-#~ "because it was not found (!?)."
-#~ msgstr ""
-
-#~ msgid "Weighted %s keywords:"
-#~ msgstr "已有 %s 记录引用"
-
-#~ msgid ""
-#~ "The uploaded file is too small "
-#~ "(<%i o) and has therefore not been"
-#~ " considered"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The uploaded file is too big (>%i"
-#~ " o) and has therefore not been "
-#~ "considered"
-#~ msgstr ""
-
-#~ msgid "A file with format '%s' already exists. Please upload another format."
-#~ msgstr ""
-
-#~ msgid "The format %s does not exist for the given version: %s"
-#~ msgstr ""
-
-#~ msgid "Your modifications to record #%i have been submitted"
-#~ msgstr ""
-
-#~ msgid "Your modifications to record #%i have been cancelled"
-#~ msgstr ""
-
-#~ msgid "Comparison of:"
-#~ msgstr ""
-
-#~ msgid "Revision"
-#~ msgstr "分类"
-
-#~ msgid "Comparing two record revisions"
-#~ msgstr ""
-
-#~ msgid "Failed to create a ticket"
-#~ msgstr ""
-
-#~ msgid "No template could be found for output format %s."
-#~ msgstr ""
-
-#~ msgid "Error when evaluating format element %s with parameters %s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Escape mode for format element %s "
-#~ "could not be retrieved. Using default"
-#~ " mode instead."
-#~ msgstr ""
-
-#~ msgid "\"nbMax\" parameter for %s must be an \"int\"."
-#~ msgstr ""
-
-#~ msgid "Could not read format template named %s. %s."
-#~ msgstr ""
-
-#~ msgid "Format element %s has no function named \"format\"."
-#~ msgstr ""
-
-#~ msgid "Modify Template Attributes"
-#~ msgstr "修改模板属性"
-
-#~ msgid "Template Editor"
-#~ msgstr "模板编辑器"
-
-#~ msgid "Check Dependencies"
-#~ msgstr "检查从属关系"
-
-#~ msgid "Update Format Attributes"
-#~ msgstr "更新格式属性"
-
-#~ msgid "Show Documentation"
-#~ msgstr "显示文件"
-
-#~ msgid "Hide Documentation"
-#~ msgstr "隐藏文件"
-
-#~ msgid "Last Modification Date"
-#~ msgstr "更新日期"
-
-#~ msgid "Manage Output Formats"
-#~ msgstr "管理输出格式"
-
-#~ msgid "Manage Format Templates"
-#~ msgstr "管理格式模板"
-
-#~ msgid "Format Elements Documentation"
-#~ msgstr "格式元件文件"
-
-#~ msgid "Add New Format Template"
-#~ msgstr "新增格式模板"
-
-#~ msgid "Check Format Templates Extensively"
-#~ msgstr "详尽的检查格式模板"
-
-#~ msgid "Code"
-#~ msgstr "代号"
-
-#~ msgid "Add New Output Format"
-#~ msgstr "新增输出格式"
-
-#~ msgid "menu"
-#~ msgstr "目录"
-
-#~ msgid "Close Output Format"
-#~ msgstr "关闭输出格式"
-
-#~ msgid "Rules"
-#~ msgstr "规则"
-
-#~ msgid "Modify Output Format Attributes"
-#~ msgstr "修改输出格式属性"
-
-#~ msgid "Remove Rule"
-#~ msgstr "移除规则"
-
-#~ msgid "Add New Rule"
-#~ msgstr "增添规则"
-
-#~ msgid "No problem found with format"
-#~ msgstr "格式正确无误"
-
-#~ msgid "An error has been found"
-#~ msgstr "发现有错误"
-
-#~ msgid "The following errors have been found"
-#~ msgstr "发现以下错误"
-
-#~ msgid "BibFormat Admin"
-#~ msgstr "BibFormat 管理"
-
-#~ msgid "Enter a search query here."
-#~ msgstr "输入查询。"
-
-#~ msgid "No Record Found for %s."
-#~ msgstr "找不到记录"
-
-#~ msgid "Tag specification \"%s\" must end with column \":\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Tag specification \"%s\" must start with \"tag\" at line %s."
-#~ msgstr ""
-
-#~ msgid "\"tag\" must be lowercase in \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Should be \"tag field_number:\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Invalid tag \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Condition \"%s\" is outside a tag specification at line %s."
-#~ msgstr ""
-
-#~ msgid "Condition \"%s\" can only have a single separator --- at line %s."
-#~ msgstr ""
-
-#~ msgid "Template \"%s\" does not exist at line %s."
-#~ msgstr "用户 %s 并不存在。"
-
-#~ msgid "Missing column \":\" after \"default\" in \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Default template specification \"%s\" must "
-#~ "start with \"default :\" at line "
-#~ "%s."
-#~ msgstr ""
-
-#~ msgid "\"default\" keyword must be lowercase in \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Line %s could not be understood at line %s."
-#~ msgstr ""
-
-#~ msgid "Output format %s cannot not be read. %s"
-#~ msgstr "输出格式 %s 属性"
-
-#~ msgid ""
-#~ "Could not find a name specified in"
-#~ " tag \"<name>\" inside format template "
-#~ "%s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Could not find a description specified"
-#~ " in tag \"<description>\" inside format "
-#~ "template %s."
-#~ msgstr ""
-
-#~ msgid "Format template %s calls undefined element \"%s\"."
-#~ msgstr "格式模板 %s 从属关系"
-
-#~ msgid ""
-#~ "Format template %s calls unreadable "
-#~ "element \"%s\". Check element file "
-#~ "permissions."
-#~ msgstr ""
-
-#~ msgid "Cannot load element \"%s\" in template %s. Check element code."
-#~ msgstr ""
-
-#~ msgid "Format element %s uses unknown parameter \"%s\" in format template %s."
-#~ msgstr ""
-
-#~ msgid "Could not read format template named %s. %s"
-#~ msgstr ""
-
-#~ msgid "Error in format element %s. %s."
-#~ msgstr "验证格式元件 %s"
-
-#~ msgid "Format element %s cannot not be read. %s"
-#~ msgstr "格式元件 %s 从属关系"
-
-#~ msgid ""
-#~ "Cannot write in etc/bibformat dir of "
-#~ "your Invenio installation. Check directory "
-#~ "permission."
-#~ msgstr ""
-
-#~ msgid "Restricted Output Format"
-#~ msgstr "限制输出格式"
-
-#~ msgid "Output Format %s Rules"
-#~ msgstr "输出格式 %s 规则"
-
-#~ msgid "Output Format %s Attributes"
-#~ msgstr "输出格式 %s 属性"
-
-#~ msgid "Output Format %s Dependencies"
-#~ msgstr "输出格式 %s 从属关系"
-
-#~ msgid "Delete Output Format"
-#~ msgstr "删除输出格式"
-
-#~ msgid "Cannot create output format"
-#~ msgstr "管理输出格式"
-
-#~ msgid "Format template %s cannot not be read. %s"
-#~ msgstr "格式模板 %s 属性"
-
-#~ msgid "Restricted Format Template"
-#~ msgstr "限制格式模板"
-
-#~ msgid "Format Template %s"
-#~ msgstr "格式模板 %s"
-
-#~ msgid "Format Template %s Attributes"
-#~ msgstr "格式模板 %s 属性"
-
-#~ msgid "Format Template %s Dependencies"
-#~ msgstr "格式模板 %s 从属关系"
-
-#~ msgid "Delete Format Template"
-#~ msgstr "删除格式模板"
-
-#~ msgid "Format Element %s Dependencies"
-#~ msgstr "格式元件 %s 从属关系"
-
-#~ msgid "Test Format Element %s"
-#~ msgstr "测试格式元件 %s"
-
-#~ msgid "Validation of Output Format %s"
-#~ msgstr "验证输出格式 %s"
-
-#~ msgid "Validation of Format Template %s"
-#~ msgstr "验证格式模板 %s"
-
-#~ msgid "Restricted Format Element"
-#~ msgstr "限制格式元件"
-
-#~ msgid "Validation of Format Element %s"
-#~ msgstr "验证格式元件 %s"
-
-#~ msgid "No format specified for validation. Please specify one."
-#~ msgstr ""
-
-#~ msgid "Format Validation"
-#~ msgstr "验证格式"
-
-#~ msgid "The current taxonomy can be accessed with this URL: %s"
-#~ msgstr ""
-
-#~ msgid "Please upload the RDF file for taxonomy %s"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If the expression contains '%', like "
-#~ "'270__a:*%*',                          it will be"
-#~ " replaced by a search string when "
-#~ "the                          knowledge base is "
-#~ "used."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Example 2: Return the institute's name"
-#~ " (100__a) when the                          user"
-#~ " gives its postal code (270__a):"
-#~ "                          Set field to 100__a,"
-#~ " expression to 270__a:*%*."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The left side of the rule (%s) "
-#~ "already appears in these knowledge "
-#~ "bases:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The right side of the rule (%s)"
-#~ " already appears in these knowledge "
-#~ "bases:"
-#~ msgstr ""
-
-#~ msgid "File %s uploaded."
-#~ msgstr ""
-
-#~ msgid "Knowledge Base %s"
-#~ msgstr "知识库 %s"
-
-#~ msgid "No rights to upload to collection '%s'"
-#~ msgstr ""
-
-#~ msgid "<b>%s documents</b> have been found."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The system is not attempting to "
-#~ "send an email from %s, to %s, "
-#~ "with body %s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Error in connecting to the SMPT "
-#~ "server waiting %s seconds. Exception is"
-#~ " %s, while sending email from %s "
-#~ "to %s with body %s."
-#~ msgstr ""
-
-#~ msgid "Error while sending an email: %s"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "Error while sending an email.\n"
-#~ "Reason: %s\n"
-#~ "Details: %s\n"
-#~ "Sender: \"%s\"\n"
-#~ "Recipient(s): \"%s\"\n"
-#~ "\n"
-#~ "The content of the mail was as follows:\n"
-#~ "%s"
-#~ msgstr ""
-
-#~ msgid "Error in sending email from %s to %s with body %s."
-#~ msgstr ""
-
-#~ msgid "Not Set"
-#~ msgstr "注意"
-
-#~ msgid "never"
-#~ msgstr "转换"
-
-#~ msgid ""
-#~ "Do you want to touch the OAI "
-#~ "set %s? Note that this will force"
-#~ " all clients to re-harvest the "
-#~ "whole set."
-#~ msgstr ""
-
-#~ msgid "OAI set %s touched."
-#~ msgstr ""
-
-#~ msgid "Name variants"
-#~ msgstr ""
-
-#~ msgid "No Name Variants"
-#~ msgstr ""
-
-#~ msgid "downloaded"
-#~ msgstr ""
-
-#~ msgid "times"
-#~ msgstr "时间"
-
-#~ msgid "Papers"
-#~ msgstr "页:"
-
-#~ msgid "No Keywords"
-#~ msgstr "关键词"
-
-#~ msgid "Frequent keywords"
-#~ msgstr ""
-
-#~ msgid "No Subject categories"
-#~ msgstr "共享收藏篮列表"
-
-#~ msgid "No Collaborations"
-#~ msgstr "专辑"
-
-#~ msgid "unknown affiliation"
-#~ msgstr "不知名动作"
-
-#~ msgid "No Affiliations"
-#~ msgstr "引用之历史记录"
-
-#~ msgid "Affiliations"
-#~ msgstr "引用之历史记录"
-
-#~ msgid "Frequent co-authors (excluding collaborations)"
-#~ msgstr ""
-
-#~ msgid "No Frequent Co-authors"
-#~ msgstr ""
-
-#~ msgid "Citations%s"
-#~ msgstr "引用之历史记录"
-
-#~ msgid "<strong> Publications per year </strong>"
-#~ msgstr ""
-
-#~ msgid "No Publication Graph"
-#~ msgstr "创建日期"
-
-#~ msgid "<strong> Publications list </strong>"
-#~ msgstr "创建日期"
-
-#~ msgid "No publications available"
-#~ msgstr "没有可使用的文件种类。"
-
-#~ msgid "Recompute Now!"
-#~ msgstr ""
-
-#~ msgid "%s is an invalid record ID"
-#~ msgstr ""
-
-#~ msgid "%s is an invalid user ID."
-#~ msgstr ""
-
-#~ msgid "Record ID %s is not a number."
-#~ msgstr ""
-
-#~ msgid "%i comments found in total (not shown on this page)"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The size of file \\\"%s\\\" (%s) "
-#~ "is larger than maximum allowed file "
-#~ "size (%s). Select files again."
-#~ msgstr ""
-
-#~ msgid "About your article at %(url)s"
-#~ msgstr ""
-
-#~ msgid "Administrate %(journal_name)s"
-#~ msgstr ""
-
-#~ msgid "Linkbacks%s: %s"
-#~ msgstr ""
-
-#~ msgid "There is no index %s.  Searching for %s in all fields."
-#~ msgstr ""
-
-#~ msgid "Instead searching %s."
-#~ msgstr ""
-
-#~ msgid "Cited by 1 record"
-#~ msgstr "已有 %s 记录引用"
-
-#~ msgid "%i comments"
-#~ msgstr "意见"
-
-#~ msgid "%i reviews"
-#~ msgstr "评论"
-
-#~ msgid "%s of"
-#~ msgstr ""
-
-#~ msgid ".. of which self-citations: %s records"
-#~ msgstr ""
-
-#~ msgid "No Papers"
-#~ msgstr "页:"
-
-#~ msgid "Frequent co-authors"
-#~ msgstr ""
-
-#~ msgid "This is me.  Verify my publication list."
-#~ msgstr ""
-
-#~ msgid "Citations:"
-#~ msgstr "引用之历史记录"
-
-#~ msgid "No Citation Information available"
-#~ msgstr "没有可使用的文件种类。"
-
-#~ msgid "<p><a href=\"%(url)s\">%(msg)s</a></p>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "For some unknown reason multiple records"
-#~ " matching the specified DOI \"%s\" "
-#~ "have been found."
-#~ msgstr ""
-
-#~ msgid "Found multiple records matching DOI %s"
-#~ msgstr ""
-
-#~ msgid "Discussion"
-#~ msgstr "連線階段"
-
-#~ msgid "Please inform the <a href='mailto%s'>administator</a>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Somebody (possibly you) coming from %(x_ip_address)s has asked\n"
-#~ "for a password reset at %(x_sitename)s\n"
-#~ "for the account \"%(x_email)s\"."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Somebody (possibly you) coming from %(x_ip_address)s has asked\n"
-#~ "to register a new account at %(x_sitename)s\n"
-#~ "for the email address \"%(x_email)s\"."
-#~ msgstr ""
-
-#~ msgid "Your alerts"
-#~ msgstr "警报"
-
-#~ msgid "Your approvals"
-#~ msgstr "批核"
-
-#~ msgid "Your baskets"
-#~ msgstr "收藏"
-
-#~ msgid "Your loans"
-#~ msgstr "外借"
-
-#~ msgid "Your submissions"
-#~ msgstr "提交"
-
-#~ msgid "Statistics"
-#~ msgstr "状态"
-
-#~ msgid "Invitation to join \"%s\" group"
-#~ msgstr ""
-
-#~ msgid "Group: %s"
-#~ msgstr "组别: %s"
-
-#~ msgid ""
-#~ "Your e-mail is auto-generated by "
-#~ "the system. Please change your e-mail"
-#~ " from <a href='%s/youraccount/edit?ln=%s'>account "
-#~ "settings</a>."
-#~ msgstr ""
-
-#~ msgid "%s  Personalize, Main page"
-#~ msgstr ""
-
-#~ msgid "Account registration at %s"
-#~ msgstr ""
-
-#~ msgid "This is the table of contents of the %(x_category)s pages."
-#~ msgstr ""
-
-#~ msgid "Page %s Not Found"
-#~ msgstr "找不到 %s 专辑"
-
-#~ msgid ""
-#~ "The task queue is currently running "
-#~ "in automatic mode, and there are "
-#~ "currently %s tasks waiting to be "
-#~ "executed. Your record should be "
-#~ "available within a few minutes and "
-#~ "searchable within an hour or "
-#~ "thereabouts.\n"
-#~ msgstr ""
-
-#~ msgid "The field %s is mandatory."
-#~ msgstr "栏位 %s 不可留空。"
-
-#~ msgid ""
-#~ "Unable to move field at position "
-#~ "%s to position %s on page %s "
-#~ "of submission '%s%s' - Invalid Field "
-#~ "Position Numbers"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to swap field at position "
-#~ "%s with field at position %s on"
-#~ " page %s of submission %s - "
-#~ "could not move field at position "
-#~ "%s to temporary field location"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to swap field at position "
-#~ "%s with field at position %s on"
-#~ " page %s of submission %s - "
-#~ "could not move field at position "
-#~ "%s to position %s. Please ask "
-#~ "Admin to check that a field was"
-#~ " not stranded in a temporary position"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to swap field at position "
-#~ "%s with field at position %s on"
-#~ " page %s of submission %s - "
-#~ "could not move field that was "
-#~ "located at position %s to position "
-#~ "%s from temporary position. Field is "
-#~ "now stranded in temporary position and"
-#~ " must be corrected manually by an "
-#~ "Admin"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to move field at position "
-#~ "%s to position %s on page %s "
-#~ "of submission %s - could not "
-#~ "decrement the position of the fields "
-#~ "below position %s. Tried to recover "
-#~ "- please check that field ordering "
-#~ "is not broken"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to move field at position "
-#~ "%s to position %s on page %s "
-#~ "of submission %s%s - could not "
-#~ "increment the position of the fields "
-#~ "at and below position %s. The "
-#~ "field that was at position %s is"
-#~ " now stranded in a temporary "
-#~ "position."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Moved field from position %s to "
-#~ "position %s on page %s of "
-#~ "submission '%s%s'."
-#~ msgstr ""
-
-#~ msgid "Unable to delete field at position %s from page %s of submission '%s'"
-#~ msgstr "不能确定提交页数数量。"
-

@@ -1,5 +1,5 @@
 # # This file is part of Invenio.
-# # Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+# # Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2015 CERN.
 # #
 # # Invenio is free software; you can redistribute it and/or
 # # modify it under the terms of the GNU General Public License as
@@ -16,15 +16,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Invenio 1.2.0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2015-03-04 16:44+0100\n"
-"PO-Revision-Date: 2008-06-13 13:00+0100\n"
+"POT-Creation-Date: 2015-08-27 15:26+0200\n"
+"PO-Revision-Date: 2015-08-27 20:11+0200\n"
 "Last-Translator: Marko Niinimaki <man@cern.ch>\n"
 "Language-Team: JA <info@invenio-software.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.0\n"
 
 #: invenio/base/decorators.py:133
 #, python-format
@@ -205,7 +205,7 @@ msgstr ""
 
 #: invenio/base/templates/mail_html.tpl:20
 #: invenio/base/templates/mail_text.tpl:20
-#: invenio/legacy/webcomment/templates.py:2256
+#: invenio/legacy/webcomment/templates.py:2255
 #, fuzzy
 msgid "Hello:"
 msgstr "ハロー"
@@ -263,48 +263,53 @@ msgstr ""
 msgid "Error in sending email from %(x_from)s to %(x_to)s with body%(x_body)s."
 msgstr ""
 
-#: invenio/ext/login/__init__.py:68
+#: invenio/ext/login/__init__.py:61
+#, fuzzy
+msgid "Provided data is not valid"
+msgstr "この記録は存在しません。"
+
+#: invenio/ext/login/__init__.py:73
 #: invenio/legacy/websession/webinterface.py:679
 msgid "Password reset request for"
 msgstr ""
 
-#: invenio/ext/login/__init__.py:124
+#: invenio/ext/login/__init__.py:129
 #, fuzzy, python-format
 msgid "You are not authorized to use '%(x_login_method)s' login method."
 msgstr "あなたはこのバスケットの所有者ではありません"
 
-#: invenio/ext/login/__init__.py:130
+#: invenio/ext/login/__init__.py:135
 #, python-format
 msgid ""
 "You have not yet confirmed the email address for the             "
 "'%(login_method)s' authentication method."
 msgstr ""
 
-#: invenio/ext/login/__init__.py:148 invenio/modules/annotations/views.py:156
+#: invenio/ext/login/__init__.py:153 invenio/modules/annotations/views.py:156
 #: invenio/modules/comments/views.py:204 invenio/modules/comments/views.py:238
 #: invenio/modules/records/views.py:80
 #, fuzzy
 msgid "Authorization failure"
 msgstr "登録失敗"
 
-#: invenio/ext/login/__init__.py:154
+#: invenio/ext/login/__init__.py:159
 #, fuzzy
 msgid "Please sign in to continue."
 msgstr "一つ以上選んでください"
 
-#: invenio/ext/login/__init__.py:158
+#: invenio/ext/login/__init__.py:163
 #, fuzzy
 msgid "Authorization failure."
 msgstr "登録失敗"
 
-#: invenio/ext/script/__init__.py:116
+#: invenio/ext/script/__init__.py:143
 #, python-format
 msgid ""
 "A newer version of Invenio is available for download. You may want to "
 "visit <a href=\"%(wiki)s\">%()s</a>"
 msgstr ""
 
-#: invenio/ext/script/__init__.py:126
+#: invenio/ext/script/__init__.py:153
 #, python-format
 msgid "Cannot download or parse release notes from %(release_notes)s"
 msgstr ""
@@ -829,7 +834,7 @@ msgstr ""
 #: invenio/legacy/websubmit/functions/Create_Upload_Files_Interface.py:467
 #: invenio/modules/access/templates/access/admin/showroledetails_base.html:54
 #: invenio/modules/groups/forms.py:46
-#: invenio/modules/oauth2server/models.py:142
+#: invenio/modules/oauth2server/models.py:143
 #: invenio/modules/search/admin_forms.py:34 invenio/modules/tags/forms.py:162
 #: invenio/modules/tags/forms.py:262
 msgid "Name"
@@ -872,8 +877,8 @@ msgstr "あなたのバスケット"
 
 #: invenio/legacy/bibcatalog/templates.py:52
 #: invenio/legacy/bibknowledge/templates.py:170
-#: invenio/legacy/webcomment/templates.py:900
-#: invenio/legacy/webcomment/templates.py:2586
+#: invenio/legacy/webcomment/templates.py:899
+#: invenio/legacy/webcomment/templates.py:2585
 #: invenio/legacy/websearch/templates.py:2038
 msgid "Previous"
 msgstr "前"
@@ -889,8 +894,8 @@ msgstr "評価"
 
 #: invenio/legacy/bibcatalog/templates.py:74
 #: invenio/legacy/bibknowledge/templates.py:168
-#: invenio/legacy/webcomment/templates.py:916
-#: invenio/legacy/webcomment/templates.py:2610
+#: invenio/legacy/webcomment/templates.py:915
+#: invenio/legacy/webcomment/templates.py:2609
 msgid "Next"
 msgstr "次"
 
@@ -916,7 +921,7 @@ msgstr ""
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:325
 #, fuzzy
 msgid "Not authorized"
-msgstr "著者"
+msgstr "あなたはこのバスケットの所有者ではありません"
 
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:79
 #, fuzzy, python-format
@@ -1459,11 +1464,11 @@ msgstr "アカウントが作られました。"
 #: invenio/legacy/bibcirculation/adminlib.py:3543
 #: invenio/legacy/bibcirculation/adminlib.py:3587
 #: invenio/legacy/webbasket/templates.py:1839
-#: invenio/legacy/webcomment/templates.py:253
-#: invenio/legacy/webcomment/templates.py:714
-#: invenio/legacy/webcomment/templates.py:2114
-#: invenio/legacy/webcomment/templates.py:2138
-#: invenio/legacy/webcomment/templates.py:2164
+#: invenio/legacy/webcomment/templates.py:252
+#: invenio/legacy/webcomment/templates.py:713
+#: invenio/legacy/webcomment/templates.py:2113
+#: invenio/legacy/webcomment/templates.py:2137
+#: invenio/legacy/webcomment/templates.py:2163
 #: invenio/legacy/webmessage/templates.py:508
 #: invenio/legacy/websession/templates.py:2236
 #: invenio/legacy/websession/templates.py:2276
@@ -1474,11 +1479,11 @@ msgstr "はい"
 #: invenio/legacy/bibcirculation/adminlib.py:2434
 #: invenio/legacy/bibcirculation/adminlib.py:3548
 #: invenio/legacy/webalert/templates.py:320
-#: invenio/legacy/webcomment/templates.py:254
-#: invenio/legacy/webcomment/templates.py:716
-#: invenio/legacy/webcomment/templates.py:2114
-#: invenio/legacy/webcomment/templates.py:2138
-#: invenio/legacy/webcomment/templates.py:2164
+#: invenio/legacy/webcomment/templates.py:253
+#: invenio/legacy/webcomment/templates.py:715
+#: invenio/legacy/webcomment/templates.py:2113
+#: invenio/legacy/webcomment/templates.py:2137
+#: invenio/legacy/webcomment/templates.py:2163
 #: invenio/legacy/webmessage/templates.py:509
 #: invenio/legacy/websession/templates.py:2237
 #: invenio/legacy/websession/templates.py:2277
@@ -1641,9 +1646,9 @@ msgstr ""
 #: invenio/legacy/bibdocfile/webinterface.py:145
 #: invenio/legacy/search_engine/__init__.py:2223
 #: invenio/legacy/search_engine/__init__.py:2232
-#: invenio/legacy/search_engine/__init__.py:5972
-#: invenio/legacy/search_engine/__init__.py:6034
-#: invenio/legacy/search_engine/__init__.py:6125
+#: invenio/legacy/search_engine/__init__.py:5978
+#: invenio/legacy/search_engine/__init__.py:6040
+#: invenio/legacy/search_engine/__init__.py:6131
 #, fuzzy
 msgid "Requested record does not seem to exist."
 msgstr "レコード %s は存在しません。"
@@ -2308,7 +2313,7 @@ msgstr "アクション"
 #: invenio/legacy/websubmit/functions/Create_Upload_Files_Interface.py:471
 #: invenio/modules/access/templates/access/admin/showroledetails_base.html:56
 #: invenio/modules/groups/forms.py:50
-#: invenio/modules/oauth2server/models.py:153
+#: invenio/modules/oauth2server/models.py:154
 msgid "Description"
 msgstr "説明"
 
@@ -2848,7 +2853,7 @@ msgstr "却下"
 #: invenio/legacy/bibcirculation/templates.py:1772
 #: invenio/legacy/bibexport/templates.py:494
 #: invenio/legacy/bibexport/templates.py:557
-#: invenio/legacy/webcomment/templates.py:2061
+#: invenio/legacy/webcomment/templates.py:2060
 msgid "OK"
 msgstr "ＯＫ"
 
@@ -3331,8 +3336,8 @@ msgstr ""
 #: invenio/legacy/bibcirculation/templates.py:15749
 #: invenio/legacy/bibcirculation/templates.py:16003
 #: invenio/legacy/bibcirculation/utils.py:455
-#: invenio/legacy/webcomment/templates.py:1738
-#: invenio/legacy/webcomment/templates.py:1770
+#: invenio/legacy/webcomment/templates.py:1737
+#: invenio/legacy/webcomment/templates.py:1769
 msgid "Email"
 msgstr "Ｅメイル"
 
@@ -4667,15 +4672,15 @@ msgid ""
 msgstr ""
 
 #: invenio/legacy/bibcirculation/webinterface.py:854
-#: invenio/legacy/search_engine/__init__.py:4757
-#: invenio/legacy/search_engine/__init__.py:5117
-#: invenio/legacy/search_engine/__init__.py:5311
-#: invenio/legacy/search_engine/__init__.py:5334
-#: invenio/legacy/search_engine/__init__.py:5342
-#: invenio/legacy/search_engine/__init__.py:5350
-#: invenio/legacy/search_engine/__init__.py:5396
-#: invenio/legacy/webcomment/templates.py:199
-#: invenio/legacy/webcomment/templates.py:2511
+#: invenio/legacy/search_engine/__init__.py:4763
+#: invenio/legacy/search_engine/__init__.py:5123
+#: invenio/legacy/search_engine/__init__.py:5317
+#: invenio/legacy/search_engine/__init__.py:5340
+#: invenio/legacy/search_engine/__init__.py:5348
+#: invenio/legacy/search_engine/__init__.py:5356
+#: invenio/legacy/search_engine/__init__.py:5402
+#: invenio/legacy/webcomment/templates.py:198
+#: invenio/legacy/webcomment/templates.py:2510
 #: invenio/modules/comments/api.py:1862
 msgid "The record has been deleted."
 msgstr "このレコードは削除されました。"
@@ -4765,10 +4770,10 @@ msgstr "トピックを選ぶ"
 #: invenio/legacy/bibdocfile/managedocfiles.py:404
 #: invenio/legacy/bibexport/templates.py:347
 #: invenio/legacy/bibexport/templates.py:401
-#: invenio/legacy/webcomment/templates.py:1024
-#: invenio/legacy/webcomment/templates.py:1343
-#: invenio/legacy/webcomment/templates.py:1791
-#: invenio/legacy/webcomment/templates.py:2028
+#: invenio/legacy/webcomment/templates.py:1023
+#: invenio/legacy/webcomment/templates.py:1342
+#: invenio/legacy/webcomment/templates.py:1790
+#: invenio/legacy/webcomment/templates.py:2027
 #: invenio/legacy/websubmit/templates.py:2505
 #: invenio/legacy/websubmit/functions/Create_Upload_Files_Interface.py:475
 msgid "Comment"
@@ -5391,7 +5396,7 @@ msgid "Total"
 msgstr "オプション"
 
 #: invenio/legacy/bibexport/templates.py:652
-#: invenio/legacy/webcomment/templates.py:2031
+#: invenio/legacy/webcomment/templates.py:2030
 msgid "Select"
 msgstr "選択"
 
@@ -5710,7 +5715,7 @@ msgstr ""
 #: invenio/legacy/bibknowledge/templates.py:329
 #: invenio/legacy/bibknowledge/templates.py:589
 #: invenio/legacy/bibknowledge/templates.py:658
-#: invenio/legacy/webcomment/templates.py:1619
+#: invenio/legacy/webcomment/templates.py:1618
 #: invenio/legacy/webjournal/templates.py:203
 #: invenio/legacy/webjournal/templates.py:575
 #: invenio/legacy/webjournal/templates.py:716
@@ -6096,8 +6101,8 @@ msgstr ""
 
 #: invenio/legacy/search_engine/__init__.py:935
 #: invenio/legacy/search_engine/__init__.py:968
-#: invenio/legacy/search_engine/__init__.py:6020
-#: invenio/legacy/search_engine/__init__.py:6114
+#: invenio/legacy/search_engine/__init__.py:6026
+#: invenio/legacy/search_engine/__init__.py:6120
 msgid "Search Results"
 msgstr "検索結果"
 
@@ -6312,7 +6317,7 @@ msgid ""
 "this doesn't help, please check your search and try again."
 msgstr ""
 
-#: invenio/legacy/search_engine/__init__.py:3232
+#: invenio/legacy/search_engine/__init__.py:3238
 #, fuzzy, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other collections gave "
@@ -6321,55 +6326,55 @@ msgstr ""
 "コレクション %(x_collection)s ではマッチしませんでした。他の公共コレクションでは "
 "%(x_nb_hits)dの%(x_url_open)sヒット%(x_url_close)sがありました。"
 
-#: invenio/legacy/search_engine/__init__.py:3249
+#: invenio/legacy/search_engine/__init__.py:3255
 #, fuzzy
 msgid ""
 "No public collection matched your query. If you were looking for a hidden"
 " document, please type the correct URL for this record."
 msgstr "公共コレクションはあなたのクエリーにマッチしませんでした。非公開ドキュメントを探しているならば、まず、制限つきコレクションを選んでください。"
 
-#: invenio/legacy/search_engine/__init__.py:3253
+#: invenio/legacy/search_engine/__init__.py:3259
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
 msgstr "公共コレクションはあなたのクエリーにマッチしませんでした。非公開ドキュメントを探しているならば、まず、制限つきコレクションを選んでください。"
 
-#: invenio/legacy/search_engine/__init__.py:3360
+#: invenio/legacy/search_engine/__init__.py:3366
 #, fuzzy
 msgid "Your search did not match any records.  Please try again."
 msgstr "%s で検索したが、どのレコードにも合致しませんでした。すべてのコレクションで最も近いものは以下のとおりです："
 
-#: invenio/legacy/search_engine/__init__.py:3369
+#: invenio/legacy/search_engine/__init__.py:3375
 #, fuzzy
 msgid "No match found, please enter different search terms."
 msgstr "別の検索をします。"
 
-#: invenio/legacy/search_engine/__init__.py:3375
+#: invenio/legacy/search_engine/__init__.py:3381
 #, fuzzy, python-format
 msgid "There are no records referring to %(x_rec)s."
 msgstr "バスケットは %i こあります。"
 
-#: invenio/legacy/search_engine/__init__.py:3377
+#: invenio/legacy/search_engine/__init__.py:3383
 #, fuzzy, python-format
 msgid "There are no records modified by %(x_rec)s."
 msgstr "バスケットは %i こあります。"
 
-#: invenio/legacy/search_engine/__init__.py:3379
+#: invenio/legacy/search_engine/__init__.py:3385
 #, fuzzy, python-format
 msgid "There are no records cited by %(x_rec)s."
 msgstr "バスケットは %i こあります。"
 
-#: invenio/legacy/search_engine/__init__.py:3385
+#: invenio/legacy/search_engine/__init__.py:3391
 #, fuzzy, python-format
 msgid "No word index is available for %(x_name)s."
 msgstr "以下の単語インデックスは見つからなかった："
 
-#: invenio/legacy/search_engine/__init__.py:3396
+#: invenio/legacy/search_engine/__init__.py:3402
 #, fuzzy, python-format
 msgid "No phrase index is available for %(x_name)s."
 msgstr "以下の句インデックスは見つからなかった："
 
-#: invenio/legacy/search_engine/__init__.py:3434
+#: invenio/legacy/search_engine/__init__.py:3440
 #, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record."
@@ -6378,45 +6383,45 @@ msgstr ""
 "%(x_index)s "
 "を　%(x_term)sで検索したが、どのレコードにも合致しませんでした。すべてのコレクションで最も近いものは以下のとおりです："
 
-#: invenio/legacy/search_engine/__init__.py:3439
+#: invenio/legacy/search_engine/__init__.py:3445
 #, fuzzy, python-format
 msgid ""
 "Search term %(x_name)s did not match any record. Nearest terms in any "
 "collection are:"
 msgstr "%s で検索したが、どのレコードにも合致しませんでした。すべてのコレクションで最も近いものは以下のとおりです："
 
-#: invenio/legacy/search_engine/__init__.py:4340
+#: invenio/legacy/search_engine/__init__.py:4346
 #, fuzzy, python-format
 msgid ""
 "Sorry, %(x_option)s does not seem to be a valid sort option. The records "
 "will not be sorted."
 msgstr "%s は正しいソートオプションではありません。タイトルでソートします。"
 
-#: invenio/legacy/search_engine/__init__.py:4468
+#: invenio/legacy/search_engine/__init__.py:4474
 #, fuzzy, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %(x_name)d records only. Using"
 " default sort order."
 msgstr "レコード数が %d を越えているので、ソートできません。"
 
-#: invenio/legacy/search_engine/__init__.py:4480
+#: invenio/legacy/search_engine/__init__.py:4486
 #, fuzzy, python-format
 msgid ""
 "Sorry, %(x_name)s does not seem to be a valid sort option. The records "
 "will not be sorted."
 msgstr "%s は正しいソートオプションではありません。タイトルでソートします。"
 
-#: invenio/legacy/search_engine/__init__.py:4760
-#: invenio/legacy/search_engine/__init__.py:5121
+#: invenio/legacy/search_engine/__init__.py:4766
+#: invenio/legacy/search_engine/__init__.py:5127
 #, fuzzy, python-format
 msgid "The record %(x_rec)d replaces it."
 msgstr "この記録は存在しません。"
 
-#: invenio/legacy/search_engine/__init__.py:4986
+#: invenio/legacy/search_engine/__init__.py:4992
 msgid "Use different search terms."
 msgstr "別の検索をします。"
 
-#: invenio/legacy/search_engine/__init__.py:5982
+#: invenio/legacy/search_engine/__init__.py:5988
 #: invenio/legacy/websearch/templates.py:813
 #: invenio/legacy/websearch/templates.py:891
 #: invenio/legacy/websearch/templates.py:1014
@@ -6430,11 +6435,11 @@ msgstr "別の検索をします。"
 msgid "Browse"
 msgstr "ブラウズ"
 
-#: invenio/legacy/search_engine/__init__.py:6413
+#: invenio/legacy/search_engine/__init__.py:6419
 msgid "No match within your time limits, discarding this condition..."
 msgstr "制限時間内に一致するものがみつかりませんでした。この条件を除きます。"
 
-#: invenio/legacy/search_engine/__init__.py:6447
+#: invenio/legacy/search_engine/__init__.py:6453
 msgid "No match within your search limits, discarding this condition..."
 msgstr "制限条件内に一致するものがみつかりませんでした。この条件を除きます。"
 
@@ -6739,7 +6744,7 @@ msgstr "検索"
 #: invenio/legacy/webbasket/webinterface.py:1026
 #: invenio/legacy/webbasket/webinterface.py:1116
 #: invenio/legacy/webbasket/webinterface.py:1260
-#: invenio/legacy/webcomment/webinterface.py:922
+#: invenio/legacy/webcomment/webinterface.py:928
 #: invenio/legacy/webmessage/templates.py:466
 #: invenio/legacy/websession/templates.py:774
 #: invenio/legacy/websession/templates.py:2350
@@ -6803,7 +6808,7 @@ msgstr "新しいアラートの設定"
 #: invenio/legacy/webalert/webinterface.py:475
 #: invenio/legacy/webalert/webinterface.py:523
 #: invenio/legacy/webalert/webinterface.py:551
-#: invenio/legacy/webcomment/webinterface.py:925
+#: invenio/legacy/webcomment/webinterface.py:931
 #: invenio/legacy/websession/webinterface.py:231
 #: invenio/legacy/websession/webinterface.py:254
 #: invenio/legacy/websession/webinterface.py:340
@@ -7484,7 +7489,7 @@ msgid "This functionality is forbidden to guest users."
 msgstr "この機能はゲストユーザには使えません。"
 
 #: invenio/legacy/webbasket/templates.py:2184
-#: invenio/legacy/webcomment/templates.py:1011
+#: invenio/legacy/webcomment/templates.py:1010
 msgid "Back to search results"
 msgstr "検索結果に戻る"
 
@@ -7659,7 +7664,7 @@ msgstr "ユーザーに追加"
 
 #: invenio/legacy/webbasket/templates.py:3221
 #: invenio/legacy/webbasket/templates.py:4025
-#: invenio/legacy/webcomment/templates.py:409
+#: invenio/legacy/webcomment/templates.py:408
 #: invenio/legacy/webmessage/templates.py:111
 #: invenio/modules/messages/templates/messages/view_base.html:55
 msgid "Reply"
@@ -7806,215 +7811,215 @@ msgstr "ユーザ %sは存在しません。"
 msgid "Record ID %(x_rec)s does not exist."
 msgstr "ユーザ %sは存在しません。"
 
-#: invenio/legacy/webcomment/templates.py:83
-#: invenio/legacy/webcomment/templates.py:938
+#: invenio/legacy/webcomment/templates.py:82
+#: invenio/legacy/webcomment/templates.py:937
 #: invenio/legacy/websubmit/templates.py:2451
 #: invenio/modules/formatter/templates/format/record/Video_HTML_detailed.tpl:58
 msgid "Write a comment"
 msgstr "コメントを核"
 
-#: invenio/legacy/webcomment/templates.py:99
+#: invenio/legacy/webcomment/templates.py:98
 #, fuzzy, python-format
 msgid "%(x_nb)i Comments for round \"%(x_name)s\""
 msgstr "%(x_name)s が %(x_date)s　に書いた。"
 
-#: invenio/legacy/webcomment/templates.py:102
+#: invenio/legacy/webcomment/templates.py:101
 #, fuzzy, python-format
 msgid "%(x_nb)i Comments"
 msgstr "コメント"
 
-#: invenio/legacy/webcomment/templates.py:140
+#: invenio/legacy/webcomment/templates.py:139
 #, fuzzy, python-format
 msgid "Showing the latest %(x_num)i comments:"
 msgstr "最新の %i このコメントを表示"
 
-#: invenio/legacy/webcomment/templates.py:153
-#: invenio/legacy/webcomment/templates.py:179
+#: invenio/legacy/webcomment/templates.py:152
+#: invenio/legacy/webcomment/templates.py:178
 msgid "Discuss this document"
 msgstr "この文書のディスカッションをする"
 
-#: invenio/legacy/webcomment/templates.py:180
-#: invenio/legacy/webcomment/templates.py:951
+#: invenio/legacy/webcomment/templates.py:179
+#: invenio/legacy/webcomment/templates.py:950
 msgid "Start a discussion about any aspect of this document."
 msgstr "この文書についてのディスカッションを始める"
 
-#: invenio/legacy/webcomment/templates.py:197
+#: invenio/legacy/webcomment/templates.py:196
 #, fuzzy, python-format
 msgid "Sorry, the record %(x_rec)s does not seem to exist."
 msgstr "レコード %s は存在しません。"
 
-#: invenio/legacy/webcomment/templates.py:201
+#: invenio/legacy/webcomment/templates.py:200
 #, fuzzy, python-format
 msgid "Sorry, %(x_rec)s is not a valid ID value."
 msgstr "%s　は有効なＩＤではありません。"
 
-#: invenio/legacy/webcomment/templates.py:203
+#: invenio/legacy/webcomment/templates.py:202
 msgid "Sorry, no record ID was provided."
 msgstr "レコードＩＤはありません。"
 
-#: invenio/legacy/webcomment/templates.py:207
+#: invenio/legacy/webcomment/templates.py:206
 #, fuzzy, python-format
 msgid "You may want to start browsing from %(x_link)s"
 msgstr "%s を閲覧しますか？"
 
-#: invenio/legacy/webcomment/templates.py:265
-#: invenio/legacy/webcomment/templates.py:756
-#: invenio/legacy/webcomment/templates.py:766
+#: invenio/legacy/webcomment/templates.py:264
+#: invenio/legacy/webcomment/templates.py:755
+#: invenio/legacy/webcomment/templates.py:765
 #, fuzzy, python-format
 msgid "%(x_nb)i comments for round \"%(x_name)s\""
 msgstr "%(x_name)s が %(x_date)s　に書いた。"
 
-#: invenio/legacy/webcomment/templates.py:295
-#: invenio/legacy/webcomment/templates.py:861
+#: invenio/legacy/webcomment/templates.py:294
+#: invenio/legacy/webcomment/templates.py:860
 msgid "Was this review helpful?"
 msgstr "このレビューは役に立ちましたか？"
 
-#: invenio/legacy/webcomment/templates.py:306
-#: invenio/legacy/webcomment/templates.py:342
-#: invenio/legacy/webcomment/templates.py:938
+#: invenio/legacy/webcomment/templates.py:305
+#: invenio/legacy/webcomment/templates.py:341
+#: invenio/legacy/webcomment/templates.py:937
 #: invenio/modules/comments/templates/comments/add_review_base.html:54
 msgid "Write a review"
 msgstr "レビューを書く。"
 
-#: invenio/legacy/webcomment/templates.py:313
-#: invenio/legacy/webcomment/templates.py:925
-#: invenio/legacy/webcomment/templates.py:2185
+#: invenio/legacy/webcomment/templates.py:312
+#: invenio/legacy/webcomment/templates.py:924
+#: invenio/legacy/webcomment/templates.py:2184
 #, python-format
 msgid "Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews"
 msgstr "レビュー数： %(x_nb_reviews)s 。平均レビュースコアー：　%(x_nb_score)s"
 
-#: invenio/legacy/webcomment/templates.py:316
+#: invenio/legacy/webcomment/templates.py:315
 #, fuzzy, python-format
 msgid "Readers found the following %(x_name)s reviews to be most helpful."
 msgstr "読者には次の %s　のレビューが役に立った。"
 
-#: invenio/legacy/webcomment/templates.py:318
-#: invenio/legacy/webcomment/templates.py:341
+#: invenio/legacy/webcomment/templates.py:317
+#: invenio/legacy/webcomment/templates.py:340
 #, fuzzy, python-format
 msgid "View all %(x_name)s reviews"
 msgstr "全部で　%s のレビューを見る。"
 
-#: invenio/legacy/webcomment/templates.py:337
-#: invenio/legacy/webcomment/templates.py:359
-#: invenio/legacy/webcomment/templates.py:2226
+#: invenio/legacy/webcomment/templates.py:336
+#: invenio/legacy/webcomment/templates.py:358
+#: invenio/legacy/webcomment/templates.py:2225
 msgid "Rate this document"
 msgstr "このドキュメントの評価"
 
-#: invenio/legacy/webcomment/templates.py:360
+#: invenio/legacy/webcomment/templates.py:359
 #, fuzzy
 msgid "Be the first to review this document.</div>"
 msgstr "このドキュメントの最初のレビューです"
 
-#: invenio/legacy/webcomment/templates.py:404
-#: invenio/legacy/webcomment/templates.py:465
-#: invenio/legacy/webcomment/templates.py:807
+#: invenio/legacy/webcomment/templates.py:403
+#: invenio/legacy/webcomment/templates.py:464
+#: invenio/legacy/webcomment/templates.py:806
 #: invenio/modules/workflows/templates/workflows/actions/approval_main.html:23
 #, fuzzy
 msgid "Close"
 msgstr "評価"
 
-#: invenio/legacy/webcomment/templates.py:411
-#: invenio/legacy/webcomment/templates.py:862
+#: invenio/legacy/webcomment/templates.py:410
+#: invenio/legacy/webcomment/templates.py:861
 msgid "Report abuse"
 msgstr "不正使用の報告"
 
-#: invenio/legacy/webcomment/templates.py:425
+#: invenio/legacy/webcomment/templates.py:424
 #, fuzzy
 msgid "Undelete comment"
 msgstr "コメントを削除"
 
-#: invenio/legacy/webcomment/templates.py:434
-#: invenio/legacy/webcomment/templates.py:436
+#: invenio/legacy/webcomment/templates.py:433
+#: invenio/legacy/webcomment/templates.py:435
 msgid "Delete comment"
 msgstr "コメントを削除"
 
-#: invenio/legacy/webcomment/templates.py:442
+#: invenio/legacy/webcomment/templates.py:441
 #, fuzzy
 msgid "Unreport comment"
 msgstr "コメントを削除"
 
-#: invenio/legacy/webcomment/templates.py:453
+#: invenio/legacy/webcomment/templates.py:452
 msgid "Attached file"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:453
+#: invenio/legacy/webcomment/templates.py:452
 msgid "Attached files"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:465
-#: invenio/legacy/webcomment/templates.py:806
+#: invenio/legacy/webcomment/templates.py:464
+#: invenio/legacy/webcomment/templates.py:805
 msgid "Open"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:534
+#: invenio/legacy/webcomment/templates.py:533
 #, python-format
 msgid "Reviewed by %(x_nickname)s on %(x_date)s"
 msgstr "%(x_nickname)s が　%(x_date)s にレビューしました。"
 
-#: invenio/legacy/webcomment/templates.py:538
+#: invenio/legacy/webcomment/templates.py:537
 #, fuzzy, python-format
 msgid "%(x_nb_people)s out of %(x_nb_total)s people found this review useful"
 msgstr "このレビューは　%(x_nb_total)i 人中 %(x_nb_people)i 人に役立ちました。"
 
-#: invenio/legacy/webcomment/templates.py:560
+#: invenio/legacy/webcomment/templates.py:559
 #, fuzzy
 msgid "Undelete review"
 msgstr "選択したレビューを消す"
 
-#: invenio/legacy/webcomment/templates.py:569
+#: invenio/legacy/webcomment/templates.py:568
 #, fuzzy
 msgid "Delete review"
 msgstr "選択したレビューを消す"
 
-#: invenio/legacy/webcomment/templates.py:575
+#: invenio/legacy/webcomment/templates.py:574
 #, fuzzy
 msgid "Unreport review"
 msgstr "レビューを書いてください。"
 
-#: invenio/legacy/webcomment/templates.py:682
-#: invenio/legacy/webcomment/templates.py:698
-#: invenio/legacy/webcomment/webinterface.py:248
-#: invenio/legacy/webcomment/webinterface.py:466
+#: invenio/legacy/webcomment/templates.py:681
+#: invenio/legacy/webcomment/templates.py:697
+#: invenio/legacy/webcomment/webinterface.py:252
+#: invenio/legacy/webcomment/webinterface.py:472
 #: invenio/legacy/websearch/adminlib.py:3406
 #: invenio/legacy/websubmit/templates.py:2449
 #: invenio/modules/comments/views.py:188
 msgid "Comments"
 msgstr "コメント"
 
-#: invenio/legacy/webcomment/templates.py:683
-#: invenio/legacy/webcomment/templates.py:699
-#: invenio/legacy/webcomment/webinterface.py:248
-#: invenio/legacy/webcomment/webinterface.py:466
+#: invenio/legacy/webcomment/templates.py:682
+#: invenio/legacy/webcomment/templates.py:698
+#: invenio/legacy/webcomment/webinterface.py:252
+#: invenio/legacy/webcomment/webinterface.py:472
 #: invenio/legacy/websearch/adminlib.py:3407
 #: invenio/modules/comments/views.py:222
 msgid "Reviews"
 msgstr "レビュー"
 
-#: invenio/legacy/webcomment/templates.py:942
+#: invenio/legacy/webcomment/templates.py:941
 #, fuzzy, python-format
 msgid "There is a total of %(x_num)s reviews"
 msgstr "全部で %s のレビューがあります"
 
-#: invenio/legacy/webcomment/templates.py:944
+#: invenio/legacy/webcomment/templates.py:943
 #, fuzzy, python-format
 msgid "There is a total of %(x_num)s comments"
 msgstr "全部で %s のコメントがあります"
 
-#: invenio/legacy/webcomment/templates.py:956
+#: invenio/legacy/webcomment/templates.py:955
 msgid "Be the first to review this document."
 msgstr "このドキュメントの最初のレビューです"
 
-#: invenio/legacy/webcomment/templates.py:975
+#: invenio/legacy/webcomment/templates.py:974
 msgid "Subscribe"
 msgstr "購読"
 
-#: invenio/legacy/webcomment/templates.py:993
+#: invenio/legacy/webcomment/templates.py:992
 #, fuzzy
 msgid "Unsubscribe"
 msgstr "購読"
 
-#: invenio/legacy/webcomment/templates.py:1010
-#: invenio/legacy/webcomment/templates.py:1787
+#: invenio/legacy/webcomment/templates.py:1009
+#: invenio/legacy/webcomment/templates.py:1786
 #: invenio/legacy/websearch/templates.py:548
 #: invenio/modules/comments/templates/comments/subscriptions_base.html:40
 #: invenio/modules/editor/templates/editor/recordmenu.html:22
@@ -8023,43 +8028,43 @@ msgstr "購読"
 msgid "Record"
 msgstr "レコード"
 
-#: invenio/legacy/webcomment/templates.py:1020
-#: invenio/legacy/webcomment/templates.py:1088
+#: invenio/legacy/webcomment/templates.py:1019
+#: invenio/legacy/webcomment/templates.py:1087
 msgid "review"
 msgstr "レビュー"
 
-#: invenio/legacy/webcomment/templates.py:1020
-#: invenio/legacy/webcomment/templates.py:1088
+#: invenio/legacy/webcomment/templates.py:1019
+#: invenio/legacy/webcomment/templates.py:1087
 msgid "comment"
 msgstr "コメント"
 
-#: invenio/legacy/webcomment/templates.py:1023
-#: invenio/legacy/webcomment/templates.py:2028
+#: invenio/legacy/webcomment/templates.py:1022
+#: invenio/legacy/webcomment/templates.py:2027
 msgid "Review"
 msgstr "レビュー"
 
-#: invenio/legacy/webcomment/templates.py:1086
+#: invenio/legacy/webcomment/templates.py:1085
 msgid "Viewing"
 msgstr "読む"
 
-#: invenio/legacy/webcomment/templates.py:1087
+#: invenio/legacy/webcomment/templates.py:1086
 msgid "Page:"
 msgstr "ページ"
 
-#: invenio/legacy/webcomment/templates.py:1101
+#: invenio/legacy/webcomment/templates.py:1100
 #, fuzzy
 msgid "You are not authorized to comment or review."
 msgstr "あなたはこのバスケットの所有者ではありません"
 
-#: invenio/legacy/webcomment/templates.py:1271
+#: invenio/legacy/webcomment/templates.py:1270
 #, fuzzy, python-format
 msgid ""
 "Note: Your nickname, %(nick)s, will be displayed as author of this "
 "comment."
 msgstr "注：このコメントの著者名はあなたのニックネーム %s になります。"
 
-#: invenio/legacy/webcomment/templates.py:1276
-#: invenio/legacy/webcomment/templates.py:1393
+#: invenio/legacy/webcomment/templates.py:1275
+#: invenio/legacy/webcomment/templates.py:1392
 #, python-format
 msgid ""
 "Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. "
@@ -8068,472 +8073,472 @@ msgstr ""
 "注： %(x_url_open)sここ%(x_url_close)s でニックネームをとうろくしてください。このコメントの著者名は "
 "%(x_nickname)s になります。"
 
-#: invenio/legacy/webcomment/templates.py:1293
+#: invenio/legacy/webcomment/templates.py:1292
 msgid "Once logged in, authorized users can also attach files."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1308
+#: invenio/legacy/webcomment/templates.py:1307
 msgid "Optionally, attach a file to this comment"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1309
+#: invenio/legacy/webcomment/templates.py:1308
 msgid "Optionally, attach files to this comment"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1310
+#: invenio/legacy/webcomment/templates.py:1309
 #, fuzzy
 msgid "Max one file"
 msgstr "ルールを追加"
 
-#: invenio/legacy/webcomment/templates.py:1311
+#: invenio/legacy/webcomment/templates.py:1310
 #, fuzzy, python-format
 msgid "Max %(maxfiles)i files"
 msgstr "ファイル"
 
-#: invenio/legacy/webcomment/templates.py:1312
+#: invenio/legacy/webcomment/templates.py:1311
 #, python-format
 msgid "Max %(x_nb_bytes)s per file"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1327
+#: invenio/legacy/webcomment/templates.py:1326
 msgid "Send me an email when a new comment is posted"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1342
-#: invenio/legacy/webcomment/templates.py:1464
+#: invenio/legacy/webcomment/templates.py:1341
+#: invenio/legacy/webcomment/templates.py:1463
 msgid "Article"
 msgstr "記事"
 
-#: invenio/legacy/webcomment/templates.py:1344
+#: invenio/legacy/webcomment/templates.py:1343
 #, fuzzy
 msgid "Add comment"
 msgstr "コメントを追加"
 
-#: invenio/legacy/webcomment/templates.py:1389
+#: invenio/legacy/webcomment/templates.py:1388
 #, fuzzy, python-format
 msgid ""
 "Note: Your nickname, %(x_name)s, will be displayed as the author of this "
 "review."
 msgstr "注：このレビューの著者名はあなたのニックネーム %s になります。"
 
-#: invenio/legacy/webcomment/templates.py:1465
+#: invenio/legacy/webcomment/templates.py:1464
 msgid "Rate this article"
 msgstr "この記事の評価"
 
-#: invenio/legacy/webcomment/templates.py:1466
+#: invenio/legacy/webcomment/templates.py:1465
 msgid "Select a score"
 msgstr "評価を選んでください"
 
-#: invenio/legacy/webcomment/templates.py:1467
+#: invenio/legacy/webcomment/templates.py:1466
 msgid "Give a title to your review"
 msgstr "レビューにタイトルをつけてください。"
 
-#: invenio/legacy/webcomment/templates.py:1468
+#: invenio/legacy/webcomment/templates.py:1467
 msgid "Write your review"
 msgstr "レビューを書いてください。"
 
-#: invenio/legacy/webcomment/templates.py:1473
+#: invenio/legacy/webcomment/templates.py:1472
 #, fuzzy
 msgid "Add review"
 msgstr "レビューを追加"
 
-#: invenio/legacy/webcomment/templates.py:1483
-#: invenio/legacy/webcomment/webinterface.py:511
+#: invenio/legacy/webcomment/templates.py:1482
+#: invenio/legacy/webcomment/webinterface.py:517
 msgid "Add Review"
 msgstr "レビューを追加"
 
-#: invenio/legacy/webcomment/templates.py:1505
+#: invenio/legacy/webcomment/templates.py:1504
 msgid "Your review was successfully added."
 msgstr "あなたのレビューは追加されました。"
 
-#: invenio/legacy/webcomment/templates.py:1507
+#: invenio/legacy/webcomment/templates.py:1506
 msgid "Your comment was successfully added."
 msgstr "あなたのコメントは追加されました。"
 
-#: invenio/legacy/webcomment/templates.py:1510
+#: invenio/legacy/webcomment/templates.py:1509
 msgid "Back to record"
 msgstr "レコードにもどる"
 
-#: invenio/legacy/webcomment/templates.py:1512
+#: invenio/legacy/webcomment/templates.py:1511
 #, fuzzy, python-format
 msgid ""
 "You can also view all the comments you have submitted so far on "
 "\"%(x_url_open)sYour Comments%(x_url_close)s\" page."
 msgstr "いまから%(x_url_open)sアカウントが%(x_url_close)sつかえるようになります。"
 
-#: invenio/legacy/webcomment/templates.py:1592
+#: invenio/legacy/webcomment/templates.py:1591
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:171
 #, fuzzy
 msgid "View most commented records"
 msgstr "コメントを見る"
 
-#: invenio/legacy/webcomment/templates.py:1594
+#: invenio/legacy/webcomment/templates.py:1593
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:207
 #, fuzzy
 msgid "View latest commented records"
 msgstr "コメントを見る"
 
-#: invenio/legacy/webcomment/templates.py:1596
+#: invenio/legacy/webcomment/templates.py:1595
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:140
 #, fuzzy
 msgid "View all comments reported as abuse"
 msgstr "レポートした全ユーザを見る。"
 
-#: invenio/legacy/webcomment/templates.py:1600
+#: invenio/legacy/webcomment/templates.py:1599
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:170
 #, fuzzy
 msgid "View most reviewed records"
 msgstr "レコードを削除"
 
-#: invenio/legacy/webcomment/templates.py:1602
+#: invenio/legacy/webcomment/templates.py:1601
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:206
 #, fuzzy
 msgid "View latest reviewed records"
 msgstr "全部で　%s のレビューを見る。"
 
-#: invenio/legacy/webcomment/templates.py:1604
+#: invenio/legacy/webcomment/templates.py:1603
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:140
 #, fuzzy
 msgid "View all reviews reported as abuse"
 msgstr "レポートした全ユーザを見る。"
 
-#: invenio/legacy/webcomment/templates.py:1612
+#: invenio/legacy/webcomment/templates.py:1611
 msgid "View all users who have been reported"
 msgstr "レポートをくれたすべてのユーザーを見る。"
 
-#: invenio/legacy/webcomment/templates.py:1614
+#: invenio/legacy/webcomment/templates.py:1613
 msgid "Guide"
 msgstr "ガイド"
 
-#: invenio/legacy/webcomment/templates.py:1616
+#: invenio/legacy/webcomment/templates.py:1615
 msgid "Comments and reviews are disabled"
 msgstr "コメントとレビューは受けられないようになっています。"
 
-#: invenio/legacy/webcomment/templates.py:1636
+#: invenio/legacy/webcomment/templates.py:1635
 msgid ""
 "Please enter the ID of the comment/review so that you can view it before "
 "deciding whether to delete it or not"
 msgstr "レビュー・コメントを読んでから消すかどうかを決める。ＩＤ＝"
 
-#: invenio/legacy/webcomment/templates.py:1660
+#: invenio/legacy/webcomment/templates.py:1659
 msgid "Comment ID:"
 msgstr "コメントＩＤ"
 
-#: invenio/legacy/webcomment/templates.py:1661
+#: invenio/legacy/webcomment/templates.py:1660
 msgid "Or enter a record ID to list all the associated comments/reviews:"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1662
+#: invenio/legacy/webcomment/templates.py:1661
 #, fuzzy
 msgid "Record ID:"
 msgstr "記録的なID"
 
-#: invenio/legacy/webcomment/templates.py:1664
+#: invenio/legacy/webcomment/templates.py:1663
 msgid "View Comment"
 msgstr "コメントを読む"
 
-#: invenio/legacy/webcomment/templates.py:1685
+#: invenio/legacy/webcomment/templates.py:1684
 msgid "There have been no reports so far."
 msgstr "これまでにレポートはありません。"
 
-#: invenio/legacy/webcomment/templates.py:1689
+#: invenio/legacy/webcomment/templates.py:1688
 #, fuzzy, python-format
 msgid "View all %(x_name)s reported comments"
 msgstr "全部で %s このコメントを読む。"
 
-#: invenio/legacy/webcomment/templates.py:1692
+#: invenio/legacy/webcomment/templates.py:1691
 #, fuzzy, python-format
 msgid "View all %(x_name)s reported reviews"
 msgstr "全部で %s このレビューを読む。"
 
-#: invenio/legacy/webcomment/templates.py:1729
+#: invenio/legacy/webcomment/templates.py:1728
 msgid ""
 "Here is a list, sorted by total number of reports, of all users who have "
 "had a comment reported at least once."
 msgstr "これまでレポートをくれたことのあるユーザーの一覧（レポート数の順）です。"
 
-#: invenio/legacy/webcomment/templates.py:1737
-#: invenio/legacy/webcomment/templates.py:1766
+#: invenio/legacy/webcomment/templates.py:1736
+#: invenio/legacy/webcomment/templates.py:1765
 #: invenio/legacy/websession/templates.py:272
 #: invenio/legacy/websession/templates.py:1221
 #: invenio/modules/accounts/forms.py:46 invenio/modules/accounts/forms.py:164
 msgid "Nickname"
 msgstr "ニックネーム"
 
-#: invenio/legacy/webcomment/templates.py:1739
-#: invenio/legacy/webcomment/templates.py:1768
+#: invenio/legacy/webcomment/templates.py:1738
+#: invenio/legacy/webcomment/templates.py:1767
 msgid "User ID"
 msgstr "ユーザＩＤ"
 
-#: invenio/legacy/webcomment/templates.py:1741
+#: invenio/legacy/webcomment/templates.py:1740
 msgid "Number positive votes"
 msgstr "好意的な評価の数"
 
-#: invenio/legacy/webcomment/templates.py:1742
+#: invenio/legacy/webcomment/templates.py:1741
 msgid "Number negative votes"
 msgstr "批判的な評価の数"
 
-#: invenio/legacy/webcomment/templates.py:1743
+#: invenio/legacy/webcomment/templates.py:1742
 msgid "Total number votes"
 msgstr "全評価数"
 
-#: invenio/legacy/webcomment/templates.py:1744
+#: invenio/legacy/webcomment/templates.py:1743
 msgid "Total number of reports"
 msgstr "全レポート数"
 
-#: invenio/legacy/webcomment/templates.py:1745
+#: invenio/legacy/webcomment/templates.py:1744
 msgid "View all user's reported comments/reviews"
 msgstr "すべてのユーザーのコメントとレビューを読む。"
 
-#: invenio/legacy/webcomment/templates.py:1778
+#: invenio/legacy/webcomment/templates.py:1777
 #, fuzzy, python-format
 msgid "This review has been reported %(x_num)i times"
 msgstr "このレビューは%i回報告された。"
 
-#: invenio/legacy/webcomment/templates.py:1780
+#: invenio/legacy/webcomment/templates.py:1779
 #, fuzzy, python-format
 msgid "This comment has been reported %(x_num)i times"
 msgstr "このコメントは%i回報告された。"
 
-#: invenio/legacy/webcomment/templates.py:2029
+#: invenio/legacy/webcomment/templates.py:2028
 msgid "Written by"
 msgstr "著者"
 
-#: invenio/legacy/webcomment/templates.py:2030
+#: invenio/legacy/webcomment/templates.py:2029
 msgid "General informations"
 msgstr "一般情報"
 
-#: invenio/legacy/webcomment/templates.py:2045
+#: invenio/legacy/webcomment/templates.py:2044
 msgid "Delete selected reviews"
 msgstr "選択したレビューを消す"
 
-#: invenio/legacy/webcomment/templates.py:2046
-#: invenio/legacy/webcomment/templates.py:2053
+#: invenio/legacy/webcomment/templates.py:2045
+#: invenio/legacy/webcomment/templates.py:2052
 msgid "Suppress selected abuse report"
 msgstr "不正なレポートを抑制"
 
-#: invenio/legacy/webcomment/templates.py:2047
+#: invenio/legacy/webcomment/templates.py:2046
 #, fuzzy
 msgid "Undelete selected reviews"
 msgstr "選択したレビューを消す"
 
-#: invenio/legacy/webcomment/templates.py:2051
+#: invenio/legacy/webcomment/templates.py:2050
 #, fuzzy
 msgid "Undelete selected comments"
 msgstr "選択したコメントを消す"
 
-#: invenio/legacy/webcomment/templates.py:2052
+#: invenio/legacy/webcomment/templates.py:2051
 msgid "Delete selected comments"
 msgstr "選択したコメントを消す"
 
-#: invenio/legacy/webcomment/templates.py:2067
+#: invenio/legacy/webcomment/templates.py:2066
 #, fuzzy, python-format
 msgid "Here are the reported reviews of user %(x_name)s"
 msgstr "ユーサー %s のレポート"
 
-#: invenio/legacy/webcomment/templates.py:2069
+#: invenio/legacy/webcomment/templates.py:2068
 #, fuzzy, python-format
 msgid "Here are the reported comments of user %(x_name)s"
 msgstr "ユーサー %s のコメント"
 
-#: invenio/legacy/webcomment/templates.py:2073
+#: invenio/legacy/webcomment/templates.py:2072
 #, fuzzy, python-format
 msgid "Here is review %(x_name)s"
 msgstr "コメント・レビュー %s"
 
-#: invenio/legacy/webcomment/templates.py:2075
+#: invenio/legacy/webcomment/templates.py:2074
 #, fuzzy, python-format
 msgid "Here is comment %(x_name)s"
 msgstr "コメント・レビュー %s"
 
-#: invenio/legacy/webcomment/templates.py:2078
+#: invenio/legacy/webcomment/templates.py:2077
 #, fuzzy, python-format
 msgid "Here is review %(x_cmtID)s written by user %(x_user)s"
 msgstr "ユーザ %(x_user)s　によるコメント（ＩＤ＝%(x_cmtID)s）"
 
-#: invenio/legacy/webcomment/templates.py:2080
+#: invenio/legacy/webcomment/templates.py:2079
 #, fuzzy, python-format
 msgid "Here is comment %(x_cmtID)s written by user %(x_user)s"
 msgstr "ユーザ %(x_user)s　によるコメント（ＩＤ＝%(x_cmtID)s）"
 
-#: invenio/legacy/webcomment/templates.py:2086
+#: invenio/legacy/webcomment/templates.py:2085
 msgid "Here are all reported reviews sorted by the most reported"
 msgstr "全レビュー（多い順）のリスト"
 
-#: invenio/legacy/webcomment/templates.py:2088
+#: invenio/legacy/webcomment/templates.py:2087
 msgid "Here are all reported comments sorted by the most reported"
 msgstr "全コメント（多い順）のリスト"
 
-#: invenio/legacy/webcomment/templates.py:2093
+#: invenio/legacy/webcomment/templates.py:2092
 #, fuzzy, python-format
 msgid "Here are all reviews for record %(x_num)i, sorted by the most reported"
 msgstr "全レビュー（多い順）のリスト"
 
-#: invenio/legacy/webcomment/templates.py:2094
+#: invenio/legacy/webcomment/templates.py:2093
 #, fuzzy
 msgid "Show comments"
 msgstr "コメントを見る"
 
-#: invenio/legacy/webcomment/templates.py:2096
+#: invenio/legacy/webcomment/templates.py:2095
 #, fuzzy, python-format
 msgid "Here are all comments for record %(x_num)i, sorted by the most reported"
 msgstr "全コメント（多い順）のリスト"
 
-#: invenio/legacy/webcomment/templates.py:2097
+#: invenio/legacy/webcomment/templates.py:2096
 #, fuzzy
 msgid "Show reviews"
 msgstr "レビュー"
 
-#: invenio/legacy/webcomment/templates.py:2122
-#: invenio/legacy/webcomment/templates.py:2146
-#: invenio/legacy/webcomment/templates.py:2172
+#: invenio/legacy/webcomment/templates.py:2121
+#: invenio/legacy/webcomment/templates.py:2145
+#: invenio/legacy/webcomment/templates.py:2171
 msgid "comment ID"
 msgstr "コメントＩＤ"
 
-#: invenio/legacy/webcomment/templates.py:2122
+#: invenio/legacy/webcomment/templates.py:2121
 msgid "successfully deleted"
 msgstr "消去しました"
 
-#: invenio/legacy/webcomment/templates.py:2146
+#: invenio/legacy/webcomment/templates.py:2145
 #, fuzzy
 msgid "successfully undeleted"
 msgstr "消去しました"
 
-#: invenio/legacy/webcomment/templates.py:2172
+#: invenio/legacy/webcomment/templates.py:2171
 msgid "successfully suppressed abuse report"
 msgstr "不正なレポートを抑制しました。"
 
-#: invenio/legacy/webcomment/templates.py:2189
+#: invenio/legacy/webcomment/templates.py:2188
 #, fuzzy
 msgid "Not yet reviewed"
 msgstr "レビューを書いてください。"
 
-#: invenio/legacy/webcomment/templates.py:2257
+#: invenio/legacy/webcomment/templates.py:2256
 #, python-format
 msgid "The following review was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2258
+#: invenio/legacy/webcomment/templates.py:2257
 #, python-format
 msgid "The following comment was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2285
+#: invenio/legacy/webcomment/templates.py:2284
 msgid "This is an automatic message, please don't reply to it."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2287
+#: invenio/legacy/webcomment/templates.py:2286
 #, python-format
 msgid "To post another comment, go to <%(x_url)s> instead."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2292
+#: invenio/legacy/webcomment/templates.py:2291
 #, python-format
 msgid "To specifically reply to this comment, go to <%(x_url)s>"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2297
+#: invenio/legacy/webcomment/templates.py:2296
 #, python-format
 msgid "To unsubscribe from this discussion, go to <%(x_url)s>"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2301
+#: invenio/legacy/webcomment/templates.py:2300
 #, python-format
 msgid "For any question, please use <%(CFG_SITE_SUPPORT_EMAIL)s>"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2368
+#: invenio/legacy/webcomment/templates.py:2367
 #, fuzzy
 msgid "Your comment will be lost."
 msgstr "コメントはポストされました"
 
-#: invenio/legacy/webcomment/templates.py:2406
+#: invenio/legacy/webcomment/templates.py:2405
 #, fuzzy
 msgid "Oldest comment first"
 msgstr "コメント削除"
 
-#: invenio/legacy/webcomment/templates.py:2407
+#: invenio/legacy/webcomment/templates.py:2406
 #, fuzzy
 msgid "Latest comment first"
 msgstr "新しいものから"
 
-#: invenio/legacy/webcomment/templates.py:2408
+#: invenio/legacy/webcomment/templates.py:2407
 msgid "Group by record, oldest commented first"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2409
+#: invenio/legacy/webcomment/templates.py:2408
 #, fuzzy
 msgid "Group by record, latest commented first"
 msgstr "コメントを見る"
 
-#: invenio/legacy/webcomment/templates.py:2411
+#: invenio/legacy/webcomment/templates.py:2410
 #, fuzzy
 msgid "Records and comments"
 msgstr "詳細とコメント"
 
-#: invenio/legacy/webcomment/templates.py:2412
+#: invenio/legacy/webcomment/templates.py:2411
 #, fuzzy
 msgid "Records only"
 msgstr "%s のレコードが見つかりました。"
 
-#: invenio/legacy/webcomment/templates.py:2413
+#: invenio/legacy/webcomment/templates.py:2412
 #, fuzzy
 msgid "Comments only"
 msgstr "コメント"
 
+#: invenio/legacy/webcomment/templates.py:2414
 #: invenio/legacy/webcomment/templates.py:2415
 #: invenio/legacy/webcomment/templates.py:2416
 #: invenio/legacy/webcomment/templates.py:2417
-#: invenio/legacy/webcomment/templates.py:2418
 #, fuzzy, python-format
 msgid "%(x_i)s items"
 msgstr "時間"
 
-#: invenio/legacy/webcomment/templates.py:2419
+#: invenio/legacy/webcomment/templates.py:2418
 #, fuzzy
 msgid "All items"
 msgstr "ユーザーに追加"
 
-#: invenio/legacy/webcomment/templates.py:2422
+#: invenio/legacy/webcomment/templates.py:2421
 msgid "Below is the list of the comments you have submitted so far."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2426
+#: invenio/legacy/webcomment/templates.py:2425
 msgid "You have not yet submitted any comment in the document \"discussion\" tab."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2429
-#: invenio/legacy/webcomment/templates.py:2437
-#: invenio/legacy/webcomment/templates.py:2445
+#: invenio/legacy/webcomment/templates.py:2428
+#: invenio/legacy/webcomment/templates.py:2436
+#: invenio/legacy/webcomment/templates.py:2444
 msgid "You might find other comments here: "
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2457
+#: invenio/legacy/webcomment/templates.py:2456
 msgid ""
 "You have not yet submitted any comment. Browse documents from the search "
 "interface and take part to discussions!"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2485
+#: invenio/legacy/webcomment/templates.py:2484
 msgid "Display"
 msgstr "表示"
 
-#: invenio/legacy/webcomment/templates.py:2486
+#: invenio/legacy/webcomment/templates.py:2485
 #, fuzzy
 msgid "Order by"
 msgstr "生成日付"
 
-#: invenio/legacy/webcomment/templates.py:2487
+#: invenio/legacy/webcomment/templates.py:2486
 #, fuzzy
 msgid "Per page"
 msgstr "次のページ"
 
-#: invenio/legacy/webcomment/templates.py:2491
+#: invenio/legacy/webcomment/templates.py:2490
 #, fuzzy
 msgid "Display options"
 msgstr "アラートの表示"
 
-#: invenio/legacy/webcomment/templates.py:2492
+#: invenio/legacy/webcomment/templates.py:2491
 #: invenio/legacy/webjournal/adminlib.py:328
 #: invenio/legacy/webjournal/adminlib.py:345
 #: invenio/legacy/webjournal/templates.py:457
@@ -8542,106 +8547,106 @@ msgstr "アラートの表示"
 msgid "Refresh"
 msgstr "参照："
 
-#: invenio/legacy/webcomment/templates.py:2521
+#: invenio/legacy/webcomment/templates.py:2520
 msgid "Comment deleted by the moderator"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2523
+#: invenio/legacy/webcomment/templates.py:2522
 msgid "You have deleted this comment: it is not visible by other users"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2530
+#: invenio/legacy/webcomment/templates.py:2529
 #, fuzzy
 msgid "(in reply to a comment)"
 msgstr "コメントを削除"
 
-#: invenio/legacy/webcomment/templates.py:2535
+#: invenio/legacy/webcomment/templates.py:2534
 msgid "See comment on discussion page"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2574
+#: invenio/legacy/webcomment/templates.py:2573
 #, python-format
 msgid "%(x_num)i comments found in total (not shown on this page)"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2576
+#: invenio/legacy/webcomment/templates.py:2575
 #, fuzzy, python-format
 msgid "%(x_num)i items found in total"
 msgstr "見つかりませんでした"
 
-#: invenio/legacy/webcomment/webinterface.py:272
-#: invenio/legacy/webcomment/webinterface.py:530
+#: invenio/legacy/webcomment/webinterface.py:276
+#: invenio/legacy/webcomment/webinterface.py:536
 msgid "Record Not Found"
 msgstr "レコードがみつからない"
 
-#: invenio/legacy/webcomment/webinterface.py:350
-#: invenio/legacy/webcomment/webinterface.py:591
-#: invenio/legacy/webcomment/webinterface.py:668
+#: invenio/legacy/webcomment/webinterface.py:354
+#: invenio/legacy/webcomment/webinterface.py:597
+#: invenio/legacy/webcomment/webinterface.py:674
 msgid "Specified comment does not belong to this record"
 msgstr ""
 
-#: invenio/legacy/webcomment/webinterface.py:359
-#: invenio/legacy/webcomment/webinterface.py:597
-#: invenio/legacy/webcomment/webinterface.py:674
+#: invenio/legacy/webcomment/webinterface.py:363
+#: invenio/legacy/webcomment/webinterface.py:603
+#: invenio/legacy/webcomment/webinterface.py:680
 #, fuzzy
 msgid "You do not have access to the specified comment"
 msgstr "このバスケットの内容を編集する権限がありません。"
 
-#: invenio/legacy/webcomment/webinterface.py:431
+#: invenio/legacy/webcomment/webinterface.py:437
 #, python-format
 msgid ""
 "The size of file \\\"%(x_file)s\\\" (%(x_size)s) is larger than maximum "
 "allowed file size (%(x_max)s). Select files again."
 msgstr ""
 
-#: invenio/legacy/webcomment/webinterface.py:513
+#: invenio/legacy/webcomment/webinterface.py:519
 #: invenio/legacy/websubmit/templates.py:2445
 #: invenio/legacy/websubmit/templates.py:2446
 msgid "Add Comment"
 msgstr "コメントを追加"
 
-#: invenio/legacy/webcomment/webinterface.py:602
+#: invenio/legacy/webcomment/webinterface.py:608
 msgid "You cannot vote for a deleted comment"
 msgstr ""
 
-#: invenio/legacy/webcomment/webinterface.py:679
+#: invenio/legacy/webcomment/webinterface.py:685
 #, fuzzy
 msgid "You cannot report a deleted comment"
 msgstr "すべてのコメントを読む。"
 
-#: invenio/legacy/webcomment/webinterface.py:826
-#: invenio/legacy/webcomment/webinterface.py:866
+#: invenio/legacy/webcomment/webinterface.py:832
+#: invenio/legacy/webcomment/webinterface.py:872
 #, fuzzy
 msgid "Page Not Found"
 msgstr "コレクション %s が見つかりません。"
 
-#: invenio/legacy/webcomment/webinterface.py:827
+#: invenio/legacy/webcomment/webinterface.py:833
 #, fuzzy
 msgid "The requested comment could not be found"
 msgstr "この記録は存在しません。"
 
-#: invenio/legacy/webcomment/webinterface.py:847
+#: invenio/legacy/webcomment/webinterface.py:853
 msgid "You cannot access files of a deleted comment"
 msgstr ""
 
-#: invenio/legacy/webcomment/webinterface.py:867
+#: invenio/legacy/webcomment/webinterface.py:873
 #, fuzzy
 msgid "The requested file could not be found"
 msgstr "この記録は存在しません。"
 
-#: invenio/legacy/webcomment/webinterface.py:910
+#: invenio/legacy/webcomment/webinterface.py:916
 #, fuzzy
 msgid "You are not authorized to use comments."
 msgstr "あなたはこのバスケットの所有者ではありません"
 
-#: invenio/legacy/webcomment/webinterface.py:912
+#: invenio/legacy/webcomment/webinterface.py:918
 #: invenio/legacy/websession/templates.py:635
 #: invenio/legacy/websession/templates.py:788
 #, fuzzy
 msgid "Your Comments"
 msgstr "コメント"
 
-#: invenio/legacy/webcomment/webinterface.py:924
+#: invenio/legacy/webcomment/webinterface.py:930
 #, fuzzy, python-format
 msgid "%(x_name)s View your previously submitted comments"
 msgstr "すべてのコメントを読む。"
@@ -13009,7 +13014,7 @@ msgid "Problem with login."
 msgstr ""
 
 #: invenio/modules/accounts/views/accounts.py:138
-#, fuzzy, python-format
+#, fuzzy
 msgid "You can now access your account."
 msgstr "いまから%(x_url_open)sアカウントが%(x_url_close)sつかえるようになります。"
 
@@ -13504,7 +13509,7 @@ msgid "Record ID %(recid)s is not a number."
 msgstr ""
 
 #: invenio/modules/comments/forms.py:38 invenio/modules/messages/forms.py:80
-#, fuzzy, python-format
+#, fuzzy
 msgid ""
 "Your message is too long, please edit it. Maximum size allowed is "
 "%{length}i characters."
@@ -13550,12 +13555,12 @@ msgid "Review was sent"
 msgstr "コメントを核"
 
 #: invenio/modules/comments/views.py:263
-#, fuzzy, python-format
+#, fuzzy
 msgid "Comment has been reported."
 msgstr "このコメントは%i回報告された。"
 
 #: invenio/modules/comments/views.py:265
-#, fuzzy, python-format
+#, fuzzy
 msgid "Comment has been already reported."
 msgstr "このコメントは%i回報告された。"
 
@@ -13640,7 +13645,7 @@ msgid ""
 msgstr ""
 
 #: invenio/modules/communities/forms.py:150
-#, fuzzy, python-format
+#, fuzzy
 msgid "The identifier already exists. Please choose a different one."
 msgstr "ニックネーム%sは存在します。"
 
@@ -13784,7 +13789,7 @@ msgid "Invalid deposition type."
 msgstr ""
 
 #: invenio/modules/deposit/views/deposit.py:76
-#, fuzzy, python-format
+#, fuzzy
 msgid "Deposition does not exists."
 msgstr "機能%sはありません。"
 
@@ -14066,7 +14071,7 @@ msgstr "%i 人のオーサーを表示"
 msgid "Manage Files of This Record"
 msgstr ""
 
-#: invenio/modules/formatter/format_elements/bfe_edit_record.py:47
+#: invenio/modules/formatter/format_elements/bfe_edit_record.py:52
 #, fuzzy
 msgid "Edit This Record"
 msgstr "別なＩＤを試してください。"
@@ -14280,12 +14285,12 @@ msgstr "あなたはどのグループの管理者でもありません"
 msgid "Members"
 msgstr "メンバーなし"
 
-#: invenio/modules/indexer/admin.py:78
+#: invenio/modules/indexer/admin.py:79
 #, fuzzy
 msgid "Knowledge base name"
 msgstr "知識ベースのマッピング"
 
-#: invenio/modules/indexer/admin.py:81 invenio/modules/indexer/admin.py:93
+#: invenio/modules/indexer/admin.py:82 invenio/modules/indexer/admin.py:93
 #: invenio/modules/knowledge/forms.py:74
 #, fuzzy
 msgid "-None-"
@@ -14295,11 +14300,11 @@ msgstr "終了"
 msgid "Stemming language"
 msgstr ""
 
-#: invenio/modules/indexer/admin.py:99
+#: invenio/modules/indexer/admin.py:98
 msgid "Tokenizer"
 msgstr ""
 
-#: invenio/modules/indexer/admin.py:105
+#: invenio/modules/indexer/admin.py:104
 #, fuzzy
 msgid "Index fields"
 msgstr "すべての分野"
@@ -14345,13 +14350,14 @@ msgid "Create KB \"Dynamic\""
 msgstr ""
 
 #: invenio/modules/knowledge/templates/knowledge/list.html:34
-#, fuzzy, python-format
+#, fuzzy
 msgid "Create new record \"Written As\""
 msgstr "バスケットは %i こあります。"
 
 #: invenio/modules/knowledge/templates/knowledge/list.html:34
-msgid "Create KB \"Writtes As\""
-msgstr ""
+#, fuzzy
+msgid "Create KB \"Written As\""
+msgstr "バスケットは %i こあります。"
 
 #: invenio/modules/knowledge/templates/knowledge/list.html:70
 #, fuzzy
@@ -14516,19 +14522,19 @@ msgstr ""
 msgid "Confidential"
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:143
+#: invenio/modules/oauth2server/models.py:144
 msgid "Name of application (displayed to users)."
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:154
+#: invenio/modules/oauth2server/models.py:155
 msgid "Optional. Description of the application (displayed to users)."
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:163
+#: invenio/modules/oauth2server/models.py:164
 msgid "Website URL"
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:164
+#: invenio/modules/oauth2server/models.py:165
 msgid "URL of your application (displayed to users)."
 msgstr ""
 
@@ -14965,7 +14971,7 @@ msgid "Tag name"
 msgstr "ニックネーム"
 
 #: invenio/modules/tags/views.py:199
-#, fuzzy, python-format
+#, fuzzy
 msgid "is already in use."
 msgstr "ニックネーム %s は登録済みです。"
 
@@ -15326,7 +15332,7 @@ msgid "just now"
 msgstr "次にすること："
 
 #: invenio/utils/date.py:555
-#, fuzzy, python-format
+#, fuzzy
 msgid " seconds ago"
 msgstr " %s 秒"
 
@@ -15384,1788 +15390,3 @@ msgstr "すべての年"
 #, fuzzy
 msgid " years ago"
 msgstr "年"
-
-#~ msgid "Warning: Please, select a valid time"
-#~ msgstr "カテゴリーを選択して下さい。"
-
-#~ msgid "Warning: Please, select a valid file"
-#~ msgstr "カテゴリーを選択して下さい。"
-
-#~ msgid "Warning: Please, select a valid date"
-#~ msgstr "カテゴリーを選択して下さい。"
-
-#~ msgid " or return to your %(x_url_open)ssearch%(x_url_close)s"
-#~ msgstr ""
-
-#~ msgid "*** basket name ***"
-#~ msgstr "バスケット名"
-
-#~ msgid ""
-#~ msgstr ""
-
-#~ msgid "Additional Citation Metrics"
-#~ msgstr "追加ファイル"
-
-#~ msgid "Sorry, you must log in to perform this action."
-#~ msgstr "ログインしてください。"
-
-#~ msgid "Please log in first."
-#~ msgstr "ログインしてください。"
-
-#~ msgid "Use the top-right menu to log in."
-#~ msgstr "上・右にログインメニューがあります。"
-
-#~ msgid "record"
-#~ msgstr "レコード"
-
-#~ msgid "document"
-#~ msgstr "ドキュメント"
-
-#~ msgid "Sorry parameter missing..."
-#~ msgstr "docimパラメータがありません。"
-
-#~ msgid "Next Step"
-#~ msgstr "次のページ"
-
-#~ msgid "Acquisitions"
-#~ msgstr "アクション"
-
-# I assume "one" stands for "topic".
-#~ msgid "Order new book"
-#~ msgstr "新しいトピックを作る。"
-
-#~ msgid "Renewalls"
-#~ msgstr "レビュー"
-
-#~ msgid "A new loan has been registered."
-#~ msgstr "アカウントが作られました。"
-
-# I assume "one" stands for "topic".
-#~ msgid "Order new copy"
-#~ msgstr "新しいトピックを作る。"
-
-#~ msgid "Book Information"
-#~ msgstr "情報"
-
-#~ msgid "EAN"
-#~ msgstr "そして"
-
-#~ msgid "Publication place"
-#~ msgstr "公開バスケット"
-
-#~ msgid "Number of pages"
-#~ msgstr "アクセス数"
-
-#~ msgid "Sub-library"
-#~ msgstr "ライブラリ"
-
-#~ msgid "Price"
-#~ msgstr "記事"
-
-#~ msgid "now"
-#~ msgstr "いいえ"
-
-#~ msgid "Not authorized"
-#~ msgstr "著者"
-
-#~ msgid "ERROR: %s does not exist"
-#~ msgstr "ユーザ %sは存在しません。"
-
-#~ msgid "Really delete"
-#~ msgstr "消去しました"
-
-#~ msgid "Verify problem"
-#~ msgstr "データベースに問題があります"
-
-#~ msgid "File"
-#~ msgstr "タイトル"
-
-#~ msgid "File %s already exists."
-#~ msgstr "ユーザ %sは存在しません。"
-
-#~ msgid "File %s: written OK."
-#~ msgstr "著者"
-
-#~ msgid "File %s: write failed."
-#~ msgstr "バスケットの削除"
-
-#~ msgid "File %s deleted."
-#~ msgstr "ユーザ %sは存在しません。"
-
-#~ msgid "File %s: delete failed."
-#~ msgstr "バスケットの削除"
-
-#~ msgid "Guests are not authorized to run batchuploader"
-#~ msgstr "あなたはこのバスケットの所有者ではありません"
-
-#~ msgid "The user '%s' is not authorized to run batchuploader"
-#~ msgstr "あなたはこのバスケットの所有者ではありません"
-
-#~ msgid "Open Tickets"
-#~ msgstr "あなたのバスケット"
-
-#~ msgid "Additional Data for this Person"
-#~ msgstr "追加ファイル"
-
-#~ msgid "Forget decision"
-#~ msgstr "決定してください"
-
-#~ msgid "Rejected!"
-#~ msgstr "却下"
-
-#~ msgid "Forget decision!"
-#~ msgstr "決定してください"
-
-#~ msgid "Forget decision."
-#~ msgstr "決定してください"
-
-#~ msgid "Your papers"
-#~ msgstr "あなたの通知"
-
-#~ msgid "Not your papers"
-#~ msgstr "パスワードを忘れましたか？"
-
-#~ msgid "These are mine!"
-#~ msgstr "バスケットは %i こあります。"
-
-#~ msgid "These are not mine!"
-#~ msgstr "バスケットは %i こあります。"
-
-#~ msgid "Not Mine."
-#~ msgstr "注意"
-
-#~ msgid "Not Mine!"
-#~ msgstr "注意"
-
-#~ msgid "Tickets"
-#~ msgstr "時間"
-
-#~ msgid "Request Tickets"
-#~ msgstr "ルール"
-
-#~ msgid "Submit Attribution Information"
-#~ msgstr "一般情報"
-
-#~ msgid "Please review your actions"
-#~ msgstr "カテゴリーを選択して下さい。"
-
-#~ msgid "You are about to attribute the following paper"
-#~ msgstr "あなたは以下のグループのメンバーです"
-
-#~ msgid "Navigation:"
-#~ msgstr "参照された履歴:"
-
-#~ msgid "Person Interface FAQ"
-#~ msgstr "内部エラー"
-
-#~ msgid "Person Search"
-#~ msgstr "検索"
-
-#~ msgid "Open tickets"
-#~ msgstr "時間"
-
-#~ msgid "Sorry."
-#~ msgstr "ごめんなさい"
-
-#~ msgid "Please provide at least one transaction."
-#~ msgstr "ログインしてください。"
-
-#~ msgid "Error:"
-#~ msgstr "エラー"
-
-#~ msgid "Create a new Person for your search"
-#~ msgstr "結果はありませんでした。"
-
-#~ msgid "Id"
-#~ msgstr "ＩＤ"
-
-#~ msgid "A %s has been added."
-#~ msgstr "グループ %s は削除されました"
-
-#~ msgid "Barcoce"
-#~ msgstr "ブラウズ"
-
-#~ msgid "No fulltext"
-#~ msgstr "フルテキスト"
-
-#~ msgid "last note on"
-#~ msgstr "最後のコメント"
-
-#~ msgid ", no notes yet"
-#~ msgstr "注意"
-
-#~ msgid "HTML brief"
-#~ msgstr "HTMLで報告"
-
-#~ msgid "deleted"
-#~ msgstr "削除"
-
-#~ msgid "in their rules and descriptions"
-#~ msgstr "’最近の追加’の表示"
-
-#~ msgid "No such knowledge base"
-#~ msgstr "不明な知識ベース"
-
-#~ msgid "Date:"
-#~ msgstr "日付"
-
-#~ msgid "Time:"
-#~ msgstr "時間"
-
-#~ msgid "Example:"
-#~ msgstr "例"
-
-#~ msgid "are mandatory"
-#~ msgstr "必須"
-
-#~ msgid "are mandatory."
-#~ msgstr "必須"
-
-#~ msgid "Check the"
-#~ msgstr "クリック"
-
-#~ msgid "Configure Bibknowledge"
-#~ msgstr "BibIndex 設定"
-
-#~ msgid "creating a new basket"
-#~ msgstr "新しいバスケットを作る。"
-
-#~ msgid "by"
-#~ msgstr ":"
-
-# Tsuboyama: because of difference of the word order, this
-# may not make sense if I give a translation.
-#~ msgid "on"
-#~ msgstr ":"
-
-#~ msgid "basket"
-#~ msgstr "バスケット"
-
-#~ msgid "previous basket"
-#~ msgstr "グループバスケット"
-
-#~ msgid "Adding"
-#~ msgstr "ペンディング"
-
-#~ msgid "Please choose a basket"
-#~ msgstr "カテゴリーを選択して下さい。"
-
-#~ msgid "Editing basket"
-#~ msgstr "バスケットの編集"
-
-#~ msgid "Editing topic"
-#~ msgstr "バスケットの編集"
-
-#~ msgid "niceName"
-#~ msgstr "名前"
-
-#~ msgid "Apply Changes"
-#~ msgstr "変更の保存"
-
-#~ msgid "Edit this item"
-#~ msgstr "編集機関"
-
-#~ msgid "return_date"
-#~ msgstr "生成日付"
-
-#~ msgid "Record %s - Add a field"
-#~ msgstr "レコード %s - フィールド追加"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s"
-#~ msgstr "レコード　%(x_recid)s　・フィールド　　　の編集 %(x_field)s"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s - Add a subfield"
-#~ msgstr ""
-
-#~ msgid "Submit and save record %s"
-#~ msgstr "サブミットしレコード %s を保存"
-
-#~ msgid "updated on"
-#~ msgstr "更新日時："
-
-#~ msgid "records"
-#~ msgstr "レコード"
-
-#~ msgid "Number of views"
-#~ msgstr "アクセス数"
-
-#~ msgid "Non-shared basket"
-#~ msgstr "バスケット"
-
-#~ msgid "Group-shared basket"
-#~ msgstr "グループ共有バスケット"
-
-#~ msgid "last"
-#~ msgstr "最後"
-
-#~ msgid "There is a total of %i comments"
-#~ msgstr "コメントの数：%i"
-
-#~ msgid "Select basket"
-#~ msgstr "バスケットを選択"
-
-#~ msgid "Add to a personal basket"
-#~ msgstr "個人バスケットに追加"
-
-#~ msgid "%i baskets"
-#~ msgstr "バスケット数 %i"
-
-#~ msgid "Add to a group-shared basket"
-#~ msgstr "グループ共有バスケットに追加"
-
-#~ msgid "Adding %i records to these baskets"
-#~ msgstr "これらのバスケットに %i レコードを追加"
-
-#~ msgid "No records were added to the selected baskets."
-#~ msgstr "選択されたバスケットにレコードの追加はなかった。"
-
-#~ msgid "Add records to baskets"
-#~ msgstr "バスケットにレコードを加える"
-
-#~ msgid "Subscribe to this discussion"
-#~ msgstr "このバスケットを購読"
-
-#~ msgid "Delete comment(s) or supress abuse report(s)"
-#~ msgstr "不正レポートの抑制"
-
-#~ msgid "Delete Comments"
-#~ msgstr "コメント削除"
-
-#~ msgid "ADD TO BASKET"
-#~ msgstr "バスケットに追加"
-
-#~ msgid "Frequently publishes in:"
-#~ msgstr "参加希望"
-
-#~ msgid "The collection to which this file belong is restricted: "
-#~ msgstr "このコレクションの内容の検索は制限されています"
-
-#~ msgid "This record does not exist. Please try another record ID."
-#~ msgstr "別なＩＤを試してください。"
-
-#~ msgid "Cannot edit deleted record.\""
-#~ msgstr "削除されたレコードは編集できません。"
-
-#~ msgid "The record will be deleted as soon as the task queue is empty."
-#~ msgstr "タスクがあき次第レコードは削除されます。"
-
-#~ msgid "Please enter the ID of the record you want to edit"
-#~ msgstr "編集したいレコードのＩＤを入れてください。"
-
-#~ msgid "Move up"
-#~ msgstr "アイテムを引き上げる"
-
-#~ msgid "Move down"
-#~ msgstr "アイテムを引き下げる"
-
-#~ msgid "Add Subfield"
-#~ msgstr "サブフィールドの追加"
-
-#~ msgid "Edit institute"
-#~ msgstr "編集機関"
-
-#~ msgid "Add Field"
-#~ msgstr "フィールドの追加"
-
-#~ msgid "Verbose"
-#~ msgstr "冗長"
-
-#~ msgid "Done"
-#~ msgstr "終了"
-
-#~ msgid "Your changes are TEMPORARY."
-#~ msgstr "変更は保存されていません。"
-
-#~ msgid "To save this record, please click on submit."
-#~ msgstr "レコードを保存するためには、サブミットをクリックしてください。"
-
-#~ msgid "Revision %(revdate)s"
-#~ msgstr "レコード　%(x_recid)s　・フィールド　　　の編集 %(x_field)s"
-
-#~ msgid "current version"
-#~ msgstr "現行のメンバー"
-
-#~ msgid "Edit current version"
-#~ msgstr "パラメータの編集。"
-
-#~ msgid "View revision"
-#~ msgstr "部"
-
-#~ msgid "Back to BibEdit"
-#~ msgstr "バスケットに戻る"
-
-#~ msgid "select_from1"
-#~ msgstr "バスケットを選択"
-
-#~ msgid "select_to1"
-#~ msgstr "トピックを選ぶ"
-
-#~ msgid "No more requests are waiting."
-#~ msgstr "ペンディングのドキュメントあり"
-
-#~ msgid "next page >>>"
-#~ msgstr "次のページ"
-
-#~ msgid "<<< previous page"
-#~ msgstr "前のページ"
-
-#~ msgid "last page >>|"
-#~ msgstr "最近の更新"
-
-#~ msgid "from"
-#~ msgstr "差出人："
-
-#~ msgid "There are record revisions not yet synchronized with the database."
-#~ msgstr "このメイルアドレスは見つかりません。"
-
-#~ msgid "View all reported reviews"
-#~ msgstr "すべてのレビューを読む。"
-
-#~ msgid "Delete a specific comment/review (by ID)"
-#~ msgstr "特定のレビュー・コメントを消す（ＩＤで）"
-
-#~ msgid "session"
-#~ msgstr "会議"
-
-#~ msgid "alerts"
-#~ msgstr "アラート"
-
-#~ msgid "account"
-#~ msgstr "アカウント"
-
-#~ msgid "messages"
-#~ msgstr "メッセージ"
-
-#~ msgid "groups"
-#~ msgstr "グループ"
-
-#~ msgid "List of direct approval categories"
-#~ msgstr "査読 カテゴリーのリスト"
-
-#~ msgid "link"
-#~ msgstr "中の"
-
-#~ msgid "External %(link_or_links)s"
-#~ msgstr "外部 %(link_or_links)s"
-
-#~ msgid "Sort:"
-#~ msgstr "並べ替え："
-
-#~ msgid "We need you to login"
-#~ msgstr "ログインしてください"
-
-#~ msgid "Alert sent successfully!"
-#~ msgstr "アラートは更新されました。 %s"
-
-#~ msgid "Migrate BibFormat Settings"
-#~ msgstr " BibFormat 設定を取り込む"
-
-# Tsuboyama assumes "migrate" means  "Include the format from another"
-#~ msgid "Migrate Knowledge Bases"
-#~ msgstr "知識ベースを取り込む"
-
-#~ msgid "Migrate Behaviours"
-#~ msgstr "ビヘビアを取り込む"
-
-# Tsuboyama assumes "Behaviors" as a technical word.
-#~ msgid "Migrate Formats"
-#~ msgstr "フォーマットをとりこむ"
-
-#~ msgid "Your account created on"
-#~ msgstr "アカウントが作られました。"
-
-#~ msgid "You have created a new account on"
-#~ msgstr "または新しいトピックをつくる。"
-
-#~ msgid "Article Error"
-#~ msgstr "記事"
-
-#~ msgid "%s Personalize, Main page"
-#~ msgstr "あなたのページ"
-
-#~ msgid "%s , personalize"
-#~ msgstr "あなたのページ"
-
-#~ msgid "Successfully featured record: %s"
-#~ msgstr "不正なレポートを抑制しました。"
-
-#~ msgid "Agenda"
-#~ msgstr "題目"
-
-#~ msgid "Webcast"
-#~ msgstr "ウエブキャスト"
-
-#~ msgid "Search Help"
-#~ msgstr "検索のヘルプ"
-
-#~ msgid "You seem to be %(x_role)s."
-#~ msgstr "あなたは %(x_role)s です。"
-
-#~ msgid "Credentials for"
-#~ msgstr "資格"
-
-#~ msgid "Unable to find file."
-#~ msgstr "ファイルが見つかりません。"
-
-#~ msgid "Cannot find submission directory."
-#~ msgstr "ディレクトリーが見つかりません。"
-
-#~ msgid "Try your search on..."
-#~ msgstr "検索を続けます。"
-
-#~ msgid "%(num)s results found"
-#~ msgstr " %s この記録が見つかりました。"
-
-#~ msgid "No result found"
-#~ msgstr "結果がありません。"
-
-#~ msgid "Sort by"
-#~ msgstr "ソート"
-
-#~ msgid "All of the words"
-#~ msgstr "すべての単語"
-
-#~ msgid "Any of the words"
-#~ msgstr "どれかの単語"
-
-#~ msgid "Exact phrase"
-#~ msgstr "句全体"
-
-#~ msgid "Partial phrase"
-#~ msgstr "句の一部"
-
-#~ msgid "Regular expression"
-#~ msgstr "正規表現:"
-
-#~ msgid "Added since"
-#~ msgstr "その後加えられた:"
-
-#~ msgid "Create New Group"
-#~ msgstr "新しいグループをつくる"
-
-#~ msgid "Detailed record #%s"
-#~ msgstr "詳細　レコード数 %d"
-
-#~ msgid "Search term <em>%s</em>"
-#~ msgstr "検索語 <em>%s</em>"
-
-#~ msgid "inside <em>%s</em> index"
-#~ msgstr "<em>%s</em> 中の索引"
-
-#~ msgid "Article:"
-#~ msgstr "論文"
-
-#~ msgid "detailed list"
-#~ msgstr "詳しいリスト"
-
-#~ msgid "%i others' baskets"
-#~ msgstr "他に属するバスケット　%i"
-
-#~ msgid "Export as"
-#~ msgstr "不正使用の報告"
-
-#~ msgid "Search Services"
-#~ msgstr "検索のヒント"
-
-#~ msgid "Citation Metrics"
-#~ msgstr "参照された履歴:"
-
-#~ msgid "WebSearch Admin Guide"
-#~ msgstr ""
-
-#~ msgid "Submit Guide"
-#~ msgstr "堤出しなさい助け"
-
-#~ msgid "Add to personal basket"
-#~ msgstr "個人バスケットに追加"
-
-#~ msgid "WebSubmit Admin Guide"
-#~ msgstr ""
-
-#~ msgid "Click here to review the transactions."
-#~ msgstr ""
-
-#~ msgid "Quit searching."
-#~ msgstr "検索実行"
-
-#~ msgid ""
-#~ "When you merge a set of profiles,"
-#~ " all the information stored will be"
-#~ " assigned to the primary profile. "
-#~ "This includes papers, ids or citations."
-#~ " After merging, only the primary "
-#~ "profile will remain in the system, "
-#~ "all other profiles will be automatically"
-#~ " deleted.</br>"
-#~ msgstr ""
-
-# Probably context dependent
-#~ msgid "Cancel merging"
-#~ msgstr "キャンセル"
-
-#~ msgid "Merge profiles"
-#~ msgstr ""
-
-#~ msgid "Claim for yourself"
-#~ msgstr ""
-
-#~ msgid "Assign to"
-#~ msgstr ""
-
-#~ msgid "Search for a person to assign the paper to"
-#~ msgstr "あなたは以下のグループのメンバーです"
-
-#~ msgid "Select All"
-#~ msgstr "すべてを消す"
-
-#~ msgid "Select None"
-#~ msgstr "評価を選んでください"
-
-#~ msgid "Invert Selection"
-#~ msgstr "参照（番号）がまだ与えられません。"
-
-#~ msgid "Hide successful claims"
-#~ msgstr ""
-
-#~ msgid "Paper Short Info"
-#~ msgstr ""
-
-#~ msgid "Author Name"
-#~ msgstr "著者"
-
-#~ msgid "Experiment"
-#~ msgstr "実験"
-
-#~ msgid "Not assigned"
-#~ msgstr "注意"
-
-#~ msgid "No status information found."
-#~ msgstr "情報"
-
-#~ msgid "Operator review of user actions pending"
-#~ msgstr ""
-
-#~ msgid "Sorry, there are currently no records to be found in this category."
-#~ msgstr ""
-
-#~ msgid "Review Transaction"
-#~ msgstr "部"
-
-#~ msgid "On all pages"
-#~ msgstr "変更を保存"
-
-#~ msgid "With selected do"
-#~ msgstr "却下日付："
-
-#~ msgid "View name variants"
-#~ msgstr "コメントを見る"
-
-#~ msgid "The author has an internal ID!"
-#~ msgstr "内部エラー"
-
-#~ msgid "These records have been marked as not being from this person."
-#~ msgstr ""
-
-#~ msgid "They will be regarded in the next run of the author "
-#~ msgstr ""
-
-#~ msgid "disambiguation algorithm and might disappear from this listing."
-#~ msgstr ""
-
-#~ msgid "No comments"
-#~ msgstr "コメント"
-
-#~ msgid "Not Available"
-#~ msgstr "ドキュメントタイプがありません。"
-
-#~ msgid " Delete this ticket"
-#~ msgstr "バスケットの削除"
-
-#~ msgid " Commit this entire ticket"
-#~ msgstr ""
-
-#~ msgid "No title available"
-#~ msgstr "ドキュメントタイプがありません。"
-
-#~ msgid "Make sure we match the right names!"
-#~ msgstr ""
-
-#~ msgid "Please select an author on each of the records that will be assigned."
-#~ msgstr ""
-
-#~ msgid "Papers without a name selected will be ignored in the process."
-#~ msgstr ""
-
-#~ msgid "Claim for person with id"
-#~ msgstr ""
-
-#~ msgid "This seems to be an empty profile without names associated to it yet"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "(the names will be automatically "
-#~ "gathered when the first paper is "
-#~ "claimed to this profile)."
-#~ msgstr ""
-
-#~ msgid "Select name for"
-#~ msgstr "評価を選んでください"
-
-#~ msgid "Error retrieving record title"
-#~ msgstr ""
-
-#~ msgid "Paper title: "
-#~ msgstr "ページ"
-
-#~ msgid "Ignore"
-#~ msgstr ""
-
-# In japanese we do not distinguish error and errors.
-#~ msgid "The following names have been automatically chosen:"
-#~ msgstr "次のエラーが見つかりました。"
-
-#~ msgid " --  With name: "
-#~ msgstr ""
-
-#~ msgid "Symbols legend: "
-#~ msgstr ""
-
-#~ msgid "Everything is shiny, captain!"
-#~ msgstr ""
-
-#~ msgid "The result of this request will be visible immediately"
-#~ msgstr ""
-
-#~ msgid "Confirmation needed to continue"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The result of this request will be"
-#~ " visible immediately but we need your"
-#~ " confirmation to do so for this "
-#~ "paper has been manually claimed before"
-#~ msgstr ""
-
-#~ msgid "This will create a change request for the operators"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The result of this request will be"
-#~ " visible upon confirmation through an "
-#~ "operator"
-#~ msgstr ""
-
-#~ msgid "Selected name on paper"
-#~ msgstr "評価を選んでください"
-
-#~ msgid "Verification needed to continue"
-#~ msgstr ""
-
-#~ msgid "This will create a request for the operators"
-#~ msgstr ""
-
-#~ msgid "Please provide your information"
-#~ msgstr "情報"
-
-#~ msgid "Please provide your first name"
-#~ msgstr "ログインしてください。"
-
-#~ msgid "Your first name:"
-#~ msgstr ""
-
-#~ msgid "Please provide your last name"
-#~ msgstr ""
-
-#~ msgid "Your last name:"
-#~ msgstr "貸し出し"
-
-#~ msgid "Please provide your eMail address"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "This eMail address is reserved by "
-#~ "a user. Please log in or provide"
-#~ " an alternative eMail address"
-#~ msgstr ""
-
-#~ msgid "Your eMail:"
-#~ msgstr "あなたの通知"
-
-#~ msgid "You may leave a comment (optional)"
-#~ msgstr ""
-
-#~ msgid "Continue claiming*"
-#~ msgstr ""
-
-#~ msgid "Confirm these changes**"
-#~ msgstr ""
-
-#~ msgid "!Delete the entire request!"
-#~ msgstr "選択したレビューを消す"
-
-#~ msgid "Mark as your documents"
-#~ msgstr "すべてのタイプのドキュメント"
-
-#~ msgid "Mark as _not_ your documents"
-#~ msgstr ""
-
-#~ msgid "Nothing staged as not yours"
-#~ msgstr ""
-
-#~ msgid "Mark as their documents"
-#~ msgstr "このドキュメントの評価"
-
-#~ msgid "Nothing staged in this category"
-#~ msgstr ""
-
-#~ msgid "Mark as _not_ their documents"
-#~ msgstr "このドキュメントの評価"
-
-#~ msgid "  * You can come back to this page later. Nothing will be lost. <br />"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "  ** Performs all requested changes. "
-#~ "Changes subject to permission restrictions "
-#~ "will be submitted to an operator "
-#~ "for manual review."
-#~ msgstr ""
-
-#~ msgid "Create a new Person"
-#~ msgstr "または新しいトピックをつくる。"
-
-#~ msgid "This is my profile"
-#~ msgstr ""
-
-#~ msgid "Assign paper"
-#~ msgstr ""
-
-#~ msgid "Add to merge list"
-#~ msgstr "ユーザーに追加"
-
-#~ msgid ""
-#~ "We do not have a publication list"
-#~ " for '%s'. Try using a less "
-#~ "specific author name, or check back "
-#~ "in a few days as attributions are"
-#~ " updated frequently.  Or you can send"
-#~ " us feedback, at "
-#~ msgstr ""
-
-#~ msgid "Recent Papers"
-#~ msgstr "ページ"
-
-#~ msgid "Showing the"
-#~ msgstr ""
-
-#~ msgid "most recent documents:"
-#~ msgstr "査読ドキュメントのリスト"
-
-#~ msgid "Sorry, there are no documents known for this person"
-#~ msgstr ""
-
-#~ msgid "The following profile is the one you were viewing before logging in: "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Out of %s paper(s) claimed to your"
-#~ " arXiv account, %s match this "
-#~ "profile: "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If none of the options suggested "
-#~ "above apply, you can look for "
-#~ "other possible options from the list "
-#~ "below:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span title=\"Login through arXiv is "
-#~ "needed to verify this is your "
-#~ "profile. When you log in your "
-#~ "publication list will automatically update "
-#~ "with all your arXiv publications.\n"
-#~ "You may also continue as a guest."
-#~ " In this case your input will "
-#~ "be processed by our staff and will"
-#~ " take longer to display.\"><strong> Login"
-#~ " with your arXiv.org account "
-#~ "</strong></span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "You have succesfully logged in via "
-#~ "arXiv. </br> You can now manage "
-#~ "your profile.</br>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "You have succesfully logged in via "
-#~ "arXiv.</br><div> <font color='red'>However the "
-#~ "profile you are viewing is not "
-#~ "your profile.</br></br></font>"
-#~ msgstr ""
-
-#~ msgid "Manage your profile"
-#~ msgstr "フォーマットテンプレートの操作"
-
-#~ msgid ""
-#~ "You have succesfully logged in, but "
-#~ "</br><div><font color='red'> you are not "
-#~ "associated to a person yet. Please "
-#~ "use the button below to choose "
-#~ "your profile </br></br></font>"
-#~ msgstr ""
-
-#~ msgid "Choose your profile"
-#~ msgstr "トピックを選ぶ"
-
-#~ msgid "Please log in through arXiv to manage your profile.</br>"
-#~ msgstr ""
-
-#~ msgid "Login into Inspire through arXiv.org"
-#~ msgstr ""
-
-#~ msgid ""
-#~ " <span title=\"ORCiD (Open Researcher "
-#~ "and Contributor ID) is a unique "
-#~ "researcher identifier that distinguishes you"
-#~ " from other researchers.\n"
-#~ "It holds a record of all your "
-#~ "research activities. You can add your"
-#~ " ORCiD to all your works to "
-#~ "make sure they are associated with "
-#~ "you. \">\n"
-#~ "        <strong> Connect this profile to an ORCiD </strong> <span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "This profile is already connected to "
-#~ "the following ORCiD: <strong>%s</strong></br>"
-#~ msgstr ""
-
-#~ msgid "Import your publications from ORCID"
-#~ msgstr ""
-
-#~ msgid "Visit your profile in ORCID"
-#~ msgstr ""
-
-#~ msgid "Connect an ORCiD to this profile"
-#~ msgstr ""
-
-#~ msgid "Suggest an ORCiD for this profile:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span title=\"When you add more "
-#~ "publications you make sure your "
-#~ "publication list and citations appear "
-#~ "correctly on your profile.\n"
-#~ "You can also assign publications to "
-#~ "other authors. This will help INSPIRE"
-#~ " provide more accurate publication and "
-#~ "citation statistics. \"><strong> Manage "
-#~ "publications </strong><span>"
-#~ msgstr ""
-
-#~ msgid "Manage publication list"
-#~ msgstr "生成日付"
-
-#~ msgid "<strong> Person identifiers, internal and external </strong>"
-#~ msgstr ""
-
-#~ msgid "add external id"
-#~ msgstr "外部 %(link_or_links)s"
-
-#~ msgid "Harvest missing external ids from claimed papers"
-#~ msgstr ""
-
-#~ msgid "suggest external id to add"
-#~ msgstr ""
-
-#~ msgid "suggest selected ids to delete"
-#~ msgstr ""
-
-#~ msgid "suggest missing ids"
-#~ msgstr ""
-
-#~ msgid "Choose system"
-#~ msgstr "トピックを選ぶ"
-
-#~ msgid ""
-#~ "<span title=\"You don’t need to add all your publications one by one.\n"
-#~ "This list contains all your publications"
-#~ " that were automatically assigned to "
-#~ "your INSPIRE profile through arXiv and"
-#~ " ORCiD. \"><strong> Automatically assigned "
-#~ "publications </strong> </span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span id=\"autoClaimMessage\">Please wait as "
-#~ "we are assigning %s papers from "
-#~ "external systems to your Inspire "
-#~ "profile</span></br>"
-#~ msgstr ""
-
-# In japanese we do not distinguish error and errors.
-#~ msgid ""
-#~ "The following publications have been "
-#~ "successfully assigned to your profile:"
-#~ msgstr "次のエラーが見つかりました。"
-
-#~ msgid "Get help!"
-#~ msgstr ""
-
-#~ msgid "<strong> Contact </strong>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Please contact our user support in "
-#~ "case you need help or you just "
-#~ "want to suggest some new ideas. We"
-#~ " will get back to you. </br>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span title=\"It sometimes happens that "
-#~ "somebody's publications are scattered among"
-#~ " two or more profiles for various "
-#~ "reasons\n"
-#~ "(different spelling, change of name, "
-#~ "multiple people with the same name). "
-#~ "You can merge a set of profiles"
-#~ " together.\n"
-#~ "This will assign all the information "
-#~ "(including publications, IDs and citations)"
-#~ " to the profile you choose as a"
-#~ " primary profile.\n"
-#~ "After the merging only the primary "
-#~ "profile will exist in the system "
-#~ "and all others will be automatically "
-#~ "deleted. \"><strong> Merge profiles "
-#~ "</strong><span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If your or somebody else's publications"
-#~ " in INSPIRE exist in multiple "
-#~ "profiles, you can fix that here. "
-#~ "</br>"
-#~ msgstr ""
-
-#~ msgid "Fatal: Author ID capabilities are disabled on this system."
-#~ msgstr ""
-
-#~ msgid "Fatal: You are not allowed to access this functionality."
-#~ msgstr "あなたは管理機能を実行することはできません。"
-
-#~ msgid "Claim this paper"
-#~ msgstr "ユーザーに追加"
-
-#~ msgid ""
-#~ "<p>We're sorry. An error occurred while"
-#~ " handling your request. Please find "
-#~ "more information below:</p>"
-#~ msgstr ""
-
-#~ msgid "This page is not accessible directly."
-#~ msgstr ""
-
-#~ msgid "Profile management"
-#~ msgstr ""
-
-#~ msgid "The due date has been updated. New due date: %s"
-#~ msgstr ""
-
-#~ msgid "Copies of %s"
-#~ msgstr ""
-
-#~ msgid "The given barcode <strong>%s</strong> is already in use."
-#~ msgstr ""
-
-#~ msgid "The copy with barcode <strong>%s</strong> has been deleted."
-#~ msgstr ""
-
-#~ msgid "It was NOT possible to delete the copy with barcode <strong>%s</strong>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated, but the"
-#~ " <strong>status was not modified</strong>."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated, but the"
-#~ " <strong>barcode was not modified</strong> "
-#~ "because it is already in use."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated to "
-#~ "<strong>[%s]</strong> with success."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated, but the"
-#~ " <strong>barcode was not modified</strong> "
-#~ "because it was not found (!?)."
-#~ msgstr ""
-
-#~ msgid "Weighted %s keywords:"
-#~ msgstr " %s　レコードから引用"
-
-#~ msgid ""
-#~ "The uploaded file is too small "
-#~ "(<%i o) and has therefore not been"
-#~ " considered"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The uploaded file is too big (>%i"
-#~ " o) and has therefore not been "
-#~ "considered"
-#~ msgstr ""
-
-#~ msgid "A file with format '%s' already exists. Please upload another format."
-#~ msgstr ""
-
-#~ msgid "The format %s does not exist for the given version: %s"
-#~ msgstr ""
-
-#~ msgid "Your modifications to record #%i have been submitted"
-#~ msgstr ""
-
-#~ msgid "Your modifications to record #%i have been cancelled"
-#~ msgstr ""
-
-#~ msgid "Comparison of:"
-#~ msgstr ""
-
-#~ msgid "Revision"
-#~ msgstr "部"
-
-#~ msgid "Comparing two record revisions"
-#~ msgstr ""
-
-#~ msgid "Failed to create a ticket"
-#~ msgstr ""
-
-#~ msgid "No template could be found for output format %s."
-#~ msgstr ""
-
-#~ msgid "Error when evaluating format element %s with parameters %s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Escape mode for format element %s "
-#~ "could not be retrieved. Using default"
-#~ " mode instead."
-#~ msgstr ""
-
-#~ msgid "\"nbMax\" parameter for %s must be an \"int\"."
-#~ msgstr ""
-
-#~ msgid "Could not read format template named %s. %s."
-#~ msgstr ""
-
-#~ msgid "Format element %s has no function named \"format\"."
-#~ msgstr ""
-
-#~ msgid "Modify Template Attributes"
-#~ msgstr "テンプレート属性の変更"
-
-#~ msgid "Template Editor"
-#~ msgstr "テンプレートエディタ"
-
-#~ msgid "Check Dependencies"
-#~ msgstr "依存関係のチェック"
-
-#~ msgid "Update Format Attributes"
-#~ msgstr "フォーマット属性の更新"
-
-#~ msgid "Show Documentation"
-#~ msgstr "ドキュメントを表示"
-
-#~ msgid "Hide Documentation"
-#~ msgstr "ドキュメントを非表示"
-
-#~ msgid "Last Modification Date"
-#~ msgstr "最終変更日付"
-
-#~ msgid "Manage Output Formats"
-#~ msgstr "出力フォーマットの操作"
-
-#~ msgid "Manage Format Templates"
-#~ msgstr "フォーマットテンプレートの操作"
-
-#~ msgid "Format Elements Documentation"
-#~ msgstr "フォーマット要素のドキュメント"
-
-#~ msgid "Add New Format Template"
-#~ msgstr "フォーマットテンプレートの追加"
-
-#~ msgid "Check Format Templates Extensively"
-#~ msgstr "フォーマットテンプレートの精査"
-
-# If this means "Please check format templates extensively" translation must
-# be
-# msgstr "フォーマットテンプレートをよくしらべてください。"
-#~ msgid "Code"
-#~ msgstr "コード"
-
-#~ msgid "Add New Output Format"
-#~ msgstr "出力フォーマットの追加:"
-
-#~ msgid "menu"
-#~ msgstr "メニュー"
-
-#~ msgid "Close Output Format"
-#~ msgstr "出力フォーマットを閉じる"
-
-#~ msgid "Rules"
-#~ msgstr "ルール"
-
-#~ msgid "Modify Output Format Attributes"
-#~ msgstr "出力フォーマット属性の変更"
-
-#~ msgid "Remove Rule"
-#~ msgstr "ルールを削除"
-
-#~ msgid "Add New Rule"
-#~ msgstr "ルールを追加"
-
-#~ msgid "No problem found with format"
-#~ msgstr "フォーマットは問題ありません。"
-
-#~ msgid "An error has been found"
-#~ msgstr "エラーが見つかりましたりました。"
-
-# In japanese we do not distinguish error and errors.
-#~ msgid "The following errors have been found"
-#~ msgstr "次のエラーが見つかりました。"
-
-#~ msgid "BibFormat Admin"
-#~ msgstr ""
-
-# I assume another string follows.
-#~ msgid "Enter a search query here."
-#~ msgstr "ここに検索クエリーを入力"
-
-#~ msgid "No Record Found for %s."
-#~ msgstr "レコードがみつからない"
-
-#~ msgid "Tag specification \"%s\" must end with column \":\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Tag specification \"%s\" must start with \"tag\" at line %s."
-#~ msgstr ""
-
-#~ msgid "\"tag\" must be lowercase in \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Should be \"tag field_number:\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Invalid tag \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Condition \"%s\" is outside a tag specification at line %s."
-#~ msgstr ""
-
-#~ msgid "Condition \"%s\" can only have a single separator --- at line %s."
-#~ msgstr ""
-
-#~ msgid "Template \"%s\" does not exist at line %s."
-#~ msgstr "ユーザ %sは存在しません。"
-
-#~ msgid "Missing column \":\" after \"default\" in \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Default template specification \"%s\" must "
-#~ "start with \"default :\" at line "
-#~ "%s."
-#~ msgstr ""
-
-#~ msgid "\"default\" keyword must be lowercase in \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Line %s could not be understood at line %s."
-#~ msgstr ""
-
-#~ msgid "Output format %s cannot not be read. %s"
-#~ msgstr "出力フォーマット属性 %s"
-
-#~ msgid ""
-#~ "Could not find a name specified in"
-#~ " tag \"<name>\" inside format template "
-#~ "%s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Could not find a description specified"
-#~ " in tag \"<description>\" inside format "
-#~ "template %s."
-#~ msgstr ""
-
-#~ msgid "Format template %s calls undefined element \"%s\"."
-#~ msgstr "フォーマットテンプレート依存関係 %s"
-
-#~ msgid ""
-#~ "Format template %s calls unreadable "
-#~ "element \"%s\". Check element file "
-#~ "permissions."
-#~ msgstr ""
-
-#~ msgid "Cannot load element \"%s\" in template %s. Check element code."
-#~ msgstr ""
-
-#~ msgid "Format element %s uses unknown parameter \"%s\" in format template %s."
-#~ msgstr ""
-
-#~ msgid "Could not read format template named %s. %s"
-#~ msgstr ""
-
-#~ msgid "Error in format element %s. %s."
-#~ msgstr "正当性の確認：フォーマット要素 %s"
-
-#~ msgid "Format element %s cannot not be read. %s"
-#~ msgstr "フォーマット要素依存関係 %s"
-
-#~ msgid ""
-#~ "Cannot write in etc/bibformat dir of "
-#~ "your Invenio installation. Check directory "
-#~ "permission."
-#~ msgstr ""
-
-#~ msgid "Restricted Output Format"
-#~ msgstr "制限された出力フォーマット:"
-
-#~ msgid "Output Format %s Rules"
-#~ msgstr "出力フォーマットルール: %s"
-
-#~ msgid "Output Format %s Attributes"
-#~ msgstr "出力フォーマット属性 %s"
-
-#~ msgid "Output Format %s Dependencies"
-#~ msgstr "出力フォーマット依存関係 %s"
-
-#~ msgid "Delete Output Format"
-#~ msgstr "出力フォーマットの削除"
-
-#~ msgid "Cannot create output format"
-#~ msgstr "出力フォーマットの操作"
-
-#~ msgid "Format template %s cannot not be read. %s"
-#~ msgstr "フォーマットテンプレート属性 %s"
-
-#~ msgid "Restricted Format Template"
-#~ msgstr "制限付きフォーマットテンプレート"
-
-#~ msgid "Format Template %s"
-#~ msgstr "フォーマットテンプレート %s"
-
-#~ msgid "Format Template %s Attributes"
-#~ msgstr "フォーマットテンプレート属性 %s"
-
-#~ msgid "Format Template %s Dependencies"
-#~ msgstr "フォーマットテンプレート依存関係 %s"
-
-#~ msgid "Delete Format Template"
-#~ msgstr "フォーマットテンプレートの削除"
-
-#~ msgid "Format Element %s Dependencies"
-#~ msgstr "フォーマット要素依存関係 %s"
-
-#~ msgid "Test Format Element %s"
-#~ msgstr "フォーマット要素の試験 %s"
-
-#~ msgid "Validation of Output Format %s"
-#~ msgstr "正当性の確認：出力フォーマット %s"
-
-#~ msgid "Validation of Format Template %s"
-#~ msgstr "正当性の確認：フォーマットテンプレート %s"
-
-#~ msgid "Restricted Format Element"
-#~ msgstr "制限付きフォーマット要素"
-
-#~ msgid "Validation of Format Element %s"
-#~ msgstr "正当性の確認：フォーマット要素 %s"
-
-#~ msgid "No format specified for validation. Please specify one."
-#~ msgstr ""
-
-#~ msgid "Format Validation"
-#~ msgstr "正当性の確認：フォーマット %s"
-
-#~ msgid "The current taxonomy can be accessed with this URL: %s"
-#~ msgstr ""
-
-#~ msgid "Please upload the RDF file for taxonomy %s"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If the expression contains '%', like "
-#~ "'270__a:*%*',                          it will be"
-#~ " replaced by a search string when "
-#~ "the                          knowledge base is "
-#~ "used."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Example 2: Return the institute's name"
-#~ " (100__a) when the                          user"
-#~ " gives its postal code (270__a):"
-#~ "                          Set field to 100__a,"
-#~ " expression to 270__a:*%*."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The left side of the rule (%s) "
-#~ "already appears in these knowledge "
-#~ "bases:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The right side of the rule (%s)"
-#~ " already appears in these knowledge "
-#~ "bases:"
-#~ msgstr ""
-
-#~ msgid "File %s uploaded."
-#~ msgstr ""
-
-#~ msgid "Knowledge Base %s"
-#~ msgstr "知識ベース %s"
-
-#~ msgid "No rights to upload to collection '%s'"
-#~ msgstr ""
-
-#~ msgid "<b>%s documents</b> have been found."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The system is not attempting to "
-#~ "send an email from %s, to %s, "
-#~ "with body %s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Error in connecting to the SMPT "
-#~ "server waiting %s seconds. Exception is"
-#~ " %s, while sending email from %s "
-#~ "to %s with body %s."
-#~ msgstr ""
-
-#~ msgid "Error while sending an email: %s"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "Error while sending an email.\n"
-#~ "Reason: %s\n"
-#~ "Details: %s\n"
-#~ "Sender: \"%s\"\n"
-#~ "Recipient(s): \"%s\"\n"
-#~ "\n"
-#~ "The content of the mail was as follows:\n"
-#~ "%s"
-#~ msgstr ""
-
-#~ msgid "Error in sending email from %s to %s with body %s."
-#~ msgstr ""
-
-#~ msgid "Not Set"
-#~ msgstr "注意"
-
-#~ msgid "never"
-#~ msgstr "変換"
-
-#~ msgid ""
-#~ "Do you want to touch the OAI "
-#~ "set %s? Note that this will force"
-#~ " all clients to re-harvest the "
-#~ "whole set."
-#~ msgstr ""
-
-#~ msgid "OAI set %s touched."
-#~ msgstr ""
-
-#~ msgid "Name variants"
-#~ msgstr ""
-
-#~ msgid "No Name Variants"
-#~ msgstr ""
-
-#~ msgid "downloaded"
-#~ msgstr ""
-
-#~ msgid "times"
-#~ msgstr "時間"
-
-#~ msgid "Papers"
-#~ msgstr "ページ"
-
-#~ msgid "No Keywords"
-#~ msgstr "キーワード"
-
-#~ msgid "Frequent keywords"
-#~ msgstr ""
-
-#~ msgid "No Subject categories"
-#~ msgstr "公開バスケットのリスト"
-
-#~ msgid "No Collaborations"
-#~ msgstr "コレクション"
-
-#~ msgid "unknown affiliation"
-#~ msgstr "アクションが不明です。"
-
-#~ msgid "No Affiliations"
-#~ msgstr "参照された履歴:"
-
-#~ msgid "Affiliations"
-#~ msgstr "参照された履歴:"
-
-#~ msgid "Frequent co-authors (excluding collaborations)"
-#~ msgstr ""
-
-#~ msgid "No Frequent Co-authors"
-#~ msgstr ""
-
-#~ msgid "Citations%s"
-#~ msgstr "参照された履歴:"
-
-#~ msgid "<strong> Publications per year </strong>"
-#~ msgstr ""
-
-#~ msgid "No Publication Graph"
-#~ msgstr "生成日付"
-
-#~ msgid "<strong> Publications list </strong>"
-#~ msgstr "生成日付"
-
-#~ msgid "No publications available"
-#~ msgstr "ドキュメントタイプがありません。"
-
-#~ msgid "Recompute Now!"
-#~ msgstr ""
-
-#~ msgid "%s is an invalid record ID"
-#~ msgstr ""
-
-#~ msgid "%s is an invalid user ID."
-#~ msgstr ""
-
-#~ msgid "Record ID %s is not a number."
-#~ msgstr ""
-
-#~ msgid "%i comments found in total (not shown on this page)"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The size of file \\\"%s\\\" (%s) "
-#~ "is larger than maximum allowed file "
-#~ "size (%s). Select files again."
-#~ msgstr ""
-
-#~ msgid "About your article at %(url)s"
-#~ msgstr ""
-
-#~ msgid "Administrate %(journal_name)s"
-#~ msgstr ""
-
-#~ msgid "Linkbacks%s: %s"
-#~ msgstr ""
-
-#~ msgid "There is no index %s.  Searching for %s in all fields."
-#~ msgstr ""
-
-#~ msgid "Instead searching %s."
-#~ msgstr ""
-
-#~ msgid "Cited by 1 record"
-#~ msgstr " %s　レコードから引用"
-
-#~ msgid "%i comments"
-#~ msgstr "コメント"
-
-#~ msgid "%i reviews"
-#~ msgstr "レビュー"
-
-#~ msgid "%s of"
-#~ msgstr ""
-
-#~ msgid ".. of which self-citations: %s records"
-#~ msgstr ""
-
-#~ msgid "No Papers"
-#~ msgstr "ページ"
-
-#~ msgid "Frequent co-authors"
-#~ msgstr ""
-
-#~ msgid "This is me.  Verify my publication list."
-#~ msgstr ""
-
-#~ msgid "Citations:"
-#~ msgstr "参照された履歴:"
-
-#~ msgid "No Citation Information available"
-#~ msgstr "ドキュメントタイプがありません。"
-
-#~ msgid "<p><a href=\"%(url)s\">%(msg)s</a></p>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "For some unknown reason multiple records"
-#~ " matching the specified DOI \"%s\" "
-#~ "have been found."
-#~ msgstr ""
-
-#~ msgid "Found multiple records matching DOI %s"
-#~ msgstr ""
-
-#~ msgid "Discussion"
-#~ msgstr "会議"
-
-#~ msgid "Please inform the <a href='mailto%s'>administator</a>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Somebody (possibly you) coming from %(x_ip_address)s has asked\n"
-#~ "for a password reset at %(x_sitename)s\n"
-#~ "for the account \"%(x_email)s\"."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Somebody (possibly you) coming from %(x_ip_address)s has asked\n"
-#~ "to register a new account at %(x_sitename)s\n"
-#~ "for the email address \"%(x_email)s\"."
-#~ msgstr ""
-
-#~ msgid "Your alerts"
-#~ msgstr "あなたの通知"
-
-#~ msgid "Your approvals"
-#~ msgstr "承認"
-
-#~ msgid "Your baskets"
-#~ msgstr "あなたのバスケット"
-
-#~ msgid "Your loans"
-#~ msgstr "貸し出し"
-
-#~ msgid "Your submissions"
-#~ msgstr "参加希望"
-
-#~ msgid "Statistics"
-#~ msgstr "状態"
-
-#~ msgid "Invitation to join \"%s\" group"
-#~ msgstr ""
-
-#~ msgid "Group: %s"
-#~ msgstr "グループ：%s"
-
-#~ msgid ""
-#~ "Your e-mail is auto-generated by "
-#~ "the system. Please change your e-mail"
-#~ " from <a href='%s/youraccount/edit?ln=%s'>account "
-#~ "settings</a>."
-#~ msgstr ""
-
-#~ msgid "%s  Personalize, Main page"
-#~ msgstr ""
-
-#~ msgid "Account registration at %s"
-#~ msgstr ""
-
-#~ msgid "This is the table of contents of the %(x_category)s pages."
-#~ msgstr ""
-
-#~ msgid "Page %s Not Found"
-#~ msgstr "コレクション %s が見つかりません。"
-
-#~ msgid ""
-#~ "The task queue is currently running "
-#~ "in automatic mode, and there are "
-#~ "currently %s tasks waiting to be "
-#~ "executed. Your record should be "
-#~ "available within a few minutes and "
-#~ "searchable within an hour or "
-#~ "thereabouts.\n"
-#~ msgstr ""
-
-#~ msgid "The field %s is mandatory."
-#~ msgstr "フィールド %s は必須です。"
-
-#~ msgid ""
-#~ "Unable to move field at position "
-#~ "%s to position %s on page %s "
-#~ "of submission '%s%s' - Invalid Field "
-#~ "Position Numbers"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to swap field at position "
-#~ "%s with field at position %s on"
-#~ " page %s of submission %s - "
-#~ "could not move field at position "
-#~ "%s to temporary field location"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to swap field at position "
-#~ "%s with field at position %s on"
-#~ " page %s of submission %s - "
-#~ "could not move field at position "
-#~ "%s to position %s. Please ask "
-#~ "Admin to check that a field was"
-#~ " not stranded in a temporary position"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to swap field at position "
-#~ "%s with field at position %s on"
-#~ " page %s of submission %s - "
-#~ "could not move field that was "
-#~ "located at position %s to position "
-#~ "%s from temporary position. Field is "
-#~ "now stranded in temporary position and"
-#~ " must be corrected manually by an "
-#~ "Admin"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to move field at position "
-#~ "%s to position %s on page %s "
-#~ "of submission %s - could not "
-#~ "decrement the position of the fields "
-#~ "below position %s. Tried to recover "
-#~ "- please check that field ordering "
-#~ "is not broken"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to move field at position "
-#~ "%s to position %s on page %s "
-#~ "of submission %s%s - could not "
-#~ "increment the position of the fields "
-#~ "at and below position %s. The "
-#~ "field that was at position %s is"
-#~ " now stranded in a temporary "
-#~ "position."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Moved field from position %s to "
-#~ "position %s on page %s of "
-#~ "submission '%s%s'."
-#~ msgstr ""
-
-#~ msgid "Unable to delete field at position %s from page %s of submission '%s'"
-#~ msgstr "ページ数が不明です。"
-
