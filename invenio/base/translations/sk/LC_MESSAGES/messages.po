@@ -1,5 +1,5 @@
 # # This file is part of Invenio.
-# # Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+# # Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2015 CERN.
 # #
 # # Invenio is free software; you can redistribute it and/or
 # # modify it under the terms of the GNU General Public License as
@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Invenio 1.2.0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2015-03-04 16:44+0100\n"
-"PO-Revision-Date: 2012-02-16 22:53+0100\n"
+"POT-Creation-Date: 2015-08-27 15:26+0200\n"
+"PO-Revision-Date: 2015-08-27 20:12+0200\n"
 "Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
 "Language-Team: SK <info@invenio-software.org>\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -25,7 +25,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.0\n"
 
 #: invenio/base/decorators.py:133
 #, python-format
@@ -206,7 +206,7 @@ msgstr ""
 
 #: invenio/base/templates/mail_html.tpl:20
 #: invenio/base/templates/mail_text.tpl:20
-#: invenio/legacy/webcomment/templates.py:2256
+#: invenio/legacy/webcomment/templates.py:2255
 msgid "Hello:"
 msgstr "Ahoj:"
 
@@ -263,48 +263,53 @@ msgstr ""
 msgid "Error in sending email from %(x_from)s to %(x_to)s with body%(x_body)s."
 msgstr ""
 
-#: invenio/ext/login/__init__.py:68
+#: invenio/ext/login/__init__.py:61
+#, fuzzy
+msgid "Provided data is not valid"
+msgstr "Tento záznam neexistuje."
+
+#: invenio/ext/login/__init__.py:73
 #: invenio/legacy/websession/webinterface.py:679
 msgid "Password reset request for"
 msgstr ""
 
-#: invenio/ext/login/__init__.py:124
+#: invenio/ext/login/__init__.py:129
 #, fuzzy, python-format
 msgid "You are not authorized to use '%(x_login_method)s' login method."
 msgstr "Nie ste vlastníkom tohto košíka."
 
-#: invenio/ext/login/__init__.py:130
+#: invenio/ext/login/__init__.py:135
 #, python-format
 msgid ""
 "You have not yet confirmed the email address for the             "
 "'%(login_method)s' authentication method."
 msgstr ""
 
-#: invenio/ext/login/__init__.py:148 invenio/modules/annotations/views.py:156
+#: invenio/ext/login/__init__.py:153 invenio/modules/annotations/views.py:156
 #: invenio/modules/comments/views.py:204 invenio/modules/comments/views.py:238
 #: invenio/modules/records/views.py:80
 #, fuzzy
 msgid "Authorization failure"
 msgstr "Zlyhanie registrácie"
 
-#: invenio/ext/login/__init__.py:154
+#: invenio/ext/login/__init__.py:159
 #, fuzzy
 msgid "Please sign in to continue."
 msgstr "Prosíme vyberte jeden alebo viac:"
 
-#: invenio/ext/login/__init__.py:158
+#: invenio/ext/login/__init__.py:163
 #, fuzzy
 msgid "Authorization failure."
 msgstr "Zlyhanie registrácie"
 
-#: invenio/ext/script/__init__.py:116
+#: invenio/ext/script/__init__.py:143
 #, python-format
 msgid ""
 "A newer version of Invenio is available for download. You may want to "
 "visit <a href=\"%(wiki)s\">%()s</a>"
 msgstr ""
 
-#: invenio/ext/script/__init__.py:126
+#: invenio/ext/script/__init__.py:153
 #, python-format
 msgid "Cannot download or parse release notes from %(release_notes)s"
 msgstr ""
@@ -818,7 +823,7 @@ msgstr "ID"
 #: invenio/legacy/websubmit/functions/Create_Upload_Files_Interface.py:467
 #: invenio/modules/access/templates/access/admin/showroledetails_base.html:54
 #: invenio/modules/groups/forms.py:46
-#: invenio/modules/oauth2server/models.py:142
+#: invenio/modules/oauth2server/models.py:143
 #: invenio/modules/search/admin_forms.py:34 invenio/modules/tags/forms.py:162
 #: invenio/modules/tags/forms.py:262
 msgid "Name"
@@ -861,8 +866,8 @@ msgstr "Vaše košíky"
 
 #: invenio/legacy/bibcatalog/templates.py:52
 #: invenio/legacy/bibknowledge/templates.py:170
-#: invenio/legacy/webcomment/templates.py:900
-#: invenio/legacy/webcomment/templates.py:2586
+#: invenio/legacy/webcomment/templates.py:899
+#: invenio/legacy/webcomment/templates.py:2585
 #: invenio/legacy/websearch/templates.py:2038
 msgid "Previous"
 msgstr "Predošlé"
@@ -878,8 +883,8 @@ msgstr "Skóre"
 
 #: invenio/legacy/bibcatalog/templates.py:74
 #: invenio/legacy/bibknowledge/templates.py:168
-#: invenio/legacy/webcomment/templates.py:916
-#: invenio/legacy/webcomment/templates.py:2610
+#: invenio/legacy/webcomment/templates.py:915
+#: invenio/legacy/webcomment/templates.py:2609
 msgid "Next"
 msgstr "Nasledujúce"
 
@@ -905,7 +910,7 @@ msgstr ""
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:325
 #, fuzzy
 msgid "Not authorized"
-msgstr "autor"
+msgstr "Nie ste vlastníkom tohto košíka."
 
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:79
 #, fuzzy, python-format
@@ -1449,11 +1454,11 @@ msgstr "Vaše konto bolo úspešne vytvorené."
 #: invenio/legacy/bibcirculation/adminlib.py:3543
 #: invenio/legacy/bibcirculation/adminlib.py:3587
 #: invenio/legacy/webbasket/templates.py:1839
-#: invenio/legacy/webcomment/templates.py:253
-#: invenio/legacy/webcomment/templates.py:714
-#: invenio/legacy/webcomment/templates.py:2114
-#: invenio/legacy/webcomment/templates.py:2138
-#: invenio/legacy/webcomment/templates.py:2164
+#: invenio/legacy/webcomment/templates.py:252
+#: invenio/legacy/webcomment/templates.py:713
+#: invenio/legacy/webcomment/templates.py:2113
+#: invenio/legacy/webcomment/templates.py:2137
+#: invenio/legacy/webcomment/templates.py:2163
 #: invenio/legacy/webmessage/templates.py:508
 #: invenio/legacy/websession/templates.py:2236
 #: invenio/legacy/websession/templates.py:2276
@@ -1464,11 +1469,11 @@ msgstr "Áno"
 #: invenio/legacy/bibcirculation/adminlib.py:2434
 #: invenio/legacy/bibcirculation/adminlib.py:3548
 #: invenio/legacy/webalert/templates.py:320
-#: invenio/legacy/webcomment/templates.py:254
-#: invenio/legacy/webcomment/templates.py:716
-#: invenio/legacy/webcomment/templates.py:2114
-#: invenio/legacy/webcomment/templates.py:2138
-#: invenio/legacy/webcomment/templates.py:2164
+#: invenio/legacy/webcomment/templates.py:253
+#: invenio/legacy/webcomment/templates.py:715
+#: invenio/legacy/webcomment/templates.py:2113
+#: invenio/legacy/webcomment/templates.py:2137
+#: invenio/legacy/webcomment/templates.py:2163
 #: invenio/legacy/webmessage/templates.py:509
 #: invenio/legacy/websession/templates.py:2237
 #: invenio/legacy/websession/templates.py:2277
@@ -1631,9 +1636,9 @@ msgstr ""
 #: invenio/legacy/bibdocfile/webinterface.py:145
 #: invenio/legacy/search_engine/__init__.py:2223
 #: invenio/legacy/search_engine/__init__.py:2232
-#: invenio/legacy/search_engine/__init__.py:5972
-#: invenio/legacy/search_engine/__init__.py:6034
-#: invenio/legacy/search_engine/__init__.py:6125
+#: invenio/legacy/search_engine/__init__.py:5978
+#: invenio/legacy/search_engine/__init__.py:6040
+#: invenio/legacy/search_engine/__init__.py:6131
 #, fuzzy
 msgid "Requested record does not seem to exist."
 msgstr "Ľutujem, záznam %s sa nezdá že by existoval."
@@ -2298,7 +2303,7 @@ msgstr "Akcia"
 #: invenio/legacy/websubmit/functions/Create_Upload_Files_Interface.py:471
 #: invenio/modules/access/templates/access/admin/showroledetails_base.html:56
 #: invenio/modules/groups/forms.py:50
-#: invenio/modules/oauth2server/models.py:153
+#: invenio/modules/oauth2server/models.py:154
 msgid "Description"
 msgstr "Popis"
 
@@ -2838,7 +2843,7 @@ msgstr "Zamietnuté"
 #: invenio/legacy/bibcirculation/templates.py:1772
 #: invenio/legacy/bibexport/templates.py:494
 #: invenio/legacy/bibexport/templates.py:557
-#: invenio/legacy/webcomment/templates.py:2061
+#: invenio/legacy/webcomment/templates.py:2060
 msgid "OK"
 msgstr "OK"
 
@@ -3319,8 +3324,8 @@ msgstr ""
 #: invenio/legacy/bibcirculation/templates.py:15749
 #: invenio/legacy/bibcirculation/templates.py:16003
 #: invenio/legacy/bibcirculation/utils.py:455
-#: invenio/legacy/webcomment/templates.py:1738
-#: invenio/legacy/webcomment/templates.py:1770
+#: invenio/legacy/webcomment/templates.py:1737
+#: invenio/legacy/webcomment/templates.py:1769
 msgid "Email"
 msgstr "Elektronická adresa"
 
@@ -4631,15 +4636,15 @@ msgid ""
 msgstr ""
 
 #: invenio/legacy/bibcirculation/webinterface.py:854
-#: invenio/legacy/search_engine/__init__.py:4757
-#: invenio/legacy/search_engine/__init__.py:5117
-#: invenio/legacy/search_engine/__init__.py:5311
-#: invenio/legacy/search_engine/__init__.py:5334
-#: invenio/legacy/search_engine/__init__.py:5342
-#: invenio/legacy/search_engine/__init__.py:5350
-#: invenio/legacy/search_engine/__init__.py:5396
-#: invenio/legacy/webcomment/templates.py:199
-#: invenio/legacy/webcomment/templates.py:2511
+#: invenio/legacy/search_engine/__init__.py:4763
+#: invenio/legacy/search_engine/__init__.py:5123
+#: invenio/legacy/search_engine/__init__.py:5317
+#: invenio/legacy/search_engine/__init__.py:5340
+#: invenio/legacy/search_engine/__init__.py:5348
+#: invenio/legacy/search_engine/__init__.py:5356
+#: invenio/legacy/search_engine/__init__.py:5402
+#: invenio/legacy/webcomment/templates.py:198
+#: invenio/legacy/webcomment/templates.py:2510
 #: invenio/modules/comments/api.py:1862
 msgid "The record has been deleted."
 msgstr "Záznam bol vymazaný."
@@ -4728,10 +4733,10 @@ msgstr "Zvoľte súbor"
 #: invenio/legacy/bibdocfile/managedocfiles.py:404
 #: invenio/legacy/bibexport/templates.py:347
 #: invenio/legacy/bibexport/templates.py:401
-#: invenio/legacy/webcomment/templates.py:1024
-#: invenio/legacy/webcomment/templates.py:1343
-#: invenio/legacy/webcomment/templates.py:1791
-#: invenio/legacy/webcomment/templates.py:2028
+#: invenio/legacy/webcomment/templates.py:1023
+#: invenio/legacy/webcomment/templates.py:1342
+#: invenio/legacy/webcomment/templates.py:1790
+#: invenio/legacy/webcomment/templates.py:2027
 #: invenio/legacy/websubmit/templates.py:2505
 #: invenio/legacy/websubmit/functions/Create_Upload_Files_Interface.py:475
 msgid "Comment"
@@ -5345,7 +5350,7 @@ msgid "Total"
 msgstr "voliteľné"
 
 #: invenio/legacy/bibexport/templates.py:652
-#: invenio/legacy/webcomment/templates.py:2031
+#: invenio/legacy/webcomment/templates.py:2030
 msgid "Select"
 msgstr "Vyber"
 
@@ -5655,7 +5660,7 @@ msgstr ""
 #: invenio/legacy/bibknowledge/templates.py:329
 #: invenio/legacy/bibknowledge/templates.py:589
 #: invenio/legacy/bibknowledge/templates.py:658
-#: invenio/legacy/webcomment/templates.py:1619
+#: invenio/legacy/webcomment/templates.py:1618
 #: invenio/legacy/webjournal/templates.py:203
 #: invenio/legacy/webjournal/templates.py:575
 #: invenio/legacy/webjournal/templates.py:716
@@ -6034,8 +6039,8 @@ msgstr ""
 
 #: invenio/legacy/search_engine/__init__.py:935
 #: invenio/legacy/search_engine/__init__.py:968
-#: invenio/legacy/search_engine/__init__.py:6020
-#: invenio/legacy/search_engine/__init__.py:6114
+#: invenio/legacy/search_engine/__init__.py:6026
+#: invenio/legacy/search_engine/__init__.py:6120
 msgid "Search Results"
 msgstr "Výsledky hľadania"
 
@@ -6252,7 +6257,7 @@ msgid ""
 "this doesn't help, please check your search and try again."
 msgstr ""
 
-#: invenio/legacy/search_engine/__init__.py:3232
+#: invenio/legacy/search_engine/__init__.py:3238
 #, fuzzy, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other collections gave "
@@ -6262,7 +6267,7 @@ msgstr ""
 "dostupné kolekcie dali %(x_url_open)s%(x_nb_hits)d "
 "záznamov%(x_url_close)s."
 
-#: invenio/legacy/search_engine/__init__.py:3249
+#: invenio/legacy/search_engine/__init__.py:3255
 #, fuzzy
 msgid ""
 "No public collection matched your query. If you were looking for a hidden"
@@ -6272,7 +6277,7 @@ msgstr ""
 " dokumenty verejne neprístupné, zvoľte prosím najskôr príslušnú neverejnú"
 " kolekciu."
 
-#: invenio/legacy/search_engine/__init__.py:3253
+#: invenio/legacy/search_engine/__init__.py:3259
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
@@ -6281,44 +6286,44 @@ msgstr ""
 " dokumenty verejne neprístupné, zvoľte prosím najskôr príslušnú neverejnú"
 " kolekciu."
 
-#: invenio/legacy/search_engine/__init__.py:3360
+#: invenio/legacy/search_engine/__init__.py:3366
 #, fuzzy
 msgid "Your search did not match any records.  Please try again."
 msgstr ""
 "Hľadaný výraz %s neodpovedá žiadnemu záznamu. Najbližšie termíny "
 "nezávisle na kolekcii sú:"
 
-#: invenio/legacy/search_engine/__init__.py:3369
+#: invenio/legacy/search_engine/__init__.py:3375
 #, fuzzy
 msgid "No match found, please enter different search terms."
 msgstr "Použite odlišné hľadacie výrazy."
 
-#: invenio/legacy/search_engine/__init__.py:3375
+#: invenio/legacy/search_engine/__init__.py:3381
 #, fuzzy, python-format
 msgid "There are no records referring to %(x_rec)s."
 msgstr "Existuje %i košíkov"
 
-#: invenio/legacy/search_engine/__init__.py:3377
+#: invenio/legacy/search_engine/__init__.py:3383
 #, fuzzy, python-format
 msgid "There are no records modified by %(x_rec)s."
 msgstr "Existuje %i košíkov"
 
-#: invenio/legacy/search_engine/__init__.py:3379
+#: invenio/legacy/search_engine/__init__.py:3385
 #, fuzzy, python-format
 msgid "There are no records cited by %(x_rec)s."
 msgstr "Existuje %i košíkov"
 
-#: invenio/legacy/search_engine/__init__.py:3385
+#: invenio/legacy/search_engine/__init__.py:3391
 #, fuzzy, python-format
 msgid "No word index is available for %(x_name)s."
 msgstr "Index slov nie je dostupný pre"
 
-#: invenio/legacy/search_engine/__init__.py:3396
+#: invenio/legacy/search_engine/__init__.py:3402
 #, fuzzy, python-format
 msgid "No phrase index is available for %(x_name)s."
 msgstr "Index viet nie je dostupný pre"
 
-#: invenio/legacy/search_engine/__init__.py:3434
+#: invenio/legacy/search_engine/__init__.py:3440
 #, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record."
@@ -6327,7 +6332,7 @@ msgstr ""
 "Hľadaný výraz %(x_term)s v indexe %(x_index)s neodpovedá žiadnemu "
 "záznamu. Najbližšie termíny nezávisle na kolekcii sú:"
 
-#: invenio/legacy/search_engine/__init__.py:3439
+#: invenio/legacy/search_engine/__init__.py:3445
 #, fuzzy, python-format
 msgid ""
 "Search term %(x_name)s did not match any record. Nearest terms in any "
@@ -6336,7 +6341,7 @@ msgstr ""
 "Hľadaný výraz %s neodpovedá žiadnemu záznamu. Najbližšie termíny "
 "nezávisle na kolekcii sú:"
 
-#: invenio/legacy/search_engine/__init__.py:4340
+#: invenio/legacy/search_engine/__init__.py:4346
 #, fuzzy, python-format
 msgid ""
 "Sorry, %(x_option)s does not seem to be a valid sort option. The records "
@@ -6345,7 +6350,7 @@ msgstr ""
 "Ľutujem, %s nie je platné nastavenie pre triedenie.  Použijem triedenie "
 "podľa názvu namiesto neho."
 
-#: invenio/legacy/search_engine/__init__.py:4468
+#: invenio/legacy/search_engine/__init__.py:4474
 #, fuzzy, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %(x_name)d records only. Using"
@@ -6354,7 +6359,7 @@ msgstr ""
 "Ľutujem, triedenie je povolené len do %d záznamov.  Použijem štandardné "
 "triedenie."
 
-#: invenio/legacy/search_engine/__init__.py:4480
+#: invenio/legacy/search_engine/__init__.py:4486
 #, fuzzy, python-format
 msgid ""
 "Sorry, %(x_name)s does not seem to be a valid sort option. The records "
@@ -6363,17 +6368,17 @@ msgstr ""
 "Ľutujem, %s nie je platné nastavenie pre triedenie.  Použijem triedenie "
 "podľa názvu namiesto neho."
 
-#: invenio/legacy/search_engine/__init__.py:4760
-#: invenio/legacy/search_engine/__init__.py:5121
+#: invenio/legacy/search_engine/__init__.py:4766
+#: invenio/legacy/search_engine/__init__.py:5127
 #, fuzzy, python-format
 msgid "The record %(x_rec)d replaces it."
 msgstr "Tento záznam neexistuje."
 
-#: invenio/legacy/search_engine/__init__.py:4986
+#: invenio/legacy/search_engine/__init__.py:4992
 msgid "Use different search terms."
 msgstr "Použite odlišné hľadacie výrazy."
 
-#: invenio/legacy/search_engine/__init__.py:5982
+#: invenio/legacy/search_engine/__init__.py:5988
 #: invenio/legacy/websearch/templates.py:813
 #: invenio/legacy/websearch/templates.py:891
 #: invenio/legacy/websearch/templates.py:1014
@@ -6387,13 +6392,13 @@ msgstr "Použite odlišné hľadacie výrazy."
 msgid "Browse"
 msgstr "Prelistuj"
 
-#: invenio/legacy/search_engine/__init__.py:6413
+#: invenio/legacy/search_engine/__init__.py:6419
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "Žiaden výsledok nevyhovuje Vašim časovým kritériám, podmienka nie je "
 "vzatá do úvahy..."
 
-#: invenio/legacy/search_engine/__init__.py:6447
+#: invenio/legacy/search_engine/__init__.py:6453
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "Žiaden výsledok nevyhovuje Vašim limitným kritériám, podmienky nie sú "
@@ -6712,7 +6717,7 @@ msgstr "Vaše hľadania"
 #: invenio/legacy/webbasket/webinterface.py:1026
 #: invenio/legacy/webbasket/webinterface.py:1116
 #: invenio/legacy/webbasket/webinterface.py:1260
-#: invenio/legacy/webcomment/webinterface.py:922
+#: invenio/legacy/webcomment/webinterface.py:928
 #: invenio/legacy/webmessage/templates.py:466
 #: invenio/legacy/websession/templates.py:774
 #: invenio/legacy/websession/templates.py:2350
@@ -6776,7 +6781,7 @@ msgstr "Nastaviť nové avízo"
 #: invenio/legacy/webalert/webinterface.py:475
 #: invenio/legacy/webalert/webinterface.py:523
 #: invenio/legacy/webalert/webinterface.py:551
-#: invenio/legacy/webcomment/webinterface.py:925
+#: invenio/legacy/webcomment/webinterface.py:931
 #: invenio/legacy/websession/webinterface.py:231
 #: invenio/legacy/websession/webinterface.py:254
 #: invenio/legacy/websession/webinterface.py:340
@@ -7461,7 +7466,7 @@ msgid "This functionality is forbidden to guest users."
 msgstr "Táto funkcia je neprístupná anonymným hosťom."
 
 #: invenio/legacy/webbasket/templates.py:2184
-#: invenio/legacy/webcomment/templates.py:1011
+#: invenio/legacy/webcomment/templates.py:1010
 msgid "Back to search results"
 msgstr "Naspäť ku výsledkom hľadania"
 
@@ -7636,7 +7641,7 @@ msgstr "Pridaj k užívateľom"
 
 #: invenio/legacy/webbasket/templates.py:3221
 #: invenio/legacy/webbasket/templates.py:4025
-#: invenio/legacy/webcomment/templates.py:409
+#: invenio/legacy/webcomment/templates.py:408
 #: invenio/legacy/webmessage/templates.py:111
 #: invenio/modules/messages/templates/messages/view_base.html:55
 msgid "Reply"
@@ -7783,219 +7788,219 @@ msgstr "Užívateľ %s neexistuje."
 msgid "Record ID %(x_rec)s does not exist."
 msgstr "Užívateľ %s neexistuje."
 
-#: invenio/legacy/webcomment/templates.py:83
-#: invenio/legacy/webcomment/templates.py:938
+#: invenio/legacy/webcomment/templates.py:82
+#: invenio/legacy/webcomment/templates.py:937
 #: invenio/legacy/websubmit/templates.py:2451
 #: invenio/modules/formatter/templates/format/record/Video_HTML_detailed.tpl:58
 msgid "Write a comment"
 msgstr "Napíšte komentár"
 
-#: invenio/legacy/webcomment/templates.py:99
+#: invenio/legacy/webcomment/templates.py:98
 #, fuzzy, python-format
 msgid "%(x_nb)i Comments for round \"%(x_name)s\""
 msgstr "%(x_name)s napísal dňa %(x_date)s:"
 
-#: invenio/legacy/webcomment/templates.py:102
+#: invenio/legacy/webcomment/templates.py:101
 #, fuzzy, python-format
 msgid "%(x_nb)i Comments"
 msgstr "%i komentárov"
 
-#: invenio/legacy/webcomment/templates.py:140
+#: invenio/legacy/webcomment/templates.py:139
 #, fuzzy, python-format
 msgid "Showing the latest %(x_num)i comments:"
 msgstr "Zobrazujúc posledných %i komentárov:"
 
-#: invenio/legacy/webcomment/templates.py:153
-#: invenio/legacy/webcomment/templates.py:179
+#: invenio/legacy/webcomment/templates.py:152
+#: invenio/legacy/webcomment/templates.py:178
 msgid "Discuss this document"
 msgstr "Diskutujte o tomto dokumente"
 
-#: invenio/legacy/webcomment/templates.py:180
-#: invenio/legacy/webcomment/templates.py:951
+#: invenio/legacy/webcomment/templates.py:179
+#: invenio/legacy/webcomment/templates.py:950
 msgid "Start a discussion about any aspect of this document."
 msgstr "Začnite diskusiu o hocakom aspekte tohto dokumentu."
 
-#: invenio/legacy/webcomment/templates.py:197
+#: invenio/legacy/webcomment/templates.py:196
 #, fuzzy, python-format
 msgid "Sorry, the record %(x_rec)s does not seem to exist."
 msgstr "Ľutujem, záznam %s sa nezdá že by existoval."
 
-#: invenio/legacy/webcomment/templates.py:201
+#: invenio/legacy/webcomment/templates.py:200
 #, fuzzy, python-format
 msgid "Sorry, %(x_rec)s is not a valid ID value."
 msgstr "Ľutujem, %s nie je platná hodnota ID."
 
-#: invenio/legacy/webcomment/templates.py:203
+#: invenio/legacy/webcomment/templates.py:202
 msgid "Sorry, no record ID was provided."
 msgstr "Ľutujem, žiadne ID záznamu nebolo dodané."
 
-#: invenio/legacy/webcomment/templates.py:207
+#: invenio/legacy/webcomment/templates.py:206
 #, fuzzy, python-format
 msgid "You may want to start browsing from %(x_link)s"
 msgstr "Môžete chcieť začať prehliadať z %s"
 
-#: invenio/legacy/webcomment/templates.py:265
-#: invenio/legacy/webcomment/templates.py:756
-#: invenio/legacy/webcomment/templates.py:766
+#: invenio/legacy/webcomment/templates.py:264
+#: invenio/legacy/webcomment/templates.py:755
+#: invenio/legacy/webcomment/templates.py:765
 #, fuzzy, python-format
 msgid "%(x_nb)i comments for round \"%(x_name)s\""
 msgstr "%(x_name)s napísal dňa %(x_date)s:"
 
-#: invenio/legacy/webcomment/templates.py:295
-#: invenio/legacy/webcomment/templates.py:861
+#: invenio/legacy/webcomment/templates.py:294
+#: invenio/legacy/webcomment/templates.py:860
 msgid "Was this review helpful?"
 msgstr "Bolo toto hodnotenie užitočné?"
 
-#: invenio/legacy/webcomment/templates.py:306
-#: invenio/legacy/webcomment/templates.py:342
-#: invenio/legacy/webcomment/templates.py:938
+#: invenio/legacy/webcomment/templates.py:305
+#: invenio/legacy/webcomment/templates.py:341
+#: invenio/legacy/webcomment/templates.py:937
 #: invenio/modules/comments/templates/comments/add_review_base.html:54
 msgid "Write a review"
 msgstr "Napíšte hodnotenie"
 
-#: invenio/legacy/webcomment/templates.py:313
-#: invenio/legacy/webcomment/templates.py:925
-#: invenio/legacy/webcomment/templates.py:2185
+#: invenio/legacy/webcomment/templates.py:312
+#: invenio/legacy/webcomment/templates.py:924
+#: invenio/legacy/webcomment/templates.py:2184
 #, python-format
 msgid "Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews"
 msgstr ""
 "Priemerné skóre hodnotení: %(x_nb_score)s založené na %(x_nb_reviews)s "
 "hodnoteniach"
 
-#: invenio/legacy/webcomment/templates.py:316
+#: invenio/legacy/webcomment/templates.py:315
 #, fuzzy, python-format
 msgid "Readers found the following %(x_name)s reviews to be most helpful."
 msgstr "Čitatelia pokladali nasledujúcich %s hodnotení za najužitočnejšie."
 
-#: invenio/legacy/webcomment/templates.py:318
-#: invenio/legacy/webcomment/templates.py:341
+#: invenio/legacy/webcomment/templates.py:317
+#: invenio/legacy/webcomment/templates.py:340
 #, fuzzy, python-format
 msgid "View all %(x_name)s reviews"
 msgstr "Zobraz všetky %s hodnotenia"
 
-#: invenio/legacy/webcomment/templates.py:337
-#: invenio/legacy/webcomment/templates.py:359
-#: invenio/legacy/webcomment/templates.py:2226
+#: invenio/legacy/webcomment/templates.py:336
+#: invenio/legacy/webcomment/templates.py:358
+#: invenio/legacy/webcomment/templates.py:2225
 msgid "Rate this document"
 msgstr "Ohodnoťte tento dokument"
 
-#: invenio/legacy/webcomment/templates.py:360
+#: invenio/legacy/webcomment/templates.py:359
 #, fuzzy
 msgid "Be the first to review this document.</div>"
 msgstr "Buďte prvý kto ohodnotí tento dokument."
 
-#: invenio/legacy/webcomment/templates.py:404
-#: invenio/legacy/webcomment/templates.py:465
-#: invenio/legacy/webcomment/templates.py:807
+#: invenio/legacy/webcomment/templates.py:403
+#: invenio/legacy/webcomment/templates.py:464
+#: invenio/legacy/webcomment/templates.py:806
 #: invenio/modules/workflows/templates/workflows/actions/approval_main.html:23
 #, fuzzy
 msgid "Close"
 msgstr "Skóre"
 
-#: invenio/legacy/webcomment/templates.py:411
-#: invenio/legacy/webcomment/templates.py:862
+#: invenio/legacy/webcomment/templates.py:410
+#: invenio/legacy/webcomment/templates.py:861
 msgid "Report abuse"
 msgstr "Hlás zneužitie"
 
-#: invenio/legacy/webcomment/templates.py:425
+#: invenio/legacy/webcomment/templates.py:424
 #, fuzzy
 msgid "Undelete comment"
 msgstr "zmaž komentáre"
 
-#: invenio/legacy/webcomment/templates.py:434
-#: invenio/legacy/webcomment/templates.py:436
+#: invenio/legacy/webcomment/templates.py:433
+#: invenio/legacy/webcomment/templates.py:435
 msgid "Delete comment"
 msgstr "Zmazať komentár"
 
-#: invenio/legacy/webcomment/templates.py:442
+#: invenio/legacy/webcomment/templates.py:441
 #, fuzzy
 msgid "Unreport comment"
 msgstr "Zmazať komentár"
 
-#: invenio/legacy/webcomment/templates.py:453
+#: invenio/legacy/webcomment/templates.py:452
 msgid "Attached file"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:453
+#: invenio/legacy/webcomment/templates.py:452
 msgid "Attached files"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:465
-#: invenio/legacy/webcomment/templates.py:806
+#: invenio/legacy/webcomment/templates.py:464
+#: invenio/legacy/webcomment/templates.py:805
 msgid "Open"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:534
+#: invenio/legacy/webcomment/templates.py:533
 #, python-format
 msgid "Reviewed by %(x_nickname)s on %(x_date)s"
 msgstr "Ohodnotené %(x_nickname)s dňa %(x_date)s"
 
-#: invenio/legacy/webcomment/templates.py:538
+#: invenio/legacy/webcomment/templates.py:537
 #, fuzzy, python-format
 msgid "%(x_nb_people)s out of %(x_nb_total)s people found this review useful"
 msgstr ""
 "%(x_nb_people)i z %(x_nb_total)i čitateľov pokladá túto kritiku za "
 "užitočnú"
 
-#: invenio/legacy/webcomment/templates.py:560
+#: invenio/legacy/webcomment/templates.py:559
 #, fuzzy
 msgid "Undelete review"
 msgstr "Zruš vybrané hodnotenia"
 
-#: invenio/legacy/webcomment/templates.py:569
+#: invenio/legacy/webcomment/templates.py:568
 #, fuzzy
 msgid "Delete review"
 msgstr "Zruš vybrané hodnotenia"
 
-#: invenio/legacy/webcomment/templates.py:575
+#: invenio/legacy/webcomment/templates.py:574
 #, fuzzy
 msgid "Unreport review"
 msgstr "Napíšte Vaše hodnotenie"
 
-#: invenio/legacy/webcomment/templates.py:682
-#: invenio/legacy/webcomment/templates.py:698
-#: invenio/legacy/webcomment/webinterface.py:248
-#: invenio/legacy/webcomment/webinterface.py:466
+#: invenio/legacy/webcomment/templates.py:681
+#: invenio/legacy/webcomment/templates.py:697
+#: invenio/legacy/webcomment/webinterface.py:252
+#: invenio/legacy/webcomment/webinterface.py:472
 #: invenio/legacy/websearch/adminlib.py:3406
 #: invenio/legacy/websubmit/templates.py:2449
 #: invenio/modules/comments/views.py:188
 msgid "Comments"
 msgstr "Komentáre"
 
-#: invenio/legacy/webcomment/templates.py:683
-#: invenio/legacy/webcomment/templates.py:699
-#: invenio/legacy/webcomment/webinterface.py:248
-#: invenio/legacy/webcomment/webinterface.py:466
+#: invenio/legacy/webcomment/templates.py:682
+#: invenio/legacy/webcomment/templates.py:698
+#: invenio/legacy/webcomment/webinterface.py:252
+#: invenio/legacy/webcomment/webinterface.py:472
 #: invenio/legacy/websearch/adminlib.py:3407
 #: invenio/modules/comments/views.py:222
 msgid "Reviews"
 msgstr "Ohodnotenia"
 
-#: invenio/legacy/webcomment/templates.py:942
+#: invenio/legacy/webcomment/templates.py:941
 #, fuzzy, python-format
 msgid "There is a total of %(x_num)s reviews"
 msgstr "Existuje celkovo %s hodnotení"
 
-#: invenio/legacy/webcomment/templates.py:944
+#: invenio/legacy/webcomment/templates.py:943
 #, fuzzy, python-format
 msgid "There is a total of %(x_num)s comments"
 msgstr "Existuje celkovo %s komentárov"
 
-#: invenio/legacy/webcomment/templates.py:956
+#: invenio/legacy/webcomment/templates.py:955
 msgid "Be the first to review this document."
 msgstr "Buďte prvý kto ohodnotí tento dokument."
 
-#: invenio/legacy/webcomment/templates.py:975
+#: invenio/legacy/webcomment/templates.py:974
 msgid "Subscribe"
 msgstr "Prihlásiť sa k odberu"
 
-#: invenio/legacy/webcomment/templates.py:993
+#: invenio/legacy/webcomment/templates.py:992
 #, fuzzy
 msgid "Unsubscribe"
 msgstr "Prihlásiť sa k odberu"
 
-#: invenio/legacy/webcomment/templates.py:1010
-#: invenio/legacy/webcomment/templates.py:1787
+#: invenio/legacy/webcomment/templates.py:1009
+#: invenio/legacy/webcomment/templates.py:1786
 #: invenio/legacy/websearch/templates.py:548
 #: invenio/modules/comments/templates/comments/subscriptions_base.html:40
 #: invenio/modules/editor/templates/editor/recordmenu.html:22
@@ -8004,43 +8009,43 @@ msgstr "Prihlásiť sa k odberu"
 msgid "Record"
 msgstr "Záznam"
 
-#: invenio/legacy/webcomment/templates.py:1020
-#: invenio/legacy/webcomment/templates.py:1088
+#: invenio/legacy/webcomment/templates.py:1019
+#: invenio/legacy/webcomment/templates.py:1087
 msgid "review"
 msgstr "ohodnotenie"
 
-#: invenio/legacy/webcomment/templates.py:1020
-#: invenio/legacy/webcomment/templates.py:1088
+#: invenio/legacy/webcomment/templates.py:1019
+#: invenio/legacy/webcomment/templates.py:1087
 msgid "comment"
 msgstr "komentár"
 
-#: invenio/legacy/webcomment/templates.py:1023
-#: invenio/legacy/webcomment/templates.py:2028
+#: invenio/legacy/webcomment/templates.py:1022
+#: invenio/legacy/webcomment/templates.py:2027
 msgid "Review"
 msgstr "Hodnotenie"
 
-#: invenio/legacy/webcomment/templates.py:1086
+#: invenio/legacy/webcomment/templates.py:1085
 msgid "Viewing"
 msgstr "Zobrazenie"
 
-#: invenio/legacy/webcomment/templates.py:1087
+#: invenio/legacy/webcomment/templates.py:1086
 msgid "Page:"
 msgstr "Strana:"
 
-#: invenio/legacy/webcomment/templates.py:1101
+#: invenio/legacy/webcomment/templates.py:1100
 #, fuzzy
 msgid "You are not authorized to comment or review."
 msgstr "Nie ste vlastníkom tohto košíka."
 
-#: invenio/legacy/webcomment/templates.py:1271
+#: invenio/legacy/webcomment/templates.py:1270
 #, fuzzy, python-format
 msgid ""
 "Note: Your nickname, %(nick)s, will be displayed as author of this "
 "comment."
 msgstr "Poznámka: Vaša prezývka, %s, bude zobrazená ako autor tohto komentára"
 
-#: invenio/legacy/webcomment/templates.py:1276
-#: invenio/legacy/webcomment/templates.py:1393
+#: invenio/legacy/webcomment/templates.py:1275
+#: invenio/legacy/webcomment/templates.py:1392
 #, python-format
 msgid ""
 "Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. "
@@ -8049,148 +8054,148 @@ msgstr ""
 "Poznámka: Ešte ste si %(x_url_open)snezvolili prezývku%(x_url_close)s. "
 "%(x_nickname)s bude zobrazené ako autor tohto komentára."
 
-#: invenio/legacy/webcomment/templates.py:1293
+#: invenio/legacy/webcomment/templates.py:1292
 msgid "Once logged in, authorized users can also attach files."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1308
+#: invenio/legacy/webcomment/templates.py:1307
 msgid "Optionally, attach a file to this comment"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1309
+#: invenio/legacy/webcomment/templates.py:1308
 msgid "Optionally, attach files to this comment"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1310
+#: invenio/legacy/webcomment/templates.py:1309
 #, fuzzy
 msgid "Max one file"
 msgstr "Pridaj hodnotenie"
 
-#: invenio/legacy/webcomment/templates.py:1311
+#: invenio/legacy/webcomment/templates.py:1310
 #, fuzzy, python-format
 msgid "Max %(maxfiles)i files"
 msgstr "súbor(y)"
 
-#: invenio/legacy/webcomment/templates.py:1312
+#: invenio/legacy/webcomment/templates.py:1311
 #, python-format
 msgid "Max %(x_nb_bytes)s per file"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1327
+#: invenio/legacy/webcomment/templates.py:1326
 msgid "Send me an email when a new comment is posted"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1342
-#: invenio/legacy/webcomment/templates.py:1464
+#: invenio/legacy/webcomment/templates.py:1341
+#: invenio/legacy/webcomment/templates.py:1463
 msgid "Article"
 msgstr "Správa"
 
-#: invenio/legacy/webcomment/templates.py:1344
+#: invenio/legacy/webcomment/templates.py:1343
 #, fuzzy
 msgid "Add comment"
 msgstr "Pridaj komentár"
 
-#: invenio/legacy/webcomment/templates.py:1389
+#: invenio/legacy/webcomment/templates.py:1388
 #, fuzzy, python-format
 msgid ""
 "Note: Your nickname, %(x_name)s, will be displayed as the author of this "
 "review."
 msgstr "Poznámka: Vaša prezývka, %s, bude zobrazená ako autor tohto hodnotenia."
 
-#: invenio/legacy/webcomment/templates.py:1465
+#: invenio/legacy/webcomment/templates.py:1464
 msgid "Rate this article"
 msgstr "Ohodnoťte tento článok"
 
-#: invenio/legacy/webcomment/templates.py:1466
+#: invenio/legacy/webcomment/templates.py:1465
 msgid "Select a score"
 msgstr "Vyber skóre"
 
-#: invenio/legacy/webcomment/templates.py:1467
+#: invenio/legacy/webcomment/templates.py:1466
 msgid "Give a title to your review"
 msgstr "Zadajte názov vášho hodnotenia"
 
-#: invenio/legacy/webcomment/templates.py:1468
+#: invenio/legacy/webcomment/templates.py:1467
 msgid "Write your review"
 msgstr "Napíšte Vaše hodnotenie"
 
-#: invenio/legacy/webcomment/templates.py:1473
+#: invenio/legacy/webcomment/templates.py:1472
 #, fuzzy
 msgid "Add review"
 msgstr "Pridaj hodnotenie"
 
-#: invenio/legacy/webcomment/templates.py:1483
-#: invenio/legacy/webcomment/webinterface.py:511
+#: invenio/legacy/webcomment/templates.py:1482
+#: invenio/legacy/webcomment/webinterface.py:517
 msgid "Add Review"
 msgstr "Pridaj hodnotenie"
 
-#: invenio/legacy/webcomment/templates.py:1505
+#: invenio/legacy/webcomment/templates.py:1504
 msgid "Your review was successfully added."
 msgstr "Vaše hodnotenie bolo úspešne pridané."
 
-#: invenio/legacy/webcomment/templates.py:1507
+#: invenio/legacy/webcomment/templates.py:1506
 msgid "Your comment was successfully added."
 msgstr "Váš komentár bol úspešne pridaný."
 
-#: invenio/legacy/webcomment/templates.py:1510
+#: invenio/legacy/webcomment/templates.py:1509
 msgid "Back to record"
 msgstr "Naspäť ku záznamu"
 
-#: invenio/legacy/webcomment/templates.py:1512
+#: invenio/legacy/webcomment/templates.py:1511
 #, fuzzy, python-format
 msgid ""
 "You can also view all the comments you have submitted so far on "
 "\"%(x_url_open)sYour Comments%(x_url_close)s\" page."
 msgstr "Môžete si prezrieť zoznam %(x_url_open)sVašich grúp%(x_url_close)s."
 
-#: invenio/legacy/webcomment/templates.py:1592
+#: invenio/legacy/webcomment/templates.py:1591
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:171
 #, fuzzy
 msgid "View most commented records"
 msgstr "zobraz komentáre"
 
-#: invenio/legacy/webcomment/templates.py:1594
+#: invenio/legacy/webcomment/templates.py:1593
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:207
 #, fuzzy
 msgid "View latest commented records"
 msgstr "zobraz komentáre"
 
-#: invenio/legacy/webcomment/templates.py:1596
+#: invenio/legacy/webcomment/templates.py:1595
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:140
 #, fuzzy
 msgid "View all comments reported as abuse"
 msgstr "Zobraz všektých hlásených používateľov"
 
-#: invenio/legacy/webcomment/templates.py:1600
+#: invenio/legacy/webcomment/templates.py:1599
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:170
 #, fuzzy
 msgid "View most reviewed records"
 msgstr "zruš záznamy"
 
-#: invenio/legacy/webcomment/templates.py:1602
+#: invenio/legacy/webcomment/templates.py:1601
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:206
 #, fuzzy
 msgid "View latest reviewed records"
 msgstr "Zobraz všetky %s hodnotenia"
 
-#: invenio/legacy/webcomment/templates.py:1604
+#: invenio/legacy/webcomment/templates.py:1603
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:140
 #, fuzzy
 msgid "View all reviews reported as abuse"
 msgstr "Zobraz všektých hlásených používateľov"
 
-#: invenio/legacy/webcomment/templates.py:1612
+#: invenio/legacy/webcomment/templates.py:1611
 msgid "View all users who have been reported"
 msgstr "Zobraz všetkých používateľov ktorí boli hlásení"
 
-#: invenio/legacy/webcomment/templates.py:1614
+#: invenio/legacy/webcomment/templates.py:1613
 msgid "Guide"
 msgstr "Príručka"
 
-#: invenio/legacy/webcomment/templates.py:1616
+#: invenio/legacy/webcomment/templates.py:1615
 msgid "Comments and reviews are disabled"
 msgstr "Komentáre a hodnotenia sú blokované"
 
-#: invenio/legacy/webcomment/templates.py:1636
+#: invenio/legacy/webcomment/templates.py:1635
 msgid ""
 "Please enter the ID of the comment/review so that you can view it before "
 "deciding whether to delete it or not"
@@ -8198,38 +8203,38 @@ msgstr ""
 "Prosím zadajte ID komentára/hodnotenia aby ste ho mohli zobraziť pred tým"
 " ako sa rozhodnete či ho zmazať alebo nie"
 
-#: invenio/legacy/webcomment/templates.py:1660
+#: invenio/legacy/webcomment/templates.py:1659
 msgid "Comment ID:"
 msgstr "ID komentára:"
 
-#: invenio/legacy/webcomment/templates.py:1661
+#: invenio/legacy/webcomment/templates.py:1660
 msgid "Or enter a record ID to list all the associated comments/reviews:"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:1662
+#: invenio/legacy/webcomment/templates.py:1661
 #, fuzzy
 msgid "Record ID:"
 msgstr "ID záznamu"
 
-#: invenio/legacy/webcomment/templates.py:1664
+#: invenio/legacy/webcomment/templates.py:1663
 msgid "View Comment"
 msgstr "Zobraziť komentár"
 
-#: invenio/legacy/webcomment/templates.py:1685
+#: invenio/legacy/webcomment/templates.py:1684
 msgid "There have been no reports so far."
 msgstr "Ešte neboli žiadne hlásenia."
 
-#: invenio/legacy/webcomment/templates.py:1689
+#: invenio/legacy/webcomment/templates.py:1688
 #, fuzzy, python-format
 msgid "View all %(x_name)s reported comments"
 msgstr "Zobraziť všetky %s ohlásené komentáre"
 
-#: invenio/legacy/webcomment/templates.py:1692
+#: invenio/legacy/webcomment/templates.py:1691
 #, fuzzy, python-format
 msgid "View all %(x_name)s reported reviews"
 msgstr "Zobraziť všetky %s ohlásené hodnotenia"
 
-#: invenio/legacy/webcomment/templates.py:1729
+#: invenio/legacy/webcomment/templates.py:1728
 msgid ""
 "Here is a list, sorted by total number of reports, of all users who have "
 "had a comment reported at least once."
@@ -8237,288 +8242,288 @@ msgstr ""
 "Tu je zoznam, utriedený podľa celkového počtu oznámení, všetkých "
 "užívateľov ktorí mali aspoň jedno oznámenie na ich komentáre."
 
-#: invenio/legacy/webcomment/templates.py:1737
-#: invenio/legacy/webcomment/templates.py:1766
+#: invenio/legacy/webcomment/templates.py:1736
+#: invenio/legacy/webcomment/templates.py:1765
 #: invenio/legacy/websession/templates.py:272
 #: invenio/legacy/websession/templates.py:1221
 #: invenio/modules/accounts/forms.py:46 invenio/modules/accounts/forms.py:164
 msgid "Nickname"
 msgstr "Prezývka"
 
-#: invenio/legacy/webcomment/templates.py:1739
-#: invenio/legacy/webcomment/templates.py:1768
+#: invenio/legacy/webcomment/templates.py:1738
+#: invenio/legacy/webcomment/templates.py:1767
 msgid "User ID"
 msgstr "ID používateľa"
 
-#: invenio/legacy/webcomment/templates.py:1741
+#: invenio/legacy/webcomment/templates.py:1740
 msgid "Number positive votes"
 msgstr "Počet kladných hlasov"
 
-#: invenio/legacy/webcomment/templates.py:1742
+#: invenio/legacy/webcomment/templates.py:1741
 msgid "Number negative votes"
 msgstr "Počet záporných hlasov"
 
-#: invenio/legacy/webcomment/templates.py:1743
+#: invenio/legacy/webcomment/templates.py:1742
 msgid "Total number votes"
 msgstr "Celkový počet hlasov"
 
-#: invenio/legacy/webcomment/templates.py:1744
+#: invenio/legacy/webcomment/templates.py:1743
 msgid "Total number of reports"
 msgstr "Celkový počet ohlásení"
 
-#: invenio/legacy/webcomment/templates.py:1745
+#: invenio/legacy/webcomment/templates.py:1744
 msgid "View all user's reported comments/reviews"
 msgstr "Zobraziť všetky užívateľmi ohlásené komentáre a hodnotenia"
 
-#: invenio/legacy/webcomment/templates.py:1778
+#: invenio/legacy/webcomment/templates.py:1777
 #, fuzzy, python-format
 msgid "This review has been reported %(x_num)i times"
 msgstr "Toto hodnotenie bolo hlásené %i krát"
 
-#: invenio/legacy/webcomment/templates.py:1780
+#: invenio/legacy/webcomment/templates.py:1779
 #, fuzzy, python-format
 msgid "This comment has been reported %(x_num)i times"
 msgstr "Tento komentár bol hlásený %i krát"
 
-#: invenio/legacy/webcomment/templates.py:2029
+#: invenio/legacy/webcomment/templates.py:2028
 msgid "Written by"
 msgstr "Napísal"
 
-#: invenio/legacy/webcomment/templates.py:2030
+#: invenio/legacy/webcomment/templates.py:2029
 msgid "General informations"
 msgstr "Všeobecné informácie"
 
-#: invenio/legacy/webcomment/templates.py:2045
+#: invenio/legacy/webcomment/templates.py:2044
 msgid "Delete selected reviews"
 msgstr "Zruš vybrané hodnotenia"
 
-#: invenio/legacy/webcomment/templates.py:2046
-#: invenio/legacy/webcomment/templates.py:2053
+#: invenio/legacy/webcomment/templates.py:2045
+#: invenio/legacy/webcomment/templates.py:2052
 msgid "Suppress selected abuse report"
 msgstr "Potlač zvolené správy o zneužití"
 
-#: invenio/legacy/webcomment/templates.py:2047
+#: invenio/legacy/webcomment/templates.py:2046
 #, fuzzy
 msgid "Undelete selected reviews"
 msgstr "Zruš vybrané hodnotenia"
 
-#: invenio/legacy/webcomment/templates.py:2051
+#: invenio/legacy/webcomment/templates.py:2050
 #, fuzzy
 msgid "Undelete selected comments"
 msgstr "Zruš vybrané komentáre"
 
-#: invenio/legacy/webcomment/templates.py:2052
+#: invenio/legacy/webcomment/templates.py:2051
 msgid "Delete selected comments"
 msgstr "Zruš vybrané komentáre"
 
-#: invenio/legacy/webcomment/templates.py:2067
+#: invenio/legacy/webcomment/templates.py:2066
 #, fuzzy, python-format
 msgid "Here are the reported reviews of user %(x_name)s"
 msgstr "Tu sú hlásené hodnotenia užívateľa %s"
 
-#: invenio/legacy/webcomment/templates.py:2069
+#: invenio/legacy/webcomment/templates.py:2068
 #, fuzzy, python-format
 msgid "Here are the reported comments of user %(x_name)s"
 msgstr "Tu sú hlásené komentáre užívateľa %s"
 
-#: invenio/legacy/webcomment/templates.py:2073
+#: invenio/legacy/webcomment/templates.py:2072
 #, fuzzy, python-format
 msgid "Here is review %(x_name)s"
 msgstr "Tu je komentár/hodnotenie %s"
 
-#: invenio/legacy/webcomment/templates.py:2075
+#: invenio/legacy/webcomment/templates.py:2074
 #, fuzzy, python-format
 msgid "Here is comment %(x_name)s"
 msgstr "Tu je komentár/hodnotenie %s"
 
-#: invenio/legacy/webcomment/templates.py:2078
+#: invenio/legacy/webcomment/templates.py:2077
 #, fuzzy, python-format
 msgid "Here is review %(x_cmtID)s written by user %(x_user)s"
 msgstr "Tu je komentár/hodnotenie %(x_cmtID)s napísaný používateľom %(x_user)s"
 
-#: invenio/legacy/webcomment/templates.py:2080
+#: invenio/legacy/webcomment/templates.py:2079
 #, fuzzy, python-format
 msgid "Here is comment %(x_cmtID)s written by user %(x_user)s"
 msgstr "Tu je komentár/hodnotenie %(x_cmtID)s napísaný používateľom %(x_user)s"
 
-#: invenio/legacy/webcomment/templates.py:2086
+#: invenio/legacy/webcomment/templates.py:2085
 msgid "Here are all reported reviews sorted by the most reported"
 msgstr "Tu sú všetky hlásené hodnotenia zoradené podľa najviac hlásených"
 
-#: invenio/legacy/webcomment/templates.py:2088
+#: invenio/legacy/webcomment/templates.py:2087
 msgid "Here are all reported comments sorted by the most reported"
 msgstr "Tu sú všetky hlásené komentáre zoradené podľa najviac hlásených"
 
-#: invenio/legacy/webcomment/templates.py:2093
+#: invenio/legacy/webcomment/templates.py:2092
 #, fuzzy, python-format
 msgid "Here are all reviews for record %(x_num)i, sorted by the most reported"
 msgstr "Tu sú všetky hlásené hodnotenia zoradené podľa najviac hlásených"
 
-#: invenio/legacy/webcomment/templates.py:2094
+#: invenio/legacy/webcomment/templates.py:2093
 #, fuzzy
 msgid "Show comments"
 msgstr "zobraz komentáre"
 
-#: invenio/legacy/webcomment/templates.py:2096
+#: invenio/legacy/webcomment/templates.py:2095
 #, fuzzy, python-format
 msgid "Here are all comments for record %(x_num)i, sorted by the most reported"
 msgstr "Tu sú všetky hlásené komentáre zoradené podľa najviac hlásených"
 
-#: invenio/legacy/webcomment/templates.py:2097
+#: invenio/legacy/webcomment/templates.py:2096
 #, fuzzy
 msgid "Show reviews"
 msgstr "ohodnotenie"
 
-#: invenio/legacy/webcomment/templates.py:2122
-#: invenio/legacy/webcomment/templates.py:2146
-#: invenio/legacy/webcomment/templates.py:2172
+#: invenio/legacy/webcomment/templates.py:2121
+#: invenio/legacy/webcomment/templates.py:2145
+#: invenio/legacy/webcomment/templates.py:2171
 msgid "comment ID"
 msgstr "ID komentára"
 
-#: invenio/legacy/webcomment/templates.py:2122
+#: invenio/legacy/webcomment/templates.py:2121
 msgid "successfully deleted"
 msgstr "úspešne vymazané"
 
-#: invenio/legacy/webcomment/templates.py:2146
+#: invenio/legacy/webcomment/templates.py:2145
 #, fuzzy
 msgid "successfully undeleted"
 msgstr "úspešne vymazané"
 
-#: invenio/legacy/webcomment/templates.py:2172
+#: invenio/legacy/webcomment/templates.py:2171
 msgid "successfully suppressed abuse report"
 msgstr "úspešne potlačené správy o zneužití"
 
-#: invenio/legacy/webcomment/templates.py:2189
+#: invenio/legacy/webcomment/templates.py:2188
 #, fuzzy
 msgid "Not yet reviewed"
 msgstr "Napíšte Vaše hodnotenie"
 
-#: invenio/legacy/webcomment/templates.py:2257
+#: invenio/legacy/webcomment/templates.py:2256
 #, python-format
 msgid "The following review was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2258
+#: invenio/legacy/webcomment/templates.py:2257
 #, python-format
 msgid "The following comment was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2285
+#: invenio/legacy/webcomment/templates.py:2284
 msgid "This is an automatic message, please don't reply to it."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2287
+#: invenio/legacy/webcomment/templates.py:2286
 #, python-format
 msgid "To post another comment, go to <%(x_url)s> instead."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2292
+#: invenio/legacy/webcomment/templates.py:2291
 #, python-format
 msgid "To specifically reply to this comment, go to <%(x_url)s>"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2297
+#: invenio/legacy/webcomment/templates.py:2296
 #, python-format
 msgid "To unsubscribe from this discussion, go to <%(x_url)s>"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2301
+#: invenio/legacy/webcomment/templates.py:2300
 #, python-format
 msgid "For any question, please use <%(CFG_SITE_SUPPORT_EMAIL)s>"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2368
+#: invenio/legacy/webcomment/templates.py:2367
 #, fuzzy
 msgid "Your comment will be lost."
 msgstr "Váš komentár bol úspešne poslaný"
 
-#: invenio/legacy/webcomment/templates.py:2406
+#: invenio/legacy/webcomment/templates.py:2405
 #, fuzzy
 msgid "Oldest comment first"
 msgstr "Zmaž komentáre"
 
-#: invenio/legacy/webcomment/templates.py:2407
+#: invenio/legacy/webcomment/templates.py:2406
 #, fuzzy
 msgid "Latest comment first"
 msgstr "posledný záznam najskôr"
 
-#: invenio/legacy/webcomment/templates.py:2408
+#: invenio/legacy/webcomment/templates.py:2407
 msgid "Group by record, oldest commented first"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2409
+#: invenio/legacy/webcomment/templates.py:2408
 #, fuzzy
 msgid "Group by record, latest commented first"
 msgstr "zobraz komentáre"
 
-#: invenio/legacy/webcomment/templates.py:2411
+#: invenio/legacy/webcomment/templates.py:2410
 #, fuzzy
 msgid "Records and comments"
 msgstr "Podrobnosti a komentáre"
 
-#: invenio/legacy/webcomment/templates.py:2412
+#: invenio/legacy/webcomment/templates.py:2411
 #, fuzzy
 msgid "Records only"
 msgstr "%s záznamov nájdených"
 
-#: invenio/legacy/webcomment/templates.py:2413
+#: invenio/legacy/webcomment/templates.py:2412
 #, fuzzy
 msgid "Comments only"
 msgstr "Komentáre"
 
+#: invenio/legacy/webcomment/templates.py:2414
 #: invenio/legacy/webcomment/templates.py:2415
 #: invenio/legacy/webcomment/templates.py:2416
 #: invenio/legacy/webcomment/templates.py:2417
-#: invenio/legacy/webcomment/templates.py:2418
 #, fuzzy, python-format
 msgid "%(x_i)s items"
 msgstr "Čas"
 
-#: invenio/legacy/webcomment/templates.py:2419
+#: invenio/legacy/webcomment/templates.py:2418
 #, fuzzy
 msgid "All items"
 msgstr "Pridaj k užívateľom"
 
-#: invenio/legacy/webcomment/templates.py:2422
+#: invenio/legacy/webcomment/templates.py:2421
 msgid "Below is the list of the comments you have submitted so far."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2426
+#: invenio/legacy/webcomment/templates.py:2425
 msgid "You have not yet submitted any comment in the document \"discussion\" tab."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2429
-#: invenio/legacy/webcomment/templates.py:2437
-#: invenio/legacy/webcomment/templates.py:2445
+#: invenio/legacy/webcomment/templates.py:2428
+#: invenio/legacy/webcomment/templates.py:2436
+#: invenio/legacy/webcomment/templates.py:2444
 msgid "You might find other comments here: "
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2457
+#: invenio/legacy/webcomment/templates.py:2456
 msgid ""
 "You have not yet submitted any comment. Browse documents from the search "
 "interface and take part to discussions!"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2485
+#: invenio/legacy/webcomment/templates.py:2484
 msgid "Display"
 msgstr "Zobraz"
 
-#: invenio/legacy/webcomment/templates.py:2486
+#: invenio/legacy/webcomment/templates.py:2485
 #, fuzzy
 msgid "Order by"
 msgstr "Dátum objednávky"
 
-#: invenio/legacy/webcomment/templates.py:2487
+#: invenio/legacy/webcomment/templates.py:2486
 #, fuzzy
 msgid "Per page"
 msgstr "Nasledujúca stránka"
 
-#: invenio/legacy/webcomment/templates.py:2491
+#: invenio/legacy/webcomment/templates.py:2490
 #, fuzzy
 msgid "Display options"
 msgstr "Zobraziť alerty"
 
-#: invenio/legacy/webcomment/templates.py:2492
+#: invenio/legacy/webcomment/templates.py:2491
 #: invenio/legacy/webjournal/adminlib.py:328
 #: invenio/legacy/webjournal/adminlib.py:345
 #: invenio/legacy/webjournal/templates.py:457
@@ -8527,106 +8532,106 @@ msgstr "Zobraziť alerty"
 msgid "Refresh"
 msgstr "Referencia"
 
-#: invenio/legacy/webcomment/templates.py:2521
+#: invenio/legacy/webcomment/templates.py:2520
 msgid "Comment deleted by the moderator"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2523
+#: invenio/legacy/webcomment/templates.py:2522
 msgid "You have deleted this comment: it is not visible by other users"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2530
+#: invenio/legacy/webcomment/templates.py:2529
 #, fuzzy
 msgid "(in reply to a comment)"
 msgstr "Zmazať komentár"
 
-#: invenio/legacy/webcomment/templates.py:2535
+#: invenio/legacy/webcomment/templates.py:2534
 msgid "See comment on discussion page"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2574
+#: invenio/legacy/webcomment/templates.py:2573
 #, python-format
 msgid "%(x_num)i comments found in total (not shown on this page)"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2576
+#: invenio/legacy/webcomment/templates.py:2575
 #, fuzzy, python-format
 msgid "%(x_num)i items found in total"
 msgstr "Žiadne hodnoty nenájdené."
 
-#: invenio/legacy/webcomment/webinterface.py:272
-#: invenio/legacy/webcomment/webinterface.py:530
+#: invenio/legacy/webcomment/webinterface.py:276
+#: invenio/legacy/webcomment/webinterface.py:536
 msgid "Record Not Found"
 msgstr "Záznam nenájdený"
 
-#: invenio/legacy/webcomment/webinterface.py:350
-#: invenio/legacy/webcomment/webinterface.py:591
-#: invenio/legacy/webcomment/webinterface.py:668
+#: invenio/legacy/webcomment/webinterface.py:354
+#: invenio/legacy/webcomment/webinterface.py:597
+#: invenio/legacy/webcomment/webinterface.py:674
 msgid "Specified comment does not belong to this record"
 msgstr ""
 
-#: invenio/legacy/webcomment/webinterface.py:359
-#: invenio/legacy/webcomment/webinterface.py:597
-#: invenio/legacy/webcomment/webinterface.py:674
+#: invenio/legacy/webcomment/webinterface.py:363
+#: invenio/legacy/webcomment/webinterface.py:603
+#: invenio/legacy/webcomment/webinterface.py:680
 #, fuzzy
 msgid "You do not have access to the specified comment"
 msgstr "Nemáte dostatočné práva na zobrazenie obsahu tohto košíka."
 
-#: invenio/legacy/webcomment/webinterface.py:431
+#: invenio/legacy/webcomment/webinterface.py:437
 #, python-format
 msgid ""
 "The size of file \\\"%(x_file)s\\\" (%(x_size)s) is larger than maximum "
 "allowed file size (%(x_max)s). Select files again."
 msgstr ""
 
-#: invenio/legacy/webcomment/webinterface.py:513
+#: invenio/legacy/webcomment/webinterface.py:519
 #: invenio/legacy/websubmit/templates.py:2445
 #: invenio/legacy/websubmit/templates.py:2446
 msgid "Add Comment"
 msgstr "Pridaj komentár"
 
-#: invenio/legacy/webcomment/webinterface.py:602
+#: invenio/legacy/webcomment/webinterface.py:608
 msgid "You cannot vote for a deleted comment"
 msgstr ""
 
-#: invenio/legacy/webcomment/webinterface.py:679
+#: invenio/legacy/webcomment/webinterface.py:685
 #, fuzzy
 msgid "You cannot report a deleted comment"
 msgstr "Zobraz všetky ohlásené komentáre"
 
-#: invenio/legacy/webcomment/webinterface.py:826
-#: invenio/legacy/webcomment/webinterface.py:866
+#: invenio/legacy/webcomment/webinterface.py:832
+#: invenio/legacy/webcomment/webinterface.py:872
 #, fuzzy
 msgid "Page Not Found"
 msgstr "Kolekcia %s nenájdená"
 
-#: invenio/legacy/webcomment/webinterface.py:827
+#: invenio/legacy/webcomment/webinterface.py:833
 #, fuzzy
 msgid "The requested comment could not be found"
 msgstr "Tento záznam neexistuje."
 
-#: invenio/legacy/webcomment/webinterface.py:847
+#: invenio/legacy/webcomment/webinterface.py:853
 msgid "You cannot access files of a deleted comment"
 msgstr ""
 
-#: invenio/legacy/webcomment/webinterface.py:867
+#: invenio/legacy/webcomment/webinterface.py:873
 #, fuzzy
 msgid "The requested file could not be found"
 msgstr "Tento záznam neexistuje."
 
-#: invenio/legacy/webcomment/webinterface.py:910
+#: invenio/legacy/webcomment/webinterface.py:916
 #, fuzzy
 msgid "You are not authorized to use comments."
 msgstr "Nie ste vlastníkom tohto košíka."
 
-#: invenio/legacy/webcomment/webinterface.py:912
+#: invenio/legacy/webcomment/webinterface.py:918
 #: invenio/legacy/websession/templates.py:635
 #: invenio/legacy/websession/templates.py:788
 #, fuzzy
 msgid "Your Comments"
 msgstr "Komentáre"
 
-#: invenio/legacy/webcomment/webinterface.py:924
+#: invenio/legacy/webcomment/webinterface.py:930
 #, fuzzy, python-format
 msgid "%(x_name)s View your previously submitted comments"
 msgstr "Zobraz všetky ohlásené komentáre"
@@ -13053,7 +13058,7 @@ msgid "Problem with login."
 msgstr ""
 
 #: invenio/modules/accounts/views/accounts.py:138
-#, fuzzy, python-format
+#, fuzzy
 msgid "You can now access your account."
 msgstr "Teraz môžete pristúpiť k Vášmu %(x_url_open)skontu%(x_url_close)s."
 
@@ -13548,7 +13553,7 @@ msgid "Record ID %(recid)s is not a number."
 msgstr ""
 
 #: invenio/modules/comments/forms.py:38 invenio/modules/messages/forms.py:80
-#, fuzzy, python-format
+#, fuzzy
 msgid ""
 "Your message is too long, please edit it. Maximum size allowed is "
 "%{length}i characters."
@@ -13597,12 +13602,12 @@ msgid "Review was sent"
 msgstr "Napíšte komentár"
 
 #: invenio/modules/comments/views.py:263
-#, fuzzy, python-format
+#, fuzzy
 msgid "Comment has been reported."
 msgstr "Tento komentár bol hlásený %i krát"
 
 #: invenio/modules/comments/views.py:265
-#, fuzzy, python-format
+#, fuzzy
 msgid "Comment has been already reported."
 msgstr "Tento komentár bol hlásený %i krát"
 
@@ -13687,7 +13692,7 @@ msgid ""
 msgstr ""
 
 #: invenio/modules/communities/forms.py:150
-#, fuzzy, python-format
+#, fuzzy
 msgid "The identifier already exists. Please choose a different one."
 msgstr "Žiadaná prezývka %s už v databáze existuje."
 
@@ -13832,7 +13837,7 @@ msgid "Invalid deposition type."
 msgstr ""
 
 #: invenio/modules/deposit/views/deposit.py:76
-#, fuzzy, python-format
+#, fuzzy
 msgid "Deposition does not exists."
 msgstr "Funkcia %s neexistuje."
 
@@ -14114,7 +14119,7 @@ msgstr ""
 msgid "Manage Files of This Record"
 msgstr ""
 
-#: invenio/modules/formatter/format_elements/bfe_edit_record.py:47
+#: invenio/modules/formatter/format_elements/bfe_edit_record.py:52
 msgid "Edit This Record"
 msgstr "Edituj tento záznam"
 
@@ -14322,12 +14327,12 @@ msgstr "Nie ste administrátorom žiadnej grupy."
 msgid "Members"
 msgstr "Žiadni členovia."
 
-#: invenio/modules/indexer/admin.py:78
+#: invenio/modules/indexer/admin.py:79
 #, fuzzy
 msgid "Knowledge base name"
 msgstr "Zruš košík"
 
-#: invenio/modules/indexer/admin.py:81 invenio/modules/indexer/admin.py:93
+#: invenio/modules/indexer/admin.py:82 invenio/modules/indexer/admin.py:93
 #: invenio/modules/knowledge/forms.py:74
 #, fuzzy
 msgid "-None-"
@@ -14337,11 +14342,11 @@ msgstr "na"
 msgid "Stemming language"
 msgstr ""
 
-#: invenio/modules/indexer/admin.py:99
+#: invenio/modules/indexer/admin.py:98
 msgid "Tokenizer"
 msgstr ""
 
-#: invenio/modules/indexer/admin.py:105
+#: invenio/modules/indexer/admin.py:104
 #, fuzzy
 msgid "Index fields"
 msgstr "všetky polia"
@@ -14387,13 +14392,14 @@ msgid "Create KB \"Dynamic\""
 msgstr ""
 
 #: invenio/modules/knowledge/templates/knowledge/list.html:34
-#, fuzzy, python-format
+#, fuzzy
 msgid "Create new record \"Written As\""
 msgstr "Existuje %i košíkov"
 
 #: invenio/modules/knowledge/templates/knowledge/list.html:34
-msgid "Create KB \"Writtes As\""
-msgstr ""
+#, fuzzy
+msgid "Create KB \"Written As\""
+msgstr "Existuje %i košíkov"
 
 #: invenio/modules/knowledge/templates/knowledge/list.html:70
 #, fuzzy
@@ -14558,19 +14564,19 @@ msgstr ""
 msgid "Confidential"
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:143
+#: invenio/modules/oauth2server/models.py:144
 msgid "Name of application (displayed to users)."
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:154
+#: invenio/modules/oauth2server/models.py:155
 msgid "Optional. Description of the application (displayed to users)."
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:163
+#: invenio/modules/oauth2server/models.py:164
 msgid "Website URL"
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:164
+#: invenio/modules/oauth2server/models.py:165
 msgid "URL of your application (displayed to users)."
 msgstr ""
 
@@ -15006,7 +15012,7 @@ msgid "Tag name"
 msgstr "Prezývka"
 
 #: invenio/modules/tags/views.py:199
-#, fuzzy, python-format
+#, fuzzy
 msgid "is already in use."
 msgstr "Žiadaná prezývka %s je už použitá."
 
@@ -15368,7 +15374,7 @@ msgid "just now"
 msgstr "Teraz musíte"
 
 #: invenio/utils/date.py:555
-#, fuzzy, python-format
+#, fuzzy
 msgid " seconds ago"
 msgstr "%s sekúnd"
 
@@ -15426,1826 +15432,3 @@ msgstr "hocaký rok"
 #, fuzzy
 msgid " years ago"
 msgstr "rok"
-
-#~ msgid "Warning: Please, select a valid time"
-#~ msgstr "Upozornenie: prosím zvoľte platný čas"
-
-#~ msgid "Warning: Please, select a valid file"
-#~ msgstr "Upozornenie: prosím zvoľte platný súbor"
-
-#~ msgid "Warning: Please, select a valid date"
-#~ msgstr "Upozornenie: prosím zvoľte platný dátum"
-
-#~ msgid "Invalid MARCXML"
-#~ msgstr "Neplatné MARCXML"
-
-#~ msgid " or return to your %(x_url_open)ssearch%(x_url_close)s"
-#~ msgstr "Teraz môžete pristúpiť k Vášmu %(x_url_open)skontu%(x_url_close)s."
-
-#~ msgid "*** basket name ***"
-#~ msgstr "Meno košíka"
-
-#~ msgid ""
-#~ msgstr ""
-
-#~ msgid "Additional Citation Metrics"
-#~ msgstr "Editujte prihlasovaciu metódu"
-
-#~ msgid "Sorry, you must log in to perform this action."
-#~ msgstr "Ľutujem, musíte sa prihlásiť aby ste mohli vykonať túto akciu."
-
-#~ msgid "Please log in first."
-#~ msgstr "Prosím najskôr sa prihláste."
-
-#~ msgid "Use the top-right menu to log in."
-#~ msgstr "Použite menu napravo nahore pre prihlásenie sa."
-
-#~ msgid "record"
-#~ msgstr "záznam"
-
-#~ msgid "document"
-#~ msgstr " dokument"
-
-#~ msgid "Sorry parameter missing..."
-#~ msgstr "Parameter docid chýba"
-
-#~ msgid "Next Step"
-#~ msgstr "Nasledujúca stránka"
-
-#~ msgid "Acquisitions"
-#~ msgstr "Akcie"
-
-#~ msgid "Order new book"
-#~ msgstr "Vytvoriť novú tému"
-
-#~ msgid "Renewalls"
-#~ msgstr "Ohodnotenia"
-
-#~ msgid "A new loan has been registered."
-#~ msgstr "Vaše konto bolo úspešne vytvorené."
-
-#~ msgid "Order new copy"
-#~ msgstr "Vytvoriť novú tému"
-
-#~ msgid "Book Information"
-#~ msgstr "Viac informácií:"
-
-#~ msgid "EAN"
-#~ msgstr "A"
-
-#~ msgid "Publication place"
-#~ msgstr "Verejné košíky"
-
-#~ msgid "Number of pages"
-#~ msgstr "Počet strán"
-
-#~ msgid "Sub-library"
-#~ msgstr "Časť knižnice"
-
-#~ msgid "Order details"
-#~ msgstr "Detaily objednávky"
-
-#~ msgid "Price"
-#~ msgstr "Cena"
-
-#~ msgid "the beginning"
-#~ msgstr "začiatok"
-
-#~ msgid "now"
-#~ msgstr "teraz"
-
-#~ msgid "BibCheck Admin"
-#~ msgstr "WebComment administrácia"
-
-#~ msgid "Not authorized"
-#~ msgstr "Neautorizované"
-
-#~ msgid "ERROR: %s does not exist"
-#~ msgstr "Užívateľ %s neexistuje."
-
-#~ msgid "Really delete"
-#~ msgstr "Skutočne zmaž"
-
-#~ msgid "Verify syntax"
-#~ msgstr "Over syntax"
-
-#~ msgid "Verify problem"
-#~ msgstr "Over problém"
-
-#~ msgid "File"
-#~ msgstr "Súbor"
-
-#~ msgid "File %s already exists."
-#~ msgstr "Užívateľ %s neexistuje."
-
-#~ msgid "File %s: written OK."
-#~ msgstr "Súbor %s: napísaný v poriadku."
-
-#~ msgid "File %s: write failed."
-#~ msgstr "Zruš košík"
-
-#~ msgid "File %s deleted."
-#~ msgstr "Súbor %s zmazaný."
-
-#~ msgid "File %s: delete failed."
-#~ msgstr "Zruš košík"
-
-#~ msgid "Guests are not authorized to run batchuploader"
-#~ msgstr "Nie ste vlastníkom tohto košíka."
-
-#~ msgid "The user '%s' is not authorized to run batchuploader"
-#~ msgstr "Nie ste vlastníkom tohto košíka."
-
-#~ msgid "Open Tickets"
-#~ msgstr "Vaše košíky"
-
-#~ msgid "Additional Data for this Person"
-#~ msgstr "Editujte prihlasovaciu metódu"
-
-#~ msgid "Forget decision"
-#~ msgstr "Súčasní členovia"
-
-#~ msgid "Rejected!"
-#~ msgstr "Zamietnuté"
-
-#~ msgid "Your papers"
-#~ msgstr "Vaše avíza"
-
-#~ msgid "Not your papers"
-#~ msgstr "Stratili ste heslo?"
-
-#~ msgid "These are mine!"
-#~ msgstr "Existuje %i košíkov"
-
-#~ msgid "These are not mine!"
-#~ msgstr "Existuje %i košíkov"
-
-#~ msgid "Not Mine."
-#~ msgstr "Poznámka"
-
-#~ msgid "Not Mine!"
-#~ msgstr "Poznámka"
-
-#~ msgid "Tickets"
-#~ msgstr "Čas"
-
-#~ msgid "Request Tickets"
-#~ msgstr "hosť"
-
-#~ msgid "Submit Attribution Information"
-#~ msgstr "Všeobecné informácie"
-
-#~ msgid "Please review your actions"
-#~ msgstr "Prosím zvoľte kategóriu"
-
-#~ msgid "You are about to attribute the following paper"
-#~ msgstr "Ste členom nasledujúcich grúp:"
-
-#~ msgid "Navigation:"
-#~ msgstr "Citačná história"
-
-#~ msgid "Person Interface FAQ"
-#~ msgstr "Interná Chyba"
-
-#~ msgid "Person Search"
-#~ msgstr "Hľadaj"
-
-#~ msgid "Open tickets"
-#~ msgstr "Čas"
-
-#~ msgid "Sorry."
-#~ msgstr "Ľutujem"
-
-#~ msgid "Please provide at least one transaction."
-#~ msgstr "Ľutujem, musíte sa prihlásiť aby ste mohli vykonať túto akciu."
-
-#~ msgid "Error:"
-#~ msgstr "Chyba"
-
-#~ msgid "Create a new Person for your search"
-#~ msgstr "Žiadne hodnoty nenájdené."
-
-#~ msgid "Id"
-#~ msgstr "ID"
-
-#~ msgid "0 borrower(s) found."
-#~ msgstr "%s záznamov nájdených"
-
-#~ msgid "You can see your loans "
-#~ msgstr "Môžte sa prihlásiť na"
-
-#~ msgid "Library(ies)"
-#~ msgstr "Knižnice"
-
-#~ msgid "new copy"
-#~ msgstr "nová kópia"
-
-#~ msgid "A %s has been added."
-#~ msgstr "Grupa %s bola zrušená."
-
-#~ msgid "Barcoce"
-#~ msgstr "Prelistuj"
-
-#~ msgid "No fulltext"
-#~ msgstr "plný text"
-
-#~ msgid "last note on"
-#~ msgstr "posledný komentár:"
-
-#~ msgid ", no notes yet"
-#~ msgstr "Poznámka"
-
-#~ msgid "HTML brief"
-#~ msgstr "HTML stručné"
-
-#~ msgid "deleted"
-#~ msgstr "Zmazať"
-
-#~ msgid "in their rules and descriptions"
-#~ msgstr "Zobrazujúc posledných %i komentárov:"
-
-#~ msgid "No such knowledge base"
-#~ msgstr "Zruš košík"
-
-#~ msgid "Date:"
-#~ msgstr "Dátum"
-
-#~ msgid "Time:"
-#~ msgstr "Čas"
-
-#~ msgid "Example:"
-#~ msgstr "Príklad"
-
-#~ msgid "are mandatory"
-#~ msgstr "nutné"
-
-#~ msgid "are mandatory."
-#~ msgstr "nutné"
-
-#~ msgid "Check the"
-#~ msgstr "Kliknite sem"
-
-#~ msgid "Configure Bibknowledge"
-#~ msgstr "Konfigurujte BibIndex"
-
-#~ msgid "creating a new basket"
-#~ msgstr "Vytvoriť nový košík"
-
-#~ msgid "by"
-#~ msgstr "od"
-
-#~ msgid "on"
-#~ msgstr "na"
-
-#~ msgid "basket"
-#~ msgstr "košíky"
-
-#~ msgid "previous basket"
-#~ msgstr "Košíky grúp"
-
-#~ msgid "Adding"
-#~ msgstr "Čakajúce"
-
-#~ msgid "Please choose a basket"
-#~ msgstr "Prosím zvoľte kategóriu"
-
-#~ msgid "Editing topic"
-#~ msgstr "Edituj košík"
-
-#~ msgid "niceName"
-#~ msgstr "Meno"
-
-#~ msgid "Apply Changes"
-#~ msgstr "Uložte zmeny"
-
-#~ msgid "Edit this item"
-#~ msgstr "Edituj %s členov"
-
-#~ msgid "return_date"
-#~ msgstr "Dátum vytnorenia"
-
-#~ msgid "Record %s - Add a field"
-#~ msgstr "Záznam %s - Pridaj pole"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s"
-#~ msgstr "Edituj záznam %(x_recid)s, pole %(x_field)s"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s - Add a subfield"
-#~ msgstr "Edituj záznam %(x_recid)s, pole %(x_field)s - Pridaj podpole"
-
-#~ msgid "Submit and save record %s"
-#~ msgstr "Pоšli a nahraj záznam %s"
-
-#~ msgid "updated on"
-#~ msgstr "aktualizované"
-
-#~ msgid "records"
-#~ msgstr "záznamy"
-
-#~ msgid "Number of views"
-#~ msgstr "Počet pozretí"
-
-#~ msgid "Non-shared basket"
-#~ msgstr "Nezdieľané košíky"
-
-#~ msgid "Group-shared basket"
-#~ msgstr "Zdieľané košíky grúp"
-
-#~ msgid "last"
-#~ msgstr "posledný"
-
-#~ msgid "There is a total of %i comments"
-#~ msgstr "Existuje celkovo %i komentárov"
-
-#~ msgid "Select basket"
-#~ msgstr "Zvoľte košík"
-
-#~ msgid "Add to a personal basket"
-#~ msgstr "Pridaj do osobného košíka"
-
-#~ msgid "%i baskets"
-#~ msgstr "%i košíkov"
-
-#~ msgid "Add to a group-shared basket"
-#~ msgstr "Pridaj do grupou zdieľaného košíka"
-
-#~ msgid "Adding %i records to these baskets"
-#~ msgstr "Pridať %i záznamov do týchto košíkov"
-
-#~ msgid "No records were added to the selected baskets."
-#~ msgstr "Žiadne záznamy neboli pridané do vybraných košíkov."
-
-#~ msgid "Add records to baskets"
-#~ msgstr "Pridať záznamy do košíkov"
-
-#~ msgid "Subscribe to this discussion"
-#~ msgstr "Prihlásiť sa k odberu tohto košíka"
-
-#~ msgid "Delete comment(s) or supress abuse report(s)"
-#~ msgstr "Potlač správy o zneužití"
-
-#~ msgid "Delete Comments"
-#~ msgstr "Zmaž komentár"
-
-#~ msgid "ADD TO BASKET"
-#~ msgstr "PRIDAŤ DO KOŠÍKA"
-
-#~ msgid "Frequently publishes in:"
-#~ msgstr "pridania"
-
-#~ msgid "The collection to which this file belong is restricted: "
-#~ msgstr "Obsah tejto kolekcie je chránený."
-
-#~ msgid "This record does not exist. Please try another record ID."
-#~ msgstr "Prosím skúste iné ID záznamu."
-
-#~ msgid "Cannot edit deleted record.\""
-#~ msgstr "Nemožno editovať vymazaný záznam."
-
-#~ msgid "The record will be deleted as soon as the task queue is empty."
-#~ msgstr "Záznam bude vymazaný tak skoro ako sa zástup procesov uvoľní."
-
-#~ msgid "Please enter the ID of the record you want to edit"
-#~ msgstr "Prosím zadajte ID záznamu ktorý chcete editovať"
-
-#~ msgid "Move up"
-#~ msgstr "Posuň položku hore"
-
-#~ msgid "Move down"
-#~ msgstr "Posuň položku dole"
-
-#~ msgid "Add Subfield"
-#~ msgstr "Pridaj podpole"
-
-#~ msgid "Add Field"
-#~ msgstr "Pridaj pole"
-
-#~ msgid "Verbose"
-#~ msgstr "Mnohoslovný"
-
-#~ msgid "Done"
-#~ msgstr "na"
-
-#~ msgid "Your changes are TEMPORARY."
-#~ msgstr "Vaše zmeny sú DOČASNÉ."
-
-#~ msgid "To save this record, please click on submit."
-#~ msgstr "Pre uloženie tohto záznamu prosím kliknite na pridaj."
-
-#~ msgid "Revision %(revdate)s"
-#~ msgstr "Edituj záznam %(x_recid)s, pole %(x_field)s"
-
-#~ msgid "Edit current version"
-#~ msgstr "Edituj parametre"
-
-#~ msgid "View revision"
-#~ msgstr "oddelenie"
-
-#~ msgid "Back to BibEdit"
-#~ msgstr "Naspäť ku košíkom"
-
-#~ msgid "select_from1"
-#~ msgstr "Zvoľte košík"
-
-#~ msgid "select_to1"
-#~ msgstr "Zvoliť tému"
-
-#~ msgid "No more requests are waiting."
-#~ msgstr "Niektoré dokumenty sú nevybavené."
-
-#~ msgid "next page >>>"
-#~ msgstr "Nasledujúca stránka"
-
-#~ msgid "<<< previous page"
-#~ msgstr "Predchádzajúca stránka"
-
-#~ msgid "last page >>|"
-#~ msgstr "posledná aktualizácia"
-
-#~ msgid "from"
-#~ msgstr "Od:"
-
-#~ msgid "There are record revisions not yet synchronized with the database."
-#~ msgstr "Vložená elektronická adresa v databáze neexistuje."
-
-#~ msgid "Please try again in a few minutes."
-#~ msgstr "Prosím skúste opäť neskôr."
-
-#~ msgid "View all reported reviews"
-#~ msgstr "Zobraz všetky ohlásené hodnotenia"
-
-#~ msgid "Delete a specific comment/review (by ID)"
-#~ msgstr "Vymaž určitý komentár alebo hodnotenie (podľa ID)"
-
-#~ msgid "session"
-#~ msgstr "seansa"
-
-#~ msgid "alerts"
-#~ msgstr "avíza"
-
-#~ msgid "account"
-#~ msgstr "konto"
-
-#~ msgid "messages"
-#~ msgstr "správy"
-
-#~ msgid "groups"
-#~ msgstr "grupy"
-
-#~ msgid "approvals"
-#~ msgstr "schválenia"
-
-#~ msgid "Unknown form field found on one of the submission pages."
-#~ msgstr "Nemožno určiť počet strán pridania."
-
-#~ msgid "List of direct approval categories"
-#~ msgstr "Zoznam referovaných kategórií"
-
-#~ msgid "link"
-#~ msgstr "v"
-
-#~ msgid "Sort:"
-#~ msgstr "Utriediť podľa:"
-
-#~ msgid "Alert sent successfully!"
-#~ msgstr "Avízo %s bolo úspešne aktualizované."
-
-#~ msgid "Webjournal Administration Interface"
-#~ msgstr "Administrácia Pridávania"
-
-#~ msgid "   Username/Email: %s\n"
-#~ msgstr "Užívateľské meno"
-
-#~ msgid "   Password: %s\n"
-#~ msgstr "Heslo"
-
-#~ msgid "Migrate BibFormat Settings"
-#~ msgstr "Konfigurujte BibFormat"
-
-#~ msgid "Migrate Formats"
-#~ msgstr "Konfigurujte BibFormat"
-
-#~ msgid "Your account created on"
-#~ msgstr "Konto vytvorené"
-
-#~ msgid "You have created a new account on"
-#~ msgstr "alebo vytvorte novú"
-
-#~ msgid "Article Error"
-#~ msgstr "Správa"
-
-#~ msgid "%s Personalize, Main page"
-#~ msgstr "Personalizácia"
-
-#~ msgid "%s , personalize"
-#~ msgstr "Personalizácia"
-
-#~ msgid "Successfully featured record: %s"
-#~ msgstr "úspešne potlačené správy o zneužití"
-
-#~ msgid "Agenda"
-#~ msgstr "Agenda"
-
-#~ msgid "Webcast"
-#~ msgstr "Webcast"
-
-#~ msgid "Search Help"
-#~ msgstr "Pomoc pre vyhľadávanie"
-
-#~ msgid "Format:"
-#~ msgstr "Formát:"
-
-#~ msgid "Send lost password"
-#~ msgstr "Pošli stratené heslo"
-
-#~ msgid "Here are your user credentials for"
-#~ msgstr "Tu sú užívateľské doklady pre"
-
-#~ msgid "username"
-#~ msgstr "užívateľské meno"
-
-#~ msgid "password"
-#~ msgstr "heslo"
-
-#~ msgid "You seem to be %(x_role)s."
-#~ msgstr "Zdáte sa byť %(x_role)s."
-
-#~ msgid "Credentials for"
-#~ msgstr "Doklady pre"
-
-#~ msgid "Unable to find file."
-#~ msgstr "Nemožno nájsť súbor."
-
-#~ msgid "Cannot find submission directory."
-#~ msgstr "Nemožno nájsť adresár pre pridanie."
-
-#~ msgid "Login via:"
-#~ msgstr "Prihlásiť cez:"
-
-#~ msgid "Try your search on..."
-#~ msgstr "Skúste hľadať na..."
-
-#~ msgid "Timeout"
-#~ msgstr "Čas"
-
-#~ msgid "%(num)s results found"
-#~ msgstr "%s záznamov nájdených"
-
-#~ msgid "No result found"
-#~ msgstr "Nenájdené žiadne hľadania"
-
-#~ msgid "user #%i"
-#~ msgstr "užívateľ"
-
-#~ msgid "GROUP_DELETED"
-#~ msgstr "ZMAŽ"
-
-#~ msgid "MEMBER_DELETED"
-#~ msgstr "ZMAŽ"
-
-#~ msgid "You can now go back to %s."
-#~ msgstr "Teraz sa môžete vrátiť ku %s."
-
-#~ msgid "You can now go back to"
-#~ msgstr "Teraz sa môžete vrátiť ku"
-
-#~ msgid "Sort by"
-#~ msgstr "Utriediť podľa"
-
-#~ msgid "%s wrote on %s:"
-#~ msgstr "%s napísal %s:"
-
-#~ msgid "wrote on"
-#~ msgstr "napísal"
-
-#~ msgid "Words nearest to"
-#~ msgstr "Slová najbližšie k"
-
-#~ msgid "inside"
-#~ msgstr "v"
-
-#~ msgid "Export as"
-#~ msgstr "Exportuj ako"
-
-#~ msgid "Search Services"
-#~ msgstr "Tipy pre vyhľadávanie"
-
-#~ msgid "Citation Metrics"
-#~ msgstr "Citačná metrika"
-
-#~ msgid "WebSearch Admin Guide"
-#~ msgstr ""
-
-#~ msgid "Submit Guide"
-#~ msgstr "Príručka pridávania"
-
-#~ msgid "Add to personal basket"
-#~ msgstr "Pridaj do osobného košíka"
-
-#~ msgid "WebSubmit Admin Guide"
-#~ msgstr "Príručka Administrácie Pridávania"
-
-#~ msgid "Click here to review the transactions."
-#~ msgstr ""
-
-#~ msgid "Quit searching."
-#~ msgstr "Vykonaj hľadanie"
-
-#~ msgid ""
-#~ "When you merge a set of profiles,"
-#~ " all the information stored will be"
-#~ " assigned to the primary profile. "
-#~ "This includes papers, ids or citations."
-#~ " After merging, only the primary "
-#~ "profile will remain in the system, "
-#~ "all other profiles will be automatically"
-#~ " deleted.</br>"
-#~ msgstr ""
-
-#~ msgid "Cancel merging"
-#~ msgstr "Zrušené"
-
-#~ msgid "Merge profiles"
-#~ msgstr ""
-
-#~ msgid "Claim for yourself"
-#~ msgstr ""
-
-#~ msgid "Assign to"
-#~ msgstr ""
-
-#~ msgid "Search for a person to assign the paper to"
-#~ msgstr "Ste členom nasledujúcich grúp:"
-
-#~ msgid "Select All"
-#~ msgstr "Zmazať všetko"
-
-#~ msgid "Select None"
-#~ msgstr "Vyber skóre"
-
-#~ msgid "Invert Selection"
-#~ msgstr "Referencia nebola ešte daná"
-
-#~ msgid "Hide successful claims"
-#~ msgstr ""
-
-#~ msgid "Paper Short Info"
-#~ msgstr ""
-
-#~ msgid "Author Name"
-#~ msgstr "Autor:"
-
-#~ msgid "Experiment"
-#~ msgstr "experiment"
-
-#~ msgid "Not assigned"
-#~ msgstr "Poznámka"
-
-#~ msgid "No status information found."
-#~ msgstr "Viac informácií:"
-
-#~ msgid "Operator review of user actions pending"
-#~ msgstr ""
-
-#~ msgid "Sorry, there are currently no records to be found in this category."
-#~ msgstr ""
-
-#~ msgid "Review Transaction"
-#~ msgstr "oddelenie"
-
-#~ msgid "On all pages"
-#~ msgstr "Uložte zmeny"
-
-#~ msgid "With selected do"
-#~ msgstr "Bol zamietnutý dňa:"
-
-#~ msgid "View name variants"
-#~ msgstr "zobraz komentáre"
-
-#~ msgid "The author has an internal ID!"
-#~ msgstr ""
-
-#~ msgid "These records have been marked as not being from this person."
-#~ msgstr ""
-
-#~ msgid "They will be regarded in the next run of the author "
-#~ msgstr ""
-
-#~ msgid "disambiguation algorithm and might disappear from this listing."
-#~ msgstr ""
-
-#~ msgid "No comments"
-#~ msgstr "komentáre"
-
-#~ msgid "Not Available"
-#~ msgstr "Žiadne typy dokumentov nie sú prístupné."
-
-#~ msgid " Delete this ticket"
-#~ msgstr "Zruš košík"
-
-#~ msgid " Commit this entire ticket"
-#~ msgstr ""
-
-#~ msgid "No title available"
-#~ msgstr "Žiadne typy dokumentov nie sú prístupné."
-
-#~ msgid "Make sure we match the right names!"
-#~ msgstr ""
-
-#~ msgid "Please select an author on each of the records that will be assigned."
-#~ msgstr ""
-
-#~ msgid "Papers without a name selected will be ignored in the process."
-#~ msgstr ""
-
-#~ msgid "Claim for person with id"
-#~ msgstr ""
-
-#~ msgid "This seems to be an empty profile without names associated to it yet"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "(the names will be automatically "
-#~ "gathered when the first paper is "
-#~ "claimed to this profile)."
-#~ msgstr ""
-
-#~ msgid "Select name for"
-#~ msgstr "Vyber skóre"
-
-#~ msgid "Error retrieving record title"
-#~ msgstr ""
-
-#~ msgid "Paper title: "
-#~ msgstr "Strana:"
-
-#~ msgid "Ignore"
-#~ msgstr ""
-
-#~ msgid "The following names have been automatically chosen:"
-#~ msgstr "Avízo %s bolo úspešne aktualizované."
-
-#~ msgid " --  With name: "
-#~ msgstr ""
-
-#~ msgid "Symbols legend: "
-#~ msgstr ""
-
-#~ msgid "Everything is shiny, captain!"
-#~ msgstr ""
-
-#~ msgid "The result of this request will be visible immediately"
-#~ msgstr ""
-
-#~ msgid "Confirmation needed to continue"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The result of this request will be"
-#~ " visible immediately but we need your"
-#~ " confirmation to do so for this "
-#~ "paper has been manually claimed before"
-#~ msgstr ""
-
-#~ msgid "This will create a change request for the operators"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The result of this request will be"
-#~ " visible upon confirmation through an "
-#~ "operator"
-#~ msgstr ""
-
-#~ msgid "Selected name on paper"
-#~ msgstr "Vyber skóre"
-
-#~ msgid "Verification needed to continue"
-#~ msgstr ""
-
-#~ msgid "This will create a request for the operators"
-#~ msgstr ""
-
-#~ msgid "Please provide your information"
-#~ msgstr "Viac informácií:"
-
-#~ msgid "Please provide your first name"
-#~ msgstr "Prosím najskôr sa prihláste."
-
-#~ msgid "Your first name:"
-#~ msgstr ""
-
-#~ msgid "Please provide your last name"
-#~ msgstr ""
-
-#~ msgid "Your last name:"
-#~ msgstr "Vaše pôžičky"
-
-#~ msgid "Please provide your eMail address"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "This eMail address is reserved by "
-#~ "a user. Please log in or provide"
-#~ " an alternative eMail address"
-#~ msgstr ""
-
-#~ msgid "Your eMail:"
-#~ msgstr "Vaše avíza"
-
-#~ msgid "You may leave a comment (optional)"
-#~ msgstr ""
-
-#~ msgid "Continue claiming*"
-#~ msgstr ""
-
-#~ msgid "Confirm these changes**"
-#~ msgstr ""
-
-#~ msgid "!Delete the entire request!"
-#~ msgstr "Zruš vybrané hodnotenia"
-
-#~ msgid "Mark as your documents"
-#~ msgstr "všetky typy dokumentov"
-
-#~ msgid "Mark as _not_ your documents"
-#~ msgstr ""
-
-#~ msgid "Nothing staged as not yours"
-#~ msgstr ""
-
-#~ msgid "Mark as their documents"
-#~ msgstr "Ohodnoťte tento dokument"
-
-#~ msgid "Nothing staged in this category"
-#~ msgstr ""
-
-#~ msgid "Mark as _not_ their documents"
-#~ msgstr "Ohodnoťte tento dokument"
-
-#~ msgid "  * You can come back to this page later. Nothing will be lost. <br />"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "  ** Performs all requested changes. "
-#~ "Changes subject to permission restrictions "
-#~ "will be submitted to an operator "
-#~ "for manual review."
-#~ msgstr ""
-
-#~ msgid "Create a new Person"
-#~ msgstr "alebo vytvorte novú"
-
-#~ msgid "This is my profile"
-#~ msgstr ""
-
-#~ msgid "Assign paper"
-#~ msgstr ""
-
-#~ msgid "Add to merge list"
-#~ msgstr "Pridaj k užívateľom"
-
-#~ msgid ""
-#~ "We do not have a publication list"
-#~ " for '%s'. Try using a less "
-#~ "specific author name, or check back "
-#~ "in a few days as attributions are"
-#~ " updated frequently.  Or you can send"
-#~ " us feedback, at "
-#~ msgstr ""
-
-#~ msgid "Recent Papers"
-#~ msgstr "Strana:"
-
-#~ msgid "Showing the"
-#~ msgstr ""
-
-#~ msgid "most recent documents:"
-#~ msgstr "Zoznam referovaných dokumentov"
-
-#~ msgid "Sorry, there are no documents known for this person"
-#~ msgstr ""
-
-#~ msgid "The following profile is the one you were viewing before logging in: "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Out of %s paper(s) claimed to your"
-#~ " arXiv account, %s match this "
-#~ "profile: "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If none of the options suggested "
-#~ "above apply, you can look for "
-#~ "other possible options from the list "
-#~ "below:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span title=\"Login through arXiv is "
-#~ "needed to verify this is your "
-#~ "profile. When you log in your "
-#~ "publication list will automatically update "
-#~ "with all your arXiv publications.\n"
-#~ "You may also continue as a guest."
-#~ " In this case your input will "
-#~ "be processed by our staff and will"
-#~ " take longer to display.\"><strong> Login"
-#~ " with your arXiv.org account "
-#~ "</strong></span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "You have succesfully logged in via "
-#~ "arXiv. </br> You can now manage "
-#~ "your profile.</br>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "You have succesfully logged in via "
-#~ "arXiv.</br><div> <font color='red'>However the "
-#~ "profile you are viewing is not "
-#~ "your profile.</br></br></font>"
-#~ msgstr ""
-
-#~ msgid "Manage your profile"
-#~ msgstr "Spravujte práva pre grupy"
-
-#~ msgid ""
-#~ "You have succesfully logged in, but "
-#~ "</br><div><font color='red'> you are not "
-#~ "associated to a person yet. Please "
-#~ "use the button below to choose "
-#~ "your profile </br></br></font>"
-#~ msgstr ""
-
-#~ msgid "Choose your profile"
-#~ msgstr "Zvoľte súbor"
-
-#~ msgid "Please log in through arXiv to manage your profile.</br>"
-#~ msgstr ""
-
-#~ msgid "Login into Inspire through arXiv.org"
-#~ msgstr ""
-
-#~ msgid ""
-#~ " <span title=\"ORCiD (Open Researcher "
-#~ "and Contributor ID) is a unique "
-#~ "researcher identifier that distinguishes you"
-#~ " from other researchers.\n"
-#~ "It holds a record of all your "
-#~ "research activities. You can add your"
-#~ " ORCiD to all your works to "
-#~ "make sure they are associated with "
-#~ "you. \">\n"
-#~ "        <strong> Connect this profile to an ORCiD </strong> <span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "This profile is already connected to "
-#~ "the following ORCiD: <strong>%s</strong></br>"
-#~ msgstr ""
-
-#~ msgid "Import your publications from ORCID"
-#~ msgstr ""
-
-#~ msgid "Visit your profile in ORCID"
-#~ msgstr ""
-
-#~ msgid "Connect an ORCiD to this profile"
-#~ msgstr ""
-
-#~ msgid "Suggest an ORCiD for this profile:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span title=\"When you add more "
-#~ "publications you make sure your "
-#~ "publication list and citations appear "
-#~ "correctly on your profile.\n"
-#~ "You can also assign publications to "
-#~ "other authors. This will help INSPIRE"
-#~ " provide more accurate publication and "
-#~ "citation statistics. \"><strong> Manage "
-#~ "publications </strong><span>"
-#~ msgstr ""
-
-#~ msgid "Manage publication list"
-#~ msgstr "Dátum vytnorenia"
-
-#~ msgid "<strong> Person identifiers, internal and external </strong>"
-#~ msgstr ""
-
-#~ msgid "add external id"
-#~ msgstr "Externé linky"
-
-#~ msgid "Harvest missing external ids from claimed papers"
-#~ msgstr ""
-
-#~ msgid "suggest external id to add"
-#~ msgstr ""
-
-#~ msgid "suggest selected ids to delete"
-#~ msgstr ""
-
-#~ msgid "suggest missing ids"
-#~ msgstr "pridania"
-
-#~ msgid "Choose system"
-#~ msgstr "Zvoľte tému"
-
-#~ msgid ""
-#~ "<span title=\"You don’t need to add all your publications one by one.\n"
-#~ "This list contains all your publications"
-#~ " that were automatically assigned to "
-#~ "your INSPIRE profile through arXiv and"
-#~ " ORCiD. \"><strong> Automatically assigned "
-#~ "publications </strong> </span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span id=\"autoClaimMessage\">Please wait as "
-#~ "we are assigning %s papers from "
-#~ "external systems to your Inspire "
-#~ "profile</span></br>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The following publications have been "
-#~ "successfully assigned to your profile:"
-#~ msgstr "Avízo %s bolo úspešne aktualizované."
-
-#~ msgid "Get help!"
-#~ msgstr ""
-
-#~ msgid "<strong> Contact </strong>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Please contact our user support in "
-#~ "case you need help or you just "
-#~ "want to suggest some new ideas. We"
-#~ " will get back to you. </br>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span title=\"It sometimes happens that "
-#~ "somebody's publications are scattered among"
-#~ " two or more profiles for various "
-#~ "reasons\n"
-#~ "(different spelling, change of name, "
-#~ "multiple people with the same name). "
-#~ "You can merge a set of profiles"
-#~ " together.\n"
-#~ "This will assign all the information "
-#~ "(including publications, IDs and citations)"
-#~ " to the profile you choose as a"
-#~ " primary profile.\n"
-#~ "After the merging only the primary "
-#~ "profile will exist in the system "
-#~ "and all others will be automatically "
-#~ "deleted. \"><strong> Merge profiles "
-#~ "</strong><span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If your or somebody else's publications"
-#~ " in INSPIRE exist in multiple "
-#~ "profiles, you can fix that here. "
-#~ "</br>"
-#~ msgstr ""
-
-#~ msgid "Fatal: Author ID capabilities are disabled on this system."
-#~ msgstr ""
-
-#~ msgid "Fatal: You are not allowed to access this functionality."
-#~ msgstr "Nie ste oprávnení k prístupu k administratívnym funkciám."
-
-#~ msgid "Claim this paper"
-#~ msgstr "Pridaj k užívateľom"
-
-#~ msgid ""
-#~ "<p>We're sorry. An error occurred while"
-#~ " handling your request. Please find "
-#~ "more information below:</p>"
-#~ msgstr ""
-
-#~ msgid "This page is not accessible directly."
-#~ msgstr ""
-
-#~ msgid "Profile management"
-#~ msgstr ""
-
-#~ msgid "The due date has been updated. New due date: %s"
-#~ msgstr ""
-
-#~ msgid "The given barcode <strong>%s</strong> is already in use."
-#~ msgstr ""
-
-#~ msgid "The barcode <strong>%s</strong> was not found"
-#~ msgstr ""
-
-#~ msgid "The copy with barcode <strong>%s</strong> has been deleted."
-#~ msgstr ""
-
-#~ msgid "It was NOT possible to delete the copy with barcode <strong>%s</strong>"
-#~ msgstr ""
-
-#~ msgid "Barcode <strong>%s</strong> not found"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated, but the"
-#~ " <strong>status was not modified</strong>."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated, but the"
-#~ " <strong>barcode was not modified</strong> "
-#~ "because it is already in use."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated to "
-#~ "<strong>[%s]</strong> with success."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated, but the"
-#~ " <strong>barcode was not modified</strong> "
-#~ "because it was not found (!?)."
-#~ msgstr ""
-
-#~ msgid "Weighted %s keywords:"
-#~ msgstr "Citované: %s záznamami"
-
-#~ msgid ""
-#~ "The uploaded file is too small "
-#~ "(<%i o) and has therefore not been"
-#~ " considered"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The uploaded file is too big (>%i"
-#~ " o) and has therefore not been "
-#~ "considered"
-#~ msgstr ""
-
-#~ msgid "A file with format '%s' already exists. Please upload another format."
-#~ msgstr ""
-
-#~ msgid "The format %s does not exist for the given version: %s"
-#~ msgstr ""
-
-#~ msgid "Comparison of:"
-#~ msgstr ""
-
-#~ msgid "Revision"
-#~ msgstr "Revízia"
-
-#~ msgid "Comparing two record revisions"
-#~ msgstr ""
-
-#~ msgid "Failed to create a ticket"
-#~ msgstr ""
-
-#~ msgid "No template could be found for output format %s."
-#~ msgstr ""
-
-#~ msgid "Could not find format element named %s."
-#~ msgstr ""
-
-#~ msgid "Error when evaluating format element %s with parameters %s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Escape mode for format element %s "
-#~ "could not be retrieved. Using default"
-#~ " mode instead."
-#~ msgstr ""
-
-#~ msgid "\"nbMax\" parameter for %s must be an \"int\"."
-#~ msgstr ""
-
-#~ msgid "Could not read format template named %s. %s."
-#~ msgstr ""
-
-#~ msgid "Format element %s has no function named \"format\"."
-#~ msgstr ""
-
-#~ msgid "Could not find output format named %s."
-#~ msgstr ""
-
-#~ msgid "Modify Template Attributes"
-#~ msgstr ""
-
-#~ msgid "Template Editor"
-#~ msgstr ""
-
-#~ msgid "Check Dependencies"
-#~ msgstr ""
-
-#~ msgid "Update Format Attributes"
-#~ msgstr ""
-
-#~ msgid "Show Documentation"
-#~ msgstr "Ukáž dokumentáciu"
-
-#~ msgid "Hide Documentation"
-#~ msgstr "Schovaj dokumentáciu"
-
-#~ msgid "Last Modification Date"
-#~ msgstr "Dátum poslednej modifikácie"
-
-#~ msgid "Manage Output Formats"
-#~ msgstr "Spravuj výstupné formáty"
-
-#~ msgid "Manage Format Templates"
-#~ msgstr ""
-
-#~ msgid "Format Elements Documentation"
-#~ msgstr ""
-
-#~ msgid "Add New Format Template"
-#~ msgstr ""
-
-#~ msgid "Check Format Templates Extensively"
-#~ msgstr ""
-
-#~ msgid "Code"
-#~ msgstr ""
-
-#~ msgid "Add New Output Format"
-#~ msgstr "Pridaj nový Výstupný formát"
-
-#~ msgid "menu"
-#~ msgstr "menu"
-
-#~ msgid "Close Output Format"
-#~ msgstr "Zatvor výstupný formát"
-
-#~ msgid "Rules"
-#~ msgstr "Pravidlá"
-
-#~ msgid "Modify Output Format Attributes"
-#~ msgstr ""
-
-#~ msgid "Remove Rule"
-#~ msgstr "Odstráň pravidlo"
-
-#~ msgid "Add New Rule"
-#~ msgstr ""
-
-#~ msgid "No problem found with format"
-#~ msgstr ""
-
-#~ msgid "An error has been found"
-#~ msgstr "Chyba bola nájdená"
-
-#~ msgid "The following errors have been found"
-#~ msgstr ""
-
-#~ msgid "BibFormat Admin"
-#~ msgstr "Administrácia Formátov"
-
-#~ msgid "Enter a search query here."
-#~ msgstr ""
-
-#~ msgid "No Record Found for %s."
-#~ msgstr "Záznam nenájdený"
-
-#~ msgid "Tag specification \"%s\" must end with column \":\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Tag specification \"%s\" must start with \"tag\" at line %s."
-#~ msgstr ""
-
-#~ msgid "\"tag\" must be lowercase in \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Should be \"tag field_number:\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Invalid tag \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Condition \"%s\" is outside a tag specification at line %s."
-#~ msgstr ""
-
-#~ msgid "Condition \"%s\" can only have a single separator --- at line %s."
-#~ msgstr ""
-
-#~ msgid "Template \"%s\" does not exist at line %s."
-#~ msgstr "Užívateľ %s neexistuje."
-
-#~ msgid "Missing column \":\" after \"default\" in \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Default template specification \"%s\" must "
-#~ "start with \"default :\" at line "
-#~ "%s."
-#~ msgstr ""
-
-#~ msgid "\"default\" keyword must be lowercase in \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Line %s could not be understood at line %s."
-#~ msgstr ""
-
-#~ msgid "Output format %s cannot not be read. %s"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Could not find a name specified in"
-#~ " tag \"<name>\" inside format template "
-#~ "%s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Could not find a description specified"
-#~ " in tag \"<description>\" inside format "
-#~ "template %s."
-#~ msgstr ""
-
-#~ msgid "Format template %s calls undefined element \"%s\"."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Format template %s calls unreadable "
-#~ "element \"%s\". Check element file "
-#~ "permissions."
-#~ msgstr ""
-
-#~ msgid "Cannot load element \"%s\" in template %s. Check element code."
-#~ msgstr ""
-
-#~ msgid "Format element %s uses unknown parameter \"%s\" in format template %s."
-#~ msgstr ""
-
-#~ msgid "Could not read format template named %s. %s"
-#~ msgstr ""
-
-#~ msgid "Error in format element %s. %s."
-#~ msgstr ""
-
-#~ msgid "Format element %s cannot not be read. %s"
-#~ msgstr ""
-
-#~ msgid "Show all %i authors"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Cannot write in etc/bibformat dir of "
-#~ "your Invenio installation. Check directory "
-#~ "permission."
-#~ msgstr ""
-
-#~ msgid "Restricted Output Format"
-#~ msgstr "Chránený výstupný formát"
-
-#~ msgid "Output Format %s Rules"
-#~ msgstr "Výstupný formát %s pravidlá"
-
-#~ msgid "Output Format %s Attributes"
-#~ msgstr ""
-
-#~ msgid "Output Format %s Dependencies"
-#~ msgstr ""
-
-#~ msgid "Delete Output Format"
-#~ msgstr "Zmaž výstupný formát"
-
-#~ msgid "Cannot create output format"
-#~ msgstr "Nemožno vytvoriť výstupný formát"
-
-#~ msgid "Format template %s cannot not be read. %s"
-#~ msgstr ""
-
-#~ msgid "Restricted Format Template"
-#~ msgstr ""
-
-#~ msgid "Format Template %s"
-#~ msgstr ""
-
-#~ msgid "Format Template %s Attributes"
-#~ msgstr ""
-
-#~ msgid "Format Template %s Dependencies"
-#~ msgstr ""
-
-#~ msgid "Delete Format Template"
-#~ msgstr "Zmaž šablónu formátu"
-
-#~ msgid "Format Element %s Dependencies"
-#~ msgstr ""
-
-#~ msgid "Test Format Element %s"
-#~ msgstr ""
-
-#~ msgid "Validation of Output Format %s"
-#~ msgstr ""
-
-#~ msgid "Validation of Format Template %s"
-#~ msgstr ""
-
-#~ msgid "Restricted Format Element"
-#~ msgstr ""
-
-#~ msgid "Validation of Format Element %s"
-#~ msgstr ""
-
-#~ msgid "No format specified for validation. Please specify one."
-#~ msgstr ""
-
-#~ msgid "Format Validation"
-#~ msgstr ""
-
-#~ msgid "The current taxonomy can be accessed with this URL: %s"
-#~ msgstr ""
-
-#~ msgid "Please upload the RDF file for taxonomy %s"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If the expression contains '%', like "
-#~ "'270__a:*%*',                          it will be"
-#~ " replaced by a search string when "
-#~ "the                          knowledge base is "
-#~ "used."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Example 2: Return the institute's name"
-#~ " (100__a) when the                          user"
-#~ " gives its postal code (270__a):"
-#~ "                          Set field to 100__a,"
-#~ " expression to 270__a:*%*."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The left side of the rule (%s) "
-#~ "already appears in these knowledge "
-#~ "bases:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The right side of the rule (%s)"
-#~ " already appears in these knowledge "
-#~ "bases:"
-#~ msgstr ""
-
-#~ msgid "Knowledge Base %s"
-#~ msgstr ""
-
-#~ msgid "Knowledge Base %s Attributes"
-#~ msgstr ""
-
-#~ msgid "Knowledge Base %s Dependencies"
-#~ msgstr ""
-
-#~ msgid "No rights to upload to collection '%s'"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The system is not attempting to "
-#~ "send an email from %s, to %s, "
-#~ "with body %s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Error in connecting to the SMPT "
-#~ "server waiting %s seconds. Exception is"
-#~ " %s, while sending email from %s "
-#~ "to %s with body %s."
-#~ msgstr ""
-
-#~ msgid "Error while sending an email: %s"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "Error while sending an email.\n"
-#~ "Reason: %s\n"
-#~ "Details: %s\n"
-#~ "Sender: \"%s\"\n"
-#~ "Recipient(s): \"%s\"\n"
-#~ "\n"
-#~ "The content of the mail was as follows:\n"
-#~ "%s"
-#~ msgstr ""
-
-#~ msgid "Error in sending email from %s to %s with body %s."
-#~ msgstr ""
-
-#~ msgid "Not Set"
-#~ msgstr "Nenastavené"
-
-#~ msgid "never"
-#~ msgstr "nikdy"
-
-#~ msgid ""
-#~ "Do you want to touch the OAI "
-#~ "set %s? Note that this will force"
-#~ " all clients to re-harvest the "
-#~ "whole set."
-#~ msgstr ""
-
-#~ msgid "OAI set %s touched."
-#~ msgstr ""
-
-#~ msgid "Name variants"
-#~ msgstr ""
-
-#~ msgid "No Name Variants"
-#~ msgstr ""
-
-#~ msgid "downloaded"
-#~ msgstr ""
-
-#~ msgid "times"
-#~ msgstr "krát"
-
-#~ msgid "Papers"
-#~ msgstr "Články"
-
-#~ msgid "No Keywords"
-#~ msgstr "Žiadne kľúčové slová"
-
-#~ msgid "Frequent keywords"
-#~ msgstr "Kľúčové slová"
-
-#~ msgid "No Subject categories"
-#~ msgstr "Zoznam verejných košíkov"
-
-#~ msgid "No Collaborations"
-#~ msgstr "kolekcie"
-
-#~ msgid "unknown affiliation"
-#~ msgstr "Neznáma afiliácia"
-
-#~ msgid "No Affiliations"
-#~ msgstr "Žiadne afiliácie"
-
-#~ msgid "Affiliations"
-#~ msgstr "Afiliácie"
-
-#~ msgid "Frequent co-authors (excluding collaborations)"
-#~ msgstr ""
-
-#~ msgid "No Frequent Co-authors"
-#~ msgstr "Žiadni častí spoluautori"
-
-#~ msgid "Citations%s"
-#~ msgstr "Citácie"
-
-#~ msgid "<strong> Publications per year </strong>"
-#~ msgstr ""
-
-#~ msgid "No Publication Graph"
-#~ msgstr "Dátum vytnorenia"
-
-#~ msgid "<strong> Publications list </strong>"
-#~ msgstr "Dátum vytnorenia"
-
-#~ msgid "No publications available"
-#~ msgstr "Žiadne typy dokumentov nie sú prístupné."
-
-#~ msgid "Recompute Now!"
-#~ msgstr ""
-
-#~ msgid "%s is an invalid record ID"
-#~ msgstr ""
-
-#~ msgid "%s is an invalid user ID."
-#~ msgstr ""
-
-#~ msgid "Record ID %s is not a number."
-#~ msgstr ""
-
-#~ msgid "%i comments found in total (not shown on this page)"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The size of file \\\"%s\\\" (%s) "
-#~ "is larger than maximum allowed file "
-#~ "size (%s). Select files again."
-#~ msgstr ""
-
-#~ msgid "About your article at %(url)s"
-#~ msgstr ""
-
-#~ msgid "Administrate %(journal_name)s"
-#~ msgstr ""
-
-#~ msgid "Linkbacks%s: %s"
-#~ msgstr ""
-
-#~ msgid "There is no index %s.  Searching for %s in all fields."
-#~ msgstr ""
-
-#~ msgid "Instead searching %s."
-#~ msgstr ""
-
-#~ msgid "Cited by 1 record"
-#~ msgstr "Citované 1 záznamom"
-
-#~ msgid "%i comments"
-#~ msgstr "%i komentárov"
-
-#~ msgid "%i reviews"
-#~ msgstr "%i hodnotení"
-
-#~ msgid "%s of"
-#~ msgstr "%s z"
-
-#~ msgid ".. of which self-citations: %s records"
-#~ msgstr ""
-
-#~ msgid "No Papers"
-#~ msgstr "Žiadne články"
-
-#~ msgid "Frequent co-authors"
-#~ msgstr "Častí spoluautori"
-
-#~ msgid "This is me.  Verify my publication list."
-#~ msgstr ""
-
-#~ msgid "Citations:"
-#~ msgstr "Citácie:"
-
-#~ msgid "No Citation Information available"
-#~ msgstr "Žiadne typy dokumentov nie sú prístupné."
-
-#~ msgid "<p><a href=\"%(url)s\">%(msg)s</a></p>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "For some unknown reason multiple records"
-#~ " matching the specified DOI \"%s\" "
-#~ "have been found."
-#~ msgstr ""
-
-#~ msgid "Found multiple records matching DOI %s"
-#~ msgstr ""
-
-#~ msgid "Discussion"
-#~ msgstr "Diskusia"
-
-#~ msgid "Please inform the <a href='mailto%s'>administator</a>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Somebody (possibly you) coming from %(x_ip_address)s has asked\n"
-#~ "for a password reset at %(x_sitename)s\n"
-#~ "for the account \"%(x_email)s\"."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Somebody (possibly you) coming from %(x_ip_address)s has asked\n"
-#~ "to register a new account at %(x_sitename)s\n"
-#~ "for the email address \"%(x_email)s\"."
-#~ msgstr ""
-
-#~ msgid "Your alerts"
-#~ msgstr "Vaše avíza"
-
-#~ msgid "Your approvals"
-#~ msgstr "Vaše schválenia"
-
-#~ msgid "Your baskets"
-#~ msgstr "Vaše košíky"
-
-#~ msgid "Your loans"
-#~ msgstr "Vaše pôžičky"
-
-#~ msgid "Your submissions"
-#~ msgstr "Vaše pridania"
-
-#~ msgid "Statistics"
-#~ msgstr "Stav"
-
-#~ msgid "Invitation to join \"%s\" group"
-#~ msgstr ""
-
-#~ msgid "Group: %s"
-#~ msgstr "Grupa: %s"
-
-#~ msgid ""
-#~ "Your e-mail is auto-generated by "
-#~ "the system. Please change your e-mail"
-#~ " from <a href='%s/youraccount/edit?ln=%s'>account "
-#~ "settings</a>."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to switch to external login "
-#~ "method %s, because your email address"
-#~ " is unknown."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to switch to external login "
-#~ "method %s, because your email address"
-#~ " is unknown to the external login "
-#~ "system."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The external login method %s does "
-#~ "not support email address based logins."
-#~ "  Please contact the site administrators."
-#~ msgstr ""
-
-#~ msgid "%s  Personalize, Main page"
-#~ msgstr ""
-
-#~ msgid "Account registration at %s"
-#~ msgstr ""
-
-#~ msgid "This is the table of contents of the %(x_category)s pages."
-#~ msgstr ""
-
-#~ msgid "Page %s Not Found"
-#~ msgstr "Stránka %s nebola nájdená"
-
-#~ msgid ""
-#~ "The task queue is currently running "
-#~ "in automatic mode, and there are "
-#~ "currently %s tasks waiting to be "
-#~ "executed. Your record should be "
-#~ "available within a few minutes and "
-#~ "searchable within an hour or "
-#~ "thereabouts.\n"
-#~ msgstr ""
-
-#~ msgid "The field %s is mandatory."
-#~ msgstr "Pole %s je povinné."
-
-#~ msgid ""
-#~ "Unable to move field at position "
-#~ "%s to position %s on page %s "
-#~ "of submission '%s%s' - Invalid Field "
-#~ "Position Numbers"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to swap field at position "
-#~ "%s with field at position %s on"
-#~ " page %s of submission %s - "
-#~ "could not move field at position "
-#~ "%s to temporary field location"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to swap field at position "
-#~ "%s with field at position %s on"
-#~ " page %s of submission %s - "
-#~ "could not move field at position "
-#~ "%s to position %s. Please ask "
-#~ "Admin to check that a field was"
-#~ " not stranded in a temporary position"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to swap field at position "
-#~ "%s with field at position %s on"
-#~ " page %s of submission %s - "
-#~ "could not move field that was "
-#~ "located at position %s to position "
-#~ "%s from temporary position. Field is "
-#~ "now stranded in temporary position and"
-#~ " must be corrected manually by an "
-#~ "Admin"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to move field at position "
-#~ "%s to position %s on page %s "
-#~ "of submission %s - could not "
-#~ "decrement the position of the fields "
-#~ "below position %s. Tried to recover "
-#~ "- please check that field ordering "
-#~ "is not broken"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Unable to move field at position "
-#~ "%s to position %s on page %s "
-#~ "of submission %s%s - could not "
-#~ "increment the position of the fields "
-#~ "at and below position %s. The "
-#~ "field that was at position %s is"
-#~ " now stranded in a temporary "
-#~ "position."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Moved field from position %s to "
-#~ "position %s on page %s of "
-#~ "submission '%s%s'."
-#~ msgstr ""
-
-#~ msgid "Unable to delete field at position %s from page %s of submission '%s'"
-#~ msgstr "Nemožno určiť počet strán pridania."
-

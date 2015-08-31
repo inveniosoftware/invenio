@@ -1,4 +1,4 @@
-# # Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+# # Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2015 CERN.
 # #
 # # Invenio is free software; you can redistribute it and/or
 # # modify it under the terms of the GNU General Public License as
@@ -15,15 +15,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Invenio 1.0.0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2015-03-04 16:44+0100\n"
-"PO-Revision-Date: 2012-03-01 16:53+0100\n"
+"POT-Creation-Date: 2015-08-27 15:26+0200\n"
+"PO-Revision-Date: 2015-08-27 20:10+0200\n"
 "Last-Translator: Nikolaos Kasioumis <nikolaos.kasioumis@cern.ch>\n"
 "Language-Team: EL <info@invenio-software.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.0\n"
 
 #: invenio/base/decorators.py:133
 #, python-format
@@ -204,7 +204,7 @@ msgstr ""
 
 #: invenio/base/templates/mail_html.tpl:20
 #: invenio/base/templates/mail_text.tpl:20
-#: invenio/legacy/webcomment/templates.py:2256
+#: invenio/legacy/webcomment/templates.py:2255
 msgid "Hello:"
 msgstr "Χαίρετε:"
 
@@ -261,41 +261,46 @@ msgstr ""
 msgid "Error in sending email from %(x_from)s to %(x_to)s with body%(x_body)s."
 msgstr ""
 
-#: invenio/ext/login/__init__.py:68
+#: invenio/ext/login/__init__.py:61
+#, fuzzy
+msgid "Provided data is not valid"
+msgstr "Η διεύθυνση URL που δώσατε δεν είναι έγκυρη."
+
+#: invenio/ext/login/__init__.py:73
 #: invenio/legacy/websession/webinterface.py:679
 msgid "Password reset request for"
 msgstr "Αίτημα επαναφοράς κωδικού για"
 
-#: invenio/ext/login/__init__.py:124
+#: invenio/ext/login/__init__.py:129
 #, fuzzy, python-format
 msgid "You are not authorized to use '%(x_login_method)s' login method."
 msgstr "Δεν έχετε δικαίωμα να χρησιμοποιήσετε τον δανεισμό."
 
-#: invenio/ext/login/__init__.py:130
+#: invenio/ext/login/__init__.py:135
 #, python-format
 msgid ""
 "You have not yet confirmed the email address for the             "
 "'%(login_method)s' authentication method."
 msgstr ""
 
-#: invenio/ext/login/__init__.py:148 invenio/modules/annotations/views.py:156
+#: invenio/ext/login/__init__.py:153 invenio/modules/annotations/views.py:156
 #: invenio/modules/comments/views.py:204 invenio/modules/comments/views.py:238
 #: invenio/modules/records/views.py:80
 #, fuzzy
 msgid "Authorization failure"
 msgstr "Πρόβλημα στην εγγραφή"
 
-#: invenio/ext/login/__init__.py:154
+#: invenio/ext/login/__init__.py:159
 #, fuzzy
 msgid "Please sign in to continue."
 msgstr "Παρακαλώ επιλέξτε ένα ή περισσότερα"
 
-#: invenio/ext/login/__init__.py:158
+#: invenio/ext/login/__init__.py:163
 #, fuzzy
 msgid "Authorization failure."
 msgstr "Αίτηση εξουσιοδότησης ρόλων"
 
-#: invenio/ext/script/__init__.py:116
+#: invenio/ext/script/__init__.py:143
 #, fuzzy, python-format
 msgid ""
 "A newer version of Invenio is available for download. You may want to "
@@ -304,7 +309,7 @@ msgstr ""
 "Μια νεότερη έκδοση του Invenio είναι διαθέσιμη για κατέβασμα. Παρακαλώ "
 "επισκευθείτε το "
 
-#: invenio/ext/script/__init__.py:126
+#: invenio/ext/script/__init__.py:153
 #, python-format
 msgid "Cannot download or parse release notes from %(release_notes)s"
 msgstr ""
@@ -824,7 +829,7 @@ msgstr "ID"
 #: invenio/legacy/websubmit/functions/Create_Upload_Files_Interface.py:467
 #: invenio/modules/access/templates/access/admin/showroledetails_base.html:54
 #: invenio/modules/groups/forms.py:46
-#: invenio/modules/oauth2server/models.py:142
+#: invenio/modules/oauth2server/models.py:143
 #: invenio/modules/search/admin_forms.py:34 invenio/modules/tags/forms.py:162
 #: invenio/modules/tags/forms.py:262
 msgid "Name"
@@ -866,8 +871,8 @@ msgstr "Έχετε %i tickets."
 
 #: invenio/legacy/bibcatalog/templates.py:52
 #: invenio/legacy/bibknowledge/templates.py:170
-#: invenio/legacy/webcomment/templates.py:900
-#: invenio/legacy/webcomment/templates.py:2586
+#: invenio/legacy/webcomment/templates.py:899
+#: invenio/legacy/webcomment/templates.py:2585
 #: invenio/legacy/websearch/templates.py:2038
 msgid "Previous"
 msgstr "Προηγούμενο"
@@ -882,8 +887,8 @@ msgstr "κλείσιμο"
 
 #: invenio/legacy/bibcatalog/templates.py:74
 #: invenio/legacy/bibknowledge/templates.py:168
-#: invenio/legacy/webcomment/templates.py:916
-#: invenio/legacy/webcomment/templates.py:2610
+#: invenio/legacy/webcomment/templates.py:915
+#: invenio/legacy/webcomment/templates.py:2609
 msgid "Next"
 msgstr "Επόμενο"
 
@@ -909,7 +914,7 @@ msgstr ""
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:325
 #, fuzzy
 msgid "Not authorized"
-msgstr "συγγραφέας"
+msgstr "Δεν έχετε δικαίωμα να χρησιμοποιήσετε τον διαδανεισμό."
 
 #: invenio/legacy/bibcheck/web/admin/bibcheckadmin.py:79
 #, fuzzy, python-format
@@ -1454,11 +1459,11 @@ msgstr "Καταχωρήθηκε επιτυχώς το νέο αίτημα."
 #: invenio/legacy/bibcirculation/adminlib.py:3543
 #: invenio/legacy/bibcirculation/adminlib.py:3587
 #: invenio/legacy/webbasket/templates.py:1839
-#: invenio/legacy/webcomment/templates.py:253
-#: invenio/legacy/webcomment/templates.py:714
-#: invenio/legacy/webcomment/templates.py:2114
-#: invenio/legacy/webcomment/templates.py:2138
-#: invenio/legacy/webcomment/templates.py:2164
+#: invenio/legacy/webcomment/templates.py:252
+#: invenio/legacy/webcomment/templates.py:713
+#: invenio/legacy/webcomment/templates.py:2113
+#: invenio/legacy/webcomment/templates.py:2137
+#: invenio/legacy/webcomment/templates.py:2163
 #: invenio/legacy/webmessage/templates.py:508
 #: invenio/legacy/websession/templates.py:2236
 #: invenio/legacy/websession/templates.py:2276
@@ -1469,11 +1474,11 @@ msgstr "Ναι"
 #: invenio/legacy/bibcirculation/adminlib.py:2434
 #: invenio/legacy/bibcirculation/adminlib.py:3548
 #: invenio/legacy/webalert/templates.py:320
-#: invenio/legacy/webcomment/templates.py:254
-#: invenio/legacy/webcomment/templates.py:716
-#: invenio/legacy/webcomment/templates.py:2114
-#: invenio/legacy/webcomment/templates.py:2138
-#: invenio/legacy/webcomment/templates.py:2164
+#: invenio/legacy/webcomment/templates.py:253
+#: invenio/legacy/webcomment/templates.py:715
+#: invenio/legacy/webcomment/templates.py:2113
+#: invenio/legacy/webcomment/templates.py:2137
+#: invenio/legacy/webcomment/templates.py:2163
 #: invenio/legacy/webmessage/templates.py:509
 #: invenio/legacy/websession/templates.py:2237
 #: invenio/legacy/websession/templates.py:2277
@@ -1634,9 +1639,9 @@ msgstr ""
 #: invenio/legacy/bibdocfile/webinterface.py:145
 #: invenio/legacy/search_engine/__init__.py:2223
 #: invenio/legacy/search_engine/__init__.py:2232
-#: invenio/legacy/search_engine/__init__.py:5972
-#: invenio/legacy/search_engine/__init__.py:6034
-#: invenio/legacy/search_engine/__init__.py:6125
+#: invenio/legacy/search_engine/__init__.py:5978
+#: invenio/legacy/search_engine/__init__.py:6040
+#: invenio/legacy/search_engine/__init__.py:6131
 msgid "Requested record does not seem to exist."
 msgstr "Η εγγραφή που ζητήσατε δεν υπάρχει."
 
@@ -2297,7 +2302,7 @@ msgstr "Τοποθεσία"
 #: invenio/legacy/websubmit/functions/Create_Upload_Files_Interface.py:471
 #: invenio/modules/access/templates/access/admin/showroledetails_base.html:56
 #: invenio/modules/groups/forms.py:50
-#: invenio/modules/oauth2server/models.py:153
+#: invenio/modules/oauth2server/models.py:154
 msgid "Description"
 msgstr "Περιγραφή"
 
@@ -2822,7 +2827,7 @@ msgstr "Επαναφορά"
 #: invenio/legacy/bibcirculation/templates.py:1772
 #: invenio/legacy/bibexport/templates.py:494
 #: invenio/legacy/bibexport/templates.py:557
-#: invenio/legacy/webcomment/templates.py:2061
+#: invenio/legacy/webcomment/templates.py:2060
 msgid "OK"
 msgstr "ΟΚ"
 
@@ -3290,8 +3295,8 @@ msgstr "Θυρίδα ταχυδρομείου"
 #: invenio/legacy/bibcirculation/templates.py:15749
 #: invenio/legacy/bibcirculation/templates.py:16003
 #: invenio/legacy/bibcirculation/utils.py:455
-#: invenio/legacy/webcomment/templates.py:1738
-#: invenio/legacy/webcomment/templates.py:1770
+#: invenio/legacy/webcomment/templates.py:1737
+#: invenio/legacy/webcomment/templates.py:1769
 msgid "Email"
 msgstr "Email"
 
@@ -4564,15 +4569,15 @@ msgid ""
 msgstr ""
 
 #: invenio/legacy/bibcirculation/webinterface.py:854
-#: invenio/legacy/search_engine/__init__.py:4757
-#: invenio/legacy/search_engine/__init__.py:5117
-#: invenio/legacy/search_engine/__init__.py:5311
-#: invenio/legacy/search_engine/__init__.py:5334
-#: invenio/legacy/search_engine/__init__.py:5342
-#: invenio/legacy/search_engine/__init__.py:5350
-#: invenio/legacy/search_engine/__init__.py:5396
-#: invenio/legacy/webcomment/templates.py:199
-#: invenio/legacy/webcomment/templates.py:2511
+#: invenio/legacy/search_engine/__init__.py:4763
+#: invenio/legacy/search_engine/__init__.py:5123
+#: invenio/legacy/search_engine/__init__.py:5317
+#: invenio/legacy/search_engine/__init__.py:5340
+#: invenio/legacy/search_engine/__init__.py:5348
+#: invenio/legacy/search_engine/__init__.py:5356
+#: invenio/legacy/search_engine/__init__.py:5402
+#: invenio/legacy/webcomment/templates.py:198
+#: invenio/legacy/webcomment/templates.py:2510
 #: invenio/modules/comments/api.py:1862
 msgid "The record has been deleted."
 msgstr "Η εγγραφή έχει διαγραφεί."
@@ -4661,10 +4666,10 @@ msgstr "Επιλέξτε ένα αρχείο"
 #: invenio/legacy/bibdocfile/managedocfiles.py:404
 #: invenio/legacy/bibexport/templates.py:347
 #: invenio/legacy/bibexport/templates.py:401
-#: invenio/legacy/webcomment/templates.py:1024
-#: invenio/legacy/webcomment/templates.py:1343
-#: invenio/legacy/webcomment/templates.py:1791
-#: invenio/legacy/webcomment/templates.py:2028
+#: invenio/legacy/webcomment/templates.py:1023
+#: invenio/legacy/webcomment/templates.py:1342
+#: invenio/legacy/webcomment/templates.py:1790
+#: invenio/legacy/webcomment/templates.py:2027
 #: invenio/legacy/websubmit/templates.py:2505
 #: invenio/legacy/websubmit/functions/Create_Upload_Files_Interface.py:475
 msgid "Comment"
@@ -5274,7 +5279,7 @@ msgid "Total"
 msgstr "Σύνολο"
 
 #: invenio/legacy/bibexport/templates.py:652
-#: invenio/legacy/webcomment/templates.py:2031
+#: invenio/legacy/webcomment/templates.py:2030
 msgid "Select"
 msgstr "Επιλογή"
 
@@ -5595,7 +5600,7 @@ msgstr "Συσχετισμοί Γνωσιακών Βάσεων"
 #: invenio/legacy/bibknowledge/templates.py:329
 #: invenio/legacy/bibknowledge/templates.py:589
 #: invenio/legacy/bibknowledge/templates.py:658
-#: invenio/legacy/webcomment/templates.py:1619
+#: invenio/legacy/webcomment/templates.py:1618
 #: invenio/legacy/webjournal/templates.py:203
 #: invenio/legacy/webjournal/templates.py:575
 #: invenio/legacy/webjournal/templates.py:716
@@ -5974,8 +5979,8 @@ msgstr ""
 
 #: invenio/legacy/search_engine/__init__.py:935
 #: invenio/legacy/search_engine/__init__.py:968
-#: invenio/legacy/search_engine/__init__.py:6020
-#: invenio/legacy/search_engine/__init__.py:6114
+#: invenio/legacy/search_engine/__init__.py:6026
+#: invenio/legacy/search_engine/__init__.py:6120
 msgid "Search Results"
 msgstr "Αποτελέσματα αναζήτησης"
 
@@ -6205,7 +6210,7 @@ msgstr ""
 "παρενθέσεις στο ερώτημα.Αν δεν σας καλύπτει, ελέγξτε τους όρους "
 "αναζήτησης και δοκιμάστε ξανά."
 
-#: invenio/legacy/search_engine/__init__.py:3232
+#: invenio/legacy/search_engine/__init__.py:3238
 #, fuzzy, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other collections gave "
@@ -6214,7 +6219,7 @@ msgstr ""
 "Κανένα αποτέλεσμα στην συλλογή %(x_collection)s. Άλλες συλλογές έδωσαν "
 "%(x_url_open)s%(x_nb_hits)d αποτελέσματα%(x_url_close)s."
 
-#: invenio/legacy/search_engine/__init__.py:3249
+#: invenio/legacy/search_engine/__init__.py:3255
 #, fuzzy
 msgid ""
 "No public collection matched your query. If you were looking for a hidden"
@@ -6223,7 +6228,7 @@ msgstr ""
 "Καμιά ανοιχτή συλλογή δεν ικανοποίησε το ερώτημά σας. Άν ψάχνετε και σε "
 "κλειστές συλλογές, παρακαλώ επιλέξτε τις στην αρχή."
 
-#: invenio/legacy/search_engine/__init__.py:3253
+#: invenio/legacy/search_engine/__init__.py:3259
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
@@ -6231,41 +6236,41 @@ msgstr ""
 "Καμιά ανοιχτή συλλογή δεν ικανοποίησε το ερώτημά σας. Άν ψάχνετε και σε "
 "κλειστές συλλογές, παρακαλώ επιλέξτε τις στην αρχή."
 
-#: invenio/legacy/search_engine/__init__.py:3360
+#: invenio/legacy/search_engine/__init__.py:3366
 #, fuzzy
 msgid "Your search did not match any records.  Please try again."
 msgstr "Το σχόλιο σας δεν μπόρεσε να καταγραφεί, παρακαλώ ξαναδοκιμάστε."
 
-#: invenio/legacy/search_engine/__init__.py:3369
+#: invenio/legacy/search_engine/__init__.py:3375
 msgid "No match found, please enter different search terms."
 msgstr "Δεν βρέθηκε αποτέλεσμα, παρακαλώ εισάγετε διαφορετικά κριτήρια αναζήτησης."
 
-#: invenio/legacy/search_engine/__init__.py:3375
+#: invenio/legacy/search_engine/__init__.py:3381
 #, fuzzy, python-format
 msgid "There are no records referring to %(x_rec)s."
 msgstr "Δεν υπάρχουν εγγραφές που να αναφέρονται στο %s."
 
-#: invenio/legacy/search_engine/__init__.py:3377
+#: invenio/legacy/search_engine/__init__.py:3383
 #, fuzzy, python-format
 msgid "There are no records modified by %(x_rec)s."
 msgstr "Δεν υπάρχουν εγγραφές που να παραπέμπονται από το %s."
 
-#: invenio/legacy/search_engine/__init__.py:3379
+#: invenio/legacy/search_engine/__init__.py:3385
 #, fuzzy, python-format
 msgid "There are no records cited by %(x_rec)s."
 msgstr "Δεν υπάρχουν εγγραφές που να παραπέμπονται από το %s."
 
-#: invenio/legacy/search_engine/__init__.py:3385
+#: invenio/legacy/search_engine/__init__.py:3391
 #, fuzzy, python-format
 msgid "No word index is available for %(x_name)s."
 msgstr "Δεν υπάρχει ευρετήριο λέξεων για το %s."
 
-#: invenio/legacy/search_engine/__init__.py:3396
+#: invenio/legacy/search_engine/__init__.py:3402
 #, fuzzy, python-format
 msgid "No phrase index is available for %(x_name)s."
 msgstr "Δεν υπάρχει ευρετήριο φράσεων για το %s."
 
-#: invenio/legacy/search_engine/__init__.py:3434
+#: invenio/legacy/search_engine/__init__.py:3440
 #, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record."
@@ -6274,7 +6279,7 @@ msgstr ""
 "Ο όρος %(x_term)s στο ευρετήριο %(x_index)s δεν ταίριαξε σε κάποια "
 "εγγραφή. Παραπλήσιοι όροι σε όλες τις συλλογές:"
 
-#: invenio/legacy/search_engine/__init__.py:3439
+#: invenio/legacy/search_engine/__init__.py:3445
 #, fuzzy, python-format
 msgid ""
 "Search term %(x_name)s did not match any record. Nearest terms in any "
@@ -6283,7 +6288,7 @@ msgstr ""
 "Ο όρος %s δεν ταίριαξε σε κάποια εγγραφή. Παραπλήσιοι όροι σε όλες τις "
 "συλλογές:"
 
-#: invenio/legacy/search_engine/__init__.py:4340
+#: invenio/legacy/search_engine/__init__.py:4346
 #, fuzzy, python-format
 msgid ""
 "Sorry, %(x_option)s does not seem to be a valid sort option. The records "
@@ -6292,7 +6297,7 @@ msgstr ""
 "Λυπούμαστε, η '%s' δεν είναι έγκυρη επιλογή ταξινόμησης. Έγινε επιλογή "
 "της ταξινόμησης κατά τίτλο."
 
-#: invenio/legacy/search_engine/__init__.py:4468
+#: invenio/legacy/search_engine/__init__.py:4474
 #, fuzzy, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %(x_name)d records only. Using"
@@ -6301,7 +6306,7 @@ msgstr ""
 "Λυπούμαστε, η ταξινόμηση επιτρέπεται σε σετ των %d εγγραφών το πολύ. Θα "
 "γίνει χρήση της της εξ΄ορισμού ταξινόμησης."
 
-#: invenio/legacy/search_engine/__init__.py:4480
+#: invenio/legacy/search_engine/__init__.py:4486
 #, fuzzy, python-format
 msgid ""
 "Sorry, %(x_name)s does not seem to be a valid sort option. The records "
@@ -6310,17 +6315,17 @@ msgstr ""
 "Λυπούμαστε, η '%s' δεν είναι έγκυρη επιλογή ταξινόμησης. Έγινε επιλογή "
 "της ταξινόμησης κατά τίτλο."
 
-#: invenio/legacy/search_engine/__init__.py:4760
-#: invenio/legacy/search_engine/__init__.py:5121
+#: invenio/legacy/search_engine/__init__.py:4766
+#: invenio/legacy/search_engine/__init__.py:5127
 #, fuzzy, python-format
 msgid "The record %(x_rec)d replaces it."
 msgstr "Αυτή η εγγραφή δεν υπάρχει."
 
-#: invenio/legacy/search_engine/__init__.py:4986
+#: invenio/legacy/search_engine/__init__.py:4992
 msgid "Use different search terms."
 msgstr "Χρησιμοποιήστε διαφορετικά κριτήρια έρευνας."
 
-#: invenio/legacy/search_engine/__init__.py:5982
+#: invenio/legacy/search_engine/__init__.py:5988
 #: invenio/legacy/websearch/templates.py:813
 #: invenio/legacy/websearch/templates.py:891
 #: invenio/legacy/websearch/templates.py:1014
@@ -6334,13 +6339,13 @@ msgstr "Χρησιμοποιήστε διαφορετικά κριτήρια έ�
 msgid "Browse"
 msgstr "Φυλλομέτρηση"
 
-#: invenio/legacy/search_engine/__init__.py:6413
+#: invenio/legacy/search_engine/__init__.py:6419
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "Κανένα αποτέλεσμα στα χρονικά περιθώρια, θα γίνει παράβλεψη του κριτηρίου"
 " αυτού..."
 
-#: invenio/legacy/search_engine/__init__.py:6447
+#: invenio/legacy/search_engine/__init__.py:6453
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "Κανένα αποτέλεσμα στα όρια έρευνας, θα γίνει παράβλεψη του κριτηρίου "
@@ -6657,7 +6662,7 @@ msgstr "Οι Αναζητήσεις μου"
 #: invenio/legacy/webbasket/webinterface.py:1026
 #: invenio/legacy/webbasket/webinterface.py:1116
 #: invenio/legacy/webbasket/webinterface.py:1260
-#: invenio/legacy/webcomment/webinterface.py:922
+#: invenio/legacy/webcomment/webinterface.py:928
 #: invenio/legacy/webmessage/templates.py:466
 #: invenio/legacy/websession/templates.py:774
 #: invenio/legacy/websession/templates.py:2350
@@ -6721,7 +6726,7 @@ msgstr "%s ρυθμίσεις, καθορισμός νέας ειδοποίησ�
 #: invenio/legacy/webalert/webinterface.py:475
 #: invenio/legacy/webalert/webinterface.py:523
 #: invenio/legacy/webalert/webinterface.py:551
-#: invenio/legacy/webcomment/webinterface.py:925
+#: invenio/legacy/webcomment/webinterface.py:931
 #: invenio/legacy/websession/webinterface.py:231
 #: invenio/legacy/websession/webinterface.py:254
 #: invenio/legacy/websession/webinterface.py:340
@@ -7416,7 +7421,7 @@ msgid "This functionality is forbidden to guest users."
 msgstr "Η λειτουργία αυτή δεν επιτρέπεται στους επισκέπτες."
 
 #: invenio/legacy/webbasket/templates.py:2184
-#: invenio/legacy/webcomment/templates.py:1011
+#: invenio/legacy/webcomment/templates.py:1010
 msgid "Back to search results"
 msgstr "Επιστροφή στα αποτελέσματα αναζήτησης"
 
@@ -7583,7 +7588,7 @@ msgstr "Προσθήκη σημείωσης"
 
 #: invenio/legacy/webbasket/templates.py:3221
 #: invenio/legacy/webbasket/templates.py:4025
-#: invenio/legacy/webcomment/templates.py:409
+#: invenio/legacy/webcomment/templates.py:408
 #: invenio/legacy/webmessage/templates.py:111
 #: invenio/modules/messages/templates/messages/view_base.html:55
 msgid "Reply"
@@ -7719,213 +7724,213 @@ msgstr "Η ταυτότητα σχολίου %s δεν υπάρχει."
 msgid "Record ID %(x_rec)s does not exist."
 msgstr "Η ταυτότητα εγγραφής %s δεν υπάρχει."
 
-#: invenio/legacy/webcomment/templates.py:83
-#: invenio/legacy/webcomment/templates.py:938
+#: invenio/legacy/webcomment/templates.py:82
+#: invenio/legacy/webcomment/templates.py:937
 #: invenio/legacy/websubmit/templates.py:2451
 #: invenio/modules/formatter/templates/format/record/Video_HTML_detailed.tpl:58
 msgid "Write a comment"
 msgstr "Γράψτε ένα σχόλιο"
 
-#: invenio/legacy/webcomment/templates.py:99
+#: invenio/legacy/webcomment/templates.py:98
 #, fuzzy, python-format
 msgid "%(x_nb)i Comments for round \"%(x_name)s\""
 msgstr "%(x_nb)i σχόλια για στάδιο \"%(x_name)s\""
 
-#: invenio/legacy/webcomment/templates.py:102
+#: invenio/legacy/webcomment/templates.py:101
 #, fuzzy, python-format
 msgid "%(x_nb)i Comments"
 msgstr "%i σχόλια"
 
-#: invenio/legacy/webcomment/templates.py:140
+#: invenio/legacy/webcomment/templates.py:139
 #, fuzzy, python-format
 msgid "Showing the latest %(x_num)i comments:"
 msgstr "Εμφάνιση των τελευταίων %i σχολίων:"
 
-#: invenio/legacy/webcomment/templates.py:153
-#: invenio/legacy/webcomment/templates.py:179
+#: invenio/legacy/webcomment/templates.py:152
+#: invenio/legacy/webcomment/templates.py:178
 msgid "Discuss this document"
 msgstr "Συζήτηση για στο έγγραφο"
 
-#: invenio/legacy/webcomment/templates.py:180
-#: invenio/legacy/webcomment/templates.py:951
+#: invenio/legacy/webcomment/templates.py:179
+#: invenio/legacy/webcomment/templates.py:950
 msgid "Start a discussion about any aspect of this document."
 msgstr "Ξεκινήστε μια συζήτηση σχετικά με το έγγραφο αυτό."
 
-#: invenio/legacy/webcomment/templates.py:197
+#: invenio/legacy/webcomment/templates.py:196
 #, fuzzy, python-format
 msgid "Sorry, the record %(x_rec)s does not seem to exist."
 msgstr "Λυπούμαστε, η εγγραφή %s δεν υπάρχει."
 
-#: invenio/legacy/webcomment/templates.py:201
+#: invenio/legacy/webcomment/templates.py:200
 #, fuzzy, python-format
 msgid "Sorry, %(x_rec)s is not a valid ID value."
 msgstr "Λυπούμαστε, το %s δεν είναι έγκυρη τιμή ταυτότητας."
 
-#: invenio/legacy/webcomment/templates.py:203
+#: invenio/legacy/webcomment/templates.py:202
 msgid "Sorry, no record ID was provided."
 msgstr "Λυπούμαστε, δεν δόθηκε καμία ταυτότητα εγγραφής."
 
-#: invenio/legacy/webcomment/templates.py:207
+#: invenio/legacy/webcomment/templates.py:206
 #, fuzzy, python-format
 msgid "You may want to start browsing from %(x_link)s"
 msgstr "Πιθανόν να θέλετε να φυλλομετρήσετε από %s"
 
-#: invenio/legacy/webcomment/templates.py:265
-#: invenio/legacy/webcomment/templates.py:756
-#: invenio/legacy/webcomment/templates.py:766
+#: invenio/legacy/webcomment/templates.py:264
+#: invenio/legacy/webcomment/templates.py:755
+#: invenio/legacy/webcomment/templates.py:765
 #, python-format
 msgid "%(x_nb)i comments for round \"%(x_name)s\""
 msgstr "%(x_nb)i σχόλια για στάδιο \"%(x_name)s\""
 
-#: invenio/legacy/webcomment/templates.py:295
-#: invenio/legacy/webcomment/templates.py:861
+#: invenio/legacy/webcomment/templates.py:294
+#: invenio/legacy/webcomment/templates.py:860
 msgid "Was this review helpful?"
 msgstr "Σας φάνηκε χρήσιμη η κριτική;"
 
-#: invenio/legacy/webcomment/templates.py:306
-#: invenio/legacy/webcomment/templates.py:342
-#: invenio/legacy/webcomment/templates.py:938
+#: invenio/legacy/webcomment/templates.py:305
+#: invenio/legacy/webcomment/templates.py:341
+#: invenio/legacy/webcomment/templates.py:937
 #: invenio/modules/comments/templates/comments/add_review_base.html:54
 msgid "Write a review"
 msgstr "Γράψτε μια κριτική"
 
-#: invenio/legacy/webcomment/templates.py:313
-#: invenio/legacy/webcomment/templates.py:925
-#: invenio/legacy/webcomment/templates.py:2185
+#: invenio/legacy/webcomment/templates.py:312
+#: invenio/legacy/webcomment/templates.py:924
+#: invenio/legacy/webcomment/templates.py:2184
 #, python-format
 msgid "Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews"
 msgstr ""
 "Μέση βαθμολογία κριτικών: %(x_nb_score)s βασισμένη σε %(x_nb_reviews)s "
 "κριτικές"
 
-#: invenio/legacy/webcomment/templates.py:316
+#: invenio/legacy/webcomment/templates.py:315
 #, fuzzy, python-format
 msgid "Readers found the following %(x_name)s reviews to be most helpful."
 msgstr "Οι αναγνώστε βρήκαν τις παρακάτω %s κριτικές αρκετά χρήσιμες."
 
-#: invenio/legacy/webcomment/templates.py:318
-#: invenio/legacy/webcomment/templates.py:341
+#: invenio/legacy/webcomment/templates.py:317
+#: invenio/legacy/webcomment/templates.py:340
 #, fuzzy, python-format
 msgid "View all %(x_name)s reviews"
 msgstr "Δείτε και τις %s κριτικές"
 
-#: invenio/legacy/webcomment/templates.py:337
-#: invenio/legacy/webcomment/templates.py:359
-#: invenio/legacy/webcomment/templates.py:2226
+#: invenio/legacy/webcomment/templates.py:336
+#: invenio/legacy/webcomment/templates.py:358
+#: invenio/legacy/webcomment/templates.py:2225
 msgid "Rate this document"
 msgstr "Βαθμολογήστε το έγγραφο αυτό"
 
-#: invenio/legacy/webcomment/templates.py:360
+#: invenio/legacy/webcomment/templates.py:359
 #, fuzzy
 msgid "Be the first to review this document.</div>"
 msgstr "Γίνετε ο πρώτος που θα γράψει κριτική για το έγγραφο αυτό."
 
-#: invenio/legacy/webcomment/templates.py:404
-#: invenio/legacy/webcomment/templates.py:465
-#: invenio/legacy/webcomment/templates.py:807
+#: invenio/legacy/webcomment/templates.py:403
+#: invenio/legacy/webcomment/templates.py:464
+#: invenio/legacy/webcomment/templates.py:806
 #: invenio/modules/workflows/templates/workflows/actions/approval_main.html:23
 #, fuzzy
 msgid "Close"
 msgstr "κλείσιμο"
 
-#: invenio/legacy/webcomment/templates.py:411
-#: invenio/legacy/webcomment/templates.py:862
+#: invenio/legacy/webcomment/templates.py:410
+#: invenio/legacy/webcomment/templates.py:861
 msgid "Report abuse"
 msgstr "Αναφορά προσβλητικού περιεχομένου"
 
-#: invenio/legacy/webcomment/templates.py:425
+#: invenio/legacy/webcomment/templates.py:424
 msgid "Undelete comment"
 msgstr "Επαναφορά σχολίου"
 
-#: invenio/legacy/webcomment/templates.py:434
-#: invenio/legacy/webcomment/templates.py:436
+#: invenio/legacy/webcomment/templates.py:433
+#: invenio/legacy/webcomment/templates.py:435
 msgid "Delete comment"
 msgstr "Διαγραφή σχολίου"
 
-#: invenio/legacy/webcomment/templates.py:442
+#: invenio/legacy/webcomment/templates.py:441
 msgid "Unreport comment"
 msgstr "Χαρακτηρισμός σχολίου ως μη ενοχλητικό"
 
-#: invenio/legacy/webcomment/templates.py:453
+#: invenio/legacy/webcomment/templates.py:452
 msgid "Attached file"
 msgstr "Συνημμένο αρχείο"
 
-#: invenio/legacy/webcomment/templates.py:453
+#: invenio/legacy/webcomment/templates.py:452
 msgid "Attached files"
 msgstr "Συνημμένα αρχεία"
 
-#: invenio/legacy/webcomment/templates.py:465
-#: invenio/legacy/webcomment/templates.py:806
+#: invenio/legacy/webcomment/templates.py:464
+#: invenio/legacy/webcomment/templates.py:805
 msgid "Open"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:534
+#: invenio/legacy/webcomment/templates.py:533
 #, python-format
 msgid "Reviewed by %(x_nickname)s on %(x_date)s"
 msgstr "Κρίθηκε από τον %(x_nickname)s στις %(x_date)s"
 
-#: invenio/legacy/webcomment/templates.py:538
+#: invenio/legacy/webcomment/templates.py:537
 #, python-format
 msgid "%(x_nb_people)s out of %(x_nb_total)s people found this review useful"
 msgstr ""
 "%(x_nb_people)s από %(x_nb_total)s ανθρώπους βρήκαν την κριτική αυτή "
 "χρήσιμη"
 
-#: invenio/legacy/webcomment/templates.py:560
+#: invenio/legacy/webcomment/templates.py:559
 msgid "Undelete review"
 msgstr "Επαναφορά κριτικής"
 
-#: invenio/legacy/webcomment/templates.py:569
+#: invenio/legacy/webcomment/templates.py:568
 msgid "Delete review"
 msgstr "Διαγραφή κριτικής"
 
-#: invenio/legacy/webcomment/templates.py:575
+#: invenio/legacy/webcomment/templates.py:574
 msgid "Unreport review"
 msgstr "Σήμανση κριτικής ως μη κακόβουλη"
 
-#: invenio/legacy/webcomment/templates.py:682
-#: invenio/legacy/webcomment/templates.py:698
-#: invenio/legacy/webcomment/webinterface.py:248
-#: invenio/legacy/webcomment/webinterface.py:466
+#: invenio/legacy/webcomment/templates.py:681
+#: invenio/legacy/webcomment/templates.py:697
+#: invenio/legacy/webcomment/webinterface.py:252
+#: invenio/legacy/webcomment/webinterface.py:472
 #: invenio/legacy/websearch/adminlib.py:3406
 #: invenio/legacy/websubmit/templates.py:2449
 #: invenio/modules/comments/views.py:188
 msgid "Comments"
 msgstr "Σχόλια"
 
-#: invenio/legacy/webcomment/templates.py:683
-#: invenio/legacy/webcomment/templates.py:699
-#: invenio/legacy/webcomment/webinterface.py:248
-#: invenio/legacy/webcomment/webinterface.py:466
+#: invenio/legacy/webcomment/templates.py:682
+#: invenio/legacy/webcomment/templates.py:698
+#: invenio/legacy/webcomment/webinterface.py:252
+#: invenio/legacy/webcomment/webinterface.py:472
 #: invenio/legacy/websearch/adminlib.py:3407
 #: invenio/modules/comments/views.py:222
 msgid "Reviews"
 msgstr "Κριτικές"
 
-#: invenio/legacy/webcomment/templates.py:942
+#: invenio/legacy/webcomment/templates.py:941
 #, fuzzy, python-format
 msgid "There is a total of %(x_num)s reviews"
 msgstr "Υπάρχουν συνολικά %s κριτικές"
 
-#: invenio/legacy/webcomment/templates.py:944
+#: invenio/legacy/webcomment/templates.py:943
 #, fuzzy, python-format
 msgid "There is a total of %(x_num)s comments"
 msgstr "Υπάρχουν συνολικά %s σχόλια"
 
-#: invenio/legacy/webcomment/templates.py:956
+#: invenio/legacy/webcomment/templates.py:955
 msgid "Be the first to review this document."
 msgstr "Γίνετε ο πρώτος που θα γράψει κριτική για το έγγραφο αυτό."
 
-#: invenio/legacy/webcomment/templates.py:975
+#: invenio/legacy/webcomment/templates.py:974
 msgid "Subscribe"
 msgstr "Εγγραφή"
 
-#: invenio/legacy/webcomment/templates.py:993
+#: invenio/legacy/webcomment/templates.py:992
 msgid "Unsubscribe"
 msgstr "Διαγραφή συνδρομής"
 
-#: invenio/legacy/webcomment/templates.py:1010
-#: invenio/legacy/webcomment/templates.py:1787
+#: invenio/legacy/webcomment/templates.py:1009
+#: invenio/legacy/webcomment/templates.py:1786
 #: invenio/legacy/websearch/templates.py:548
 #: invenio/modules/comments/templates/comments/subscriptions_base.html:40
 #: invenio/modules/editor/templates/editor/recordmenu.html:22
@@ -7934,34 +7939,34 @@ msgstr "Διαγραφή συνδρομής"
 msgid "Record"
 msgstr "Εγγραφή"
 
-#: invenio/legacy/webcomment/templates.py:1020
-#: invenio/legacy/webcomment/templates.py:1088
+#: invenio/legacy/webcomment/templates.py:1019
+#: invenio/legacy/webcomment/templates.py:1087
 msgid "review"
 msgstr "κριτική"
 
-#: invenio/legacy/webcomment/templates.py:1020
-#: invenio/legacy/webcomment/templates.py:1088
+#: invenio/legacy/webcomment/templates.py:1019
+#: invenio/legacy/webcomment/templates.py:1087
 msgid "comment"
 msgstr "σχόλιο"
 
-#: invenio/legacy/webcomment/templates.py:1023
-#: invenio/legacy/webcomment/templates.py:2028
+#: invenio/legacy/webcomment/templates.py:1022
+#: invenio/legacy/webcomment/templates.py:2027
 msgid "Review"
 msgstr "Κριτική"
 
-#: invenio/legacy/webcomment/templates.py:1086
+#: invenio/legacy/webcomment/templates.py:1085
 msgid "Viewing"
 msgstr "Βλέπετε την "
 
-#: invenio/legacy/webcomment/templates.py:1087
+#: invenio/legacy/webcomment/templates.py:1086
 msgid "Page:"
 msgstr "Σελίδα: "
 
-#: invenio/legacy/webcomment/templates.py:1101
+#: invenio/legacy/webcomment/templates.py:1100
 msgid "You are not authorized to comment or review."
 msgstr "Δεν έχετε δικαίωμα να σχολιάσετε ή να κάνετε κριτική."
 
-#: invenio/legacy/webcomment/templates.py:1271
+#: invenio/legacy/webcomment/templates.py:1270
 #, fuzzy, python-format
 msgid ""
 "Note: Your nickname, %(nick)s, will be displayed as author of this "
@@ -7970,8 +7975,8 @@ msgstr ""
 "Σημείωση: Το ψευδώνυμό σας, %s, θα εμφανίζεται ως συγγραφέας του σχολίου "
 "αυτού."
 
-#: invenio/legacy/webcomment/templates.py:1276
-#: invenio/legacy/webcomment/templates.py:1393
+#: invenio/legacy/webcomment/templates.py:1275
+#: invenio/legacy/webcomment/templates.py:1392
 #, python-format
 msgid ""
 "Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. "
@@ -7980,92 +7985,92 @@ msgstr ""
 "Σημείωση: δεν έχετε %(x_url_open)sορίσει το ψευδώνυμό σας%(x_url_close)s."
 " Ο %(x_nickname)s θα εμφανίζεται σαν συντάκτης του σχολίου αυτού."
 
-#: invenio/legacy/webcomment/templates.py:1293
+#: invenio/legacy/webcomment/templates.py:1292
 msgid "Once logged in, authorized users can also attach files."
 msgstr ""
 "Αφού συνδεθούν, οι εξουσιοδοτημένοι χρήστες μπορούν επίσης να επισυνάψουν"
 " αρχεία."
 
-#: invenio/legacy/webcomment/templates.py:1308
+#: invenio/legacy/webcomment/templates.py:1307
 msgid "Optionally, attach a file to this comment"
 msgstr "Προαιρετικά, μπορείτε να επισυνάψετε ένα αρχείο σε αυτό το σχόλιο"
 
-#: invenio/legacy/webcomment/templates.py:1309
+#: invenio/legacy/webcomment/templates.py:1308
 msgid "Optionally, attach files to this comment"
 msgstr "Προαιρετικά, μπορείτε να επισυνάψετε αρχεία σε αυτό το σχόλιο"
 
-#: invenio/legacy/webcomment/templates.py:1310
+#: invenio/legacy/webcomment/templates.py:1309
 msgid "Max one file"
 msgstr "Όριο ένα αρχείο"
 
-#: invenio/legacy/webcomment/templates.py:1311
+#: invenio/legacy/webcomment/templates.py:1310
 #, fuzzy, python-format
 msgid "Max %(maxfiles)i files"
 msgstr "Όριο %i αρχεία"
 
-#: invenio/legacy/webcomment/templates.py:1312
+#: invenio/legacy/webcomment/templates.py:1311
 #, python-format
 msgid "Max %(x_nb_bytes)s per file"
 msgstr "Όριο %(x_nb_bytes)s ανά αρχείο"
 
-#: invenio/legacy/webcomment/templates.py:1327
+#: invenio/legacy/webcomment/templates.py:1326
 msgid "Send me an email when a new comment is posted"
 msgstr "Να μου αποσταλεί email όταν το σχόλιό μου δημοσιευτεί"
 
-#: invenio/legacy/webcomment/templates.py:1342
-#: invenio/legacy/webcomment/templates.py:1464
+#: invenio/legacy/webcomment/templates.py:1341
+#: invenio/legacy/webcomment/templates.py:1463
 msgid "Article"
 msgstr "Άρθρο"
 
-#: invenio/legacy/webcomment/templates.py:1344
+#: invenio/legacy/webcomment/templates.py:1343
 msgid "Add comment"
 msgstr "Προσθήκη σχολίου"
 
-#: invenio/legacy/webcomment/templates.py:1389
+#: invenio/legacy/webcomment/templates.py:1388
 #, fuzzy, python-format
 msgid ""
 "Note: Your nickname, %(x_name)s, will be displayed as the author of this "
 "review."
 msgstr "Σημείωση: Ο %s, θα εμφανίζεται σαν συγγραφέας της κριτικής αυτής."
 
-#: invenio/legacy/webcomment/templates.py:1465
+#: invenio/legacy/webcomment/templates.py:1464
 msgid "Rate this article"
 msgstr "Βαθμολογήστε αυτό το άρθρο"
 
-#: invenio/legacy/webcomment/templates.py:1466
+#: invenio/legacy/webcomment/templates.py:1465
 msgid "Select a score"
 msgstr "Επιλέξτε μια βαθμολογία"
 
-#: invenio/legacy/webcomment/templates.py:1467
+#: invenio/legacy/webcomment/templates.py:1466
 msgid "Give a title to your review"
 msgstr "Δώστε έναν τίτλο στην κριτική σας"
 
-#: invenio/legacy/webcomment/templates.py:1468
+#: invenio/legacy/webcomment/templates.py:1467
 msgid "Write your review"
 msgstr "Γράψτε μια κριτική"
 
-#: invenio/legacy/webcomment/templates.py:1473
+#: invenio/legacy/webcomment/templates.py:1472
 msgid "Add review"
 msgstr "Προσθήκη Κριτικής"
 
-#: invenio/legacy/webcomment/templates.py:1483
-#: invenio/legacy/webcomment/webinterface.py:511
+#: invenio/legacy/webcomment/templates.py:1482
+#: invenio/legacy/webcomment/webinterface.py:517
 msgid "Add Review"
 msgstr "Προσθήκη Κριτικής"
 
-#: invenio/legacy/webcomment/templates.py:1505
+#: invenio/legacy/webcomment/templates.py:1504
 msgid "Your review was successfully added."
 msgstr "Η κριτική σας προστέθηκε επιτυχώς."
 
-#: invenio/legacy/webcomment/templates.py:1507
+#: invenio/legacy/webcomment/templates.py:1506
 msgid "Your comment was successfully added."
 msgstr "Το σχόλιό σας προστέθηκε επιτυχώς."
 
-#: invenio/legacy/webcomment/templates.py:1510
+#: invenio/legacy/webcomment/templates.py:1509
 msgid "Back to record"
 msgstr "Επιστροφή στην εγγραφή"
 
-#: invenio/legacy/webcomment/templates.py:1512
+#: invenio/legacy/webcomment/templates.py:1511
 #, fuzzy, python-format
 msgid ""
 "You can also view all the comments you have submitted so far on "
@@ -8074,49 +8079,49 @@ msgstr ""
 "Μπορείτε να συμβουλευτείτε την λίστα των "
 "%(x_url_open)stickets%(x_url_close)s σας."
 
-#: invenio/legacy/webcomment/templates.py:1592
+#: invenio/legacy/webcomment/templates.py:1591
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:171
 msgid "View most commented records"
 msgstr "Προβολή των εγγραφών με τα περισσότερα σχόλια"
 
-#: invenio/legacy/webcomment/templates.py:1594
+#: invenio/legacy/webcomment/templates.py:1593
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:207
 msgid "View latest commented records"
 msgstr "Προβολή των εγγραφών με τα πιο πρόσφατα σχόλια"
 
-#: invenio/legacy/webcomment/templates.py:1596
+#: invenio/legacy/webcomment/templates.py:1595
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:140
 msgid "View all comments reported as abuse"
 msgstr "Προβολή των σχολίων που έχουν αναφερθεί ως κακόβουλα"
 
-#: invenio/legacy/webcomment/templates.py:1600
+#: invenio/legacy/webcomment/templates.py:1599
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:170
 msgid "View most reviewed records"
 msgstr "Προβολή των εγγραφών με τις περισσότερες κριτικές"
 
-#: invenio/legacy/webcomment/templates.py:1602
+#: invenio/legacy/webcomment/templates.py:1601
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:206
 msgid "View latest reviewed records"
 msgstr "Προβολή των εγγραφών με τις πιο πρόσφατες κριτικές"
 
-#: invenio/legacy/webcomment/templates.py:1604
+#: invenio/legacy/webcomment/templates.py:1603
 #: invenio/legacy/webcomment/web/admin/webcommentadmin.py:140
 msgid "View all reviews reported as abuse"
 msgstr "Προβολή των κριτικών που έχουν αναφερθεί ως κακόβουλες"
 
-#: invenio/legacy/webcomment/templates.py:1612
+#: invenio/legacy/webcomment/templates.py:1611
 msgid "View all users who have been reported"
 msgstr "Προβολή όλων των χρηστών που έχουν αναφερθεί"
 
-#: invenio/legacy/webcomment/templates.py:1614
+#: invenio/legacy/webcomment/templates.py:1613
 msgid "Guide"
 msgstr "Οδηγός"
 
-#: invenio/legacy/webcomment/templates.py:1616
+#: invenio/legacy/webcomment/templates.py:1615
 msgid "Comments and reviews are disabled"
 msgstr "Τα σχόλια και οι κριτικές έχουν απενεργοποιηθεί"
 
-#: invenio/legacy/webcomment/templates.py:1636
+#: invenio/legacy/webcomment/templates.py:1635
 msgid ""
 "Please enter the ID of the comment/review so that you can view it before "
 "deciding whether to delete it or not"
@@ -8124,39 +8129,39 @@ msgstr ""
 "Παρακαλώ εισάγετε το ID του σχολίου/κριτικής ώστε να μπορέσετε να το "
 "δείτε πριν αποφασίσετε εάν θα το σβήσετε"
 
-#: invenio/legacy/webcomment/templates.py:1660
+#: invenio/legacy/webcomment/templates.py:1659
 msgid "Comment ID:"
 msgstr "ID σχολίου:"
 
-#: invenio/legacy/webcomment/templates.py:1661
+#: invenio/legacy/webcomment/templates.py:1660
 msgid "Or enter a record ID to list all the associated comments/reviews:"
 msgstr ""
 "Εναλλακτικά, εισάγετε την ταυτότητα εγγραφής για να εμφανίσετε τα σχετικά"
 " σχόλια/κριτικές:"
 
-#: invenio/legacy/webcomment/templates.py:1662
+#: invenio/legacy/webcomment/templates.py:1661
 msgid "Record ID:"
 msgstr "ID εγγραφής:"
 
-#: invenio/legacy/webcomment/templates.py:1664
+#: invenio/legacy/webcomment/templates.py:1663
 msgid "View Comment"
 msgstr "Επισκόπηση Σχολίου"
 
-#: invenio/legacy/webcomment/templates.py:1685
+#: invenio/legacy/webcomment/templates.py:1684
 msgid "There have been no reports so far."
 msgstr "Δεν υπάρχουν ύποπτες αναφορές μέχρι στιγμής."
 
-#: invenio/legacy/webcomment/templates.py:1689
+#: invenio/legacy/webcomment/templates.py:1688
 #, fuzzy, python-format
 msgid "View all %(x_name)s reported comments"
 msgstr "Προβολή των %s ύποπτων σχολίων που υπάρχουν"
 
-#: invenio/legacy/webcomment/templates.py:1692
+#: invenio/legacy/webcomment/templates.py:1691
 #, fuzzy, python-format
 msgid "View all %(x_name)s reported reviews"
 msgstr "Προβολή των %s ύποπτων κριτικών που υπάρχουν"
 
-#: invenio/legacy/webcomment/templates.py:1729
+#: invenio/legacy/webcomment/templates.py:1728
 msgid ""
 "Here is a list, sorted by total number of reports, of all users who have "
 "had a comment reported at least once."
@@ -8164,291 +8169,291 @@ msgstr ""
 "Ακολουθεί μια λίστα από όλους τους χρήστες, των οποίων τα σχόλια τους "
 "αναφέρθηκαν ως ύποπτα, ταξινομημένη με τον συνολικό αριθμό αναφορών."
 
-#: invenio/legacy/webcomment/templates.py:1737
-#: invenio/legacy/webcomment/templates.py:1766
+#: invenio/legacy/webcomment/templates.py:1736
+#: invenio/legacy/webcomment/templates.py:1765
 #: invenio/legacy/websession/templates.py:272
 #: invenio/legacy/websession/templates.py:1221
 #: invenio/modules/accounts/forms.py:46 invenio/modules/accounts/forms.py:164
 msgid "Nickname"
 msgstr "Ψευδώνυμο"
 
-#: invenio/legacy/webcomment/templates.py:1739
-#: invenio/legacy/webcomment/templates.py:1768
+#: invenio/legacy/webcomment/templates.py:1738
+#: invenio/legacy/webcomment/templates.py:1767
 msgid "User ID"
 msgstr "ID Χρήστη"
 
-#: invenio/legacy/webcomment/templates.py:1741
+#: invenio/legacy/webcomment/templates.py:1740
 msgid "Number positive votes"
 msgstr "Αριθμός θετικών ψήφων"
 
-#: invenio/legacy/webcomment/templates.py:1742
+#: invenio/legacy/webcomment/templates.py:1741
 msgid "Number negative votes"
 msgstr "Αριθμός αρνητικών ψήφων"
 
-#: invenio/legacy/webcomment/templates.py:1743
+#: invenio/legacy/webcomment/templates.py:1742
 msgid "Total number votes"
 msgstr "Συνολικός αριθμός ψήφων"
 
-#: invenio/legacy/webcomment/templates.py:1744
+#: invenio/legacy/webcomment/templates.py:1743
 msgid "Total number of reports"
 msgstr "Συνολικός αριθμός αναφορών"
 
-#: invenio/legacy/webcomment/templates.py:1745
+#: invenio/legacy/webcomment/templates.py:1744
 msgid "View all user's reported comments/reviews"
 msgstr "Επισκόπηση των ύποπτων σχολίων/κριτικών όλων των χρηστών"
 
-#: invenio/legacy/webcomment/templates.py:1778
+#: invenio/legacy/webcomment/templates.py:1777
 #, fuzzy, python-format
 msgid "This review has been reported %(x_num)i times"
 msgstr "Αυτη η κριτική έχει αναφερθεί ως ύποπτη %i φορές"
 
-#: invenio/legacy/webcomment/templates.py:1780
+#: invenio/legacy/webcomment/templates.py:1779
 #, fuzzy, python-format
 msgid "This comment has been reported %(x_num)i times"
 msgstr "Αυτό το σχόλιο έχει αναφερθεί ως ύποπτο %i φορές"
 
-#: invenio/legacy/webcomment/templates.py:2029
+#: invenio/legacy/webcomment/templates.py:2028
 msgid "Written by"
 msgstr "Συντάχθηκε από"
 
-#: invenio/legacy/webcomment/templates.py:2030
+#: invenio/legacy/webcomment/templates.py:2029
 msgid "General informations"
 msgstr "Γενικές πληροφορίες"
 
-#: invenio/legacy/webcomment/templates.py:2045
+#: invenio/legacy/webcomment/templates.py:2044
 msgid "Delete selected reviews"
 msgstr "Διαγραφή επιλεγμένων κριτικών"
 
-#: invenio/legacy/webcomment/templates.py:2046
-#: invenio/legacy/webcomment/templates.py:2053
+#: invenio/legacy/webcomment/templates.py:2045
+#: invenio/legacy/webcomment/templates.py:2052
 msgid "Suppress selected abuse report"
 msgstr "Αποσιώπηση επιλεγμένων αναφορών για πιθανή προσβλητική χρήση"
 
-#: invenio/legacy/webcomment/templates.py:2047
+#: invenio/legacy/webcomment/templates.py:2046
 msgid "Undelete selected reviews"
 msgstr "Επαναφέρετε τις επιλεγμένες κριτικές"
 
-#: invenio/legacy/webcomment/templates.py:2051
+#: invenio/legacy/webcomment/templates.py:2050
 msgid "Undelete selected comments"
 msgstr "Επαναφέρετε τα επιλεγμένα σχόλια"
 
-#: invenio/legacy/webcomment/templates.py:2052
+#: invenio/legacy/webcomment/templates.py:2051
 msgid "Delete selected comments"
 msgstr "Διαγραφή επιλεγμένων σχολίων"
 
-#: invenio/legacy/webcomment/templates.py:2067
+#: invenio/legacy/webcomment/templates.py:2066
 #, fuzzy, python-format
 msgid "Here are the reported reviews of user %(x_name)s"
 msgstr "Ορίστε οι ύποπτες κριτικές του χρήστη %s"
 
-#: invenio/legacy/webcomment/templates.py:2069
+#: invenio/legacy/webcomment/templates.py:2068
 #, fuzzy, python-format
 msgid "Here are the reported comments of user %(x_name)s"
 msgstr "Ορίστε τα ύποπτα σχόλια του χρήστη %s"
 
-#: invenio/legacy/webcomment/templates.py:2073
+#: invenio/legacy/webcomment/templates.py:2072
 #, fuzzy, python-format
 msgid "Here is review %(x_name)s"
 msgstr "Η κριτική %s"
 
-#: invenio/legacy/webcomment/templates.py:2075
+#: invenio/legacy/webcomment/templates.py:2074
 #, fuzzy, python-format
 msgid "Here is comment %(x_name)s"
 msgstr "Το σχόλιο %s"
 
-#: invenio/legacy/webcomment/templates.py:2078
+#: invenio/legacy/webcomment/templates.py:2077
 #, python-format
 msgid "Here is review %(x_cmtID)s written by user %(x_user)s"
 msgstr "Η κριτική %(x_cmtID)s γραμμένο από τον χρήστη %(x_user)s"
 
-#: invenio/legacy/webcomment/templates.py:2080
+#: invenio/legacy/webcomment/templates.py:2079
 #, python-format
 msgid "Here is comment %(x_cmtID)s written by user %(x_user)s"
 msgstr "Το σχόλιο %(x_cmtID)s γραμμένο από τον χρήστη %(x_user)s"
 
-#: invenio/legacy/webcomment/templates.py:2086
+#: invenio/legacy/webcomment/templates.py:2085
 msgid "Here are all reported reviews sorted by the most reported"
 msgstr "Ορίστε όλες οι ύποπτες κριτικές, ταξινομημένες κατά αριθμό αναφορών"
 
-#: invenio/legacy/webcomment/templates.py:2088
+#: invenio/legacy/webcomment/templates.py:2087
 msgid "Here are all reported comments sorted by the most reported"
 msgstr "Ορίστε όλα τα ύποπτα σχόλια, ταξινομημένα κατά αριθμό αναφορών"
 
-#: invenio/legacy/webcomment/templates.py:2093
+#: invenio/legacy/webcomment/templates.py:2092
 #, fuzzy, python-format
 msgid "Here are all reviews for record %(x_num)i, sorted by the most reported"
 msgstr ""
 "Εδώ φαίνονται όλες οι κριτικές για την εγγραφή %i, ταξινομημένες κατά "
 "αριθμό αναφορών"
 
-#: invenio/legacy/webcomment/templates.py:2094
+#: invenio/legacy/webcomment/templates.py:2093
 msgid "Show comments"
 msgstr "Εμφάνιση σχολίων"
 
-#: invenio/legacy/webcomment/templates.py:2096
+#: invenio/legacy/webcomment/templates.py:2095
 #, fuzzy, python-format
 msgid "Here are all comments for record %(x_num)i, sorted by the most reported"
 msgstr "Όλα τα σχόλια για την εγγραφή %i, ταξινομημένα κατά αριθμό αναφορών"
 
-#: invenio/legacy/webcomment/templates.py:2097
+#: invenio/legacy/webcomment/templates.py:2096
 msgid "Show reviews"
 msgstr "Εμφάνιση κριτικών"
 
-#: invenio/legacy/webcomment/templates.py:2122
-#: invenio/legacy/webcomment/templates.py:2146
-#: invenio/legacy/webcomment/templates.py:2172
+#: invenio/legacy/webcomment/templates.py:2121
+#: invenio/legacy/webcomment/templates.py:2145
+#: invenio/legacy/webcomment/templates.py:2171
 msgid "comment ID"
 msgstr "ID σχολίου"
 
-#: invenio/legacy/webcomment/templates.py:2122
+#: invenio/legacy/webcomment/templates.py:2121
 msgid "successfully deleted"
 msgstr "διαγράφηκε επιτυχώς"
 
-#: invenio/legacy/webcomment/templates.py:2146
+#: invenio/legacy/webcomment/templates.py:2145
 msgid "successfully undeleted"
 msgstr "επανήλθε επιτυχώς"
 
-#: invenio/legacy/webcomment/templates.py:2172
+#: invenio/legacy/webcomment/templates.py:2171
 msgid "successfully suppressed abuse report"
 msgstr "η αναφορά για πιθανά προσβλητικό περιεχόμενο αποσιωπήθηκε επιτυχώς"
 
-#: invenio/legacy/webcomment/templates.py:2189
+#: invenio/legacy/webcomment/templates.py:2188
 msgid "Not yet reviewed"
 msgstr "Χωρίς κριτική ακόμα"
 
-#: invenio/legacy/webcomment/templates.py:2257
+#: invenio/legacy/webcomment/templates.py:2256
 #, python-format
 msgid "The following review was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
 msgstr ""
 "Η παρακάτω κριτική απεστάλη στην %(CFG_SITE_NAME)s από τον/την "
 "%(user_nickname)s:"
 
-#: invenio/legacy/webcomment/templates.py:2258
+#: invenio/legacy/webcomment/templates.py:2257
 #, python-format
 msgid "The following comment was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
 msgstr ""
 "Το παρακάτω σχόλιο απεστάλη στην %(CFG_SITE_NAME)s από τον/την "
 "%(user_nickname)s:"
 
-#: invenio/legacy/webcomment/templates.py:2285
+#: invenio/legacy/webcomment/templates.py:2284
 msgid "This is an automatic message, please don't reply to it."
 msgstr "Αυτό είναι ένα αυτοματοποιημένο μήνυμα, παρακαλώ μην απαντήσετε."
 
-#: invenio/legacy/webcomment/templates.py:2287
+#: invenio/legacy/webcomment/templates.py:2286
 #, python-format
 msgid "To post another comment, go to <%(x_url)s> instead."
 msgstr "Για αποστολή νέου σχολίου, επισκευτείτε το <%(x_url)s>."
 
-#: invenio/legacy/webcomment/templates.py:2292
+#: invenio/legacy/webcomment/templates.py:2291
 #, python-format
 msgid "To specifically reply to this comment, go to <%(x_url)s>"
 msgstr "Για απάντηση στο συγκεκριμένο σχόλιο, επισκευτείτε το <%(x_url)s"
 
-#: invenio/legacy/webcomment/templates.py:2297
+#: invenio/legacy/webcomment/templates.py:2296
 #, python-format
 msgid "To unsubscribe from this discussion, go to <%(x_url)s>"
 msgstr ""
 "Για να διαγραφείτε από την συγκεκριμένη συζήτηση, επισκευτείτε το "
 "<%(x_url)s"
 
-#: invenio/legacy/webcomment/templates.py:2301
+#: invenio/legacy/webcomment/templates.py:2300
 #, python-format
 msgid "For any question, please use <%(CFG_SITE_SUPPORT_EMAIL)s>"
 msgstr ""
 "Για οποιαδήποτε ερώτηση, παρακαλώ επικοινωνήστε με "
 "<%(CFG_SITE_SUPPORT_EMAIL)s>"
 
-#: invenio/legacy/webcomment/templates.py:2368
+#: invenio/legacy/webcomment/templates.py:2367
 msgid "Your comment will be lost."
 msgstr "Το σχόλιό σας θα χαθεί."
 
-#: invenio/legacy/webcomment/templates.py:2406
+#: invenio/legacy/webcomment/templates.py:2405
 #, fuzzy
 msgid "Oldest comment first"
 msgstr "Διαγραφή σχολίων"
 
-#: invenio/legacy/webcomment/templates.py:2407
+#: invenio/legacy/webcomment/templates.py:2406
 #, fuzzy
 msgid "Latest comment first"
 msgstr "Το τελευταίο, πρώτο"
 
-#: invenio/legacy/webcomment/templates.py:2408
+#: invenio/legacy/webcomment/templates.py:2407
 msgid "Group by record, oldest commented first"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2409
+#: invenio/legacy/webcomment/templates.py:2408
 #, fuzzy
 msgid "Group by record, latest commented first"
 msgstr "Προβολή των εγγραφών με τα πιο πρόσφατα σχόλια"
 
-#: invenio/legacy/webcomment/templates.py:2411
+#: invenio/legacy/webcomment/templates.py:2410
 #, fuzzy
 msgid "Records and comments"
 msgstr "Λεπτομέρειες και σχόλια"
 
-#: invenio/legacy/webcomment/templates.py:2412
+#: invenio/legacy/webcomment/templates.py:2411
 #, fuzzy
 msgid "Records only"
 msgstr "βρέθηκαν εγγραφές"
 
-#: invenio/legacy/webcomment/templates.py:2413
+#: invenio/legacy/webcomment/templates.py:2412
 #, fuzzy
 msgid "Comments only"
 msgstr "Σχόλια"
 
+#: invenio/legacy/webcomment/templates.py:2414
 #: invenio/legacy/webcomment/templates.py:2415
 #: invenio/legacy/webcomment/templates.py:2416
 #: invenio/legacy/webcomment/templates.py:2417
-#: invenio/legacy/webcomment/templates.py:2418
 #, fuzzy, python-format
 msgid "%(x_i)s items"
 msgstr "%i αντικείμενα"
 
-#: invenio/legacy/webcomment/templates.py:2419
+#: invenio/legacy/webcomment/templates.py:2418
 #, fuzzy
 msgid "All items"
 msgstr "Προσθήκη αντικειμένων"
 
-#: invenio/legacy/webcomment/templates.py:2422
+#: invenio/legacy/webcomment/templates.py:2421
 msgid "Below is the list of the comments you have submitted so far."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2426
+#: invenio/legacy/webcomment/templates.py:2425
 msgid "You have not yet submitted any comment in the document \"discussion\" tab."
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2429
-#: invenio/legacy/webcomment/templates.py:2437
-#: invenio/legacy/webcomment/templates.py:2445
+#: invenio/legacy/webcomment/templates.py:2428
+#: invenio/legacy/webcomment/templates.py:2436
+#: invenio/legacy/webcomment/templates.py:2444
 msgid "You might find other comments here: "
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2457
+#: invenio/legacy/webcomment/templates.py:2456
 msgid ""
 "You have not yet submitted any comment. Browse documents from the search "
 "interface and take part to discussions!"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2485
+#: invenio/legacy/webcomment/templates.py:2484
 msgid "Display"
 msgstr "Προβολή"
 
-#: invenio/legacy/webcomment/templates.py:2486
+#: invenio/legacy/webcomment/templates.py:2485
 #, fuzzy
 msgid "Order by"
 msgstr "Ημ/νία παραγγελίας"
 
-#: invenio/legacy/webcomment/templates.py:2487
+#: invenio/legacy/webcomment/templates.py:2486
 #, fuzzy
 msgid "Per page"
 msgstr "Επόμενη σελίδα"
 
-#: invenio/legacy/webcomment/templates.py:2491
+#: invenio/legacy/webcomment/templates.py:2490
 #, fuzzy
 msgid "Display options"
 msgstr "Παρουσίαση ειδοποιήσεων"
 
-#: invenio/legacy/webcomment/templates.py:2492
+#: invenio/legacy/webcomment/templates.py:2491
 #: invenio/legacy/webjournal/adminlib.py:328
 #: invenio/legacy/webjournal/adminlib.py:345
 #: invenio/legacy/webjournal/templates.py:457
@@ -8456,52 +8461,52 @@ msgstr "Παρουσίαση ειδοποιήσεων"
 msgid "Refresh"
 msgstr "Ανανέωση"
 
-#: invenio/legacy/webcomment/templates.py:2521
+#: invenio/legacy/webcomment/templates.py:2520
 msgid "Comment deleted by the moderator"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2523
+#: invenio/legacy/webcomment/templates.py:2522
 msgid "You have deleted this comment: it is not visible by other users"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2530
+#: invenio/legacy/webcomment/templates.py:2529
 #, fuzzy
 msgid "(in reply to a comment)"
 msgstr "Χαρακτηρισμός σχολίου ως μη ενοχλητικό"
 
-#: invenio/legacy/webcomment/templates.py:2535
+#: invenio/legacy/webcomment/templates.py:2534
 msgid "See comment on discussion page"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2574
+#: invenio/legacy/webcomment/templates.py:2573
 #, python-format
 msgid "%(x_num)i comments found in total (not shown on this page)"
 msgstr ""
 
-#: invenio/legacy/webcomment/templates.py:2576
+#: invenio/legacy/webcomment/templates.py:2575
 #, fuzzy, python-format
 msgid "%(x_num)i items found in total"
 msgstr "%i αντικείμενα βρέθηκαν"
 
-#: invenio/legacy/webcomment/webinterface.py:272
-#: invenio/legacy/webcomment/webinterface.py:530
+#: invenio/legacy/webcomment/webinterface.py:276
+#: invenio/legacy/webcomment/webinterface.py:536
 msgid "Record Not Found"
 msgstr "Η εγγραφή δεν βρέθηκε"
 
-#: invenio/legacy/webcomment/webinterface.py:350
-#: invenio/legacy/webcomment/webinterface.py:591
-#: invenio/legacy/webcomment/webinterface.py:668
+#: invenio/legacy/webcomment/webinterface.py:354
+#: invenio/legacy/webcomment/webinterface.py:597
+#: invenio/legacy/webcomment/webinterface.py:674
 msgid "Specified comment does not belong to this record"
 msgstr ""
 
-#: invenio/legacy/webcomment/webinterface.py:359
-#: invenio/legacy/webcomment/webinterface.py:597
-#: invenio/legacy/webcomment/webinterface.py:674
+#: invenio/legacy/webcomment/webinterface.py:363
+#: invenio/legacy/webcomment/webinterface.py:603
+#: invenio/legacy/webcomment/webinterface.py:680
 #, fuzzy
 msgid "You do not have access to the specified comment"
 msgstr "Δεν έχετε τα απαιτούμενα δικαιώματα για να διαγράψετε αυτή τη σημείωση."
 
-#: invenio/legacy/webcomment/webinterface.py:431
+#: invenio/legacy/webcomment/webinterface.py:437
 #, fuzzy, python-format
 msgid ""
 "The size of file \\\"%(x_file)s\\\" (%(x_size)s) is larger than maximum "
@@ -8510,51 +8515,51 @@ msgstr ""
 "Το μέγεθος του αρχείου \\\"%s\\\" (%s) είναι μεγαλύτερο από το μέγιστο "
 "επιτρεπόμενο όριο (%s). Επιλέξτε αρχεία ξανά."
 
-#: invenio/legacy/webcomment/webinterface.py:513
+#: invenio/legacy/webcomment/webinterface.py:519
 #: invenio/legacy/websubmit/templates.py:2445
 #: invenio/legacy/websubmit/templates.py:2446
 msgid "Add Comment"
 msgstr "Προσθήκη σχολίου"
 
-#: invenio/legacy/webcomment/webinterface.py:602
+#: invenio/legacy/webcomment/webinterface.py:608
 msgid "You cannot vote for a deleted comment"
 msgstr ""
 
-#: invenio/legacy/webcomment/webinterface.py:679
+#: invenio/legacy/webcomment/webinterface.py:685
 #, fuzzy
 msgid "You cannot report a deleted comment"
 msgstr "Προβολή όλων των πιθανά προσβλητικών σχολίων"
 
-#: invenio/legacy/webcomment/webinterface.py:826
-#: invenio/legacy/webcomment/webinterface.py:866
+#: invenio/legacy/webcomment/webinterface.py:832
+#: invenio/legacy/webcomment/webinterface.py:872
 msgid "Page Not Found"
 msgstr "Η σελίδα δε βρέθηκε"
 
-#: invenio/legacy/webcomment/webinterface.py:827
+#: invenio/legacy/webcomment/webinterface.py:833
 msgid "The requested comment could not be found"
 msgstr "Το συγκεκριμένο σχόλιο δεν υπάρχει"
 
-#: invenio/legacy/webcomment/webinterface.py:847
+#: invenio/legacy/webcomment/webinterface.py:853
 msgid "You cannot access files of a deleted comment"
 msgstr ""
 
-#: invenio/legacy/webcomment/webinterface.py:867
+#: invenio/legacy/webcomment/webinterface.py:873
 msgid "The requested file could not be found"
 msgstr "Το αρχείο που ζητήσατε δεν υπάρχει"
 
-#: invenio/legacy/webcomment/webinterface.py:910
+#: invenio/legacy/webcomment/webinterface.py:916
 #, fuzzy
 msgid "You are not authorized to use comments."
 msgstr "Δεν έχετε δικαίωμα να χρησιμοποιήσετε τον δανεισμό."
 
-#: invenio/legacy/webcomment/webinterface.py:912
+#: invenio/legacy/webcomment/webinterface.py:918
 #: invenio/legacy/websession/templates.py:635
 #: invenio/legacy/websession/templates.py:788
 #, fuzzy
 msgid "Your Comments"
 msgstr "Σχόλια"
 
-#: invenio/legacy/webcomment/webinterface.py:924
+#: invenio/legacy/webcomment/webinterface.py:930
 #, fuzzy, python-format
 msgid "%(x_name)s View your previously submitted comments"
 msgstr "Προβολή όλων των πιθανά προσβλητικών σχολίων"
@@ -13106,7 +13111,7 @@ msgid "Problem with login."
 msgstr "Σύγκριση με αρχικό"
 
 #: invenio/modules/accounts/views/accounts.py:138
-#, fuzzy, python-format
+#, fuzzy
 msgid "You can now access your account."
 msgstr " Έχετε τώρα πρόσβαση στον %(x_url_open)sλογαριασμό%(x_url_close)s σας."
 
@@ -13594,7 +13599,7 @@ msgid "Record ID %(recid)s is not a number."
 msgstr "Η ταυτότητα εγγραφής %s δεν είναι αριθμός."
 
 #: invenio/modules/comments/forms.py:38 invenio/modules/messages/forms.py:80
-#, fuzzy, python-format
+#, fuzzy
 msgid ""
 "Your message is too long, please edit it. Maximum size allowed is "
 "%{length}i characters."
@@ -13643,12 +13648,12 @@ msgid "Review was sent"
 msgstr "Γράψτε ένα σχόλιο"
 
 #: invenio/modules/comments/views.py:263
-#, fuzzy, python-format
+#, fuzzy
 msgid "Comment has been reported."
 msgstr "Αυτό το σχόλιο έχει αναφερθεί ως ύποπτο %i φορές"
 
 #: invenio/modules/comments/views.py:265
-#, fuzzy, python-format
+#, fuzzy
 msgid "Comment has been already reported."
 msgstr "Αυτό το σχόλιο έχει αναφερθεί ως ύποπτο %i φορές"
 
@@ -13733,7 +13738,7 @@ msgid ""
 msgstr ""
 
 #: invenio/modules/communities/forms.py:150
-#, fuzzy, python-format
+#, fuzzy
 msgid "The identifier already exists. Please choose a different one."
 msgstr "Ένα αρχείο με όνομα %s υπάρχει ήδη. Παρακαλώ επιλέξτε ένα άλλο όνομα."
 
@@ -13878,7 +13883,7 @@ msgid "Invalid deposition type."
 msgstr ""
 
 #: invenio/modules/deposit/views/deposit.py:76
-#, fuzzy, python-format
+#, fuzzy
 msgid "Deposition does not exists."
 msgstr "Η λειτουργία %s δεν υπάρχει."
 
@@ -14165,7 +14170,7 @@ msgstr "Εμφάνιση και των %i συγγραφέων"
 msgid "Manage Files of This Record"
 msgstr "Διαχείριση αρχείων της παρούσας εγγραφής"
 
-#: invenio/modules/formatter/format_elements/bfe_edit_record.py:47
+#: invenio/modules/formatter/format_elements/bfe_edit_record.py:52
 msgid "Edit This Record"
 msgstr "Επεξεργασία της παρούσας εγγραφής"
 
@@ -14373,12 +14378,12 @@ msgstr "Δεν είστε διαχειριστής σε καμία ομάδα."
 msgid "Members"
 msgstr "Χωρίς μέλη."
 
-#: invenio/modules/indexer/admin.py:78
+#: invenio/modules/indexer/admin.py:79
 #, fuzzy
 msgid "Knowledge base name"
 msgstr "Λείπει το όνομα της γνωσιακής βάσης"
 
-#: invenio/modules/indexer/admin.py:81 invenio/modules/indexer/admin.py:93
+#: invenio/modules/indexer/admin.py:82 invenio/modules/indexer/admin.py:93
 #: invenio/modules/knowledge/forms.py:74
 #, fuzzy
 msgid "-None-"
@@ -14388,11 +14393,11 @@ msgstr "Κανένα"
 msgid "Stemming language"
 msgstr ""
 
-#: invenio/modules/indexer/admin.py:99
+#: invenio/modules/indexer/admin.py:98
 msgid "Tokenizer"
 msgstr ""
 
-#: invenio/modules/indexer/admin.py:105
+#: invenio/modules/indexer/admin.py:104
 #, fuzzy
 msgid "Index fields"
 msgstr "οποιοδήποτε πεδίο"
@@ -14438,13 +14443,14 @@ msgid "Create KB \"Dynamic\""
 msgstr ""
 
 #: invenio/modules/knowledge/templates/knowledge/list.html:34
-#, fuzzy, python-format
+#, fuzzy
 msgid "Create new record \"Written As\""
 msgstr "Δεν υπάρχουν εγγραφές που να παραπέμπονται από το %s."
 
 #: invenio/modules/knowledge/templates/knowledge/list.html:34
-msgid "Create KB \"Writtes As\""
-msgstr ""
+#, fuzzy
+msgid "Create KB \"Written As\""
+msgstr "Δεν υπάρχουν εγγραφές που να παραπέμπονται από το %s."
 
 #: invenio/modules/knowledge/templates/knowledge/list.html:70
 #, fuzzy
@@ -14609,19 +14615,19 @@ msgstr ""
 msgid "Confidential"
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:143
+#: invenio/modules/oauth2server/models.py:144
 msgid "Name of application (displayed to users)."
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:154
+#: invenio/modules/oauth2server/models.py:155
 msgid "Optional. Description of the application (displayed to users)."
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:163
+#: invenio/modules/oauth2server/models.py:164
 msgid "Website URL"
 msgstr ""
 
-#: invenio/modules/oauth2server/models.py:164
+#: invenio/modules/oauth2server/models.py:165
 msgid "URL of your application (displayed to users)."
 msgstr ""
 
@@ -15063,7 +15069,7 @@ msgid "Tag name"
 msgstr "Ψευδώνυμο"
 
 #: invenio/modules/tags/views.py:199
-#, fuzzy, python-format
+#, fuzzy
 msgid "is already in use."
 msgstr "Το επιθυμητό nickname %s χρησιμοποιείται ήδη."
 
@@ -15425,7 +15431,7 @@ msgid "just now"
 msgstr "Πρέπει τώρα"
 
 #: invenio/utils/date.py:555
-#, fuzzy, python-format
+#, fuzzy
 msgid " seconds ago"
 msgstr "%s δευτερόλεπτα"
 
@@ -15483,2210 +15489,3 @@ msgstr "οποιουδήποτε έτους"
 #, fuzzy
 msgid " years ago"
 msgstr "έτος"
-
-#~ msgid "Warning: Please, select a valid time"
-#~ msgstr "Προσοχή: Παρακαλώ, επιλέξτε μια σωστή τιμή για τον χρόνο"
-
-#~ msgid "Warning: Please, select a valid file"
-#~ msgstr "Προσοχή: Παρακαλώ, επιλέξτε ένα σωστό αρχείο"
-
-#~ msgid "Warning: The date format is not correct"
-#~ msgstr "Προσοχή: Η μορφή της ημερομηνίας δεν είναι σωστή"
-
-#~ msgid "Warning: Please, select a valid date"
-#~ msgstr "Προσοχή: Παρακαλώ, επιλέξτε μια σωστή ημερομηνία"
-
-#~ msgid ""
-#~ msgstr ""
-
-#~ msgid "Invalid MARCXML"
-#~ msgstr "Μη έγκυρο MARCXML"
-
-#~ msgid " or return to your %(x_url_open)ssearch%(x_url_close)s"
-#~ msgstr " ή επιστρέψτε στην %(x_url_open)sαναζήτησή%(x_url_close)s σας"
-
-#~ msgid "*** basket name ***"
-#~ msgstr "*** όνομα καλαθιού ***"
-
-#~ msgid "<div class=\"webcomment_comment_round_header\">%(x_nb)i Comments"
-#~ msgstr "<div class=\"webcomment_comment_round_header\">%(x_nb)i Σχόλια"
-
-#~ msgid "%(x_name)s"
-#~ msgstr "%(x_name)s"
-
-#~ msgid "Additional Citation Metrics"
-#~ msgstr "Πρόσθετα στατιστικά αναφορών"
-
-#~ msgid "Sorry, you must log in to perform this action."
-#~ msgstr ""
-
-#~ msgid "Please log in first."
-#~ msgstr "Παρακαλώ κάντε login πρώτα."
-
-#~ msgid "Use the top-right menu to log in."
-#~ msgstr "Χρησιμοποιείστε το πάνω δεξιά μενού για να κάνετε login."
-
-#~ msgid "record"
-#~ msgstr "εγγραφή"
-
-#~ msgid "document"
-#~ msgstr "έγγραφο"
-
-#~ msgid "Sorry parameter missing..."
-#~ msgstr "Λυπούμαστε, κάποια παράμετρος λείπει..."
-
-#~ msgid "Next Step"
-#~ msgstr "Επόμενο Βήμα"
-
-#~ msgid "Acquisitions"
-#~ msgstr "Ενέργειες"
-
-#~ msgid "List of ordered books"
-#~ msgstr "Λίστα δανεισμένων βιβλίων"
-
-#~ msgid "Order new book"
-#~ msgstr "Παραγγελία νέου αντίγραφου"
-
-#~ msgid "Renewalls"
-#~ msgstr "Ανανεώσεις"
-
-#~ msgid "A new loan has been registered."
-#~ msgstr "Καταχωρήθηκε αίτηση νέου δανεισμού."
-
-#~ msgid "Associate barcode"
-#~ msgstr "Αντιστοιχίστε σε barcode"
-
-#~ msgid "No hold requests waiting."
-#~ msgstr "Δεν υπάρχουν αιτήσεις κρατήσεων σε αναμονή."
-
-#~ msgid "Select hold request"
-#~ msgstr "Επιλέξτε αίτημα κράτησης"
-
-#~ msgid "Barcode(s)"
-#~ msgstr "Barcode(s)"
-
-#~ msgid "Order new copy"
-#~ msgstr "Παραγγελία νέου αντίγραφου"
-
-#~ msgid "Book Information"
-#~ msgstr "Πληροφορίες Τεκμηρίου"
-
-#~ msgid "EAN"
-#~ msgstr "ΕΑΝ"
-
-#~ msgid "Publication place"
-#~ msgstr "Τοποθεσία έκδοσης"
-
-#~ msgid "Number of pages"
-#~ msgstr "Αριθμός σελίδων"
-
-#~ msgid "Sub-library"
-#~ msgstr "Υπο-Βιβλιοθήκη"
-
-#~ msgid "CERN Central Library"
-#~ msgstr "CERN Central Library"
-
-#~ msgid "Order details"
-#~ msgstr "Λεπτομέρειες δανεισμού"
-
-#~ msgid "Price"
-#~ msgstr "Τιμή"
-
-#~ msgid "Ordered date"
-#~ msgstr "Ημερομηνία παραγγελίας"
-
-#~ msgid "Notes about acquisition"
-#~ msgstr "Λεπτομέρειες σχετικά με προσκτήσεις"
-
-#~ msgid "A new ILL request has been registered with success."
-#~ msgstr "Μια νέα αίτηση διαδανεισμού καταχωρήθηκε επιτυχώς."
-
-#~ msgid "Purchase information updated with success."
-#~ msgstr "Οι πληροφορίες αγοράς ενημερώθηκαν με επιτυχία."
-
-#~ msgid "the beginning"
-#~ msgstr "αρχή"
-
-#~ msgid "now"
-#~ msgstr "τώρα"
-
-#~ msgid "BibCheck Admin"
-#~ msgstr "Διαχείριση BibCheck"
-
-#~ msgid "Not authorized"
-#~ msgstr "Χωρίς εξουσιοδότηση"
-
-#~ msgid "ERROR: %s does not exist"
-#~ msgstr "Σφάλμα: το %s δεν υπάρχει"
-
-#~ msgid "ERROR: %s is not a directory"
-#~ msgstr "Σφάλμα: το %s δεν είναι κατάλογος αρχείων"
-
-#~ msgid "ERROR: %s is not writable"
-#~ msgstr "Σφάλμα: το %s δεν είναι εγγράψιμο"
-
-#~ msgid "Limit to knowledge bases containing string:"
-#~ msgstr "Περιορισμός σε γνωσιακές βάσεις που περιέχουν τη φράση:"
-
-#~ msgid "Really delete"
-#~ msgstr "Επιβεβαίωση διαγραφής"
-
-#~ msgid "Verify syntax"
-#~ msgstr "Επαλήθευση σύνταξης"
-
-#~ msgid "Calling bibcheck -verify failed."
-#~ msgstr "Η εκτέλεση του bibcheck -verify απέτυχε."
-
-#~ msgid "Verify BibCheck config file"
-#~ msgstr "Επιβεβαίωση του αρχείου παραμέτρων του BibCheck"
-
-#~ msgid "Verify problem"
-#~ msgstr "Επιβεβαίωση προβλήματος"
-
-#~ msgid "File"
-#~ msgstr "Αρχείο"
-
-#~ msgid "Edit BibCheck config file"
-#~ msgstr "Τροποποίηση του αρχείου παραμέτρων του BibCheck"
-
-#~ msgid "File %s already exists."
-#~ msgstr "Το αρχείο %s υπάρχει ήδη."
-
-#~ msgid "File %s: written OK."
-#~ msgstr "Αρχείο %s: η εγγραφή πέτυχε."
-
-#~ msgid "File %s: write failed."
-#~ msgstr "Αρχείο %s: η εγγραφή απέτυχε."
-
-#~ msgid "Save BibCheck config file"
-#~ msgstr "Αποθήκευση αρχείου παραμέτρων του BibCheck"
-
-#~ msgid "File %s deleted."
-#~ msgstr "Το αρχείο %s έχει διαγραφεί."
-
-#~ msgid "File %s: delete failed."
-#~ msgstr "Αρχείο %s: η διαγραφή απέτυχε"
-
-#~ msgid "Delete BibCheck config file"
-#~ msgstr "Διαγραφή αρχείου παραμέτρων του BibCheck"
-
-#~ msgid "Guests are not authorized to run batchuploader"
-#~ msgstr ""
-
-#~ msgid "The user '%s' is not authorized to run batchuploader"
-#~ msgstr "Ο χρήστης '%s' δεν έχει δικαίωμα να χρησιμοποιήσει το batchuploader"
-
-#~ msgid "Papers removed from this profile"
-#~ msgstr "Οι δημοσιεύσεις έχουν αφαιρεθεί από το προφίλ αυτό"
-
-#~ msgid "Papers in need of review"
-#~ msgstr "Δημοσιεύσεις που χρειάζονται αξιολόγηση"
-
-#~ msgid "Open Tickets"
-#~ msgstr "Ανοιχτά Tickets"
-
-#~ msgid "Papers of this Person"
-#~ msgstr "Δημοσιεύσεις του ατόμου αυτού"
-
-#~ msgid "Papers _not_ of this Person"
-#~ msgstr "Δημοσιεύσεις που δεν ανήκουν στο άτομο αυτό"
-
-#~ msgid "Tickets for this Person"
-#~ msgstr "Tickets για το άτομο αυτό"
-
-#~ msgid "Additional Data for this Person"
-#~ msgstr "Επιπλέον δεδομένα για το άτομο αυτό"
-
-#~ msgid "Yes, those papers are by this person."
-#~ msgstr "Ναι, αυτές οι δημοσιεύσεις είναι από αυτό το άτομο."
-
-#~ msgid "No, those papers are not by this person"
-#~ msgstr "Όχι, αυτές οι δημοσιεύσεις δεν είναι από αυτό το άτομο."
-
-#~ msgid "Assign to other person"
-#~ msgstr "Άνάθεση σε άλλο άτομο"
-
-#~ msgid "Forget decision"
-#~ msgstr "Παράβλεψη απόφασης"
-
-#~ msgid "Confirm!"
-#~ msgstr "Επιβεβαίωση"
-
-#~ msgid "Yes, this paper is by this person."
-#~ msgstr "Ναι, αυτή η δημοσίευση είναι από αυτό το άτομο."
-
-#~ msgid "Rejected!"
-#~ msgstr "Απορρίφθηκε"
-
-#~ msgid "No, this paper is <i>not</i> by this person"
-#~ msgstr "Όχι, αυτή η δημοσίευση <i>δεν</i> είναι από αυτό το άτομο"
-
-#~ msgid "To other person!"
-#~ msgstr "Σε άλλο άτομο!"
-
-#~ msgid "Confirmed."
-#~ msgstr "Επιβεβαιώθηκε."
-
-#~ msgid "Marked as this person's paper"
-#~ msgstr "Σημάνθηκε ως δημοσίευση αυτού του ατόμου"
-
-#~ msgid "Forget decision!"
-#~ msgstr "Παράβλεψη απόφασης!"
-
-#~ msgid "Forget decision."
-#~ msgstr "Παράβλεψη απόφασης."
-
-#~ msgid "Repeal!"
-#~ msgstr "Ανάκληση!"
-
-#~ msgid "But it's <i>not</i> this person's paper."
-#~ msgstr "Αλλά <i>δεν</i> είναι δημοσίευση αυτού του ατόμου."
-
-#~ msgid "But it <i>is</i> this person's paper."
-#~ msgstr "Αλλά <i>είναι</i> είναι δημοσίευση αυτού του ατόμου."
-
-#~ msgid "Repealed"
-#~ msgstr "Ανακλήθηκε"
-
-#~ msgid "Marked as not this person's paper"
-#~ msgstr "Σημάνθηκε ως δημοσίευση όχι αυτού του ατόμου"
-
-#~ msgid "Your papers"
-#~ msgstr "Οι δημοσιεύσεις μου"
-
-#~ msgid "Not your papers"
-#~ msgstr "Δημοσιεύσεις που δεν ανήκουν σε εσάς"
-
-#~ msgid "These are mine!"
-#~ msgstr "Είναι δικές μου!"
-
-#~ msgid "These are not mine!"
-#~ msgstr "Δεν είναι δικές μου!"
-
-#~ msgid "It's not mine, but I know whose it is!"
-#~ msgstr "Δεν είναι δική μου, αλλά γνωρίζω σε ποιόν ανήκει!"
-
-#~ msgid "Mine!"
-#~ msgstr "Δική μου!"
-
-#~ msgid "This is not my paper!"
-#~ msgstr "Αυτή δεν είναι δική μου δημοσίευση"
-
-#~ msgid "Not Mine."
-#~ msgstr "Δεν είναι δική μου."
-
-#~ msgid "Marked as my paper!"
-#~ msgstr "Σημάνθηκε ως δική μου δημοσίευση!"
-
-#~ msgid "Forget assignment decision"
-#~ msgstr "Παράβλεψη απόφασης ανάθεσης"
-
-#~ msgid "Not Mine!"
-#~ msgstr "Όχι δική μου!"
-
-#~ msgid "But this is mine!"
-#~ msgstr "Μα είναι δική μου!"
-
-#~ msgid "But this is my paper!"
-#~ msgstr "Μα είναι δική μου δημοσίευση!"
-
-#~ msgid "Marked as not your paper."
-#~ msgstr "Σημάνθηκε ως δημοσίευση που δεν ανήκει σε εσάς."
-
-#~ msgid "Tickes you created about this person"
-#~ msgstr "Tickets που δημιουργήσατε για αυτό το άτομο"
-
-#~ msgid "Tickets"
-#~ msgstr "Tickets"
-
-#~ msgid "Request Tickets"
-#~ msgstr "Ticket Αιτήσεων"
-
-#~ msgid "Submit Attribution Information"
-#~ msgstr "Υποβολή πληροφοριών ανάθεσης"
-
-#~ msgid "Please review your actions"
-#~ msgstr "Παρακαλώ εξετάστε τις ενέργειές σας"
-
-#~ msgid "Person search for assignment in progress!"
-#~ msgstr "Η αναζήτηση ατόμου για ανάθεση δημοσιεύσεων είναι σε εξέλιξη!"
-
-#~ msgid "You are searching for a person to assign the following papers:"
-#~ msgstr "Γίνεται αναζήτηση ατόμου για ανάθεση των παρακάτω δημοσιεύσεων:"
-
-#~ msgid "You are going to claim papers for: %s"
-#~ msgstr "Πρόκειται να διεκδικήσετε δημοσιεύσεις για: %s"
-
-#~ msgid "Welcome!"
-#~ msgstr "Καλωσήλθατε!"
-
-#~ msgid "You are about to attribute the following paper"
-#~ msgstr "Πρόκειται να αναθέσετε την παρακάτω δημοσίευση"
-
-#~ msgid "Info"
-#~ msgstr "Πληροφορίες"
-
-#~ msgid "Names variants:"
-#~ msgstr "Εναλλακτικές μορφές ονομάτων:"
-
-#~ msgid "... This tab is currently under construction ... "
-#~ msgstr "... Αυτό το πλαίσιο είναι υπό κατασκευή ..."
-
-#~ msgid "Navigation:"
-#~ msgstr "Πλοήγηση:"
-
-#~ msgid "Run paper attribution for another author"
-#~ msgstr "Εκτέλεση ανάθεσης δημοσιεύσεων για άλλο συγγραφέα"
-
-#~ msgid "Person Interface FAQ"
-#~ msgstr "FAQ διεπαφής ατόμων"
-
-#~ msgid "Person Search"
-#~ msgstr "Αναζήτηση Ατόμων"
-
-#~ msgid "Open tickets"
-#~ msgstr "Ανοιχτά tickets"
-
-#~ msgid "Please Check your entries"
-#~ msgstr "Παρακαλώ ελέξτε τις καταχωρήσεις σας"
-
-#~ msgid "Sorry."
-#~ msgstr "Λυπούμαστε."
-
-#~ msgid "Please provide at least one transaction."
-#~ msgstr "Παρακαλώ δώστε τουλάχιστον μία συναλλαγή."
-
-#~ msgid "Error:"
-#~ msgstr "Σφάλμα:"
-
-#~ msgid "We do not have a publication list for '%s'."
-#~ msgstr "Δεν υπάρχει λίστα δημοσιεύσεων για τον/την '%s'."
-
-#~ msgid "Create a new Person for your search"
-#~ msgstr "Δημιουργήστε ένα νέο άτομο για την αναζήτησή σας"
-
-#~ msgid "YES!"
-#~ msgstr "ΝΑΙ!"
-
-#~ msgid " Attribute Papers To "
-#~ msgstr " Απόδοση δημοσιεύσεων σε "
-
-#~ msgid "Correct my publication lists!"
-#~ msgstr "Διορθώστε την λίστα δημοσιεύσεών μου!"
-
-#~ msgid "This book is sent to you ..."
-#~ msgstr "Το βιβλίο έχει αποσταλλεί σε εσάς ..."
-
-#~ msgid "Id"
-#~ msgstr "Id"
-
-#~ msgid "0 borrower(s) found."
-#~ msgstr "0 δανειζόμενοι βρέθηκαν."
-
-#~ msgid "You can see your loans "
-#~ msgstr "Μπορείτε να δείτε τους δανεισμούς σας"
-
-#~ msgid "."
-#~ msgstr "."
-
-#~ msgid "There %s request(s) on the book who has been returned."
-#~ msgstr "Υπάρχουν %s αιτήσεις σχετικά με το βιβλίο που έχει επιστραφεί."
-
-#~ msgid "There are no requests waiting on the item <strong>%s</strong>."
-#~ msgstr ""
-
-#~ msgid "Hold requests and loans overview on"
-#~ msgstr "Αιτήσεις κρατήσεων και δανεισμών για το"
-
-#~ msgid "Library(ies)"
-#~ msgstr "Βιβλιοθήκη/ες"
-
-#~ msgid "new copy"
-#~ msgstr "νεο αντίγραφο"
-
-#~ msgid "A %s has been added."
-#~ msgstr "Προστέθηκε %s"
-
-#~ msgid "0 library(ies) found."
-#~ msgstr "0 βιβλιοθήκες βρέθηκαν."
-
-#~ msgid "Back borrower's loans"
-#~ msgstr "Επιστροφή στους δανεισμούς"
-
-#~ msgid "period_of_interest_from"
-#~ msgstr "period_of_interest_from"
-
-#~ msgid "jsCal3"
-#~ msgstr "jsCal3"
-
-#~ msgid "period_of_interest_to"
-#~ msgstr "period_of_interest_to"
-
-#~ msgid "jsCal4"
-#~ msgstr "jsCal4"
-
-#~ msgid "Borrower wants only this edition?"
-#~ msgstr "Ο δανειζόμενος επιθυμεί μόνο αυτή την έκδοση;"
-
-#~ msgid "jsCal1"
-#~ msgstr "jsCal1"
-
-#~ msgid "jsCal2"
-#~ msgstr "jsCal2"
-
-#~ msgid "Volume, Issue, Page"
-#~ msgstr "Τόμος, Τεύχος, Σελίδα"
-
-#~ msgid "Barcoce"
-#~ msgstr "Barcode"
-
-#~ msgid "An ILL request has been updated with success."
-#~ msgstr "Το αίτημα διαδανεισμού ενημερώθηκε με επιτυχία."
-
-#~ msgid "Book does not exists on Invenio."
-#~ msgstr "Το βιβλίο δεν υπάρχει στο σύστημα."
-
-#~ msgid "Check if the book already exists on Invenio,"
-#~ msgstr "Έλεγχος αν το βιβλίο υπάρχει στο σύστημα,"
-
-#~ msgid "Book does not exists on Invenio. Please fill the following form."
-#~ msgstr ""
-
-#~ msgid "No fulltext"
-#~ msgstr "Δίχως πλήρες κείμενο"
-
-#~ msgid "last note on"
-#~ msgstr "τελευταία σημείωση σε"
-
-#~ msgid ", no notes yet"
-#~ msgstr ", δίχως σημειώσεις"
-
-#~ msgid "HTML brief"
-#~ msgstr "σύντομη HTML"
-
-#~ msgid "You have "
-#~ msgstr "Εχετε "
-
-#~ msgid "ERROR"
-#~ msgstr "ΣΦΑΛΜΑ"
-
-#~ msgid "already exists."
-#~ msgstr "υπάρχει ήδη."
-
-#~ msgid "deleted"
-#~ msgstr "διεγράφη"
-
-#~ msgid "The left side of the rule "
-#~ msgstr "Αριστερή στήλη του κανόνα"
-
-#~ msgid "The right side of the rule "
-#~ msgstr "Δεξιά στήλη του κανόνα"
-
-#~ msgid "No such knowledge base"
-#~ msgstr "Ανύπαρκτη γνωσιακή βάση"
-
-#~ msgid "Date:"
-#~ msgstr "Ημερομηνία:"
-
-#~ msgid "Time:"
-#~ msgstr "Ώρα:"
-
-#~ msgid "Example:"
-#~ msgstr "Παράδειγμα:"
-
-#~ msgid "All fields with"
-#~ msgstr "Όλα τα πεδία με"
-
-#~ msgid "are mandatory"
-#~ msgstr "είναι υποχρεωτικά"
-
-#~ msgid "Input dir:"
-#~ msgstr "Φάκελος εισόδου:"
-
-#~ msgid "are mandatory."
-#~ msgstr "είναι υποχρεωτικά."
-
-#~ msgid "Check the"
-#~ msgstr "Ελέγξτε την"
-
-#~ msgid " Batch Uploader daemon help page"
-#~ msgstr " σελίδα βοήθειας για το Μαζικό Ανέβασμα"
-
-#~ msgid " for executing these actions periodically."
-#~ msgstr " για την περιοδική εκτέλεση των ενεργειών αυτών."
-
-#~ msgid "Configure Bibknowledge"
-#~ msgstr "Παραμετροποίηση Bibknowledge"
-
-#~ msgid "creating a new basket"
-#~ msgstr "δημιουργία νέου καλαθιού"
-
-#~ msgid "In"
-#~ msgstr "Σε"
-
-#~ msgid "by"
-#~ msgstr "από"
-
-#~ msgid "on"
-#~ msgstr "στις"
-
-#~ msgid "basket"
-#~ msgstr "καλάθι"
-
-#~ msgid "Proceed to the"
-#~ msgstr "Μετάβαση σε"
-
-#~ msgid "previous basket"
-#~ msgstr "προηγούμενο καλάθι"
-
-#~ msgid "or return to your"
-#~ msgstr "ή επιστροφή σε"
-
-#~ msgid "Adding"
-#~ msgstr "Προσθήκη"
-
-#~ msgid "Please choose a basket"
-#~ msgstr "Παρακαλώ επιλέξτε ένα καλάθι"
-
-#~ msgid "Editing basket"
-#~ msgstr "Επεξεργασία καλαθιού"
-
-#~ msgid "Editing topic"
-#~ msgstr "Επεξεργασία θέματος"
-
-#~ msgid " of "
-#~ msgstr " απο "
-
-#~ msgid "niceName"
-#~ msgstr "niceName"
-
-#~ msgid "Apply Changes"
-#~ msgstr "Αποθήκευση Αλλαγών"
-
-#~ msgid "Replace text"
-#~ msgstr "Αντικατάσταση κειμένου"
-
-#~ msgid "Edit this item"
-#~ msgstr "Τροποποίηση του τεκμηρίου αυτού"
-
-#~ msgid "Record %s - Add a field"
-#~ msgstr "Εγγραφή %s - Προσθήκη πεδίου"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s"
-#~ msgstr "Επεξεργασία εγγραφής %(x_recid)s, πεδίο %(x_field)s"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s - Add a subfield"
-#~ msgstr ""
-
-#~ msgid "Submit and save record %s"
-#~ msgstr "Υποβολή και αποθήκευση εγγραφής %s"
-
-#~ msgid "updated on"
-#~ msgstr "ενημέρωθηκε στις"
-
-#~ msgid "records"
-#~ msgstr "εγγραφές"
-
-#~ msgid "Number of views"
-#~ msgstr "Αριθμός επισκοπήσεων"
-
-#~ msgid "Non-shared basket"
-#~ msgstr "Μη-μοιρασμένο καλάθι"
-
-#~ msgid "Group-shared basket"
-#~ msgstr "Μοιρασμένο καλάθι σε ομάδα."
-
-#~ msgid "last"
-#~ msgstr "τελευταίο"
-
-#~ msgid "View comments"
-#~ msgstr "Επισκόπηση σχολίων"
-
-#~ msgid "There is a total of %i comments"
-#~ msgstr "Υπάρχουν συνολικά %i σχόλια"
-
-#~ msgid "Select basket"
-#~ msgstr "Επιλέξτε καλάθι"
-
-#~ msgid "Add to a personal basket"
-#~ msgstr "Προσθήκη σε προσωπικό καλάθι"
-
-#~ msgid "%i baskets"
-#~ msgstr "%i καλάθια"
-
-#~ msgid "Add to a group-shared basket"
-#~ msgstr "Προσθήκη σε καλάθι μοιρασμένο σε ομάδα"
-
-#~ msgid "Adding %i records to these baskets"
-#~ msgstr "Προσθήκη %i εγγραφών στα καλάθια αυτά"
-
-#~ msgid "No records were added to the selected baskets."
-#~ msgstr "Καμία εγγραφή δεν προστέθηκε στα επιλεγμένα καλάθια."
-
-#~ msgid "Add records to baskets"
-#~ msgstr "Προσθήκη εγγραφών στα καλάθια"
-
-#~ msgid "Subscribe to this discussion"
-#~ msgstr "Εγγραφή στο καλάθι αυτό"
-
-#~ msgid "Delete comment(s) or supress abuse report(s)"
-#~ msgstr "Αποσιώπηση αναφορών για πιθανά προσβλητική χρήση"
-
-#~ msgid "Delete Comments"
-#~ msgstr "Διαγραφή Σχολίου"
-
-#~ msgid "ADD TO BASKET"
-#~ msgstr "ΠΡΟΣΘΗΚΗ ΣΤΟ ΚΑΛΑΘΙ"
-
-#~ msgid "Frequently publishes in:"
-#~ msgstr "Δημοσιεύει στο"
-
-#~ msgid "The collection to which this file belong is restricted: "
-#~ msgstr "Η συλλογή στην οποία ανήκει το αρχείο αυτό είναι προστατευμένη."
-
-#~ msgid "You will also lose any unsubmitted changes for this record!"
-#~ msgstr "Όλες οι μη υποβληθείσες αλλαγές για την εγγραφή αυτή, θα χαθούν!"
-
-#~ msgid "This record does not exist. Please try another record ID."
-#~ msgstr "Παρακαλώ δοκιμάστε διαφορετικό αριθμό εγγραφής."
-
-#~ msgid "Cannot edit deleted record.\""
-#~ msgstr "Δεν είναι δυνατό να επεξεργαστείτε μια διαγραμμένη εγγραφή."
-
-#~ msgid "The record will be deleted as soon as the task queue is empty."
-#~ msgstr "Η εγγραφή θα διαγραφεί, μόλις αδειάσει η ουρά εργασιών."
-
-#~ msgid "Please enter the ID of the record you want to edit"
-#~ msgstr "Παρακαλώ εισάγετε το ID της εγγραφής που θέλετε να επεξεργαστείτε"
-
-#~ msgid "Move up"
-#~ msgstr "Μετακίνηση στοιχείου επάνω"
-
-#~ msgid "Move down"
-#~ msgstr "Μετακίνηση στοιχείου κάτω"
-
-#~ msgid "Add Subfield"
-#~ msgstr "Προσθήκη Υποπεδίου"
-
-#~ msgid "Edit institute"
-#~ msgstr "Τροποποίηση ινστιτούτου"
-
-#~ msgid "Add Field"
-#~ msgstr "Προσθήκη Πεδίου"
-
-#~ msgid "Verbose"
-#~ msgstr "Πιο Αναλυτικά"
-
-#~ msgid "Done"
-#~ msgstr "Υποβολή"
-
-#~ msgid "Your changes are TEMPORARY."
-#~ msgstr "Οι αλλαγές σας είναι ΠΡΟΣΩΡΙΝΕΣ."
-
-#~ msgid "To save this record, please click on submit."
-#~ msgstr "Για να αποθηκεύσετε, παρακαλώ επιλέξτε 'υποβολή'."
-
-#~ msgid "Revision %(revdate)s"
-#~ msgstr "Εγγραφή #%(recid)s, έκδοση %(revdate)s"
-
-#~ msgid "current version"
-#~ msgstr "Τρέχοντα μέλη"
-
-#~ msgid "Edit current version"
-#~ msgstr "Τροποποίηση παραμέτρων"
-
-#~ msgid "View revision"
-#~ msgstr "τμήμα"
-
-#~ msgid "Back to BibEdit"
-#~ msgstr "Επιστροφή στα καλάθια"
-
-#~ msgid "select_from1"
-#~ msgstr "επιλογή χρήστη"
-
-#~ msgid "select_to1"
-#~ msgstr "Επιλογή θέματος"
-
-#~ msgid "No more requests are waiting."
-#~ msgstr "Κάποια έγγραφα εκκρεμούν ακόμη"
-
-#~ msgid "next page >>>"
-#~ msgstr "Επόμενη σελίδα"
-
-#~ msgid "<<< previous page"
-#~ msgstr "Προηγούμενη σελίδα"
-
-#~ msgid "last page >>|"
-#~ msgstr "τελευταία ενημέρωση"
-
-#~ msgid "from"
-#~ msgstr "Από:"
-
-#~ msgid "Please try another record ID."
-#~ msgstr "Παρακαλώ δοκιμάστε διαφορετικό αριθμό εγγραφής."
-
-#~ msgid "This record is currently being edited by another user."
-#~ msgstr "Αυτή η εγγραφή επεξεργάζεται από κάποιον άλλο χρήστη."
-
-#~ msgid "Cannot edit deleted record."
-#~ msgstr "Δεν είναι δυνατό να επεξεργαστείτε μια διαγραμμένη εγγραφή."
-
-#~ msgid "There are record revisions not yet synchronized with the database."
-#~ msgstr ""
-
-#~ msgid "Please try again in a few minutes."
-#~ msgstr "Παρακαλώ ξαναδοκιμάστε αργότερα."
-
-#~ msgid "Record #%s"
-#~ msgstr "Εγγραφή #%s"
-
-#~ msgid "Record #%(recid)s, revision %(revdate)s"
-#~ msgstr "Εγγραφή #%(recid)s, έκδοση %(revdate)s"
-
-#~ msgid "older versions"
-#~ msgstr "παλιότερες εκδόσεις"
-
-#~ msgid "Configure BibHarvest"
-#~ msgstr "Παραμετροποίηση BibHarvest"
-
-#~ msgid "View all reported reviews"
-#~ msgstr "Προβολή όλων των πιθανά προσβλητικών κριτικών"
-
-#~ msgid "Delete a specific comment/review (by ID)"
-#~ msgstr "Διαγραφή ενός συγκεκριμένου σχολίου/κριτικής (με ID)"
-
-#~ msgid "Here is comment/review %s"
-#~ msgstr "Ορίστε το σχόλιο/κριτική %s"
-
-#~ msgid "Here is comment/review %(x_cmtID)s written by user %(x_user)s"
-#~ msgstr ""
-
-#~ msgid "Delete Comment"
-#~ msgstr "Διαγραφή Σχολίου"
-
-#~ msgid "No words index available for"
-#~ msgstr "Δεν υπάρχει ευρετήριο λέξεων για"
-
-#~ msgid "No phrase index available for"
-#~ msgstr "Δεν υπάρχει ευρετήριο φράσεων για"
-
-#~ msgid "Publishes in"
-#~ msgstr "Δημοσιεύει στο"
-
-#~ msgid "session"
-#~ msgstr "συνεδρία"
-
-#~ msgid "alerts"
-#~ msgstr "ειδοποιήσεις"
-
-#~ msgid "account"
-#~ msgstr "Λογαριασμός"
-
-#~ msgid "messages"
-#~ msgstr "μηνύματα"
-
-#~ msgid "groups"
-#~ msgstr "ομάδες"
-
-#~ msgid "statistics"
-#~ msgstr "στατιστικά"
-
-#~ msgid "approvals"
-#~ msgstr "εγκρίσεις"
-
-#~ msgid "administration"
-#~ msgstr "διαχείριση"
-
-#~ msgid "Please send an error report to the Administrator."
-#~ msgstr "Παρακαλώ αποστείλατε την αναφορά σφάλματος στον Διαχειριστή."
-
-#~ msgid "Invalid parameter"
-#~ msgstr "Λανθασμένη παράμετρος"
-
-#~ msgid "Unable to find the submission directory."
-#~ msgstr "Δεν είναι δυνατόν να βρεθεί ο κατάλογος υποβολών."
-
-#~ msgid "Unable to create a directory for this submission."
-#~ msgstr "Δεν είναι δυνατόν να δημιουργηθεί κατάλογος για την υποβολή αυτή."
-
-#~ msgid "Cannot create submission directory."
-#~ msgstr "Δεν είναι δυνατόν να δημιουργηθεί κατάλογος υποβολών."
-
-#~ msgid "Unknown form field found on one of the submission pages."
-#~ msgstr "Άγνωστο πεδίο βρέθηκε σε μια από τις σελίδες υποβολής."
-
-#~ msgid "Unable to find document type."
-#~ msgstr "Δεν είναι δυνατόν να βρεθεί ο τύπος εγγράφου."
-
-#~ msgid "Go to general approval workflow"
-#~ msgstr "Μεταφορά σε ροή εργασίας απλής έγκρισης"
-
-#~ msgid "List of direct approval categories"
-#~ msgstr "Λίστα κατηγοριών με άμεση έγκριση"
-
-#~ msgid "Specific Approval and Refereeing Workflow"
-#~ msgstr "Ροή εργασίας ειδικών εγκρίσεων και αξιολογήσεων"
-
-#~ msgid "There is no format configured for this journals index page"
-#~ msgstr ""
-
-#~ msgid "There is no format configured for this journals search page"
-#~ msgstr ""
-
-#~ msgid "There is no format configured for this journals popup page"
-#~ msgstr ""
-
-#~ msgid "We could not find a current issue in the Database"
-#~ msgstr "Δεν μπόρεσε να βρεθεί ένα τρέχον τεύχος στην Βάση"
-
-#~ msgid "link"
-#~ msgstr "παραπομπή"
-
-#~ msgid "links"
-#~ msgstr "παραπομπές"
-
-#~ msgid "CERN %(link_or_links)s"
-#~ msgstr "CERN %(link_or_links)s"
-
-#~ msgid "External %(link_or_links)s"
-#~ msgstr "Εξωτερικά %(link_or_links)s"
-
-#~ msgid "Sort:"
-#~ msgstr "Ταξινόμηση με:"
-
-#~ msgid "Parameter docid missing"
-#~ msgstr "Η παράμετρος docid λείπει"
-
-#~ msgid "We need you to login"
-#~ msgstr "Απαιτείται να κάνετε login"
-
-#~ msgid "Alert sent successfully!"
-#~ msgstr "Η ειδοποίηση απεστάλλη επιτυχώς!"
-
-#~ msgid "Webjournal Administration Interface"
-#~ msgstr "Περιβάλλον Διαχείρισης WebSubmit"
-
-#~ msgid "No popup type"
-#~ msgstr "Δεν υπάρχει τύπος αναδυόμενου παραθύρου"
-
-#~ msgid "We could not know what kind of popup you requested"
-#~ msgstr "Δεν γνωρίζουμε τι τύπο αναδυόμενου παραθύρου ζητήσατε"
-
-#~ msgid "Available journals"
-#~ msgstr "Διαθέσιμα περιοδικά"
-
-#~ msgid "Please note that this URL will remain valid for about %s days only."
-#~ msgstr ""
-
-#~ msgid "   Username/Email: %s\n"
-#~ msgstr "   Όνομα χρήστη/Email:"
-
-#~ msgid "   Password: %s\n"
-#~ msgstr "   Κωδικός:"
-
-#~ msgid "Migrate BibFormat Settings"
-#~ msgstr "Μεταφορά Ρυθμίσεων BibFormat"
-
-#~ msgid "Migrate Knowledge Bases"
-#~ msgstr "Μεταφορά Γνωσιακών Βάσεων"
-
-#~ msgid "Migrate Behaviours"
-#~ msgstr "Μεταφορά Συμπεριφορών (Behaviours)"
-
-#~ msgid "Migrate Formats"
-#~ msgstr "Μεταφορά Μορφών Εξόδου"
-
-#~ msgid "Your account created on"
-#~ msgstr "Ο Λογαριασμός σας δημιουργήθηκε στις"
-
-#~ msgid "You have created a new account on"
-#~ msgstr "Δημιουργήστε έναν νέο λογαριασμό στις"
-
-#~ msgid "No Articles"
-#~ msgstr "Άρθρο"
-
-#~ msgid "No Issues"
-#~ msgstr "Δεν υπάρχουν μηνύματα"
-
-#~ msgid "Article Error"
-#~ msgstr "Άρθρο"
-
-#~ msgid "%s Personalize, Main page"
-#~ msgstr "Ρυθμίσεις"
-
-#~ msgid "%s , personalize"
-#~ msgstr "Ρυθμίσεις"
-
-#~ msgid "Successfully featured record: %s"
-#~ msgstr "η αναφορά για πιθανά προσβλητικό περιεχόμενο αποσιωπήθηκε επιτυχώς"
-
-#~ msgid "Convert"
-#~ msgstr "Μετατροπή"
-
-#~ msgid "Agenda"
-#~ msgstr "Ατζέντα"
-
-#~ msgid "Webcast"
-#~ msgstr "Webcast"
-
-#~ msgid "Search Help"
-#~ msgstr "Βοήθεια αναζήτησης"
-
-#~ msgid "Format:"
-#~ msgstr "Μορφοποίηση:"
-
-#~ msgid "Send lost password"
-#~ msgstr "Αποστολή κωδικού"
-
-#~ msgid "Here are your user credentials for"
-#~ msgstr "Ορίστε τα διαπιστευτήριά σας για"
-
-#~ msgid "username"
-#~ msgstr "όνομα χρήστη"
-
-#~ msgid "password"
-#~ msgstr "κωδικός"
-
-#~ msgid "You can login at"
-#~ msgstr "Μπορείτε να κάνετε login στο"
-
-#~ msgid "You seem to be %(x_role)s."
-#~ msgstr "Φαίνεται να είστε %(x_role)s."
-
-#~ msgid "Credentials for"
-#~ msgstr "Διαπιστευτήρια για"
-
-#~ msgid "Unable to find file."
-#~ msgstr "Δεν είναι δυνατό να βρεθεί το αρχείο."
-
-#~ msgid "Cannot find submission directory."
-#~ msgstr "Δεν είναι δυνατόν να βρεθεί ο κατάλογος υποβολών."
-
-#~ msgid "Login via:"
-#~ msgstr "Είσοδος μέσω:"
-
-#~ msgid "Edit parameters"
-#~ msgstr "Τροποποίηση παραμέτρων"
-
-#~ msgid "Try your search on..."
-#~ msgstr "Δοκιμάστε την έρευνά σας στο..."
-
-#~ msgid "Timeout"
-#~ msgstr "Ώρα"
-
-#~ msgid "See results"
-#~ msgstr "αποτελέσματα"
-
-#~ msgid "%(num)s results found"
-#~ msgstr "%s εγγραφές βρέθηκαν"
-
-#~ msgid "No result found"
-#~ msgstr "Δεν βρέθηκαν ερωτήματα"
-
-#~ msgid "user #%i"
-#~ msgstr "χρήστης #%i"
-
-#~ msgid "GROUP_DELETED"
-#~ msgstr "ΔΙΑΓΡΑΦΗ"
-
-#~ msgid "MEMBER_DELETED"
-#~ msgstr "ΔΙΑΓΡΑΦΗ"
-
-#~ msgid "You can now go back to %s."
-#~ msgstr "Μπορείτε να επιστρέψετε στο %s."
-
-#~ msgid "You can now go back to"
-#~ msgstr "Μπορείτε να επιστρέψετε στο"
-
-#~ msgid "Sort by"
-#~ msgstr "Ταξινόμηση με"
-
-#~ msgid "%s wrote on %s:"
-#~ msgstr "%s καταγράφηκε στις %s:"
-
-#~ msgid "Words nearest to"
-#~ msgstr "Κοντινές λέξεις σε"
-
-#~ msgid "inside"
-#~ msgstr "μέσα"
-
-#~ msgid "No waiting member"
-#~ msgstr "Δεν βρέθηκε χρήστης σε αναμονή"
-
-#~ msgid "Waiting members"
-#~ msgstr "Χρήστες σε αναμονή"
-
-#~ msgid "Group: <b>%s</b>"
-#~ msgstr "Ομάδα: <b>%s</b>"
-
-#~ msgid "Please select"
-#~ msgstr "Παρακαλώ επιλέξτε"
-
-#~ msgid "Please Select:"
-#~ msgstr "Παρακαλώ Επιλέξτε"
-
-#~ msgid "Add member"
-#~ msgstr "Προσθήκη μέλους"
-
-#~ msgid "Bring item up"
-#~ msgstr "Μετακίνηση στοιχείου επάνω"
-
-#~ msgid "You're not member of a group"
-#~ msgstr "Δεν είστε μέλος ομάδας"
-
-#~ msgid "Cannot find number of pages."
-#~ msgstr "Δεν μπορώ να βρώ τον αριθμό των σελίδων."
-
-#~ msgid "Cannot find document."
-#~ msgstr "Δεν μπορώ να βρω το έγγραφο."
-
-#~ msgid "You now have to"
-#~ msgstr "Τώρα πρέπει να"
-
-#~ msgid "All of the words"
-#~ msgstr "Όλες οι λέξεις"
-
-#~ msgid "Any of the words"
-#~ msgstr "Οποιαδήποτε από τις λέξεις"
-
-#~ msgid "Exact phrase"
-#~ msgstr "Ακριβής φράση"
-
-#~ msgid "Partial phrase"
-#~ msgstr "Επιμέρους φράση"
-
-#~ msgid "Regular expression"
-#~ msgstr "Regular expression"
-
-#~ msgid "Added since"
-#~ msgstr "Προστέθηκαν από"
-
-#~ msgid "Record #%d: %s"
-#~ msgstr "Εγγραφή #%d: %s"
-
-#~ msgid "your submissions"
-#~ msgstr "των υποβολών"
-
-#~ msgid "your approvals"
-#~ msgstr "των εγκρίσεών"
-
-#~ msgid "Edit<br/>members"
-#~ msgstr "Τροποποίηση μελών"
-
-#~ msgid "Create New Group"
-#~ msgstr "Δημιουργία Νέας Ομάδας"
-
-#~ msgid "Error: %s"
-#~ msgstr "Σφάλμα: %s"
-
-#~ msgid "error"
-#~ msgstr "σφάλμα"
-
-#~ msgid "warning"
-#~ msgstr "προειδοποίηση"
-
-#~ msgid "Submission no(1)"
-#~ msgstr "Υποβολή Νο(1)"
-
-#~ msgid "record #%s"
-#~ msgstr "εγγραφή #%s"
-
-#~ msgid "pending"
-#~ msgstr "εκκρεμούν"
-
-#~ msgid "click here"
-#~ msgstr "κάντε κλίκ εδώ"
-
-#~ msgid "This Document has been <strong class=\"headline\">approved</strong>."
-#~ msgstr ""
-
-#~ msgid "This Document has been <strong class=\"headline\">rejected</strong>."
-#~ msgstr ""
-
-#~ msgid "%s"
-#~ msgstr "%s"
-
-#~ msgid "Detailed record #%s"
-#~ msgstr "Αναλυτική εγγραφή #%s"
-
-#~ msgid "These users are overquota: "
-#~ msgstr "Οι παρακάτω χρήστε έχουν ξεπεράσει το όριο χρήσης: "
-
-#~ msgid "Search term <em>%s</em>"
-#~ msgstr "Όρος αναζήτησης <em>%s</em>"
-
-#~ msgid "inside <em>%s</em> index"
-#~ msgstr "στο <em>%s</em> ευρετήριο"
-
-#~ msgid "%s will temporarly be displayed as author of this comment."
-#~ msgstr "Ο %s θα εμφανίζεται προσωρινά ως συγγραφέας του σχολίου αυτού"
-
-#~ msgid "Article:"
-#~ msgstr "Άρθρο:"
-
-#~ msgid "Comment:"
-#~ msgstr "Σχόλιο:"
-
-#~ msgid "Write a %s"
-#~ msgstr "Γράψτε μια %s"
-
-#~ msgid "#"
-#~ msgstr "#"
-
-#~ msgid "Discuss this document:"
-#~ msgstr "Συζήτηση για στο έγγραφο:"
-
-#~ msgid "(Report abuse)"
-#~ msgstr "(Αναφορά κακόβουλης χρήσης)"
-
-#~ msgid "Average review score"
-#~ msgstr "Μέσος βαθμολογία κριτικών"
-
-#~ msgid "based on %(nb_comments_total)s reviews"
-#~ msgstr "βασισμένο σε %(nb_comments_total)s κριτικές"
-
-#~ msgid "MARC"
-#~ msgstr "MARC"
-
-#~ msgid "Please try to come back later."
-#~ msgstr "Παρακαλώ δοκιμάστε αργότερα."
-
-#~ msgid "Please enter"
-#~ msgstr "Παρακαλώ εισάγετε"
-
-#~ msgid "to edit"
-#~ msgstr "προς επεξεργασία"
-
-#~ msgid "detailed list"
-#~ msgstr "αναλυτική λίστα"
-
-#~ msgid "your searches"
-#~ msgstr "έρευνές σας"
-
-#~ msgid "%i others' baskets"
-#~ msgstr "%i καλάθια άλλων"
-
-#~ msgid "View all Reported %s"
-#~ msgstr "Επισκόπηση όλων των %s που έχουν αναφερθεί"
-
-#~ msgid "Export as"
-#~ msgstr "Εξαγωγή ως"
-
-#~ msgid "Search Services"
-#~ msgstr "Παραδείγματα αναζήτησης"
-
-#~ msgid "Citation Metrics"
-#~ msgstr "Στατιστικά Παραπομπών"
-
-#~ msgid "WebSearch Admin Guide"
-#~ msgstr "Οδηγός αναζήτησης"
-
-#~ msgid "Submit Guide"
-#~ msgstr "Οδηγός υποβολής εγγράφου"
-
-#~ msgid "Add to personal basket"
-#~ msgstr "Προσθήκη στο προσωπικό καλάθι"
-
-#~ msgid "WebSubmit Admin Guide"
-#~ msgstr "Οδηγός διαχείρισης WebSubmit"
-
-#~ msgid "Click here to review the transactions."
-#~ msgstr "Πατήστε εδώ για να επανεξετάσετε τις ενέργειες."
-
-#~ msgid "Quit searching."
-#~ msgstr "Άκύρωση έρευνας."
-
-#~ msgid ""
-#~ "When you merge a set of profiles,"
-#~ " all the information stored will be"
-#~ " assigned to the primary profile. "
-#~ "This includes papers, ids or citations."
-#~ " After merging, only the primary "
-#~ "profile will remain in the system, "
-#~ "all other profiles will be automatically"
-#~ " deleted.</br>"
-#~ msgstr ""
-
-#~ msgid "Cancel merging"
-#~ msgstr "Ακυρώθηκε"
-
-#~ msgid "Merge profiles"
-#~ msgstr ""
-
-#~ msgid "Claim for yourself"
-#~ msgstr ""
-
-#~ msgid "Assign to"
-#~ msgstr ""
-
-#~ msgid "Search for a person to assign the paper to"
-#~ msgstr " Αναζήτηση ατόμου για την ανάθεση της δημοσίευσης αυτής"
-
-#~ msgid "Select All"
-#~ msgstr "Επιλογή Όλων"
-
-#~ msgid "Select None"
-#~ msgstr "Επιλογή Κανενός"
-
-#~ msgid "Invert Selection"
-#~ msgstr "Αντιστροφή Επιλογής"
-
-#~ msgid "Hide successful claims"
-#~ msgstr "Απόκρυψη επιτυχημένων διεκδικήσεων"
-
-#~ msgid "Paper Short Info"
-#~ msgstr ""
-
-#~ msgid "Author Name"
-#~ msgstr "Συγγραφέας"
-
-#~ msgid "Experiment"
-#~ msgstr "πείραμα"
-
-#~ msgid "Not assigned"
-#~ msgstr "Όχι δική μου"
-
-#~ msgid "No status information found."
-#~ msgstr "Δεν βρέθηκαν πληροφορίες κατάστασης."
-
-#~ msgid "Operator review of user actions pending"
-#~ msgstr "Εκκρεμεί επανεξέταση των ενεργειών του χρήστη από τον διαχειριστή"
-
-#~ msgid "Sorry, there are currently no records to be found in this category."
-#~ msgstr "Δεν υπάρχουν εγγραφές σε αυτή την κατηγορία."
-
-#~ msgid "Review Transaction"
-#~ msgstr "Επανεξέταση ενεργειών"
-
-#~ msgid "On all pages"
-#~ msgstr " Σε όλες τις σελίδες: "
-
-#~ msgid "With selected do"
-#~ msgstr "Απορρίφθηκε στις:"
-
-#~ msgid "View name variants"
-#~ msgstr "Παραλλαγές του ονόματος"
-
-#~ msgid "The author has an internal ID!"
-#~ msgstr "Εμφανίστηκε ένα εσωτερικό σφάλμα"
-
-#~ msgid "These records have been marked as not being from this person."
-#~ msgstr "Οι εγγραφές αυτές σημάνθηκαν οτι δεν ανήκουν σε αυτό το άτομο."
-
-#~ msgid "They will be regarded in the next run of the author "
-#~ msgstr "Θα εξετασθούν στην επόμενη εκτέλεση του αλγορίθμου "
-
-#~ msgid "disambiguation algorithm and might disappear from this listing."
-#~ msgstr ""
-#~ "αποσαφήνισης συγγραφέα και ενδέχεται να "
-#~ "εξαφανιστούν από αυτόν τον κατάλογο."
-
-#~ msgid "No comments"
-#~ msgstr "Δίχως σχόλια"
-
-#~ msgid "Not Available"
-#~ msgstr "Μη διαθέσιμο"
-
-#~ msgid " Delete this ticket"
-#~ msgstr " Διαγραφή αυτού του ticket"
-
-#~ msgid " Commit this entire ticket"
-#~ msgstr " Αποθήκευση αυτού του ticket"
-
-#~ msgid "No title available"
-#~ msgstr "Μη διαθέσιμο"
-
-#~ msgid "Make sure we match the right names!"
-#~ msgstr ""
-
-#~ msgid "Please select an author on each of the records that will be assigned."
-#~ msgstr "Παρακαλώ επιλέξτε έναν συγγραφέα για τις εν λόγω εγγραφές."
-
-#~ msgid "Papers without a name selected will be ignored in the process."
-#~ msgstr "Τα κουτιά που δεν επιλέχθηκαν, θα αγνοηθούν στην διαδικασία."
-
-#~ msgid "Claim for person with id"
-#~ msgstr ""
-
-#~ msgid "This seems to be an empty profile without names associated to it yet"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "(the names will be automatically "
-#~ "gathered when the first paper is "
-#~ "claimed to this profile)."
-#~ msgstr ""
-
-#~ msgid "Select name for"
-#~ msgstr "Επιλέξτε όνομα για"
-
-#~ msgid "Error retrieving record title"
-#~ msgstr "Λάθος κατά την ανάκτηση του τίτλου της εγγραφής"
-
-#~ msgid "Paper title: "
-#~ msgstr "Τίτλος δημοσίευσης: "
-
-#~ msgid "Ignore"
-#~ msgstr "Παράβλεψη"
-
-#~ msgid "The following names have been automatically chosen:"
-#~ msgstr "Τα παρακάτω ονόματα επιλέχθηκαν αυτόματα:"
-
-#~ msgid " --  With name: "
-#~ msgstr " -- Με όνομα: "
-
-#~ msgid "Symbols legend: "
-#~ msgstr "Λεζάντα συμβόλων: "
-
-#~ msgid "Everything is shiny, captain!"
-#~ msgstr "Όρτσα τα πανιά καπετάνιε!"
-
-#~ msgid "The result of this request will be visible immediately"
-#~ msgstr "Το αποτέλεσμα του αιτήματος αυτού θα είναι άμεσα ορατό"
-
-#~ msgid "Confirmation needed to continue"
-#~ msgstr "Χρειάζεται επιβεβαίωση για συνέχεια"
-
-#~ msgid ""
-#~ "The result of this request will be"
-#~ " visible immediately but we need your"
-#~ " confirmation to do so for this "
-#~ "paper has been manually claimed before"
-#~ msgstr ""
-#~ "Το αποτέλεσμα του αιτήματος αυτού θα "
-#~ "είναι άμεσα ορατό, αλλά χρειαζόμαστε "
-#~ "επιβεβαίωση του αιτήματος επειδή η "
-#~ "δημοσίευση αυτή έχει διεκδικηθεί χειροκίνητα"
-#~ " στο παρελθόν"
-
-#~ msgid "This will create a change request for the operators"
-#~ msgstr "Αυτό θα δημιουργήσει ένα αίτημα αλλάγής προς τους διαχειριστές"
-
-#~ msgid ""
-#~ "The result of this request will be"
-#~ " visible upon confirmation through an "
-#~ "operator"
-#~ msgstr ""
-#~ "Το αποτέλεσμα του αιτήματος αυτού θα "
-#~ "γίνει ορατό μετά από επιβεβαίωση ενός"
-#~ " διαχειριστή"
-
-#~ msgid "Selected name on paper"
-#~ msgstr "Επιλεγμένο όνομα στην δημοσίευση"
-
-#~ msgid "Verification needed to continue"
-#~ msgstr "Χρειάζεται επιβεβαίωση για συνέχεια"
-
-#~ msgid "This will create a request for the operators"
-#~ msgstr "Αυτό θα δημιουργήσει ένα αίτημα προς τους διαχειριστές"
-
-#~ msgid "Please provide your information"
-#~ msgstr "Παρακαλώ παρέχετε τις πληροφορίες σας"
-
-#~ msgid "Please provide your first name"
-#~ msgstr "Παρακαλώ παρέχετε το κύριο όνομά σας"
-
-#~ msgid "Your first name:"
-#~ msgstr "Το κύριο όνομά σας:"
-
-#~ msgid "Please provide your last name"
-#~ msgstr "Παρακαλώ παρέχετε το επίθετό σας"
-
-#~ msgid "Your last name:"
-#~ msgstr "Το επίθετό σας:"
-
-#~ msgid "Please provide your eMail address"
-#~ msgstr "Παρακαλώ δώστε τη διεύθυνση ηλεκτρονικού ταχυδρομείου σας"
-
-#~ msgid ""
-#~ "This eMail address is reserved by "
-#~ "a user. Please log in or provide"
-#~ " an alternative eMail address"
-#~ msgstr ""
-#~ "Αυτή η διεύθυνση email χρησιμοποιείται "
-#~ "ήδη από κάποιον χρήστη. Παρακαλώ κάντε"
-#~ " login ή δώστε κάποια εναλλακτική "
-#~ "διεύθυνση email"
-
-#~ msgid "Your eMail:"
-#~ msgstr "Το email σας:"
-
-#~ msgid "You may leave a comment (optional)"
-#~ msgstr "Προαιρετικά μπορείτε να αφήσετε κάποιο σχόλιο"
-
-#~ msgid "Continue claiming*"
-#~ msgstr "Συνέχιση διεκδίκησης*"
-
-#~ msgid "Confirm these changes**"
-#~ msgstr "Επιβεβαίωση των αλλαγών**"
-
-#~ msgid "!Delete the entire request!"
-#~ msgstr "!Διαγραφή όλης της αίτησης!"
-
-#~ msgid "Mark as your documents"
-#~ msgstr "Επισήμανση των εγγράφων ως δικά σας"
-
-#~ msgid "Mark as _not_ your documents"
-#~ msgstr "Επισήμανση των εγγράφων ως _μη_ δικά σας"
-
-#~ msgid "Nothing staged as not yours"
-#~ msgstr "Τίποτα εκκρεμές ως μη δικό σας"
-
-#~ msgid "Mark as their documents"
-#~ msgstr "Επισήμανση ως δικά τους έγγραφα"
-
-#~ msgid "Nothing staged in this category"
-#~ msgstr "Τίποτα εκκρεμές σε αυτήν την κατηγορία"
-
-#~ msgid "Mark as _not_ their documents"
-#~ msgstr "Επισήμανση ως _μη_ δικά τους έγγραφα"
-
-#~ msgid "  * You can come back to this page later. Nothing will be lost. <br />"
-#~ msgstr ""
-#~ " * Μπορείτε να επιστρέψετε αργότερα "
-#~ "στην σελίδα αυτή. Τίποδα δεν θα "
-#~ "χαθεί. <br />"
-
-#~ msgid ""
-#~ "  ** Performs all requested changes. "
-#~ "Changes subject to permission restrictions "
-#~ "will be submitted to an operator "
-#~ "for manual review."
-#~ msgstr ""
-#~ "  ** Εκτελεί όλες τις αιτούμενες "
-#~ "αλλαγές. Αλλαγές που χρειάζονται άδεια, "
-#~ "θα αποσταλλούν σε κάποιο διαχειριστή για"
-#~ " έλεγχο."
-
-#~ msgid "Create a new Person"
-#~ msgstr "δημιουργία νέου"
-
-#~ msgid "This is my profile"
-#~ msgstr "Αυτή είναι δική μου δημοσίευση!"
-
-#~ msgid "Assign paper"
-#~ msgstr "Ανάθεση σε άλλο άτομο"
-
-#~ msgid "Add to merge list"
-#~ msgstr "Προσθήκη σε χρήστες"
-
-#~ msgid ""
-#~ "We do not have a publication list"
-#~ " for '%s'. Try using a less "
-#~ "specific author name, or check back "
-#~ "in a few days as attributions are"
-#~ " updated frequently.  Or you can send"
-#~ " us feedback, at "
-#~ msgstr ""
-
-#~ msgid "Recent Papers"
-#~ msgstr "Πρόσφατες Δημοσιεύσεις"
-
-#~ msgid "Showing the"
-#~ msgstr "Εμφάνιση των"
-
-#~ msgid "most recent documents:"
-#~ msgstr "πιο πρόσφατων εγγράφων:"
-
-#~ msgid "The following profile is the one you were viewing before logging in: "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Out of %s paper(s) claimed to your"
-#~ " arXiv account, %s match this "
-#~ "profile: "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If none of the options suggested "
-#~ "above apply, you can look for "
-#~ "other possible options from the list "
-#~ "below:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span title=\"Login through arXiv is "
-#~ "needed to verify this is your "
-#~ "profile. When you log in your "
-#~ "publication list will automatically update "
-#~ "with all your arXiv publications.\n"
-#~ "You may also continue as a guest."
-#~ " In this case your input will "
-#~ "be processed by our staff and will"
-#~ " take longer to display.\"><strong> Login"
-#~ " with your arXiv.org account "
-#~ "</strong></span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "You have succesfully logged in via "
-#~ "arXiv. </br> You can now manage "
-#~ "your profile.</br>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "You have succesfully logged in via "
-#~ "arXiv.</br><div> <font color='red'>However the "
-#~ "profile you are viewing is not "
-#~ "your profile.</br></br></font>"
-#~ msgstr ""
-
-#~ msgid "Manage your profile"
-#~ msgstr "Διαχείριση Αρχείων της Εγγραφής"
-
-#~ msgid ""
-#~ "You have succesfully logged in, but "
-#~ "</br><div><font color='red'> you are not "
-#~ "associated to a person yet. Please "
-#~ "use the button below to choose "
-#~ "your profile </br></br></font>"
-#~ msgstr ""
-
-#~ msgid "Choose your profile"
-#~ msgstr "Επιλέξτε ένα αρχείο"
-
-#~ msgid "Please log in through arXiv to manage your profile.</br>"
-#~ msgstr ""
-
-#~ msgid "Login into Inspire through arXiv.org"
-#~ msgstr ""
-
-#~ msgid ""
-#~ " <span title=\"ORCiD (Open Researcher "
-#~ "and Contributor ID) is a unique "
-#~ "researcher identifier that distinguishes you"
-#~ " from other researchers.\n"
-#~ "It holds a record of all your "
-#~ "research activities. You can add your"
-#~ " ORCiD to all your works to "
-#~ "make sure they are associated with "
-#~ "you. \">\n"
-#~ "        <strong> Connect this profile to an ORCiD </strong> <span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "This profile is already connected to "
-#~ "the following ORCiD: <strong>%s</strong></br>"
-#~ msgstr ""
-
-#~ msgid "Import your publications from ORCID"
-#~ msgstr ""
-
-#~ msgid "Visit your profile in ORCID"
-#~ msgstr ""
-
-#~ msgid "Connect an ORCiD to this profile"
-#~ msgstr ""
-
-#~ msgid "Suggest an ORCiD for this profile:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span title=\"When you add more "
-#~ "publications you make sure your "
-#~ "publication list and citations appear "
-#~ "correctly on your profile.\n"
-#~ "You can also assign publications to "
-#~ "other authors. This will help INSPIRE"
-#~ " provide more accurate publication and "
-#~ "citation statistics. \"><strong> Manage "
-#~ "publications </strong><span>"
-#~ msgstr ""
-
-#~ msgid "Manage publication list"
-#~ msgstr "Λίστα δημοσιεύσεων "
-
-#~ msgid "<strong> Person identifiers, internal and external </strong>"
-#~ msgstr ""
-
-#~ msgid "add external id"
-#~ msgstr "εξωτερικός σύνδεσμος"
-
-#~ msgid "Harvest missing external ids from claimed papers"
-#~ msgstr ""
-
-#~ msgid "suggest external id to add"
-#~ msgstr ""
-
-#~ msgid "suggest selected ids to delete"
-#~ msgstr ""
-
-#~ msgid "suggest missing ids"
-#~ msgstr "υποβολές"
-
-#~ msgid "Choose system"
-#~ msgstr "Επιλογή προτύπου"
-
-#~ msgid ""
-#~ "<span title=\"You don’t need to add all your publications one by one.\n"
-#~ "This list contains all your publications"
-#~ " that were automatically assigned to "
-#~ "your INSPIRE profile through arXiv and"
-#~ " ORCiD. \"><strong> Automatically assigned "
-#~ "publications </strong> </span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span id=\"autoClaimMessage\">Please wait as "
-#~ "we are assigning %s papers from "
-#~ "external systems to your Inspire "
-#~ "profile</span></br>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The following publications have been "
-#~ "successfully assigned to your profile:"
-#~ msgstr "Τα παρακάτω αρχεία μπήκαν επιτυχώς στην ουρά:"
-
-#~ msgid "Get help!"
-#~ msgstr ""
-
-#~ msgid "<strong> Contact </strong>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Please contact our user support in "
-#~ "case you need help or you just "
-#~ "want to suggest some new ideas. We"
-#~ " will get back to you. </br>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<span title=\"It sometimes happens that "
-#~ "somebody's publications are scattered among"
-#~ " two or more profiles for various "
-#~ "reasons\n"
-#~ "(different spelling, change of name, "
-#~ "multiple people with the same name). "
-#~ "You can merge a set of profiles"
-#~ " together.\n"
-#~ "This will assign all the information "
-#~ "(including publications, IDs and citations)"
-#~ " to the profile you choose as a"
-#~ " primary profile.\n"
-#~ "After the merging only the primary "
-#~ "profile will exist in the system "
-#~ "and all others will be automatically "
-#~ "deleted. \"><strong> Merge profiles "
-#~ "</strong><span>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If your or somebody else's publications"
-#~ " in INSPIRE exist in multiple "
-#~ "profiles, you can fix that here. "
-#~ "</br>"
-#~ msgstr ""
-
-#~ msgid "Fatal: Author ID capabilities are disabled on this system."
-#~ msgstr "Σφάλμα: η χρήση του Author ID έχουν απενεργοποιηθεί σε αυτό το σύστημα."
-
-#~ msgid "Fatal: You are not allowed to access this functionality."
-#~ msgstr "Σφάλμα: Δεν έχετε δικαίωμα να χρησιμοποιήσετε αυτή την λειτουργία."
-
-#~ msgid "Claim this paper"
-#~ msgstr "Διεκδικήστε την δημοσίευση αυτή"
-
-#~ msgid ""
-#~ "<p>We're sorry. An error occurred while"
-#~ " handling your request. Please find "
-#~ "more information below:</p>"
-#~ msgstr ""
-#~ "<p>Λυπούμαστε, αλλά συνέβει ένα σφάλμα "
-#~ "κατά την διαχείριση της αίτησής σας. "
-#~ "Παρακαλώ δείτε παρακάτω επιπλέον "
-#~ "πληροφορίες:</p>"
-
-#~ msgid "This page is not accessible directly."
-#~ msgstr "Η σελίδα αυτή δεν είναι προσβάσιμη άμεσα."
-
-#~ msgid "Profile management"
-#~ msgstr ""
-
-#~ msgid "The given barcode <strong>%s</strong> is already in use."
-#~ msgstr ""
-
-#~ msgid "The copy with barcode <strong>%s</strong> has been deleted."
-#~ msgstr ""
-
-#~ msgid "It was NOT possible to delete the copy with barcode <strong>%s</strong>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated, but the"
-#~ " <strong>status was not modified</strong>."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated, but the"
-#~ " <strong>barcode was not modified</strong> "
-#~ "because it is already in use."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated to "
-#~ "<strong>[%s]</strong> with success."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Item <strong>[%s]</strong> updated, but the"
-#~ " <strong>barcode was not modified</strong> "
-#~ "because it was not found (!?)."
-#~ msgstr ""
-
-#~ msgid "Weighted %s keywords:"
-#~ msgstr "Παραπέμπεται από: %s εγγραφές"
-
-#~ msgid "The format %s does not exist for the given version: %s"
-#~ msgstr ""
-
-#~ msgid "Comparison of:"
-#~ msgstr "Σύγκριση των:"
-
-#~ msgid "Revision"
-#~ msgstr "Αναθεώρηση"
-
-#~ msgid "Failed to create a ticket"
-#~ msgstr "Αδυναμία δημιουργίας ticket"
-
-#~ msgid "No template could be found for output format %s."
-#~ msgstr ""
-
-#~ msgid "Error when evaluating format element %s with parameters %s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Escape mode for format element %s "
-#~ "could not be retrieved. Using default"
-#~ " mode instead."
-#~ msgstr ""
-
-#~ msgid "\"nbMax\" parameter for %s must be an \"int\"."
-#~ msgstr ""
-
-#~ msgid "Could not read format template named %s. %s."
-#~ msgstr ""
-
-#~ msgid "Format element %s has no function named \"format\"."
-#~ msgstr ""
-
-#~ msgid "Modify Template Attributes"
-#~ msgstr "Τροποποίηση Χαρακτηριστικών Προτύπων"
-
-#~ msgid "Template Editor"
-#~ msgstr "Επεξεργασία Προτύπων"
-
-#~ msgid "Check Dependencies"
-#~ msgstr "Έλεγχος Συσχετισμών"
-
-#~ msgid "Update Format Attributes"
-#~ msgstr "Ενημέρωση Χαρακτηριστικών Μορφής"
-
-#~ msgid "Show Documentation"
-#~ msgstr "Εμφάνιση Αρχείων Βοήθειας"
-
-#~ msgid "Hide Documentation"
-#~ msgstr "Απόκρυψη Αρχείων Βοήθειας"
-
-#~ msgid "Last Modification Date"
-#~ msgstr "Ημερομηνία Τελευταίας Τροποποίησης"
-
-#~ msgid "Manage Output Formats"
-#~ msgstr "Διαχείριση Μορφής Αποτελεσμάτων"
-
-#~ msgid "Manage Format Templates"
-#~ msgstr "Διαχείριση Προτύπων Μορφής"
-
-#~ msgid "Format Elements Documentation"
-#~ msgstr "Αρχείο Βοήθειας Στοιχείων Μορφής"
-
-#~ msgid "Add New Format Template"
-#~ msgstr "Προσθήκη Νέου Προτύπου Μορφής"
-
-#~ msgid "Check Format Templates Extensively"
-#~ msgstr "Εκτενής Έλεγχος Προτύπων Μορφής"
-
-#~ msgid "Code"
-#~ msgstr "Κώδικας"
-
-#~ msgid "Add New Output Format"
-#~ msgstr "Προσθήκη Νέας Μορφής Εξόδου"
-
-#~ msgid "menu"
-#~ msgstr "Μενού"
-
-#~ msgid "Close Output Format"
-#~ msgstr "Κλείσιμο Μορφής Εξόδου"
-
-#~ msgid "Rules"
-#~ msgstr "Κανόνες"
-
-#~ msgid "Modify Output Format Attributes"
-#~ msgstr "Τροποποίηση Χαρακτηριστικών Μορφής Εξόδου"
-
-#~ msgid "Remove Rule"
-#~ msgstr "Διαγραφή Κανόνα"
-
-#~ msgid "Add New Rule"
-#~ msgstr "Προσθήκη Νέου Κανόνα"
-
-#~ msgid "No problem found with format"
-#~ msgstr "Δεν βρέθηκε πρόβλημα στην μορφοποίηση"
-
-#~ msgid "An error has been found"
-#~ msgstr "Εντοπίστηκε σφάλμα"
-
-#~ msgid "The following errors have been found"
-#~ msgstr "Έχουν εντοπιστεί τα παρακάτω σφάλματα"
-
-#~ msgid "BibFormat Admin"
-#~ msgstr "Διαχείριση BibFormat"
-
-#~ msgid "Enter a search query here."
-#~ msgstr "Εισάγετε μια φράση αναζήτησης εδώ."
-
-#~ msgid "No Record Found for %s."
-#~ msgstr "Η εγγραφή δεν βρέθηκε"
-
-#~ msgid "Tag specification \"%s\" must end with column \":\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Tag specification \"%s\" must start with \"tag\" at line %s."
-#~ msgstr ""
-
-#~ msgid "\"tag\" must be lowercase in \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Should be \"tag field_number:\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Invalid tag \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Condition \"%s\" is outside a tag specification at line %s."
-#~ msgstr ""
-
-#~ msgid "Condition \"%s\" can only have a single separator --- at line %s."
-#~ msgstr ""
-
-#~ msgid "Template \"%s\" does not exist at line %s."
-#~ msgstr "Το αρχείο %s δεν υπάρχει."
-
-#~ msgid "Missing column \":\" after \"default\" in \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Default template specification \"%s\" must "
-#~ "start with \"default :\" at line "
-#~ "%s."
-#~ msgstr ""
-
-#~ msgid "\"default\" keyword must be lowercase in \"%s\" at line %s."
-#~ msgstr ""
-
-#~ msgid "Line %s could not be understood at line %s."
-#~ msgstr ""
-
-#~ msgid "Output format %s cannot not be read. %s"
-#~ msgstr "Χαρακτηριστικά Μορφής Αποτελέσματος %s"
-
-#~ msgid ""
-#~ "Could not find a name specified in"
-#~ " tag \"<name>\" inside format template "
-#~ "%s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Could not find a description specified"
-#~ " in tag \"<description>\" inside format "
-#~ "template %s."
-#~ msgstr ""
-
-#~ msgid "Format template %s calls undefined element \"%s\"."
-#~ msgstr "Συσχετισμοί Προτύπου Μορφής %s"
-
-#~ msgid ""
-#~ "Format template %s calls unreadable "
-#~ "element \"%s\". Check element file "
-#~ "permissions."
-#~ msgstr ""
-
-#~ msgid "Cannot load element \"%s\" in template %s. Check element code."
-#~ msgstr ""
-
-#~ msgid "Format element %s uses unknown parameter \"%s\" in format template %s."
-#~ msgstr ""
-
-#~ msgid "Could not read format template named %s. %s"
-#~ msgstr ""
-
-#~ msgid "Error in format element %s. %s."
-#~ msgstr "Επικύρωση Στοιχείου Μορφής %s"
-
-#~ msgid "Format element %s cannot not be read. %s"
-#~ msgstr "Συσχετισμοί Στοιχείου Μορφής %s"
-
-#~ msgid ""
-#~ "Cannot write in etc/bibformat dir of "
-#~ "your Invenio installation. Check directory "
-#~ "permission."
-#~ msgstr ""
-
-#~ msgid "Restricted Output Format"
-#~ msgstr "Περιορισμένη Μορφή Αποτελεσμάτων"
-
-#~ msgid "Output Format %s Rules"
-#~ msgstr "Κανόνες Μορφής Αποτελέσματος %s"
-
-#~ msgid "Output Format %s Attributes"
-#~ msgstr "Χαρακτηριστικά Μορφής Αποτελέσματος %s"
-
-#~ msgid "Output Format %s Dependencies"
-#~ msgstr "Συσχετισμοί Μορφής Εξόδου %s"
-
-#~ msgid "Delete Output Format"
-#~ msgstr "Διαγραφή Μορφής Εξόδου"
-
-#~ msgid "Cannot create output format"
-#~ msgstr "Δεν είναι δυνατή η δημιουργία μορφής εξόδου"
-
-#~ msgid "Format template %s cannot not be read. %s"
-#~ msgstr "Χαρακτηριστικά Προτύπου Μορφής %s"
-
-#~ msgid "Restricted Format Template"
-#~ msgstr "Πρότυπο Περιορισμένης Μορφής"
-
-#~ msgid "Format Template %s"
-#~ msgstr "Πρότυπο Μορφής %s"
-
-#~ msgid "Format Template %s Attributes"
-#~ msgstr "Χαρακτηριστικά Προτύπου Μορφής %s"
-
-#~ msgid "Format Template %s Dependencies"
-#~ msgstr "Συσχετισμοί Προτύπου Μορφής %s"
-
-#~ msgid "Delete Format Template"
-#~ msgstr "Διαγραφή Προτύπου Μορφής"
-
-#~ msgid "Format Element %s Dependencies"
-#~ msgstr "Συσχετισμοί Στοιχείου Μορφής %s"
-
-#~ msgid "Test Format Element %s"
-#~ msgstr "Δοκιμή Στοιχείου Μορφής %s"
-
-#~ msgid "Validation of Output Format %s"
-#~ msgstr "Επικύρωση Μορφής Εξόδου %s"
-
-#~ msgid "Validation of Format Template %s"
-#~ msgstr "Επικύρωση Προτύπου Μορφής %s"
-
-#~ msgid "Restricted Format Element"
-#~ msgstr "Περιορισμένο Στοιχείο Μορφής"
-
-#~ msgid "Validation of Format Element %s"
-#~ msgstr "Επικύρωση Στοιχείου Μορφής %s"
-
-#~ msgid "No format specified for validation. Please specify one."
-#~ msgstr ""
-
-#~ msgid "Format Validation"
-#~ msgstr "Επικύρωση Μορφής"
-
-#~ msgid "Knowledge Base %s"
-#~ msgstr "Γνωσιακή Βάση %s"
-
-#~ msgid ""
-#~ "The system is not attempting to "
-#~ "send an email from %s, to %s, "
-#~ "with body %s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Error in connecting to the SMPT "
-#~ "server waiting %s seconds. Exception is"
-#~ " %s, while sending email from %s "
-#~ "to %s with body %s."
-#~ msgstr ""
-
-#~ msgid "Error while sending an email: %s"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "Error while sending an email.\n"
-#~ "Reason: %s\n"
-#~ "Details: %s\n"
-#~ "Sender: \"%s\"\n"
-#~ "Recipient(s): \"%s\"\n"
-#~ "\n"
-#~ "The content of the mail was as follows:\n"
-#~ "%s"
-#~ msgstr ""
-
-#~ msgid "Error in sending email from %s to %s with body %s."
-#~ msgstr ""
-
-#~ msgid "Not Set"
-#~ msgstr "Μη Ορισμένο"
-
-#~ msgid "never"
-#~ msgstr "ποτέ"
-
-#~ msgid ""
-#~ "Do you want to touch the OAI "
-#~ "set %s? Note that this will force"
-#~ " all clients to re-harvest the "
-#~ "whole set."
-#~ msgstr ""
-
-#~ msgid "OAI set %s touched."
-#~ msgstr ""
-
-#~ msgid "Name variants"
-#~ msgstr "Παραλλαγές του ονόματος"
-
-#~ msgid "No Name Variants"
-#~ msgstr "Δεν υπάρχουν παραλλαγές του ονόματος"
-
-#~ msgid "times"
-#~ msgstr "φορές"
-
-#~ msgid "Papers"
-#~ msgstr "Δημοσιεύσεις"
-
-#~ msgid "No Keywords"
-#~ msgstr "Χωρίς λέξεις-κλειδιά"
-
-#~ msgid "Frequent keywords"
-#~ msgstr "Συχνά χρησιμοποιούμενες λέξεις-κλειδιά"
-
-#~ msgid "No Subject categories"
-#~ msgstr "Λίστα κατηγοριών δημοσίευσης"
-
-#~ msgid "No Collaborations"
-#~ msgstr "Συνεργασίες συγγραφέων"
-
-#~ msgid "unknown affiliation"
-#~ msgstr "άγνωστο affiliation"
-
-#~ msgid "No Affiliations"
-#~ msgstr "Χωρίς affiliations"
-
-#~ msgid "Affiliations"
-#~ msgstr "Affiliations"
-
-#~ msgid "Frequent co-authors (excluding collaborations)"
-#~ msgstr ""
-
-#~ msgid "No Frequent Co-authors"
-#~ msgstr "Κανένας συχνά εμφανιζόμενος πρόσθετος συγγραφέα"
-
-#~ msgid "Citations%s"
-#~ msgstr "Παραπομπές"
-
-#~ msgid "<strong> Publications per year </strong>"
-#~ msgstr ""
-
-#~ msgid "No Publication Graph"
-#~ msgstr "Ημ/νία έκδοσης"
-
-#~ msgid "<strong> Publications list </strong>"
-#~ msgstr "Λίστα δημοσιεύσεων "
-
-#~ msgid "No publications available"
-#~ msgstr "Δεν υπάρχει διαθέσιμη πληροφορία"
-
-#~ msgid "Recompute Now!"
-#~ msgstr ""
-
-#~ msgid "%i comments found in total (not shown on this page)"
-#~ msgstr ""
-
-#~ msgid "Linkbacks%s: %s"
-#~ msgstr ""
-
-#~ msgid "Cited by 1 record"
-#~ msgstr "Παραπέμπεται από 1 εγγραφή"
-
-#~ msgid "%i comments"
-#~ msgstr "%i σχόλια"
-
-#~ msgid "%i reviews"
-#~ msgstr "%i κριτικές"
-
-#~ msgid "%s of"
-#~ msgstr "%s από"
-
-#~ msgid "No Papers"
-#~ msgstr "Χωρίς Δημοσιεύσεις"
-
-#~ msgid "Frequent co-authors"
-#~ msgstr "Συχνά εμφανιζόμενοι προσθετοι συγγραφείς"
-
-#~ msgid "This is me.  Verify my publication list."
-#~ msgstr "Είμαι εγώ. Επιβεβαιώστε την λίστα δημοσιευμάτων μου."
-
-#~ msgid "Citations:"
-#~ msgstr "Παραπομπές:"
-
-#~ msgid "No Citation Information available"
-#~ msgstr "Δεν υπάρχουν διαθέσιμες πληροφορίες για παραπομπές"
-
-#~ msgid "<p><a href=\"%(url)s\">%(msg)s</a></p>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "For some unknown reason multiple records"
-#~ " matching the specified DOI \"%s\" "
-#~ "have been found."
-#~ msgstr ""
-
-#~ msgid "Found multiple records matching DOI %s"
-#~ msgstr ""
-
-#~ msgid "Discussion"
-#~ msgstr "Συζήτηση"
-
-#~ msgid "Please inform the <a href='mailto%s'>administator</a>"
-#~ msgstr ""
-
-#~ msgid "Your alerts"
-#~ msgstr "Οι Ειδοποιήσεις μου"
-
-#~ msgid "Your approvals"
-#~ msgstr "Οι εγκρίσεις μου"
-
-#~ msgid "Your baskets"
-#~ msgstr "Τα καλάθια μου"
-
-#~ msgid "Your loans"
-#~ msgstr "Οι δανεισμοί μου"
-
-#~ msgid "Your submissions"
-#~ msgstr "Οι υποβολές μου"
-
-#~ msgid "Statistics"
-#~ msgstr "Στατιστικά"
-
-#~ msgid "Group: %s"
-#~ msgstr "Ομάδα: %s"
-
-#~ msgid ""
-#~ "Your e-mail is auto-generated by "
-#~ "the system. Please change your e-mail"
-#~ " from <a href='%s/youraccount/edit?ln=%s'>account "
-#~ "settings</a>."
-#~ msgstr ""
-
-#~ msgid "Page %s Not Found"
-#~ msgstr "Η Σελίδα %s Δεν Βρέθηκε"
-
-#~ msgid "The field %s is mandatory."
-#~ msgstr "Το πεδίο %s είναι υποχρεωτικό."
-
-#~ msgid "Unable to delete field at position %s from page %s of submission '%s'"
-#~ msgstr ""
-#~ "Αδύνατο να διαγραφεί το πεδίο στην "
-#~ "θέση %s της σελίδας %s της "
-#~ "υποβολής '%s'"
-
