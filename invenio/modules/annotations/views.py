@@ -38,9 +38,10 @@ from urlparse import urlsplit
 
 from .api import add_annotation, get_annotations, get_count
 from .forms import WebPageAnnotationForm, WebPageAnnotationFormAttachments
+from .receivers import extract_notes
 from .noteutils import get_note_title, get_original_comment, \
     note_is_collapsed, prepare_notes
-from .receivers import extract_notes
+
 
 blueprint = Blueprint('annotations',
                       __name__,

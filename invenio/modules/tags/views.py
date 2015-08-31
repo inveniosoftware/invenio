@@ -45,11 +45,16 @@ from .forms import AttachTagForm, CreateTagForm, DetachTagForm, EditTagForm, \
     TagAnnotationForm, validate_tag_exists, validate_user_owns_tag, validators
 from .models import WtgTAG, WtgTAGRecord, wash_tag
 
+from .models import \
+    WtgTAG, \
+    WtgTAGRecord, \
+    wash_tag
+
 # Uset settings
 user_settings = LocalProxy(
-    lambda:
-    current_user['settings'].get('webtag',
-                                 cfg['CFG_WEBTAG_DEFAULT_USER_SETTINGS']))
+    lambda: current_user['settings'].get(
+        'webtag', cfg['CFG_WEBTAG_DEFAULT_USER_SETTINGS']
+    ))
 
 blueprint = Blueprint('webtag', __name__, url_prefix='/yourtags',
                       template_folder='templates', static_folder='static')
@@ -450,7 +455,7 @@ def detach():
     form = DetachTagForm(request.values, csrf_enabled=False)
 
     if form.validate():
-        association = db.session.query(WtgTAGRecord) \
+        association = db.session.query(WtgTAGRecord)\
             .filter_by(id_tag=form.data['id_tag'],
                        id_bibrec=form.data['id_bibrec']).first()
         if association:
