@@ -19,10 +19,10 @@
 
 from urlparse import urlsplit
 
-from flask import current_app, Blueprint, render_template, request, redirect, \
-    flash, jsonify, url_for, g, abort
-from flask_login import login_required, current_user
-from sqlalchemy.event import listen
+from flask import Blueprint, abort, current_app, flash, g, jsonify, redirect, \
+    render_template, request, url_for
+
+from flask_login import current_user, login_required
 
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
@@ -30,10 +30,13 @@ from invenio.modules.comments.models import CmtRECORDCOMMENT
 from invenio.modules.comments.views import blueprint as comments_blueprint
 from invenio.modules.records.views import request_record
 
+from sqlalchemy.event import listen
+
 from .api import add_annotation, get_annotations, get_count
 from .forms import WebPageAnnotationForm, WebPageAnnotationFormAttachments
-from .noteutils import get_note_title, prepare_notes, note_is_collapsed, \
-    get_original_comment
+from .noteutils import get_note_title, get_original_comment, \
+    note_is_collapsed, prepare_notes
+
 from .receivers import extract_notes
 
 blueprint = Blueprint('annotations',
