@@ -420,7 +420,7 @@ def _get_external_publications(person_id):
 
         orcid_pubs = dict()
         for doi, title in orcid_dois:
-            queried_doi = run_sql('SELECT value from bib02x where tag="0247_a" and value="%s"', (doi,))
+            queried_doi = run_sql('SELECT value from bib02x where tag="0247_a" and value=%s', (doi,))
             if not queried_doi:
                 # The paper is not available in Inspire
                 orcid_pubs[doi] = title
