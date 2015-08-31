@@ -254,8 +254,13 @@
         {%- endblock search_results_footer %}
       </form>
 
-  {% for category, msg in get_flashed_messages(with_categories=True, category_filter=['search-results-after']) %}
-    {{ msg|safe }}
+  {% for category, msg in get_flashed_messages(with_categories=True,
+  category_filter=['search-results-after', 'search-results-after(html_safe)']) %}
+    {% if category.endswith('(html_safe)') %}
+      {{ msg|safe }}
+    {% else %}
+      {{ msg }}
+    {% endif %}
   {% endfor %}
 {% endblock %}{% endmacro %}
 
