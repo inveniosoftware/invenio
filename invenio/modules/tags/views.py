@@ -25,33 +25,31 @@
 """
 
 # Flask
-from werkzeug import LocalProxy
-from flask import render_template, request, flash, redirect, url_for, \
-    jsonify, Blueprint
-from invenio.base.i18n import _
-from invenio.base.decorators import wash_arguments, templated
-from flask_login import current_user, login_required
-from invenio.base.globals import cfg
+from flask import Blueprint, flash, jsonify, redirect, \
+    render_template, request, url_for
 
-# External imports
+from flask_breadcrumbs import default_breadcrumb_root, register_breadcrumb
+
+from flask_login import current_user, login_required
+
+from flask_menu import register_menu
+
+from invenio.base.decorators import templated, wash_arguments
+from invenio.base.globals import cfg
+from invenio.base.i18n import _
+from invenio.ext.sqlalchemy import db
 from invenio.modules.accounts.models import User
 from invenio.modules.records.models import Record as Bibrec
 from invenio.modules.search.models import Collection
 from invenio.modules.search.views.search import response_formated_records
-from flask_menu import register_menu
-from flask_breadcrumbs import default_breadcrumb_root, register_breadcrumb
-from invenio.ext.sqlalchemy import db
+
+from werkzeug import LocalProxy
 
 # Internal imports
-from .models import \
-    WtgTAG, \
-    WtgTAGRecord, \
-    wash_tag
-
 # Forms
 from .forms import \
-    CreateTagForm, \
     AttachTagForm, \
+    CreateTagForm, \
     DetachTagForm, \
     EditTagForm, \
     TagAnnotationForm, \
@@ -59,9 +57,15 @@ from .forms import \
     validate_user_owns_tag, \
     validators
 
+from .models import \
+    WtgTAG, \
+    WtgTAGRecord, \
+    wash_tag
+
 # Uset settings
-user_settings = LocalProxy(lambda:
-    current_user['settings'].get('webtag', cfg['CFG_WEBTAG_DEFAULT_USER_SETTINGS']))
+user_settings = LocalProxy(
+
+    lambda: current_user['settings'].get('webtag', cfg['CFG_WEBTAG_DEFAULT_USER_SETTINGS']))
 
 blueprint = Blueprint('webtag', __name__, url_prefix='/yourtags',
                       template_folder='templates', static_folder='static')
@@ -100,8 +104,8 @@ def display_cloud():
 
     for tag in tags:
         size = min_size + \
-                   float(max_size - min_size) * \
-                   float(tag.record_count - min_count) / difference
+            float(max_size - min_size) * \
+            float(tag.record_count - min_count) / difference
 
         tag.css_size = str(size*100)
 
@@ -113,7 +117,7 @@ def display_cloud():
 @login_required
 @templated('tags/display_list.html')
 @wash_arguments({'sort_by': (unicode, 'name'),
-                                 'order': (unicode, '')})
+                 'order': (unicode, '')})
 @register_breadcrumb(blueprint, '.list', _('Display as List'))
 def display_list(sort_by, order):
     """ List of user's private/group/public tags """
@@ -161,8 +165,8 @@ def tag_details(id_tag):
         return redirect(url_for('.display_cloud'))
 
     return response_formated_records([bibrec.id for bibrec in tag.records],
-                              Collection.query.get(1),
-                              'hb')
+                                     Collection.query.get(1),
+                                     'hb')
 
 
 @blueprint.route('/tag/<int:id_tag>/edit', methods=['GET', 'POST'])
@@ -241,10 +245,8 @@ def record_tags(id_bibrec):
     from .template_context_functions.tfn_webtag_record_tags \
         import template_context_function
 
-    from invenio.ext.template import render_template_to_string
-
     return dict(
-        tag_list = template_context_function(id_bibrec, current_user.get_id()))
+        tag_list=template_context_function(id_bibrec, current_user.get_id()))
 
 
 @blueprint.route('/tokenize/<int:id_bibrec>', methods=['GET', 'POST'])
@@ -315,7 +317,7 @@ def editor(id_bibrec):
     # invenio_templated cannot be used,
     # because this view is requested using AJAX
     return render_template('tags/record_editor.html', id_bibrec=id_bibrec,
-                                                 record_tags=tags_json)
+                           record_tags=tags_json)
 
 
 #Temporary solution to call validators, we need a better one
@@ -460,8 +462,8 @@ def detach():
 
     if form.validate():
         association = db.session.query(WtgTAGRecord)\
-                      .filter_by(id_tag = form.data['id_tag'],
-                                 id_bibrec = form.data['id_bibrec']).first()
+            .filter_by(id_tag=form.data['id_tag'],
+                       id_bibrec=form.data['id_bibrec']).first()
         if association:
             db.session.delete(association)
             db.session.commit()
