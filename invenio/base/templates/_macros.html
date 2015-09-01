@@ -19,11 +19,18 @@
 
 {%- macro flashed_messages() -%}
   {% block messages %}
-    {% for category, msg in get_flashed_messages(with_categories=True, category_filter=['', 'info', 'danger', 'error', 'warning', 'success']) %}
-    {% set category = 'danger' if category == 'error' else category %}
-      <div class="alert alert-{{ category }}">
+    {% for category, msg in get_flashed_messages(with_categories=True,
+    category_filter=['', 'info', 'danger', 'error', 'warning', 'success',
+    '(html_safe)', 'info(html_safe)', 'danger(html_safe)', 'error(html_safe)',
+    'warning(html_safe)', 'success(html_safe)']) %}
+    {% set category = 'danger' if category == 'error' or category == 'error(html_safe)' else category %}
+      <div class="alert alert-{{ category[:-('(html_safe)'|length)] if category.endswith('(html_safe)') else category }}">
         <a class="close" data-dismiss="alert" href="#">&times;</a>
-        {{ msg|safe }}
+        {% if category.endswith('(html_safe)') %}
+            {{ msg|safe }}
+        {% else %}
+            {{ msg }}
+        {% endif %}
       </div>
     {% endfor %}
   {% endblock messages %}
