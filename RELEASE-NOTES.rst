@@ -1,8 +1,8 @@
 ============================
- Invenio v2.0.5 is released
+ Invenio v2.0.6 is released
 ============================
 
-Invenio v2.0.5 was released on July 17, 2015.
+Invenio v2.0.6 was released on September 1, 2015.
 
 About
 -----
@@ -13,96 +13,86 @@ digital library or document repository on the web.
 Security fixes
 --------------
 
-+ docker:
++ global
 
-  - Disables debug mode when using standard Docker image. Uses docker
-    compose to set the variable instead.
+  - Fixes potential XSS issues by changing main flash messages
+    template so that they are not displayed as safe HTML by default.
+
++ search
+
+  - Fixes potential XSS issues by changing search flash messages
+    template so that they are not displayed as safe HTML by default.
+
 
 Improved features
 -----------------
 
-+ deposit:
++ I18N
 
-  - Improves handling of large files in deposit.
+  - Completes Italian translation.
+  - Completes French translation.
 
-+ docker:
++ global
 
-  - Improves Docker documentation notably related to how to work with
-    Invenio site overlays.
+  - Adds super(SmartDict, self).__init__ call in the __init__ method
+    in SmartDict to be able to make multiple inheritance in Record
+    class in invenio-records and be able to call both parent's
+    __init__.
 
-  - Changes port number exposed by docker to non-reserved ones to
-    avoid conflicts with local installations. Webport is now 28080,
-    Redis 26379 and MySQL is 23306, which is a simple +20000 shift
-    from the standard ports.
-
-  - Integrates docker boot script into docker image.
-
-  - Changes docker boot script to use `exec`. This ensure signal
-    forwarding and reduces the overhead by one process. As a result
-    container shutdown is faster now.
-
-  - Changes manual master/slave configuration of Docker devboot script
-    to automatic solution using file locks.
-
-+ jasmine:
-
-  - Allows using variables from application config for building asset
-    bundles.
 
 Bug fixes
 ---------
 
-+ deposit:
++ OAIHarvest
 
-  - Fixes issue with PLUpload chunking not being enabled.
+  - Fixes the parsing of resumptiontoken in incoming OAI-PMH XML which
+    could fail when the resumptiontoken was empty.
 
-+ encoder:
++ i18n
 
-  - Corrects the `compose_file` function call in `process_batch_job`
-    to produce `<directory>/content.<extension>` instead of
-    `<directory>/content.content;<extension>`. (#3354)
+  - Updates PO message catalogues and cleans them of duplicated
+    messages.  (#3455)
 
-+ global:
++ installation
 
-  - Fixes the way configuration variables are parsed from ENV. It now
-    uses the same method we are using in `inveniomanage config set`.
-    This fixes the problem that `False` is not parsed correctly.
+  - Fixes database creation and upgrading by limiting Alembic version
+    to <0.7.
 
-+ installation:
++ legacy
 
-  - Fixes capitalization of package names.
+  - Addresses an issue with calling six urllib.parse in a wrong way,
+    making users unable to harvest manually from the command line.
 
-+ legacy:
-
-  - Fixes inveniogc crash when mysql is NOT used to store sessions.
-    (#3205)
-
-+ login:
-
-  - Provides flash message to indicate that an email with password
-    recovery could not be sent. (#3309)
 
 Notes
 -----
 
-+ global:
++ global
 
-  - Backports Flask-IIIF extension from original commit
-    213b6f1144734c9ecf425a1bc7b78e56ee5e4e3e. The extension is not
-    enabled by default in order to avoid feature addition to existing
-    minor release.
+  - Displaying HTML safe flash messages can be done by using one of
+    these flash contexts: '(html_safe)', 'info(html_safe)',
+    'danger(html_safe)', 'error(html_safe)', 'warning(html_safe)',
+    'success(html_safe)' instead of the standard ones (which are the
+    same without '(html safe)' at the end).
+
++ search
+
+  - Displaying HTML safe flash messages can be done by using one of
+    these flash contexts: 'search-results-after(html_safe)',
+    'websearch-after-search-form(html_safe)' instead of the standard
+    ones (which are the same without '(html safe)' at the end).
 
 Installation
 ------------
 
-   $ pip install invenio==2.0.5
+   $ pip install invenio==2.0.6
 
 Upgrade
 -------
 
    $ bibsched stop
    $ sudo systemctl stop apache2
-   $ pip install --upgrade invenio==2.0.5
+   $ pip install --upgrade invenio==2.0.6
    $ inveniomanage upgrader check
    $ inveniomanage upgrader run
    $ sudo systemctl start apache2
@@ -111,7 +101,7 @@ Upgrade
 Documentation
 -------------
 
-   http://invenio.readthedocs.org/en/v2.0.5
+   http://invenio.readthedocs.org/en/v2.0.6
 
 Happy hacking and thanks for flying Invenio.
 

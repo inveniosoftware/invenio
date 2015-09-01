@@ -5,6 +5,7 @@ include *.txt
 include *.yml
 include .bowerrc
 include .dockerignore
+include .editorconfig
 include ABOUT-NLS
 include AUTHORS
 include COPYING
