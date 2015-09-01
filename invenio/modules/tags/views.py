@@ -21,8 +21,8 @@
 
 from __future__ import unicode_literals
 
-from flask import Blueprint, flash, jsonify, redirect, render_template, \
-    request, url_for
+from flask import Blueprint, escape, flash, jsonify, redirect, \
+    render_template, request, url_for
 
 from flask_breadcrumbs import default_breadcrumb_root, register_breadcrumb
 
@@ -188,8 +188,8 @@ def tag_edit(id_tag):
             flash(_('Tag Successfully edited.'), 'success')
 
         else:
-            flash(_('Tag name') + ' <strong>' + tag.name + '</strong> ' +
-                  _('is already in use.'), 'error')
+            flash(_('Tag name') + ' <strong>' + escape(tag.name) +
+                  '</strong> ' + _('is already in use.'), 'error(html_safe)')
 
     return dict(tag=tag, form=form)
 

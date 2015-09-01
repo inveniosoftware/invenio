@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -35,10 +35,15 @@
 </div>
 {%- block search_form_flashed_messages -%}
 {%- for category, msg in get_flashed_messages(with_categories=True,
-                                             category_filter=['websearch-after-search-form']) %}
+                                             category_filter=['websearch-after-search-form',
+                                             'websearch-after-search-form(html_safe)']) %}
 <div class="row">
   <div class="col-md-12">
-    {{ msg|safe }}
+    {% if category.endswith('(html_safe)') %}
+      {{ msg|safe }}
+    {% else %}
+      {{ msg }}
+    {% endif %}
   </div>
 </div>
   {%- endfor %}

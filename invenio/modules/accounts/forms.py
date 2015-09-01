@@ -173,7 +173,7 @@ class ChangeUserEmailSettingsForm(InvenioBaseForm):
         from flask import flash, url_for
         flash(_("Note that if you have changed your email address, you \
                 will have to <a href=%(link)s>reset</a> your password anew.",
-                link=url_for('webaccount.lost')), 'warning')
+                link=url_for('webaccount.lost')), 'warning(html_safe)')
 
 
 class ProfileForm(InvenioBaseForm):
