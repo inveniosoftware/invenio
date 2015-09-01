@@ -544,8 +544,10 @@ def find_affected_records_for_index(indexes=None, recIDs=None, force_all_indexes
         res = run_sql("""SELECT bibrec.id,modification_date,''
                          FROM bibrec, hstRECORD
                          WHERE modification_date>%s
+                           AND id_bibrec BETWEEN %s AND %s
                            AND bibrec.id=id_bibrec
-                           AND (SELECT COUNT(*) FROM hstRECORD WHERE id_bibrec=bibrec.id)=1""", (min_last_updated,))
+                           AND (SELECT COUNT(*) FROM hstRECORD WHERE id_bibrec=bibrec.id)=1""",
+                      (recIDs_range[0], recIDs_range[1], min_last_updated,))
         if res:
             recIDs_info.extend(res)
 
