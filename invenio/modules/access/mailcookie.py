@@ -29,8 +29,9 @@ from datetime import datetime, timedelta
 
 from invenio.ext.sqlalchemy import db
 
-from .errors import InvenioWebAccessMailCookieError
-from .models import AccMAILCOOKIE, User
+from invenio.modules.access.errors import InvenioWebAccessMailCookieError
+from invenio.modules.access.models import AccMAILCOOKIE, AccROLE, UserAccROLE
+from invenio.modules.accounts.models import User
 
 _datetime_format = "%Y-%m-%d %H:%M:%S"
 
@@ -51,8 +52,7 @@ def mail_cookie_create_common(kind, params, cookie_timeout=timedelta(days=1),
 def mail_cookie_create_role(role_name, role_timeout=timedelta(hours=3),
                             cookie_timeout=timedelta(days=1), onetime=True):
     """Create a unique url to belong temporaly to a role."""
-    from .control import acc_get_role_id
-    assert(acc_get_role_id(role_name) != 0)
+    assert AccROLE.exists(AccROLE == role_name)
     kind = 'role'
     params = (role_name, role_timeout)
     return mail_cookie_create_common(kind, params, cookie_timeout, onetime)
@@ -112,18 +112,16 @@ def mail_cookie_check_role(cookie, uid):
 
     Temporarily add the given uid to the role specified.
     """
-    from .control import acc_get_role_id, acc_add_user_role
     try:
         (kind, params) = mail_cookie_check_common(cookie)
         assert kind == 'role'
         (role_name, role_timeout) = params
-        role_id = acc_get_role_id(role_name)
-        assert role_id != 0
+        role = AccROLE.factory(name=role_name)
         assert type(role_timeout) is timedelta
     except (TypeError, AssertionError, StandardError):
         raise InvenioWebAccessMailCookieError
     expiration = (datetime.today()+role_timeout).strftime(_datetime_format)
-    acc_add_user_role(uid, role_id, expiration=expiration)
+    UserAccROLE.factory(id_user=uid, id_accROLE=role.id, expiration=expiration)
     return (role_name, expiration)
 
 
@@ -142,7 +140,7 @@ def mail_cookie_check_pw_reset(cookie):
 
 def mail_cookie_check_mail_activation(cookie):
     """Check a mail activation cookie for a valid authorization."""
-    #try:
+    # try:
     (kind, email) = mail_cookie_check_common(cookie)
     assert(kind == 'mail_activation')
     user = db.session.query(User.query.filter_by(email=email).exists())
@@ -151,8 +149,8 @@ def mail_cookie_check_mail_activation(cookie):
     else:
         raise InvenioWebAccessMailCookieError(
             "email '%s' doesn't exist" % email)
-        #except (TypeError, AssertionError):
-        #raise InvenioWebAccessMailCookieError
+        # except (TypeError, AssertionError):
+        # raise InvenioWebAccessMailCookieError
 
 
 def mail_cookie_check_authorize_action(cookie):

@@ -17,51 +17,45 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.models.access.bases
-    ---------------------------
+"""JSONAlchemy model extension.
 
-    JSONAlchemy model extension.
+example of a document base::
 
-    example of a document base::
-
-        bases:
-            invenio.modules.access.bases.AclFactory('doc')
+    bases:
+        invenio.modules.access.bases.AclFactory('doc')
 """
 
 import six
 
 from flask_login import current_user
 
+from invenio.modules.access import models
+
 from .engine import acc_authorize_action
-from .control import acc_is_user_in_role, acc_get_role_id
-from .firerole import compile_role_definition, acc_firerole_check_user
-from .local_config import SUPERADMINROLE, CFG_WEBACCESS_WARNING_MSGS
+from .firerole import acc_firerole_check_user, compile_role_definition
+from .local_config import CFG_WEBACCESS_WARNING_MSGS, SUPERADMINROLE
 
 
 def AclFactory(obj=''):
-    """Creates access control behavior extension for JSONAlchemy model.
+    """Create access control behavior extension for JSONAlchemy model.
 
     :param obj: name of action object (e.g. check 'viewrestrdoc' where
         'viewrestr' is action and 'doc' is `obj`)
     :return: JSONAlchemy class extesion
         (note: it has to return class not instance)
     """
-
     class Acl(object):
-        """
-        Access controled behavior for JSONAlchemy models.
-        """
+
+        """Access controled behavior for JSONAlchemy models."""
 
         def is_authorized(self, user_info=None, action='viewrestr'):
-            """Check if the user is authorized to perform the action with the
-            given restrictions.
+            """Check if the user is authorized to perform the action.
 
             This method is able to run *pre* and *post* hooks to extend its
             functionality,
             e.g. :class:`~invenio_records.bases:DocumentsHooks`
 
-        .. note::
+            .. note::
 
                 If the object has embed restrictions it will override the
                 access right of the parent. For example in
@@ -85,7 +79,11 @@ def AclFactory(obj=''):
             if restriction is None:
                 return (1, 'Missing restriction')
 
-            if acc_is_user_in_role(user_info, acc_get_role_id(SUPERADMINROLE)):
+            if models.UserAccROLE.is_user_in_any_role(
+                user_info=user_info,
+                id_roles=[
+                    models.AccROLE.factory(name=SUPERADMINROLE).id]
+            ):
                 return (0, CFG_WEBACCESS_WARNING_MSGS[0])
 
             is_authorized = (0, CFG_WEBACCESS_WARNING_MSGS[0])
@@ -116,8 +114,11 @@ def AclFactory(obj=''):
                                          '%s in order to access this document'
                                          % repr(auth_value))
                 elif auth_type == 'role':
-                    if not acc_is_user_in_role(user_info,
-                                               acc_get_role_id(auth_value)):
+                    if not models.UserAccROLE.is_user_in_any_role(
+                        user_info=user_info,
+                        id_roles=[r.id for r in models.AccROLE.factory(
+                            name=auth_value)]
+                    ):
                         is_authorized = (1, 'You must be member in the role %s'
                                          ' in order to access this document' %
                                          repr(auth_value))

@@ -1,5 +1,6 @@
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
+#               2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -18,9 +19,14 @@
 """Define access exceptions."""
 
 
+class AccessFactoryError(Exception):
+
+    """If there is an error on factory calling."""
+
+
 class InvenioWebAccessFireroleError(Exception):
 
-    """Just an Exception to discover if it's a FireRole problem"""
+    """Just an Exception to discover if it's a FireRole problem."""
 
 
 class InvenioWebAccessMailCookieError(Exception):
