@@ -155,7 +155,7 @@ def _get_extids_from_orcid(orcid_id):
                         if identifier_type == "doi":
                             ext_ids_dict[identifier_type].add(get_doi(value))
                         ext_ids_dict[identifier_type].add(value)
-            except KeyError:
+            except (KeyError, AttributeError, TypeError):
                 # No identifiers on this work.
                 pass
     except KeyError:
