@@ -471,7 +471,7 @@ def remove_temporary_emails(emails):
 
     @rtype: list|str
     """
-    from invenio.modules.access.local_config import CFG_TEMP_EMAIL_ADDRESS
+    from invenio_access.local_config import CFG_TEMP_EMAIL_ADDRESS
     _RE_TEMPORARY_EMAIL = re.compile(CFG_TEMP_EMAIL_ADDRESS % r'.+?', re.I)
 
     if type(emails) in (str, unicode):

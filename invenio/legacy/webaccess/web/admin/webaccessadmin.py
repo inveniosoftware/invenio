@@ -20,10 +20,10 @@
 __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_LANG
-import invenio.modules.access.admin_lib as wal
-from invenio.modules.access.local_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SRC
+import invenio_access.admin_lib as wal
+from invenio_access.local_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SRC
 # reload(wal)
-# from invenio.modules.access.admin_lib import index
+# from invenio_access.admin_lib import index
 
 index = wal.index
 
