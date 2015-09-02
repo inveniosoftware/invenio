@@ -419,7 +419,7 @@ def blob_to_string(ablob):
             return ablob
         else:
             # BLOB is array.array in MySQLdb 1.0.0 and later
-            return ablob.tostring()
+            return str(ablob)
     else:
         return ablob
 
