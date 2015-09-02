@@ -25,7 +25,7 @@ except ImportError:
     import simplejson as json
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
-from invenio.modules.access.engine import acc_authorize_action
+from invenio_access.engine import acc_authorize_action
 from invenio.ext.legacy.handler import WebInterfaceDirectory
 from invenio.legacy.webpage import page
 from invenio.legacy.bibsched.webapi import get_javascript, get_bibsched_tasks, \
