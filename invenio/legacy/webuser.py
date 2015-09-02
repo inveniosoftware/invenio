@@ -86,21 +86,21 @@ from invenio_accounts.models import User
 from sqlalchemy.exc import OperationalError
 
 
-acc_get_role_id = lazy_import('invenio.modules.access.control:acc_get_role_id')
-acc_get_action_roles = lazy_import('invenio.modules.access.control:acc_get_action_roles')
-acc_get_action_id = lazy_import('invenio.modules.access.control:acc_get_action_id')
-acc_is_user_in_role = lazy_import('invenio.modules.access.control:acc_is_user_in_role')
-acc_find_possible_activities = lazy_import('invenio.modules.access.control:acc_find_possible_activities')
-mail_cookie_create_mail_activation = lazy_import('invenio.modules.access.mailcookie:mail_cookie_create_mail_activation')
-acc_firerole_check_user = lazy_import('invenio.modules.access.firerole:acc_firerole_check_user')
-load_role_definition = lazy_import('invenio.modules.access.firerole:load_role_definition')
-from invenio.modules.access.local_config import SUPERADMINROLE
-CFG_EXTERNAL_AUTH_USING_SSO = lazy_import('invenio.modules.access.local_config:CFG_EXTERNAL_AUTH_USING_SSO')
-CFG_EXTERNAL_AUTHENTICATION = lazy_import('invenio.modules.access.local_config:CFG_EXTERNAL_AUTHENTICATION')
-CFG_WEBACCESS_MSGS = lazy_import('invenio.modules.access.local_config:CFG_WEBACCESS_MSGS')
-CFG_WEBACCESS_WARNING_MSGS = lazy_import('invenio.modules.access.local_config:CFG_WEBACCESS_WARNING_MSGS')
-CFG_EXTERNAL_AUTH_DEFAULT = lazy_import('invenio.modules.access.local_config:CFG_EXTERNAL_AUTH_DEFAULT')
-CFG_TEMP_EMAIL_ADDRESS = lazy_import('invenio.modules.access.local_config:CFG_TEMP_EMAIL_ADDRESS')
+acc_get_role_id = lazy_import('invenio_access.control:acc_get_role_id')
+acc_get_action_roles = lazy_import('invenio_access.control:acc_get_action_roles')
+acc_get_action_id = lazy_import('invenio_access.control:acc_get_action_id')
+acc_is_user_in_role = lazy_import('invenio_access.control:acc_is_user_in_role')
+acc_find_possible_activities = lazy_import('invenio_access.control:acc_find_possible_activities')
+mail_cookie_create_mail_activation = lazy_import('invenio_access.mailcookie:mail_cookie_create_mail_activation')
+acc_firerole_check_user = lazy_import('invenio_access.firerole:acc_firerole_check_user')
+load_role_definition = lazy_import('invenio_access.firerole:load_role_definition')
+from invenio_access.local_config import SUPERADMINROLE
+CFG_EXTERNAL_AUTH_USING_SSO = lazy_import('invenio_access.local_config:CFG_EXTERNAL_AUTH_USING_SSO')
+CFG_EXTERNAL_AUTHENTICATION = lazy_import('invenio_access.local_config:CFG_EXTERNAL_AUTHENTICATION')
+CFG_WEBACCESS_MSGS = lazy_import('invenio_access.local_config:CFG_WEBACCESS_MSGS')
+CFG_WEBACCESS_WARNING_MSGS = lazy_import('invenio_access.local_config:CFG_WEBACCESS_WARNING_MSGS')
+CFG_EXTERNAL_AUTH_DEFAULT = lazy_import('invenio_access.local_config:CFG_EXTERNAL_AUTH_DEFAULT')
+CFG_TEMP_EMAIL_ADDRESS = lazy_import('invenio_access.local_config:CFG_TEMP_EMAIL_ADDRESS')
 
 
 re_invalid_nickname = re.compile(""".*[,'@]+.*""")

@@ -45,7 +45,7 @@ class AccAuthorizeActionPermission(Permission):
 
     def allows(self, identity):
         """Check if given identity can perform defined action."""
-        from invenio.modules.access.engine import acc_authorize_action
+        from invenio_access.engine import acc_authorize_action
         auth, message = acc_authorize_action(
             identity.id, self.action, **dict(
                 (k, v() if callable(v) else v)

@@ -36,10 +36,10 @@ from invenio.legacy.bibdocfile.config import CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGE
      CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_RESTRICTIONS, \
      CFG_BIBDOCFILE_ICON_SUBFORMAT_RE
 from invenio.utils import apache
-from invenio.modules.access.local_config import VIEWRESTRCOLL
-from invenio.modules.access.mailcookie import mail_cookie_create_authorize_action
-from invenio.modules.access.engine import acc_authorize_action
-from invenio.modules.access.control import acc_is_role
+from invenio_access.local_config import VIEWRESTRCOLL
+from invenio_access.mailcookie import mail_cookie_create_authorize_action
+from invenio_access.engine import acc_authorize_action
+from invenio_access.control import acc_is_role
 from invenio_records.api import get_record
 from invenio.legacy.bibrecord import record_empty
 from invenio.legacy.webpage import page, pageheaderonly, \

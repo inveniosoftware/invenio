@@ -64,7 +64,7 @@ from socket import gethostname
 
 from invenio.legacy.dbquery import run_sql, _db_login
 from invenio_accounts.models import User
-from invenio.modules.access.engine import acc_authorize_action
+from invenio_access.engine import acc_authorize_action
 from invenio.config import (
     CFG_BIBSCHED_PROCESS_USER,
     CFG_TMPDIR,
@@ -76,7 +76,7 @@ from invenio.config import (
 )
 from invenio.ext.logging import register_exception
 
-from invenio.modules.access.local_config import CFG_EXTERNAL_AUTH_USING_SSO, \
+from invenio_access.local_config import CFG_EXTERNAL_AUTH_USING_SSO, \
                                                 CFG_EXTERNAL_AUTHENTICATION
 from invenio.legacy.webuser import get_user_preferences, get_email, get_email_from_username
 from invenio.legacy.bibsched.bibtask_config import (
