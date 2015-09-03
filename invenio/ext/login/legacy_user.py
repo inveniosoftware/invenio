@@ -157,7 +157,7 @@ class UserInfo(CombinedMultiDict, UserMixin):
             data['email'] = user.email or ''
             data['note'] = user.note or ''
             data['group'] = map(lambda x: x.group.name,
-                                user.groups or [])
+                                getattr(user, 'groups', []))
             data.update(user.settings or {})
             data['settings'] = user.settings or {}
             data['guest'] = str(int(user.guest))  # '1' or '0'
