@@ -105,7 +105,8 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
 
 
         ## create OAI response
-        req.content_type = "text/xml"
+        req.content_type = "text/xml; charset=utf-8"
+        req.encoding = "UTF-8"
         req.send_http_header()
 
         if not oai_errors:
