@@ -113,6 +113,9 @@ install_requires = [
     "MySQL-python>=1.2.5",
     "numpy>=1.7",
     "nydus>=0.10.8",
+    # FIXME new oauthlib release after 0.7.2 has some compatible problems with
+    # the used Flask-Oauthlib version.
+    "oauthlib==0.7.2",
     # pyparsing>=2.0.2 has a new api and is not compatible yet
     "passlib>=1.6.2",
     "pyparsing>=2.0.1,<2.0.2",
