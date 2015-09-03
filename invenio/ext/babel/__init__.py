@@ -56,13 +56,13 @@ def set_locale(ln):
 
 def get_translation(locale):
     """Generate translation for given language."""
-    translations = None
+    translations = support.Translations.load(None, [locale])
     # NOTE that packages have to be loaded in reversed order!
     for plugin in reversed(current_app.extensions['registry']['packages']):
         if not pkg_resources.resource_isdir(plugin, 'translations'):
             continue
         dirname = pkg_resources.resource_filename(plugin, 'translations')
-        if translations is None:
+        if not hasattr(translations, 'merge'):
             translations = support.Translations.load(dirname, [locale])
         else:
             try:
