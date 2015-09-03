@@ -186,8 +186,8 @@ class UserInfo(CombinedMultiDict, UserMixin):
 
         from invenio.legacy.webuser import isUserSubmitter, isUserReferee, \
             isUserAdmin, isUserSuperAdmin
-        from invenio.modules.access.engine import acc_authorize_action
-        from invenio.modules.access.control import acc_get_role_id, \
+        from invenio_access.engine import acc_authorize_action
+        from invenio_access.control import acc_get_role_id, \
             acc_is_user_in_role
         from invenio_search.utils import \
             get_permitted_restricted_collections
@@ -258,7 +258,7 @@ class UserInfo(CombinedMultiDict, UserMixin):
 
     def is_authorized(self, name, **kwargs):
         """Check if user is authorized."""
-        from invenio.modules.access.engine import acc_authorize_action
+        from invenio_access.engine import acc_authorize_action
         return acc_authorize_action(self, name)[0] == 0
 
     def is_active(self):

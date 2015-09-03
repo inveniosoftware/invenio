@@ -22,5 +22,5 @@ import warnings
 from invenio.utils.deprecation import RemovedInInvenio23Warning
 
 warnings.warn("Legacy WebAccess will be removed in 2.3. Please check "
-              "'invenio.modules.access' module.",
+              "'invenio_access' module.",
               RemovedInInvenio23Warning)

@@ -89,8 +89,8 @@ from invenio.legacy.bibrecord import (get_fieldvalues,
 from .utils import record_exists
 from invenio.legacy.bibrecord import create_record, record_xml_output
 from invenio.legacy.miscutil.data_cacher import DataCacher
-from invenio.modules.access.control import acc_get_action_id
-from invenio.modules.access.local_config import VIEWRESTRCOLL, \
+from invenio_access.control import acc_get_action_id
+from invenio_access.local_config import VIEWRESTRCOLL, \
     CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS, \
     CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_USERIDS_IN_TAGS, \
     CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS, \
@@ -99,7 +99,7 @@ from invenio.modules.access.local_config import VIEWRESTRCOLL, \
 from intbitset import intbitset
 from invenio.legacy.dbquery import InvenioDbQueryWildcardLimitError
 from invenio.utils.serializers import deserialize_via_marshal
-from invenio.modules.access.engine import acc_authorize_action
+from invenio_access.engine import acc_authorize_action
 from invenio.ext.logging import register_exception
 from invenio.utils.text import encode_for_xml, wash_for_utf8, strip_accents
 from invenio.legacy import bibrecord
