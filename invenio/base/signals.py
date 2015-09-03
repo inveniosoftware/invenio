@@ -33,32 +33,6 @@ before_handle_user_exception = _signals.signal(
 This signal is sent right before user exception handler is called.
 """
 
-webcoll_after_webpage_cache_update = _signals.signal(
-    'webcoll-after-webpage-cache-update')
-"""
-This signal is sent right after webcoll runs webpage cache update.
-It is passed the collection to be sent named `response`.
-
-Example subscriber::
-
-    def clear_additional_cache(sender, collection=None, lang=None):
-        pass
-
-    from invenio.base.signals import webcoll_after_webpage_cache_update
-    from flask import current_app
-    webcoll_after_webpage_cache_update.connect(
-        clear_additional_cache,
-        current_app._get_current_object()
-    )
-"""
-
-webcoll_after_reclist_cache_update = _signals.signal(
-    'webcoll_after_reclist_cache_update')
-"""
-This signal is sent right after webcoll runs reclist cache update.
-It passes all updated collections.
-"""
-
 pre_command = _signals.signal('pre-command')
 """
 This signal is sent right before any inveniomanage command is executed.
