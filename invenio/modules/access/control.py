@@ -24,6 +24,8 @@ from __future__ import print_function
 
 import urlparse
 
+import warnings
+
 from intbitset import intbitset
 
 from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CFG_SITE_RECORD
@@ -44,6 +46,7 @@ from invenio.modules.access.models import AccACTION, AccAuthorization, \
 
 from six import iteritems
 
+from sqlalchemy import func
 from sqlalchemy.exc import ProgrammingError
 
 
@@ -57,6 +60,8 @@ def acc_add_action(name_action='', description='', optional='no',
     :return: id_action, name_action, description and allowedkeywords or
              0 in case of failure
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     keystr = ''
     # action with this name already exists, return 0
     if db.session.query(
@@ -93,6 +98,8 @@ def acc_delete_action(id_action=0, name_action=0):
     :param id_action: id of action to be deleted, prefered variable
     :param name_action: this is used if id_action is not given
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     id_action = id_action or acc_get_action_id(name_action=name_action)
     if not id_action:
         return 0
@@ -115,6 +122,8 @@ def acc_verify_action(name_action='', description='', allowedkeywords='',
 
     return id if identical, 0 if not.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     id_action = acc_get_action_id(name_action=name_action)
 
     if not id_action:
@@ -141,6 +150,8 @@ def acc_update_action(id_action=0, name_action='', verbose=0, **update):
     :param **update: dictionary containg keywords: description, allowed
         keywords and/or optional other keywords are ignored
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     id_action = id_action or acc_get_action_id(name_action=name_action)
 
     if not id_action:
@@ -222,6 +233,8 @@ def acc_add_role(name_role, description,
 
     firerole_def_src - firewall like role definition sources
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     if not run_sql("""SELECT name FROM "accROLE" WHERE name = %s""",
                    (name_role, )):
         res = run_sql(
@@ -244,20 +257,25 @@ def acc_is_role(name_action, **arguments):
     :param arguments: arguments for authorization
     """
     # first check if an action exists with this name
-    id_action = acc_get_action_id(name_action)
-    arole = run_sql(
-        """SELECT "id_accROLE" FROM "accROLE_accACTION_accARGUMENT" WHERE """
-        """ "id_accACTION" =%s AND argumentlistid <= 0 LIMIT 1""",
-        (id_action, ), 1, run_on_slave=True)
-    if arole:
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
+    action = AccACTION.query.filter_by(name=name_action).one()
+    auth = AccAuthorization.query.filter(
+        AccAuthorization.id_accACTION == action.id,
+        AccAuthorization.argumentlistid <= 0
+    ).first()
+    if auth.role:
         return True
-    other_roles_to_check = run_sql((
-        """SELECT "id_accROLE", keyword, value, argumentlistid FROM """
-        """ "accROLE_accACTION_accARGUMENT" JOIN "accARGUMENT" """
-        """ON "id_accARGUMENT"=id WHERE "id_accACTION" =%s """
-        """AND argumentlistid > 0"""), (id_action, ), run_on_slave=True)
+    auths = AccAuthorization.query.join(AccAuthorization.argument).filter(
+        AccAuthorization.id_accACTION == 3,
+        AccAuthorization.argumentlistid > 0
+    ).all()
     other_roles_to_check_dict = {}
-    for id_accROLE, keyword, value, argumentlistid in other_roles_to_check:
+    for auth in auths:
+        id_accROLE = auth.id_accROLE
+        keyword = auth.argument.keyword
+        value = auth.argument.value
+        argumentlistid = auth.argumentlistid
         try:
             other_roles_to_check_dict[
                 (id_accROLE, argumentlistid)][keyword] = value
@@ -285,6 +303,8 @@ def acc_delete_role(id_role=0, name_role=0):
     :param id_role: id of role to be deleted, prefered variable
     :param name_role: this is used if id_role is not given
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     count = 0
     id_role = id_role or acc_get_role_id(name_role=name_role)
 
@@ -341,6 +361,8 @@ def acc_update_role(id_role=0, name_role='', dummy=0, description='',
     :param firerole_def_ser: compiled firewall like role definition
     :param firerole_def_src: firewall like role definition
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     id_role = id_role or acc_get_role_id(name_role=name_role)
 
     if not id_role:
@@ -363,6 +385,8 @@ def acc_add_user_role(id_user=None, id_role=None, email='', name_role='',
     :param email: email of the user
     :param name_role: name of the role, to be used instead of id.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     id_user = id_user or acc_get_user_id(email=email)
     id_role = id_role or acc_get_role_id(name_role=name_role)
 
@@ -397,6 +421,8 @@ def acc_delete_user_role(id_user, id_role=0, name_role=0):
     :param id_role: role in the database, prefered parameter
     :param name_role: can also delete role on background of role name.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     # need to find id of the role
     id_role = id_role or acc_get_role_id(name_role=name_role)
 
@@ -416,6 +442,8 @@ def acc_add_argument(keyword='', value=''):
     :param keyword: inserted in keyword column
     :param value: inserted in value column.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     # if one of the values are missing, return 0
     if not keyword or not value:
         return 0
@@ -436,6 +464,8 @@ def acc_delete_argument(id_argument):
     :param id_argument: id of the argument to be deleted
     :return: the success of the operation is returned.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     # return number of deleted entries, 1 or 0
     return run_sql("""DELETE FROM "accARGUMENT" WHERE id = %s """,
                    (id_argument, ))
@@ -446,6 +476,8 @@ def acc_delete_argument_names(keyword='', value=''):
 
     send call to another function...
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     # one of the values is missing
     if not keyword or not value:
         return 0
@@ -477,6 +509,8 @@ def acc_add_authorization(name_role='', name_action='', optional=0, **keyval):
         arguments and add with arglistid -1 and id_argument -1
     :param **keyval: dictionary of keyword=value pairs, used to find ids.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     inserted = []
 
     # check that role and action exist
@@ -613,6 +647,8 @@ def acc_add_role_action_arguments(id_role=0, id_action=0, arglistid=-1,
     :param verbose: extra output
     :param id_arguments: list of arguments to add to group.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     inserted = []
 
     if verbose:
@@ -784,6 +820,8 @@ def acc_add_role_action_arguments_names(name_role='', name_action='',
 
     **keyval - dictionary of keyword=value pairs, used to find ids.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     if verbose:
         print('names: starting')
     if verbose:
@@ -859,6 +897,8 @@ def acc_delete_role_action_arguments(id_role, id_action, arglistid=1,
 
     id_arguments - list of ids to delete.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     keepauths = []  # these will be kept
     # find all possible actions
     pas = acc_find_possible_actions_ids(id_role, id_action)
@@ -901,6 +941,8 @@ def acc_delete_role_action_arguments_names(name_role='', name_action='',
 
     **keyval - dictionary of keyword=value pairs for the arguments.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     # find ids for role and action
     id_role = acc_get_role_id(name_role=name_role)
     id_action = acc_get_action_id(name_action=name_action)
@@ -943,6 +985,8 @@ def acc_delete_role_action_arguments_group(id_role=0, id_action=0,
 
     for connection between role and action.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     if not id_role or not id_action:
         return []
 
@@ -963,6 +1007,8 @@ def acc_delete_possible_actions(id_role=0, id_action=0, authids=[]):
 
     authids - list of row indexes to be removed.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     # find all authorizations
     pas = acc_find_possible_actions(id_role=id_role, id_action=id_action)
 
@@ -1001,6 +1047,8 @@ def acc_delete_possible_actions(id_role=0, id_action=0, authids=[]):
 
 def acc_delete_role_action(id_role=0, id_action=0):
     """delete all connections between a role and an action."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     count = run_sql(
         """DELETE FROM "accROLE_accACTION_accARGUMENT"
            WHERE "id_accROLE" = %s AND "id_accACTION" = %s """,
@@ -1018,6 +1066,8 @@ def acc_get_action_id(name_action):
 
     name_action - name of the wanted action
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     try:
         return run_sql("""SELECT id FROM "accACTION" WHERE name = %s""",
                        (name_action, ), run_on_slave=True)[0][0]
@@ -1027,6 +1077,8 @@ def acc_get_action_id(name_action):
 
 def acc_get_action_name(id_action):
     """get name of action when id is given."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     try:
         return run_sql("""SELECT name FROM "accACTION" WHERE id = %s""",
                        (id_action, ))[0][0]
@@ -1036,6 +1088,8 @@ def acc_get_action_name(id_action):
 
 def acc_get_action_description(id_action):
     """get description of action when id is given."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     try:
         return run_sql("""SELECT description FROM "accACTION" WHERE id = %s""",
                        (id_action, ))[0][0]
@@ -1048,6 +1102,8 @@ def acc_get_action_keywords(id_action=0, name_action=''):
 
     empty list if no keywords.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     result = acc_get_action_keywords_string(id_action=id_action,
                                             name_action=name_action)
 
@@ -1059,6 +1115,8 @@ def acc_get_action_keywords(id_action=0, name_action=''):
 
 def acc_get_action_keywords_string(id_action=0, name_action=''):
     """get keywordstring when id is given."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     id_action = id_action or acc_get_action_id(name_action)
     try:
         result = run_sql("""SELECT allowedkeywords from "accACTION"
@@ -1074,6 +1132,8 @@ def acc_get_action_is_optional(id_action=0):
 
     return 1 if yes, 0 if no.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     result = acc_get_action_optional(id_action=id_action)
     return result == 'yes' and 1 or 0
 
@@ -1083,6 +1143,8 @@ def acc_get_action_optional(id_action=0):
 
     return result, but 0 if action does not exist.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     try:
         result = run_sql("""SELECT optional from "accACTION" where id = %s""",
                          (id_action, ))[0][0]
@@ -1094,6 +1156,8 @@ def acc_get_action_optional(id_action=0):
 
 def acc_get_action_details(id_action=0):
     """get all the fields for an action."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     try:
         result = run_sql(
             """SELECT id,name,description,allowedkeywords,optional
@@ -1110,12 +1174,16 @@ def acc_get_action_details(id_action=0):
 
 def acc_get_all_actions():
     """return all entries in accACTION."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     return run_sql("""SELECT id, name, description
         FROM "accACTION" ORDER BY name""")
 
 
 def acc_get_action_roles(id_action):
     """Return all the roles connected with an action."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     return run_sql("""SELECT DISTINCT(r.id), r.name, r.description
         FROM "accROLE_accACTION_accARGUMENT" raa, "accROLE" r
         WHERE (raa."id_accROLE"  = r.id AND raa."id_accACTION"  = %s)
@@ -1127,6 +1195,8 @@ def acc_get_action_roles(id_action):
 
 def acc_get_role_id(name_role):
     """get id of role, name given."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     try:
         return run_sql("""SELECT id FROM "accROLE" WHERE name = %s""",
                        (name_role, ), run_on_slave=True)[0][0]
@@ -1136,6 +1206,8 @@ def acc_get_role_id(name_role):
 
 def acc_get_role_name(id_role):
     """get name of role, id given."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     try:
         return run_sql("""SELECT name FROM "accROLE" WHERE id = %s""",
                        (id_role, ))[0][0]
@@ -1145,6 +1217,8 @@ def acc_get_role_name(id_role):
 
 def acc_get_role_definition(id_role=0):
     """get firewall like role definition object for a role."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     try:
         return run_sql("""SELECT firerole_def_ser FROM "accROLE"
         WHERE id = %s""", (id_role, ))[0][0]
@@ -1154,6 +1228,8 @@ def acc_get_role_definition(id_role=0):
 
 def acc_get_role_details(id_role=0):
     """get all the fields for a role."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     try:
         result = run_sql("""SELECT id, name, description, firerole_def_src
         FROM "accROLE" WHERE id = %s """, (id_role, ))[0]
@@ -1168,6 +1244,8 @@ def acc_get_role_details(id_role=0):
 
 def acc_get_all_roles():
     """get all entries in accROLE."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     return run_sql("""SELECT id, name, description,
         firerole_def_ser, firerole_def_src
         FROM "accROLE" ORDER BY name""")
@@ -1175,6 +1253,8 @@ def acc_get_all_roles():
 
 def acc_get_role_actions(id_role):
     """get all actions connected to a role."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     if acc_get_role_name(id_role) == SUPERADMINROLE:
         return run_sql("""SELECT id, name, description
             FROM "accACTION"
@@ -1193,6 +1273,8 @@ def acc_get_role_users(id_role):
     Note this function will not consider implicit user linked by the
     FireRole definition.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     return run_sql("""SELECT DISTINCT(u.id), u.email, u.settings
         FROM "user_accROLE" ur, user u
         WHERE ur."id_accROLE"  = %s AND
@@ -1203,6 +1285,8 @@ def acc_get_role_users(id_role):
 
 def acc_get_roles_emails(id_roles):
     """Get emails by roles."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     from invenio_accounts.models import User
     return set(map(lambda u: u.email.lower().strip(),
                    db.session.query(db.func.distinct(User.email)).join(
@@ -1217,6 +1301,8 @@ def acc_get_argument_id(keyword, value):
 
     value = 'optional value' is replaced for "id_accARGUMENT" = -1.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     try:
         return run_sql("""SELECT DISTINCT id FROM "accARGUMENT"
         WHERE keyword = %s and value = %s""", (keyword, value))[0][0]
@@ -1230,6 +1316,8 @@ def acc_get_argument_id(keyword, value):
 
 def acc_get_user_email(id_user=0):
     """get email of user, id given."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     try:
         return run_sql("""SELECT email FROM "user" WHERE id = %s """,
                        (id_user, ))[0][0].lower().strip()
@@ -1239,6 +1327,8 @@ def acc_get_user_email(id_user=0):
 
 def acc_get_user_id(email=''):
     """get id of user, email given."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     try:
         return run_sql("""SELECT id FROM "user" WHERE email = %s """,
                        (email.lower().strip(), ))[0][0]
@@ -1248,11 +1338,13 @@ def acc_get_user_id(email=''):
 
 def acc_is_user_in_role(user_info, id_role):
     """Return True if the user belong implicitly or explicitly to the role."""
-    if run_sql("""SELECT ur."id_accROLE"
-            FROM "user_accROLE" ur
-            WHERE ur.id_user = %s AND ur.expiration >= NOW() AND
-            ur."id_accROLE"  = %s LIMIT 1""", (user_info['uid'], id_role), 1,
-               run_on_slave=True):
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
+    if UserAccROLE.query.filter(
+        UserAccROLE.id_user == user_info['uid'],
+        UserAccROLE.expiration >= func.now(),
+        UserAccROLE.id_accROLE == id_role
+    ).first():
         return True
 
     return acc_firerole_check_user(user_info, load_role_definition(id_role))
@@ -1260,6 +1352,8 @@ def acc_is_user_in_role(user_info, id_role):
 
 def acc_is_user_in_any_role(user_info, id_roles):
     """Check if the user have at least one of that roles."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     if db.session.query(db.func.count(UserAccROLE.id_accROLE)).filter(db.and_(
             UserAccROLE.id_user == user_info['uid'],
             UserAccROLE.expiration >= db.func.now(),
@@ -1275,6 +1369,8 @@ def acc_is_user_in_any_role(user_info, id_roles):
 
 def acc_get_user_roles_from_user_info(user_info):
     """get all roles a user is connected to."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     uid = user_info['uid']
     if uid == -1:
         roles = intbitset()
@@ -1298,6 +1394,8 @@ def acc_get_user_roles_from_user_info(user_info):
 
 def acc_get_user_roles(id_user):
     """get all roles a user is explicitly connected to."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     explicit_roles = run_sql("""SELECT ur."id_accROLE"
         FROM "user_accROLE" ur
         WHERE ur.id_user = %s AND ur.expiration >= NOW()
@@ -1313,6 +1411,8 @@ def acc_find_possible_activities(user_info, ln=CFG_SITE_LANG):
     is allowed (i.e. all the administrative action which are connected to
     an web area in Invenio) and the corresponding url.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     your_role_actions = acc_find_user_role_actions(user_info)
     your_admin_activities = {}
     for (role, action) in your_role_actions:
@@ -1356,6 +1456,8 @@ def acc_find_possible_activities(user_info, ln=CFG_SITE_LANG):
 
 def acc_find_user_role_actions(user_info):
     """find name of all roles and actions connected to user_info."""
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     uid = user_info['uid']
     # Not actions for anonymous
     if uid == -1:
@@ -1414,6 +1516,8 @@ def acc_find_possible_actions_all(id_role):
 
     returns a list with headers
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     query = """SELECT DISTINCT(aar."id_accACTION" )
                FROM "accROLE_accACTION_accARGUMENT" aar
                WHERE aar."id_accROLE"  = %s
@@ -1452,6 +1556,8 @@ def acc_find_possible_roles(name_action, always_add_superadmin=True,
 
     :return: roles as a list of role_id
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     query_roles_without_args = \
         db.select([AccAuthorization.id_accROLE], db.and_(
             AccAuthorization.argumentlistid <= 0,
@@ -1506,6 +1612,8 @@ def acc_find_possible_actions_user_from_user_info(user_info, id_action):
 
     id_action - action id.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     res = []
 
     for id_role in acc_get_user_roles_from_user_info(user_info):
@@ -1533,6 +1641,8 @@ def acc_find_possible_actions_user(id_user, id_action):
     Note this function considers only explicit links between users and roles,
     and not FireRole definitions.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     res = []
 
     for id_role in acc_get_user_roles(id_user):
@@ -1551,6 +1661,8 @@ def acc_find_possible_actions_ids(id_role, id_action):
 
     utilization of acc_get_argument_id and acc_find_possible_actions.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     pas = acc_find_possible_actions(id_role, id_action)
 
     if not pas:
@@ -1584,6 +1696,8 @@ def acc_find_possible_actions(id_role, id_action):
     if SUPERADMINROLE, nothing is returned since an infinte number of
     combination are possible.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     # query to find all entries for user and action
     res1 = run_sql(""" SELECT raa.argumentlistid, ar.keyword, ar.value
         FROM "accROLE_accACTION_accARGUMENT" raa, "accARGUMENT" ar
@@ -1687,6 +1801,8 @@ def acc_split_argument_group(id_role=0, id_action=0, arglistid=0):
 
     arglistid - argumentlistid to be splittetd
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     if not id_role or not id_action or not arglistid:
         return []
 
@@ -1726,6 +1842,8 @@ def acc_merge_argument_groups(id_role=0, id_action=0, arglistids=[]):
 
     arglistids - list of groups to be merged together into one.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     if len(arglistids) < 2:
         return []
 
@@ -1786,6 +1904,8 @@ def acc_reset_default_settings(superusers=(),
     additional_def_auths - additional list of default authorizations
         (see DEF_DEMO_AUTHS in access_control_config.py)
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     remove = acc_delete_all_settings()
     add = acc_add_default_settings(
         superusers, additional_def_user_roles,
@@ -1800,6 +1920,8 @@ def acc_delete_all_settings():
     simply remove all data affiliated with webaccess by truncating
     tables accROLE, accACTION, accARGUMENT and those connected.
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     from invenio.ext.sqlalchemy import db
     db.session.commit()
 
@@ -1829,6 +1951,8 @@ def acc_add_default_settings(superusers=(),
     additional_def_auths - additional list of default authorizations
         (see DEF_DEMO_AUTHS in access_control_config.py)
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     # from superusers: allow input formats ['email1', 'email2'] and
     # [['email1'], ['email2']] and [['email1', id], ['email2', id]]
     for user in superusers:
@@ -1913,6 +2037,8 @@ def acc_find_delegated_roles(id_role_admin=0):
 
     id_role_admin - id of the admin role
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     id_action_delegate = acc_get_action_id(name_action=DELEGATEADDUSERROLE)
 
     rolenames = run_sql("""SELECT DISTINCT(ar.value)
@@ -1942,6 +2068,8 @@ def acc_cleanup_arguments():
     returns how many arguments where deleted and a list of the deleted
     id_arguments
     """
+    warnings.warn("Legacy access interface deprecated.",
+                  PendingDeprecationWarning)
     # find unreferenced arguments
     ids1 = run_sql("""SELECT DISTINCT ar.id
         FROM "accARGUMENT" ar LEFT JOIN "accROLE_accACTION_accARGUMENT" raa ON
