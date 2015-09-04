@@ -79,12 +79,14 @@ PACKAGES = [
     'invenio_previewer',
     # TODO 'invenio_messages',
     'invenio_groups',
+    'invenio_access',
     'invenio_accounts',
     'invenio_upgrader',
     'invenio.base',
 ]
 
 PACKAGES_EXCLUDE = [
+    'invenio.modules.access',
     'invenio.modules.accounts',
     'invenio.modules.annotations',
     'invenio.modules.archiver',

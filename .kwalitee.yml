@@ -20,7 +20,6 @@
 min_reviewers: 2
 
 components:
-- access
 - accounts
 - admin
 - alerts

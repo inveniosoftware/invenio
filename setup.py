@@ -99,6 +99,7 @@ install_requires = [
     "fs>=0.4",
     "idutils>=0.1.0",
     "intbitset>=2.0",
+    "invenio-access>=0.1.0",
     "invenio-accounts>=0.1.0",
     "invenio-client>=0.1.0",
     "invenio-formatter>=0.2.0",
@@ -308,8 +309,6 @@ setup(
             'inveniogc = invenio.legacy.websession.scripts.inveniogc:main',
             'textmarc2xmlmarc = '
             ' invenio.legacy.bibrecord.scripts.textmarc2xmlmarc:main',
-            'webaccessadmin = '
-            ' invenio.modules.access.scripts.webaccessadmin:main',
             'webauthorprofile = '
             ' invenio.legacy.webauthorprofile.scripts.webauthorprofile:main',
             'xmlmarc2textmarc = '

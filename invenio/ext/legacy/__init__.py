@@ -41,7 +41,7 @@ from .request_class import LegacyRequest
 
 def cli_cmd_reset(sender, yes_i_know=False, drop=True, **kwargs):
     """Reset legacy values."""
-    from invenio.modules.access.scripts.webaccessadmin import main as \
+    from invenio_access.scripts.webaccessadmin import main as \
         webaccessadmin
 
     for cmd in (
