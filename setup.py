@@ -78,6 +78,7 @@ install_requires = [
     "fixture>=1.5",
     "Flask>=0.10.1",
     "Flask-Admin>=1.1.0",
+    "Flask-AppFactory>=0.1.0",
     "Flask-Assets>=0.10",
     "Flask-Babel>=0.9",
     "Flask-Breadcrumbs>=0.2",
