@@ -24,12 +24,6 @@ Admin's Guide
 .. toctree::
    :maxdepth: 1
 
-   bibconvert-admin-guide
-   bibedit-admin-guide
-   bibknowledge-admin-guide
    bibsched-admin-guide
    bibupload-admin-guide
-   oaiharvest-admin-guide
-   publiline-admin-guide
-   websession-admin-guide
    webstyle-admin-guide
