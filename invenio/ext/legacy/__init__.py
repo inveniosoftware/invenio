@@ -41,12 +41,15 @@ from .request_class import LegacyRequest
 
 def cli_cmd_reset(sender, yes_i_know=False, drop=True, **kwargs):
     """Reset legacy values."""
-    from invenio_access.scripts.webaccessadmin import main as \
-        webaccessadmin
+    cmds = []
+    if 'invenio_access' in current_app.config['PACKAGES']:
+        from invenio_access.scripts.webaccessadmin import main as \
+            webaccessadmin
+        cmds.append(
+            (webaccessadmin, "webaccessadmin -u admin -c -a -D")
+        )
 
-    for cmd in (
-        (webaccessadmin, "webaccessadmin -u admin -c -a -D"),
-    ):
+    for cmd in cmds:
         if run_py_func(*cmd, passthrough=True).exit_code:
             print("ERROR: failed execution of", *cmd)
             sys.exit(1)
