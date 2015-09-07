@@ -77,7 +77,6 @@ from invenio.config import \
      CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY, \
      CFG_WEBSEARCH_WILDCARD_LIMIT
 
-from invenio_search.searchext.engines.native import search_unit
 from invenio_search.utils import get_most_popular_field_values
 from invenio_search.errors import \
      InvenioWebSearchUnknownCollectionError, \
@@ -210,11 +209,8 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0,
 
        This function is suitable as a mid-level API.
     """
-    if f is None:
-        from invenio_search.api import Query
-        results = Query(p).search()
-    else:
-        results = search_unit(p, f, m, wl=wl)
+    from invenio_search.api import Query
+    results = Query(p).search()
     import warnings
     warnings.warn(
         'Deprecated search_pattern(p={0}, f={1}, m={2}) = {3}.'.format(
@@ -222,9 +218,6 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0,
         stacklevel=2
     )
     return results
-
-
-from invenio_search.searchext.engines.native import *
 
 
 def guess_primary_collection_of_a_record(recID):
