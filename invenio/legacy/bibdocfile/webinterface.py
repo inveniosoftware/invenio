@@ -42,8 +42,8 @@ from invenio_access.engine import acc_authorize_action
 from invenio_access.control import acc_is_role
 from invenio_records.api import get_record
 from invenio.legacy.bibrecord import record_empty
-from invenio.legacy.webpage import page, pageheaderonly, \
-    pagefooteronly, warning_page, write_warning
+from invenio.legacy.webpage import page, \
+    warning_page, write_warning
 from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_info, isUserSuperAdmin, \
                             isGuestUser
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
@@ -51,17 +51,15 @@ from invenio.utils.url import make_canonical_urlargd, redirect_to_url
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.search_engine import \
      guess_primary_collection_of_a_record, record_exists, \
-     create_navtrail_links, check_user_can_view_record
+     check_user_can_view_record
 from invenio_records.access import is_user_owner_of_record
 from invenio.legacy.bibdocfile.api import BibRecDocs, normalize_format, file_strip_ext, \
     stream_restricted_icon, BibDoc, InvenioBibDocFileError, \
     get_subformat_from_format
 from invenio.ext.logging import register_exception
-from invenio_collections.models import Collection
 import invenio.legacy.template
 bibdocfile_templates = invenio.legacy.template.load('bibdocfile')
 webstyle_templates = invenio.legacy.template.load('webstyle')
-websearch_templates = invenio.legacy.template.load('websearch')
 
 from invenio.legacy.bibdocfile.managedocfiles import \
      create_file_upload_interface, \
@@ -175,8 +173,6 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 if version != 'all':
                     version = ''
 
-            display_hidden = isUserSuperAdmin(user_info)
-
             if version != 'all':
                 # search this filename in the complete list of files
                 for doc in bibarchive.list_bibdocs():
@@ -229,55 +225,10 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 req.status = apache.HTTP_NOT_FOUND
                 warn += write_warning(_("Requested file does not seem to exist."))
 #            filelist = bibarchive.display("", version, ln=ln, verbose=verbose, display_hidden=display_hidden)
-            filelist = bibdocfile_templates.tmpl_display_bibrecdocs(bibarchive, "", version, ln=ln, verbose=verbose, display_hidden=display_hidden)
-
-            t = warn + bibdocfile_templates.tmpl_filelist(
-                ln=ln,
-                filelist=filelist)
-
-            cc = guess_primary_collection_of_a_record(self.recid)
-            cc_id = Collection.query.filter_by(name=cc).value('id')
             unordered_tabs = None  # get_detailed_page_tabs(cc_id, self.recid, ln)
             ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in iteritems(unordered_tabs)]
             ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
-            link_ln = ''
-            if ln != CFG_SITE_LANG:
-                link_ln = '?ln=%s' % ln
-            tabs = [(unordered_tabs[tab_id]['label'],
-                     '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln),
-                     tab_id == 'files',
-                     unordered_tabs[tab_id]['enabled'])
-                    for (tab_id, dummy_order) in ordered_tabs_id
-                    if unordered_tabs[tab_id]['visible'] is True]
 
-            tabs_counts = {}  # get_detailed_page_tabs_counts(self.recid)
-            top = webstyle_templates.detailed_record_container_top(self.recid,
-                                                                   tabs,
-                                                                   args['ln'],
-                                                                   citationnum=tabs_counts['Citations'],
-                                                                   referencenum=tabs_counts['References'],
-                                                                   discussionnum=tabs_counts['Discussions'])
-            bottom = webstyle_templates.detailed_record_container_bottom(self.recid,
-                                                                         tabs,
-                                                                         args['ln'])
-            title, description, keywords = websearch_templates.tmpl_record_page_header_content(req, self.recid, args['ln'])
-            return pageheaderonly(title=title,
-                        navtrail=create_navtrail_links(cc=cc, aas=0, ln=ln) + \
-                                        ''' &gt; <a class="navtrail" href="%s/%s/%s">%s</a>
-                                        &gt; %s''' % \
-                        (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, title, _("Access to Fulltext")),
-
-                        description=description,
-                        keywords=keywords,
-                        uid=uid,
-                        language=ln,
-                        req=req,
-                        navmenuid='search',
-                        navtrail_append_title_p=0) + \
-                        websearch_templates.tmpl_search_pagestart(ln) + \
-                        top + t + bottom + \
-                        websearch_templates.tmpl_search_pageend(ln) + \
-                        pagefooteronly(language=ln, req=req)
         return getfile, []
 
     def __call__(self, req, form):
@@ -423,18 +374,6 @@ class WebInterfaceManageDocFilesPages(WebInterfaceDirectory):
         if argd['recid'] and argd['do'] == 0:
             # Displaying interface to manage files
             # Prepare navtrail
-            title, dummy_description, dummy_keywords = websearch_templates.tmpl_record_page_header_content(req, argd['recid'],
-                                                                                               argd['ln'])
-            navtrail = '''<a class="navtrail" href="%(CFG_SITE_URL)s/help/admin">Admin Area</a> &gt;
-        <a class="navtrail" href="%(CFG_SITE_URL)s/%(CFG_SITE_RECORD)s/managedocfiles">%(manage_files)s</a> &gt;
-        %(record)s: %(title)s
-        ''' \
-            % {'CFG_SITE_URL': CFG_SITE_URL,
-               'title': title,
-               'manage_files': _("Document File Manager"),
-               'record': _("Record #%(x_rec)i", x_rec=argd['recid']),
-               'CFG_SITE_RECORD': CFG_SITE_RECORD}
-
             body += create_file_upload_interface(\
                 recid=argd['recid'],
                 ln=argd['ln'],
