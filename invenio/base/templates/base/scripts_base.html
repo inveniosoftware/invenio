@@ -23,6 +23,6 @@
   <!-- {{ bundle.weight }}: {{ bundle.output }} -->
   {%- endif %}
   {%- assets bundle %}
-  <script type="text/javascript" src="{{ EXTRA.static_url_path }}{{ ASSET_URL }}"></script>
+  <script type="text/javascript" src="{{ (EXTRA.get('static_url_path', '') + ASSET_URL) | replace('//', '/') }}"></script>
   {%- endassets %}
 {%- endfor %}

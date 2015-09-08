@@ -67,6 +67,7 @@ PACKAGES = [
     'invenio_collections',
     'invenio_documents',
     'invenio_pidstore',
+    'invenio_jsonschemas',
     'invenio.modules.*',
     'invenio_formatter',
     'invenio_unapi',

@@ -22,6 +22,15 @@
 FROM python:2.7-slim
 MAINTAINER CERN <info@invenio-software.org>
 
+# expose the right port
+EXPOSE 28080
+
+# add invenio user
+RUN useradd --home-dir /home/invenio --create-home --shell /bin/bash --uid 1000 invenio
+
+# set work dir
+WORKDIR /code
+
 # nodejs repo
 # detects distribution and adds the right repo
 # See: https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager#debian-and-ubuntu-based-linux-distributions
@@ -29,24 +38,26 @@ RUN apt-get update && \
     apt-get -qy install --fix-missing --no-install-recommends \
         curl \
         && \
-    curl -sL https://deb.nodesource.com/setup_0.10 | bash -
+    curl -sL https://deb.nodesource.com/setup_iojs_2.x | bash -
 
-# install requirements from repos
-# also clean up apt
+#  - package cache updates
+#  - install requirements from repos
+#  - clean up
+#  - install python requirements
+#  - install nodejs requirements
 RUN apt-get update && \
     apt-get -qy upgrade --fix-missing --no-install-recommends && \
     apt-get -qy install --fix-missing --no-install-recommends \
         gcc \
         git \
+        iojs \
         libffi-dev \
         liblzma-dev \
         libmysqlclient-dev \
         libssl-dev \
         libxslt-dev \
         mysql-client \
-        nodejs \
         poppler-utils \
-        subversion \
         sudo \
         && \
     apt-get clean autoclean && \
@@ -54,46 +65,47 @@ RUN apt-get update && \
     rm -rf /var/lib/{apt,dpkg}/ && \
     (find /usr/share/doc -depth -type f ! -name copyright -delete || true) && \
     (find /usr/share/doc -empty -delete || true) && \
-    rm -rf /usr/share/man/* /usr/share/groff/* /usr/share/info/*
-
-# install python requirements
-RUN pip install --upgrade pip && \
+    rm -rf /usr/share/man/* /usr/share/groff/* /usr/share/info/* && \
+    pip install --upgrade pip && \
     pip install ipdb \
         ipython \
         mock \
         unittest2 \
-        watchdog
-
-# install nodejs requirements
-RUN npm update && \
+        watchdog \
+        && \
+    npm update && \
     npm install --silent -g bower less clean-css uglify-js requirejs
-
-# add invenio user
-RUN useradd --home-dir /home/invenio --create-home --shell /bin/bash --uid 1000 invenio
 
 
 ###############################################################################
 ## 2. Requirements (semi-stable)                                             ##
 ###############################################################################
 
-# select proper requierments level
+# global environment variables:
+#  - docker specific paths for Invenio
+#  - proper requirements level
+#  - Python extras
+ENV INVENIOBASE_INSTANCE_PATH="/home/invenio/instance" \
+    INVENIOBASE_STATIC_FOLDER="/home/invenio/static" \
+    REQUIREMENTS="devel" \
+    REXTRAS="development,docs"
 #ENV REQUIREMENTS lowest
-ENV REQUIREMENTS release
-#ENV REQUIREMENTS devel
-ENV REXTRAS development,docs
+#ENV REQUIREMENTS release
 
 # add requirement files
 COPY ./requirements-devel.txt ./requirements.py ./setup.cfg ./setup.py /code/
 COPY ./invenio/version.py /code/invenio/version.py
-WORKDIR /code
 
 # install python requirements
 # the different levels get composed from different sources
 # higher levels include all requirements of lower levels
+# NOTE: the compilation step is not that important, because it also compiles some tests
+#       for modules that contain syntax errors on purpose (e.g. flask-registry)
 RUN python requirements.py --extras=$REXTRAS --level=min > requirements.py.lowest.txt && \
     python requirements.py --extras=$REXTRAS --level=pypi > requirements.py.release.txt && \
     python requirements.py --extras=$REXTRAS --level=dev > requirements.py.devel.txt && \
-    pip install -r requirements.py.$REQUIREMENTS.txt --allow-all-external --quiet
+    pip install --requirement requirements.py.$REQUIREMENTS.txt --allow-all-external && \
+    (python -O -m compileall || true)
 
 
 ###############################################################################
@@ -108,14 +120,14 @@ COPY . /code
 ## 4. Build (changing)                                                       ##
 ###############################################################################
 
-# install invenio
-RUN pip install -e .[$REXTRAS] --quiet
-
-# build translation catalog
-RUN python setup.py compile_catalog
-
-# clean up
-RUN rm -rf /tmp/* /var/tmp/* /var/lib/{cache,log}/ /root/.cache/*
+#  - install invenio
+#  - update Python bytecode
+#  - build translation catalog
+#  - clean up
+RUN pip install --editable .[$REXTRAS] && \
+    (python -O -m compileall . || true) && \
+    python setup.py compile_catalog && \
+    rm -rf /tmp/* /var/tmp/* /var/lib/{cache,log}/ /root/.cache/*
 
 
 ###############################################################################
@@ -136,13 +148,7 @@ USER invenio
 # add volumes
 # do this AFTER `chown`, because otherwise directory permissions are not
 # preserved
-VOLUME /code
-VOLUME /home/invenio
-VOLUME /tmp
-
-# global environment variables
-ENV INVENIOBASE_INSTANCE_PATH /home/invenio/instance
-ENV INVENIOBASE_STATIC_FOLDER /home/invenio/static
+VOLUME ["/code", "/home/invenio", "/tmp"]
 
 # install init scripts
 ENTRYPOINT ["/code/scripts/docker_boot.sh"]
