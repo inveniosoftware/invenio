@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -487,7 +487,8 @@ class Template:
         """ Returns the OpenSearch description file of this site.
         """
         _ = gettext_set_language(ln)
-        return """<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
+        return """<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
                        xmlns:moz="http://www.mozilla.org/2006/browser/search/">
 <ShortName>%(short_name)s</ShortName>
 <LongName>%(long_name)s</LongName>
@@ -500,10 +501,10 @@ class Template:
 <Developer>Powered by Invenio</Developer>
 <Url type="text/html" indexOffset="1" rel="results" template="%(html_search_syntax)s" />
 <Url type="application/rss+xml" indexOffset="1" rel="results" template="%(rss_search_syntax)s" />
-<Url type="application/opensearchdescription+xml" rel="self" template="%(CFG_BASE_URL)s/opensearchdescription" />
-<moz:SearchForm>%(CFG_BASE_URL)s</moz:SearchForm>
+<Url type="application/opensearchdescription+xml" rel="self" template="%(CFG_SITE_URL)s/opensearchdescription" />
+<moz:SearchForm>%(CFG_SITE_URL)s</moz:SearchForm>
 </OpenSearchDescription>""" % \
-  {'CFG_BASE_URL': CFG_BASE_URL,
+  {'CFG_SITE_URL': CFG_SITE_URL,
    'short_name': CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)[:16],
    'long_name': CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
    'description': (_("Search on %(x_CFG_SITE_NAME_INTL)s") % \
