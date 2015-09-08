@@ -57,7 +57,6 @@ EXTENSIONS = [
     'flask_breadcrumbs:Breadcrumbs',
     'invenio_deposit.url_converters',
     # TODO 'invenio.ext.iiif',
-    'invenio.ext.es',
 ]
 
 PACKAGES = [
