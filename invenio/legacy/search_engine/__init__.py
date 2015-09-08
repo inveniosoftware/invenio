@@ -154,6 +154,11 @@ def create_navtrail_links(cc=CFG_SITE_NAME, aas=0, ln=CFG_SITE_LANG, self_p=1, t
 from invenio_search.washers import *
 
 
+# FIXME remove from master in 66ad8455 commit
+def get_collection_reclist(coll, recreate_cache_if_needed=True):
+    """Return hitset of recIDs that belong to the collection 'coll'."""
+    return intbitset()
+
 def get_coll_ancestors(coll):
     "Returns a list of ancestors for collection 'coll'."
     coll_ancestors = []

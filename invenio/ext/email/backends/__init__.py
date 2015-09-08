@@ -24,7 +24,7 @@ CFG_SITE_ADMIN_EMAIL.
 
 __revision__ = "$Id$"
 
-from invenio.config import CFG_SITE_ADMIN_EMAIL
+from invenio.base.globals import cfg
 
 
 def adminonly_class(Backend):
@@ -40,7 +40,7 @@ def adminonly_class(Backend):
 #%s
 #--------------------------------------------------------------
 #%s""" % (','.join(m.recipients()), m.body)
-                m.to = [CFG_SITE_ADMIN_EMAIL]
+                m.to = [cfg['CFG_SITE_ADMIN_EMAIL']]
                 m.cc = []
                 m.bcc = []
                 if 'Cc' in m.extra_headers:

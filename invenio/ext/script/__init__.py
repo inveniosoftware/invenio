@@ -104,7 +104,7 @@ def check_for_software_updates(flash_message=False):
     :return: True if you have latest version, else False if you need to upgrade
              or None if server was not reachable.
     """
-    from invenio.config import CFG_VERSION
+    from invenio.version import __version__ as invenio_version
     from invenio.base.i18n import _
     try:
         find = re.compile('Invenio v[0-9]+.[0-9]+.[0-9]+(\-rc[0-9])?'
@@ -134,7 +134,7 @@ def check_for_software_updates(flash_message=False):
         version1 = submatch.search(version)
         web_version = version1.group().split(".")
 
-        local_version = CFG_VERSION.split(".")
+        local_version = invenio_version.split(".")
 
         if (web_version[0] > local_version[0] or
                 web_version[0] == local_version[0] and
