@@ -27,7 +27,6 @@ config.toolbar_WebJournal = [
 ['Maximize','ShowBlocks']
 ];
 
-config.skin = 'v2';
 config.resize_enabled = false;
 
 /* Remove "status" bar at the bottom of the editor displaying the DOM path*/

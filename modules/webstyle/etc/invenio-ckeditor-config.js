@@ -24,7 +24,6 @@ config.toolbar_WebComment = [
                              ['HorizontalRule','Smiley','SpecialChar','ScientificChar']
 			     ];
 
-config.skin = 'v2';
 config.resize_dir = 'vertical';
 
 /* Enable browser built-in spellchecker */

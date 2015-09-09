@@ -30,7 +30,7 @@ MJV = 2.3
 MATHJAX = http://invenio-software.org/download/mathjax/MathJax-v$(MJV).zip
 
 # current CKeditor version
-CKV = 3.6.6
+CKV = 4.5.3
 CKEDITOR = ckeditor_$(CKV).zip
 
 # current MediaElement.js version
