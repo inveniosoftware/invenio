@@ -78,6 +78,9 @@ Contents
         natively in UTF-8 mode by setting "default-character-set=utf8"
         in various parts of your "my.cnf" file, such as in the
         "[mysql]" part and elsewhere; but this is not really required.
+        Note also that you may encounter problems when MySQL is run in
+        "strict mode"; you may want to configure your "my.cnf" in order
+        to avoid using strict mode (such as `STRICT_ALL_TABLES`).
         <http://mysql.com/>
 
      c) Apache 2 server, with support for loading DSO modules, and
