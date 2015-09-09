@@ -79,7 +79,6 @@ components:
 - script
 - sequencegenerator
 - session
-- sorter
 - sqlalchemy
 - sslify
 - sso
