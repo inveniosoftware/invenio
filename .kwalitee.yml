@@ -86,6 +86,7 @@ components:
 - submit
 - sword
 - tags
+- tests
 - template
 - textminer
 - tickets

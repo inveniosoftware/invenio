@@ -1220,10 +1220,8 @@ def iter_suites(packages=None):
     if packages is None:
         testsuite = ModuleAutoDiscoveryRegistry('testsuite', app=app)
         from invenio import testsuite as testsuite_invenio
-        from invenio.base import testsuite as testsuite_base
         from invenio.celery import testsuite as testsuite_celery
         testsuite.register(testsuite_invenio)
-        testsuite.register(testsuite_base)
         testsuite.register(testsuite_celery)
     else:
         exclude = map(lambda x: x + '.testsuite',
