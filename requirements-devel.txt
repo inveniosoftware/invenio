@@ -16,6 +16,8 @@
 -e git+git://github.com/inveniosoftware/idutils.git#egg=idutils
 -e git+git://github.com/inveniosoftware/intbitset.git#egg=intbitset
 -e git+git://github.com/inveniosoftware/invenio-access.git#egg=invenio-access
+-e git+git://github.com/inveniosoftware/invenio-accounts.git#egg=invenio-accounts
+-e git+git://github.com/inveniosoftware/invenio-base.git#egg=invenio-base
 -e git+git://github.com/inveniosoftware/invenio-client.git#egg=invenio-client
 -e git+git://github.com/inveniosoftware/invenio-collections.git#egg=invenio-collections
 -e git+git://github.com/inveniosoftware/invenio-comments.git#egg=invenio-comments

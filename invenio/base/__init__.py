@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+#
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,9 +17,20 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.A
 
-"""
-    invenio.base
-    ------------
+"""Import proxy for 'invenio_base' package."""
 
-    Builds the Invenio application.
-"""
+import warnings
+
+warnings.warn('"invenio.base" is deprecated in favor of "invenio_base".',
+              DeprecationWarning)
+
+
+def setup():
+    """Install import proxy."""
+    from flask.exthook import ExtensionImporter
+    importer = ExtensionImporter(['invenio_base.%s'], __name__)
+    importer.install()
+
+
+setup()
+del setup

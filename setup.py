@@ -101,6 +101,7 @@ install_requires = [
     "intbitset>=2.0",
     "invenio-access>=0.1.0",
     "invenio-accounts>=0.1.2",
+    "invenio-base>=0.1.0",
     "invenio-client>=0.1.0",
     "invenio-formatter>=0.2.0",
     "invenio-groups>=0.1.0",
@@ -292,7 +293,6 @@ setup(
     platforms='any',
     entry_points={
         'console_scripts': [
-            'inveniomanage = invenio.base.manage:main',
             'plotextractor = invenio.utils.scripts.plotextractor:main',
             # Legacy
             'alertengine = invenio.legacy.webalert.scripts.alertengine:main',
@@ -312,9 +312,6 @@ setup(
             ' invenio.legacy.bibrecord.scripts.xmlmarc2textmarc:main',
             'xmlmarclint = invenio.legacy.bibrecord.scripts.xmlmarclint:main',
         ],
-        "distutils.commands": [
-            "inveniomanage = invenio.base.setuptools:InvenioManageCommand",
-        ]
     },
     setup_requires=setup_requires,
     install_requires=install_requires,

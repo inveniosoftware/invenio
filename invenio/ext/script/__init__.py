@@ -301,7 +301,7 @@ def register_manager(manager):
             manager.add_command(script.split('.')[-1],
                                 import_string(script + ':manager'))
         for script in managers:
-            if script.__name__ == 'invenio.base.manage':
+            if script.__name__ == 'invenio_base.manage':
                 continue
             manager.add_command(extract_name(script.__name__),
                                 getattr(script, 'manager'))
