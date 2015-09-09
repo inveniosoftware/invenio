@@ -48,16 +48,16 @@ refer to it as ``$MYSQL_ROOT``.
 
     $ sudo apt-get install mysql-server
 
-2.1.2. Node.js
+2.1.2. Io.js
 ++++++++++++++
 
-`node.js <http://nodejs.org/>`_ and `npm <https://www.npmjs.org/>`_ can be
-installed using NodeSource's script.
+`io.js <http://iojs.org/>`_ and `npm <https://www.npmjs.org/>`_ can be
+installed using io.js's script.
 
 .. code-block:: console
 
-    $ curl -sL https://deb.nodesource.com/setup_0.10 | sudo bash -
-    $ sudo apt-get install nodejs
+    $ curl -sL https://deb.nodesource.com/setup_iojs_2.x | sudo bash -
+    $ sudo apt-get install iojs
 
 2.2. Centos / RHEL
 ~~~~~~~~~~~~~~~~~~
@@ -109,12 +109,12 @@ parameter to rpm.
     $ sudo mysql_secure_installation
     # follow the instructions
 
-2.2.2. Node.js
-++++++++++++++
+2.2.2. Io.js / Node.js
+++++++++++++++++++++++
 
-Node.js requires a bit more manual work to install it from the sources. We are
-following the tutorial: `digital ocean: tutorial on how to install node.js on
-centor
+Io.js or Node.js require a bit more manual work to install it from the sources.
+We are following the tutorial: `digital ocean: tutorial on how to install
+node.js on centos
 <https://www.digitalocean.com/community/tutorials/how-to-install-and-run-a-node-js-app-on-centos-6-4-64bit>`_
 
 .. code-block:: console

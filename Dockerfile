@@ -31,9 +31,7 @@ RUN useradd --home-dir /home/invenio --create-home --shell /bin/bash --uid 1000 
 # set work dir
 WORKDIR /code
 
-# nodejs repo
-# detects distribution and adds the right repo
-# See: https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager#debian-and-ubuntu-based-linux-distributions
+# iojs, detects distribution and adds the right repo
 RUN apt-get update && \
     apt-get -qy install --fix-missing --no-install-recommends \
         curl \
@@ -44,7 +42,7 @@ RUN apt-get update && \
 #  - install requirements from repos
 #  - clean up
 #  - install python requirements
-#  - install nodejs requirements
+#  - install iojs requirements
 RUN apt-get update && \
     apt-get -qy upgrade --fix-missing --no-install-recommends && \
     apt-get -qy install --fix-missing --no-install-recommends \
