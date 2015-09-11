@@ -120,9 +120,7 @@ class LaziestDict(LazyDict):
 
         def reader_discover(key):
             from werkzeug.utils import import_string
-            return import_string(
-                'invenio.jsonalchemy.jsonext.readers%sreader:reader' % (key)
-            )
+            return import_string(key)
 
         laziest_dict = LaziestDict(reader_discover)
 

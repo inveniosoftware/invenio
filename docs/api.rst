@@ -45,15 +45,6 @@ Extensions
    ext/sqlalchemy
    ext/template
 
-Modules
--------
-
-.. toctree::
-   :maxdepth: 1
-
-   modules/jsonalchemy
-
-
 Utilities
 ---------
 

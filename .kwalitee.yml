@@ -56,7 +56,6 @@ components:
 - indexer
 - installation
 - jasmine
-- jsonalchemy
 - kwalitee
 - legacy
 - logging
