@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@ from invenio.celery import celery
 @celery.task
 def invenio_version():
     """ Task that will return the current running Invenio version """
-    from invenio.base.globals import cfg
+    from invenio_base.globals import cfg
     return cfg['CFG_VERSION']
 
 

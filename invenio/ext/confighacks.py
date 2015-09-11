@@ -86,7 +86,7 @@ def setup_app(app):
             elif name == '__path__':
                 return os.path.dirname(__file__)
             try:
-                from invenio.base.helpers import utf8ifier
+                from invenio_base.helpers import utf8ifier
                 warnings.warn(
                     "Usage of invenio.config.{0} is deprecated".format(name),
                     RemovedInInvenio23Warning

@@ -19,7 +19,7 @@
 
 """Dashboard User Settings"""
 
-from invenio.base.i18n import _
+from invenio_base.i18n import _
 from flask_login import current_user
 from invenio.modules.dashboard.settings import Settings, \
     UserSettingsAttributeStorage

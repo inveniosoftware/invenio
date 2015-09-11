@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@ from __future__ import absolute_import
 
 import logging
 
-from invenio.base.globals import cfg
+from invenio_base.globals import cfg
 
 from .wrappers import _get_filename_and_line
 from .models import HstEXCEPTION

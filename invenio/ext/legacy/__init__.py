@@ -29,9 +29,9 @@ from flask import (abort, current_app, g, render_template, request,
 
 from flask_admin.menu import MenuLink
 
-from invenio.base import signals
-from invenio.base.scripts.database import create, recreate
-from invenio.base.utils import run_py_func
+from invenio_base import signals
+from invenio_base.scripts.database import create, recreate
+from invenio_base.utils import run_py_func
 
 from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import BaseResponse

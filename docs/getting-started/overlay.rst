@@ -1,5 +1,5 @@
 ..  This file is part of Invenio
-    Copyright (C) 2014 CERN.
+    Copyright (C) 2014, 2015 CERN.
 
     Invenio is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -194,7 +194,7 @@ Put the required configuration into ``config.py``.
     PACKAGES = [
         "myoverlay.base",
         "invenio.modules.*",
-        "invenio.base",
+        "invenio_base",
     ]
 
     try:
@@ -575,7 +575,7 @@ Let's create the ``wsgi.py`` file.
 
 .. code-block:: python
 
-    from invenio.base.factory import create_wsgi_app
+    from invenio_base.factory import create_wsgi_app
 
     application = create_wsgi_app()
 

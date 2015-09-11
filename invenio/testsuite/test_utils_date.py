@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -108,7 +108,7 @@ class ConvertIntoDateGUITest(InvenioTestCase):
     if lang_slovak_configured:
         def test_convert_bad_to_dategui_sk(self):
             """dateutils - conversion of bad text date into Slovak GUI date"""
-            from invenio.base.i18n import gettext_set_language
+            from invenio_base.i18n import gettext_set_language
             ln = 'sk'
             _ = gettext_set_language(ln)
             datetext = "2006-02-AA 18:36:01"

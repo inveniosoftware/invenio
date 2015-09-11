@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@ from __future__ import absolute_import
 from HTMLParser import HTMLParser
 from six import iteritems
 from werkzeug.local import LocalProxy
-from invenio.base.globals import cfg
+from invenio_base.globals import cfg
 from invenio.utils.text import indent_text, encode_for_xml
 default_ln = lambda ln: cfg['CFG_SITE_LANG'] if ln is None else ln
 import re

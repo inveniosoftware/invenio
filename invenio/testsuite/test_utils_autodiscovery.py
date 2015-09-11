@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011, 2012, 2013 CERN.
+# Copyright (C) 2009, 2010, 2011, 2012, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -32,7 +32,7 @@ class AutodiscoveryTest(InvenioTestCase):
 
     def test_autodiscover_modules(self):
         """autodiscover modules"""
-        modules = autodiscover_modules(['invenio.base'], related_name_re='config')
+        modules = autodiscover_modules(['invenio_base'], related_name_re='config')
         assert(len(modules) == 1)
         assert(None not in modules)
         modules = autodiscover_modules(['invenio.not_an_existing_folder'], related_name_re='foo_.+')

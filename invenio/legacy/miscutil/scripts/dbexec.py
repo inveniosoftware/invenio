@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2013 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012,
+#               2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,7 +25,7 @@ __revision__ = "$Id$"
 import subprocess
 import sys
 
-from invenio.base.globals import cfg
+from invenio_base.globals import cfg
 from invenio.ext.script import Manager
 
 manager = Manager(usage="Runs SQL commands")
@@ -60,7 +61,7 @@ def dbexec(version=False, interactive=False):
 
 
 def main():
-    from invenio.base.factory import create_app
+    from invenio_base.factory import create_app
     app = create_app()
     manager.app = app
     if len(sys.argv) < 2 or sys.argv[1] != 'dbexec':

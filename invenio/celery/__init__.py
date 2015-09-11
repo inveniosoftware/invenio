@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -62,7 +62,7 @@ class InvenioLoader(BaseLoader):
             if current_app:
                 self.flask_app = current_app
             else:
-                from invenio.base.factory import create_app
+                from invenio_base.factory import create_app
                 self.flask_app = create_app(CELERY_CONTEXT=True)
                 from invenio.ext.sqlalchemy import db
                 self.db = db

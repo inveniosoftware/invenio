@@ -570,7 +570,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             _get_record(rec_id)
 
             # Fire record signals.
-            from invenio.base import signals
+            from invenio_base import signals
             if record_had_altered_bit:
                 signals.record_after_update.send(
                     'bibupload', recid=rec_id)

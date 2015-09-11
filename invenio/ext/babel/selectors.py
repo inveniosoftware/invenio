@@ -25,7 +25,7 @@ from flask_login import current_user
 
 def get_locale():
     """Compute the language needed to return the answer to the client."""
-    from invenio.base.i18n import wash_language
+    from invenio_base.i18n import wash_language
     required_ln = None
     passed_ln = request.values.get('ln', type=str)
     if passed_ln:

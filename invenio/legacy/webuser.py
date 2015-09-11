@@ -48,7 +48,7 @@ import os
 import binascii
 import time
 
-from invenio.base.wrappers import lazy_import
+from invenio_base.wrappers import lazy_import
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_ACCESS_CONTROL_LEVEL_GUESTS, \
@@ -77,7 +77,7 @@ from invenio.legacy.dbquery import run_sql
 from invenio.utils.serializers import serialize_via_marshal
 
 
-from invenio.base.i18n import gettext_set_language, wash_languages, wash_language
+from invenio_base.i18n import gettext_set_language, wash_languages, wash_language
 from invenio.ext.email import send_email
 from invenio.ext.logging import register_exception
 from invenio.ext.sqlalchemy import db

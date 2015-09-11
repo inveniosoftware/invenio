@@ -57,7 +57,7 @@ from flask_registry import ModuleAutoDiscoveryRegistry, RegistryProxy
 from flask_script import Manager as FlaskExtManager
 from flask_script.commands import Clean, Server, Shell, ShowUrls
 
-from invenio.base.signals import post_command, pre_command
+from invenio_base.signals import post_command, pre_command
 
 from six.moves import urllib
 
@@ -105,7 +105,7 @@ def check_for_software_updates(flash_message=False):
              or None if server was not reachable.
     """
     from invenio.config import CFG_VERSION
-    from invenio.base.i18n import _
+    from invenio_base.i18n import _
     try:
         find = re.compile('Invenio v[0-9]+.[0-9]+.[0-9]+(\-rc[0-9])?'
                           ' is released')
@@ -297,7 +297,7 @@ def register_manager(manager):
         return parts[-2]
 
     with manager.app.app_context():
-        for script in find_modules('invenio.base.scripts'):
+        for script in find_modules('invenio_base.scripts'):
             manager.add_command(script.split('.')[-1],
                                 import_string(script + ':manager'))
         for script in managers:

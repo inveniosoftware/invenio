@@ -39,9 +39,9 @@ from formatter import DumbWriter, AbstractFormatter
 from six import iteritems, StringIO
 from time import sleep
 
-from invenio.base.globals import cfg
-from invenio.base.helpers import unicodifier
-from invenio.base.i18n import _
+from invenio_base.globals import cfg
+from invenio_base.helpers import unicodifier
+from invenio_base.i18n import _
 from invenio.ext.template import render_template_to_string
 
 from .errors import EmailError

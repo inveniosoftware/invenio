@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@
 def setup(sphinx):
     """Setup Sphinx object."""
     from flask import has_app_context
-    from invenio.base.factory import create_app
+    from invenio_base.factory import create_app
 
     if not has_app_context():
         app = create_app()

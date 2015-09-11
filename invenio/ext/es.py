@@ -250,8 +250,8 @@ def delete_index(sender, **kwargs):
 
 def setup_app(app):
     """Set up the extension for the given app."""
-    from invenio.base import signals
-    from invenio.base.scripts.database import recreate, drop, create
+    from invenio_base import signals
+    from invenio_base.scripts.database import recreate, drop, create
 
     from invenio_records.models import RecordMetadata
 

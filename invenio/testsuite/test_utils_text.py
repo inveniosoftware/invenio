@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2008, 2009, 2010, 2011, 2013, 2014 CERN.
+# Copyright (C) 2008, 2009, 2010, 2011, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -30,7 +30,7 @@ except ImportError:
 
 from unidecode import unidecode
 
-from invenio.base.wrappers import lazy_import
+from invenio_base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 decode_to_unicode = lazy_import('invenio.utils.text:decode_to_unicode')

@@ -66,7 +66,7 @@ def authenticate(nickname_or_email=None, password=None,
     :param login_method: Login method (default: 'Local')
     :return: UserInfo
     """
-    from invenio.base.i18n import _
+    from invenio_base.i18n import _
     from invenio.ext.sqlalchemy import db
     from invenio_accounts.models import User
     from sqlalchemy.orm.exc import NoResultFound

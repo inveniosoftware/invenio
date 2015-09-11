@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013,
+#               2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -31,7 +32,7 @@ import inspect
 from flask import current_app
 from six import iteritems, StringIO
 
-from invenio.base.globals import cfg
+from invenio_base.globals import cfg
 
 
 # Regular expression to match possible password related variable that should

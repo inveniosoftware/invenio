@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -90,7 +90,7 @@ class TemplateArgsTest(InvenioTestCase):
 
     @property
     def config(self):
-        from invenio.base.config import EXTENSIONS
+        from invenio_base.config import EXTENSIONS
         cfg = super(TemplateArgsTest, self).config
         cfg['EXTENSIONS'] = EXTENSIONS + [
             'invenio.testsuite.test_ext_template.TemplateArgsTest']

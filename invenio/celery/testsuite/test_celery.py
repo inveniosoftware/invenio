@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -36,7 +36,7 @@ class CeleryTest(CeleryTestCase):
     def test_task_invenio_version(self):
         """ Test calling of tasks """
 
-        from invenio.base.globals import cfg
+        from invenio_base.globals import cfg
         from invenio.celery.tasks import invenio_version
 
         # Call task function without celery

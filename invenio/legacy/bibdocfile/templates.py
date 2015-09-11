@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,7 +20,7 @@ import cgi
 
 from invenio.config import CFG_SITE_URL, \
      CFG_SITE_LANG, CFG_SITE_RECORD, CFG_INSPIRE_SITE
-from invenio.base.i18n import gettext_set_language
+from invenio_base.i18n import gettext_set_language
 from invenio.utils.date import convert_datestruct_to_dategui
 from invenio.utils.url import create_html_link
 from invenio.utils.text import nice_size

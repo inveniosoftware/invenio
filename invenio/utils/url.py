@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2015 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 
+#               2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -45,7 +46,7 @@ try:
 except ImportError:
     BEAUTIFUL_SOUP_IMPORTED = False
 
-from invenio.base.globals import cfg
+from invenio_base.globals import cfg
 from invenio.utils.hash import sha1, md5, HASHLIB_IMPORTED
 from invenio.utils.text import wash_for_utf8
 from invenio.utils import apache

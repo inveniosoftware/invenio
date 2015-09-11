@@ -32,7 +32,7 @@ import warnings
 
 from flask import session
 
-from invenio.base.i18n import wash_language
+from invenio_base.i18n import wash_language
 from invenio.config import (
     CFG_ACCESS_CONTROL_LEVEL_SITE,
     CFG_SITE_RECORD,

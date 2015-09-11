@@ -84,7 +84,7 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_CERN_SITE, \
      CFG_SITE_RECORD
-from invenio.base.i18n import gettext_set_language
+from invenio_base.i18n import gettext_set_language
 from invenio.legacy.bibdocfile.cli import cli_fix_marc
 from invenio.legacy.bibdocfile.api import BibRecDocs, \
      decompose_file, calculate_md5, BibDocFile, \

@@ -1,5 +1,6 @@
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 
+#               2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -37,7 +38,7 @@ from invenio.config import \
      CFG_BASE_URL, \
      CFG_SITE_URL
 
-from invenio.base.i18n import gettext_set_language, language_list_long
+from invenio_base.i18n import gettext_set_language, language_list_long
 from invenio.utils.url import make_canonical_urlargd, create_html_link
 from invenio.utils.date import convert_datecvs_to_datestruct
 from invenio_formatter import format_record

@@ -21,7 +21,7 @@
 
 from flask_menu import Menu
 from flask_login import current_user
-from invenio.base.i18n import _
+from invenio_base.i18n import _
 
 menu = Menu()
 

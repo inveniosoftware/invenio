@@ -35,7 +35,7 @@ class ArxivMixin(InvenioTestCase):
     @property
     def config(self):
         """Remove Arxiv from extensions to get full control of the test."""
-        from invenio.base.config import EXTENSIONS
+        from invenio_base.config import EXTENSIONS
         cfg = super(ArxivMixin, self).config
         cfg["EXTENSIONS"] = filter(
             lambda k: not k.startswith("invenio.ext.arxiv"),

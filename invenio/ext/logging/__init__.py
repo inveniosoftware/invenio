@@ -26,7 +26,7 @@ To run the examples below in a shell, be sure to first create the Flask
 application:
 
 >>> from flask import current_app
->>> from invenio.base.factory import create_app
+>>> from invenio_base.factory import create_app
 >>> app = create_app()
 
 Logging errors

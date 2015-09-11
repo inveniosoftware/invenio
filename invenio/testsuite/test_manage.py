@@ -23,7 +23,7 @@ from __future__ import print_function
 
 import sys
 
-from invenio.base.utils import run_py_func
+from invenio_base.utils import run_py_func
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
@@ -86,9 +86,9 @@ class InveniomanageTest(InvenioTestCase):
 
     def test_signals_usage(self):
         """ Test signal handling. """
-        from invenio.base.scripts.database import main as db_main
-        from invenio.base.signals import pre_command, post_command
-        from invenio.base.manage import main, version as im_version
+        from invenio_base.scripts.database import main as db_main
+        from invenio_base.signals import pre_command, post_command
+        from invenio_base.manage import main, version as im_version
 
         def pre_handler_version(sender, *args, **kwargs):
             print('>>> pre_handler_version')

@@ -149,7 +149,7 @@ To: to@example.com"""
         """
         html_images = {
             'img1': pkg_resources.resource_filename(
-                'invenio.base',
+                'invenio_base',
                 os.path.join('static', 'img', 'journal_water_dog.gif')
             )
         }
@@ -170,7 +170,7 @@ To: to@example.com"""
         """
         attachments = [
             pkg_resources.resource_filename(
-                'invenio.base',
+                'invenio_base',
                 os.path.join('static', 'img', 'journal_header.png')
             )
         ]

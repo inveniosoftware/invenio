@@ -35,7 +35,7 @@ from logging import getLogger, debug, DEBUG
 from optparse import OptionParser, OptionGroup, OptionValueError
 from six import iteritems
 
-from invenio.base.factory import with_app_context
+from invenio_base.factory import with_app_context
 
 from invenio.ext.logging import register_exception
 from invenio.config import CFG_SITE_URL, CFG_BIBDOCFILE_FILEDIR, \

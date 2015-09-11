@@ -149,7 +149,7 @@ def make_test_suite(*test_cases):
     return unittest.TestSuite([unittest.makeSuite(case, 'test')
                                for case in test_cases])
 
-from invenio.base.factory import create_app
+from invenio_base.factory import create_app
 # pyparsing needed to import here before flask_testing in order to avoid
 # pyparsing troubles due to twill
 
@@ -299,8 +299,8 @@ def make_flask_test_suite(*test_cases):
                 for k, d in iteritems(engines)]
 
     return unittest.TestSuite([unittest.makeSuite(case, 'test')
-                              for case in reduce(add, map(create_type,
-                                                          test_cases))])
+                               for case in reduce(add, map(create_type,
+                                                           test_cases))])
 
 
 @nottest

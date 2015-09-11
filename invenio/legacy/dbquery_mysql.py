@@ -40,7 +40,7 @@ import time
 
 from flask import current_app
 
-from invenio.base.globals import cfg
+from invenio_base.globals import cfg
 from invenio.utils.datastructures import LazyDict
 
 from MySQLdb import OperationalError as MySQLdbOperationalError

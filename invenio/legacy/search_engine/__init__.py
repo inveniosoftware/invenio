@@ -106,7 +106,7 @@ from invenio.legacy import bibrecord
 from invenio.legacy.dbquery import run_sql, run_sql_with_limit, \
     wash_table_column_name, get_table_update_time
 from invenio.legacy.webuser import getUid, collect_user_info
-from invenio.base.i18n import gettext_set_language
+from invenio_base.i18n import gettext_set_language
 
 from invenio.utils import apache
 

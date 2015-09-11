@@ -1,5 +1,6 @@
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+#               2011, 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -28,7 +29,7 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_NAME
-from invenio.base.i18n import gettext_set_language
+from invenio_base.i18n import gettext_set_language
 from invenio.legacy.webuser import \
      create_userinfobox_body, \
      getUid

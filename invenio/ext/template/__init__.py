@@ -73,7 +73,7 @@ def inject_utils():
     - ``is_language_rtl``: True if the chosen language should be read right to
       left.
     """
-    from invenio.base.i18n import is_language_rtl
+    from invenio_base.i18n import is_language_rtl
     from invenio_records.api import get_record
     from invenio.utils.url import create_url, get_canonical_and_alternates_urls
 

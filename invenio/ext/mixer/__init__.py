@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -220,8 +220,8 @@ def setup_app(app):
     """Set up the extension for the given app."""
     mixer.init_app(app)
     # Subscribe to database post create and recreate command
-    from invenio.base import signals
-    from invenio.base.scripts.database import create, recreate, dump
+    from invenio_base import signals
+    from invenio_base.scripts.database import create, recreate, dump
     signals.post_command.connect(blend_all, sender=create)
     signals.post_command.connect(blend_all, sender=recreate)
     signals.post_command.connect(unblend_all, sender=dump)

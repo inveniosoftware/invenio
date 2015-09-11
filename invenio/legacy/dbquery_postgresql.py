@@ -40,7 +40,7 @@ import warnings
 
 from flask import current_app, has_app_context
 
-from invenio.base.globals import cfg
+from invenio_base.globals import cfg
 from invenio.ext.sqlalchemy import db
 
 
@@ -125,7 +125,7 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False,
         else:
             recset = cur.fetchall()
 
-        from invenio.base.helpers import utf8ifier
+        from invenio_base.helpers import utf8ifier
         recset = map(dict if with_dict else tuple, recset)
         recset = utf8ifier(recset)
 

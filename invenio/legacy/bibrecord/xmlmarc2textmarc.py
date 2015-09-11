@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2010, 2011, 2013 CERN.
+# Copyright (C) 2010, 2011, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -25,7 +25,7 @@ from os.path import basename
 from random import randint, seed
 
 
-from invenio.base.globals import cfg
+from invenio_base.globals import cfg
 
 from invenio.legacy.bibrecord import \
      create_records, \
