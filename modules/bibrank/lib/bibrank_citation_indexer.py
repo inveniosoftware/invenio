@@ -2,7 +2,7 @@
 ##
 ## This file is part of Invenio.
 ## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013,
-##               2014 CERN.
+##               2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -795,7 +795,7 @@ def standardize_report_number(report_number):
                   ur'arXiv:\g<1>',
                   report_number,
                   re.I | re.U)
-    if report_number.lower().startswith('arxiv:') and (report_number) > len("arXiv:") and not report_number[len("arXiv:")].isdigit():
+    if report_number.lower().startswith('arxiv:') and len(report_number) > len("arXiv:") and not report_number[len("arXiv:")].isdigit():
         # Quick hack to strip arXiv: prefix in case of legacy arXiv IDs
         report_number = report_number[len("arXiv:"):]
     return report_number
