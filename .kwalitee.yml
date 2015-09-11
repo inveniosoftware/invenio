@@ -75,7 +75,6 @@ components:
 - registry
 - restful
 - script
-- sequencegenerator
 - session
 - sqlalchemy
 - sslify
