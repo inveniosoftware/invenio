@@ -39,28 +39,7 @@ Links
 import os
 import sys
 
-from distutils.command.build import build
-
 from setuptools import find_packages, setup
-from setuptools.command.install_lib import install_lib
-
-
-class _build(build):  # noqa
-
-    """Compile catalog before building the package."""
-
-    sub_commands = [('compile_catalog', None)] + build.sub_commands
-
-
-class _install_lib(install_lib):  # noqa
-
-    """Custom install_lib command."""
-
-    def run(self):
-        """Compile catalog before running installation command."""
-        install_lib.run(self)
-        self.run_command('compile_catalog')
-
 
 install_requires = [
     "Babel>=1.3",
@@ -327,8 +306,4 @@ setup(
     ],
     test_suite='invenio.testsuite.suite',
     tests_require=tests_require,
-    cmdclass={
-        'build': _build,
-        'install_lib': _install_lib,
-    },
 )

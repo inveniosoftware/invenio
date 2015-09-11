@@ -63,7 +63,6 @@ install:
   - "travis_retry pip install unittest2"
   - "travis_retry pip install -r .travis-$REQUIREMENTS-requirements.txt --allow-all-external"
   - "travis_retry pip install -e .[$REXTRAS] --process-dependency-links"
-  - "python setup.py compile_catalog"
   - "npm update"
   - "npm install --silent -g bower less clean-css uglify-js requirejs"
   # All the step below this points are solely for test purposes, don't use them
