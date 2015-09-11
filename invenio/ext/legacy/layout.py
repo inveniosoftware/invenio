@@ -146,25 +146,15 @@ except ImportError:
     bibdocfile_legacy_getfile = WebInterfaceDumbPages
 
 
-try:
-    from invenio.legacy.bibsched.webinterface import \
-        WebInterfaceBibSchedPages
-except ImportError:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceBibSchedPages = WebInterfaceDumbPages
-
-
 class WebInterfaceAdminPages(WebInterfaceDirectory):
 
     """This class implements /admin2 admin pages."""
 
-    _exports = ['index', 'bibsched']
+    _exports = ['index']
 
     def index(self, req, form):
         return "FIXME: return /help/admin content"
 
-
-    bibsched = WebInterfaceBibSchedPages()
 
 
 class WebInterfaceInvenio(WebInterfaceDirectory):

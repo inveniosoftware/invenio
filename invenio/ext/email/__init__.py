@@ -121,36 +121,7 @@ def scheduled_send_email(fromaddr,
                     (if string, then receivers are separated by ',')
     @return: the scheduled bibtasklet
     """
-    from invenio.legacy.bibsched.bibtask import task_low_level_submission
-    if not isinstance(toaddr, (unicode, str)):
-        toaddr = ','.join(toaddr)
-    if not isinstance(replytoaddr, (unicode, str)):
-        replytoaddr = ','.join(replytoaddr)
-
-    toaddr = remove_temporary_emails(toaddr)
-
-    if user is None:
-        user = fromaddr
-    if other_bibtasklet_arguments is None:
-        other_bibtasklet_arguments = []
-    else:
-        other_bibtasklet_arguments = list(other_bibtasklet_arguments)
-    if not header is None:
-        other_bibtasklet_arguments.extend(("-a", "header=%s" % header))
-    if not footer is None:
-        other_bibtasklet_arguments.extend(("-a", "footer=%s" % footer))
-    return task_low_level_submission(
-        "bibtasklet", user, "-T", "bst_send_email",
-        "-a", "fromaddr=%s" % fromaddr,
-        "-a", "toaddr=%s" % toaddr,
-        "-a", "replytoaddr=%s" % replytoaddr,
-        "-a", "subject=%s" % subject,
-        "-a", "content=%s" % content,
-        "-a", "copy_to_admin=%s" % copy_to_admin,
-        "-a", "attempt_times=%s" % attempt_times,
-        "-a", "attempt_sleeptime=%s" % attempt_sleeptime,
-        "-a", "bccaddr=%s" % bccaddr,
-        *other_bibtasklet_arguments)
+    raise RuntimeError('scheduled_send_email has been removed.')
 
 
 def send_email(fromaddr,

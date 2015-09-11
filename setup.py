@@ -299,9 +299,6 @@ setup(
             'bibauthorid = '
             ' invenio.legacy.bibauthorid.scripts.bibauthorid:main',
             'bibdocfile = invenio.legacy.bibdocfile.scripts.bibdocfile:main',
-            'bibsched = invenio.legacy.bibsched.scripts.bibsched:main',
-            'bibtaskex = invenio.legacy.bibsched.scripts.bibtaskex:main',
-            'bibtasklet = invenio.legacy.bibsched.scripts.bibtasklet:main',
             'bibtex = invenio.modules.sequencegenerator.scripts.bibtex:main',
             'bibupload = invenio.legacy.bibupload.scripts.bibupload:main',
             'dbexec = invenio.legacy.miscutil.scripts.dbexec:main',
