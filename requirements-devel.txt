@@ -29,5 +29,6 @@
 -e git+git://github.com/inveniosoftware/invenio-records.git#egg=invenio-records
 -e git+git://github.com/inveniosoftware/invenio-search.git#egg=invenio-search
 -e git+git://github.com/inveniosoftware/invenio-upgrader.git#egg=invenio-upgrader
+-e git+git://github.com/inveniosoftware/invenio-utils.git#egg=invenio-utils
 -e git+git://github.com/inveniosoftware/invenio-workflows.git#egg=invenio-workflows
 -e git+git://github.com/inveniosoftware/workflow.git#egg=workflow

@@ -100,6 +100,7 @@ install_requires = [
     "invenio-documents>=0.1.0.post2",
     "invenio-upgrader>=0.1.0",
     "invenio-unapi>=0.1.0",
+    "invenio-utils>=0.1.0",
     "itsdangerous>=0.24",
     "jellyfish>=0.3.2",
     "Jinja2>=2.7",

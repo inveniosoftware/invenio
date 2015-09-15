@@ -45,16 +45,6 @@ Extensions
    ext/sqlalchemy
    ext/template
 
-Utilities
----------
-
-.. toctree::
-   :maxdepth: 1
-
-   utils/datastructures
-   utils/washers
-   utils/forms
-
 Legacy
 ------
 

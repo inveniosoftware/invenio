@@ -29,7 +29,7 @@ from flask import _request_ctx_stack, current_app, g
 
 from flask_babel import Babel, gettext
 
-from invenio.utils.datastructures import LaziestDict
+from invenio_utils.datastructures import LaziestDict
 
 import pkg_resources
 
