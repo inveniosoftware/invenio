@@ -692,7 +692,7 @@ The mechanism of temporary identifiers can not be used in the con text of record
 <p>If it is needed to use the batch upload function from within command line, this can be achieved with a curl call, like:
 <blockquote>
 <pre>
-$ curl -F 'file=@localfile.xml' -F 'mode=-i' http://cds.cern.ch/batchuploader/robotupload [-F 'callback_url=http://...'] -A invenio_webupload
+$ curl -F 'file=@localfile.xml' -F 'mode=-i' http://cds.cern.ch/batchuploader/robotupload [-F 'callback_url=http://...'] [-F 'priority=3'] -A invenio_webupload
 <pre>
 </blockquote></p>
 
@@ -715,6 +715,10 @@ http://cds.cern.ch/batchuploader/robotupload/insert
 http://cds.cern.ch/batchuploader/robotupload/insert?callback_url=http://myhandler
 </pre>
 <p>
+
+<p>Both in the RESTful interface and in the legacy one, the client can specify the <tt>priority</tt> parameter to provide a number between -10 and 10,
+where 10 is the highest priority and -10 the lowest. This is a hint to the bibliographic scheduler to decide when to actually schedule the given
+upload.</p>
 
 <p>In case the HTTP server that is going to receive the feedback at <em>callback_url</em> expect the request to be encoded in <em>application/x-www-form-urlencoded</em> rather than <em>application/json</em> (e.g. if the server is implemented directly in Oracle),
 you can further specify the <em>special_treatment<em> argument and set it to <em>oracle</em>. The feedback will then be further encoded
