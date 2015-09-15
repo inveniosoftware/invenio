@@ -61,10 +61,11 @@ def get_records_wit_erratum():
         _RECORDS_WITH_ERRATUM = search_pattern(p='**', f='773__m')
     return _RECORDS_WITH_ERRATUM
 
+
 def record_duplicates_in_asana(match, recids):
     if not CFG_INSPIRE_SITE:
         return
-    from invenio.config import CFG_ASANA_API_KEY
+    from invenio.config import CFG_ASANA_API_KEY, CFG_CACHEDIR
     from asana import asana
     from urllib import quote
     api = asana.AsanaAPI(CFG_ASANA_API_KEY)
@@ -79,9 +80,20 @@ def record_duplicates_in_asana(match, recids):
     if recids & get_records_wit_erratum():
         prefix = "[ERRATUM?] "
 
-    ticket = api.create_task(name='%s%s refers to record IDs %s' % (prefix, match, ', '.join(str(recid) for recid in recids)),
-                             workspace=CFG_INSPIRE_ASANA_WORKSPACE, notes=notes,
-                             projects=[CFG_INSPIRE_ASANA_DUPLICATE_RECIDS_PROJECT])
+    title = '%s%s refers to record IDs %s' % (prefix, match, ', '.join(str(recid) for recid in recids))
+
+    try:
+        title_not_found = ('%s\n' % title) not in open(os.path.join(CFG_CACHEDIR, 'asana_tickets.txt'))
+    except IOError:
+        # File does not exist yet
+        title_not_found = True
+
+    if title_not_found:
+        # First time this ticket is created
+        print >> open(os.path.join(CFG_CACHEDIR, 'asana_tickets.txt'), 'a'), title
+        ticket = api.create_task(name=title,
+                                 workspace=CFG_INSPIRE_ASANA_WORKSPACE, notes=notes,
+                                 projects=[CFG_INSPIRE_ASANA_DUPLICATE_RECIDS_PROJECT])
 
 
 def compute_weights():
