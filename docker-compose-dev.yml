@@ -21,7 +21,7 @@ web:
   build: .
   command: inveniomanage runserver -h 0.0.0.0 -p 28080 -d -r
   ports:
-    - "127.0.0.1:28080:28080"
+    - "0.0.0.0:28080:28080"
   environment:
     - ASSETS_DEBUG=True
     - BROKER_URL=amqp://guest:guest@rabbit:5672//
@@ -69,12 +69,12 @@ worker:
 redis:
   image: redis
   ports:
-    - "127.0.0.1:26379:6379"
+    - "0.0.0.0:26379:6379"
   read_only: true
 mysql:
   image: mysql
   ports:
-    - "127.0.0.1:23306:3306"
+    - "0.0.0.0:23306:3306"
   environment:
     - MYSQL_DATABASE=invenio
     - MYSQL_USER=invenio
@@ -87,13 +87,13 @@ mysql:
 rabbitmq:
   image: rabbitmq:3-management
   ports:
-    - "127.0.0.1:25672:5672"
-    - "127.0.0.1:25673:15672"
+    - "0.0.0.0:25672:5672"
+    - "0.0.0.0:25673:15672"
   read_only: true
 elasticsearch:
   image: elasticsearch
   volumes:
       - ./elasticsearch-docker.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
   ports:
-    - "127.0.0.1:29200:9200"
+    - "0.0.0.0:29200:9200"
   read_only: true
