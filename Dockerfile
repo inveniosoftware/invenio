@@ -124,7 +124,6 @@ COPY . /code
 #  - clean up
 RUN pip install --editable .[$REXTRAS] && \
     (python -O -m compileall . || true) && \
-    python setup.py compile_catalog && \
     rm -rf /tmp/* /var/tmp/* /var/lib/{cache,log}/ /root/.cache/*
 
 
