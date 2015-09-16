@@ -173,7 +173,7 @@ def cli_upload(req, file_content=None, mode=None, callback_url=None, nonce=None,
         _log(msg)
         req.status = HTTP_BAD_REQUEST
         return _write(req, msg)
-    args = ['bibupload', "batchupload", arg_mode, filename, '-P', priority]
+    args = ['bibupload', "batchupload", arg_mode, filename, '-P', str(priority)]
     # run upload command
     if callback_url:
         args += ["--callback-url", callback_url]
