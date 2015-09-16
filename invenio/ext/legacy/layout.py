@@ -138,13 +138,6 @@ class WebInterfaceDumbPages(WebInterfaceDirectory):
         return WebInterfaceDumbPages(), path
     index = __call__
 
-try:
-    from invenio.legacy.bibdocfile.webinterface import \
-        bibdocfile_legacy_getfile
-except ImportError:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    bibdocfile_legacy_getfile = WebInterfaceDumbPages
-
 
 class WebInterfaceAdminPages(WebInterfaceDirectory):
 
@@ -170,7 +163,6 @@ class WebInterfaceInvenio(WebInterfaceDirectory):
         'comments',
         'error',
         'oai2d', ('oai2d.py', 'oai2d'),
-        ('getfile.py', 'getfile'),
         'rss',
         'stats',
         'journal',
@@ -181,9 +173,6 @@ class WebInterfaceInvenio(WebInterfaceDirectory):
         'textmining',
         'info',
     ]
-
-    def __init__(self):
-        self.getfile = bibdocfile_legacy_getfile
 
     _mapping = dict(
         youraccount='WebInterfaceYourAccountPages',
