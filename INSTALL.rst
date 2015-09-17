@@ -564,7 +564,8 @@ When all the servers are running, it is possible to upload the demo records.
 
     $ # in a new terminal
     $ workon invenio
-    (invenio)$ inveniomanage demosite populate --packages=invenio_demosite.base
+    (invenio)$ cdvirtualenv src/invenio-demosite
+    (invenio)$ inveniomanage records create -t marcxml < invenio_demosite/testsuite/data/demo_record_marc_data.xml
 
 And you may now open your favourite web browser on
 `http://0.0.0.0:4000/ <http://0.0.0.0:4000/>`_
