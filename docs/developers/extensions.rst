@@ -67,7 +67,7 @@ First we'll create the following folder structure::
 
 Here's the contents of the most important files:
 
-* ``__init__.py`` contains :py:func:`~invenio.ext.login.setup_app` function:
+* ``__init__.py`` contains ``setup_app`` function:
 
 .. code-block:: python
 

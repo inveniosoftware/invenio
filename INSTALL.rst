@@ -435,7 +435,7 @@ Installing the required assets (JavaScript, CSS, etc.) via bower. The file
 
 We recommend you to only alter ``bower-base.json`` and regenerate
 ``bower.json`` with it as needed. The
-:py:class:`invenio.ext.assets.commands.BowerCommand` is aggregating all the
+``invenio_ext.assets.commands.BowerCommand`` is aggregating all the
 dependencies defined by each bundle.
 
 The last step, which is very important will be to collect all the assets, but
@@ -468,7 +468,7 @@ the following commands.
     (invenio)$ inveniomanage config set CFG_SITE_SECURE_URL http://localhost:4000
 
 Assets in non-development mode may be combined and minified using various
-filters (see :ref:`ext_assets`). We need to set the path to the binaries if
+filters. We need to set the path to the binaries if
 they are not in the environment ``$PATH`` already.
 
 .. code-block:: console

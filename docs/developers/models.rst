@@ -23,7 +23,7 @@ Our custom bridge contains several custom types and driver hacks for
 smoother integration with multiple database engines. The code structure
 follows::
 
-    invenio/ext/sqlalchemy
+    invenio_ext/sqlalchemy
         /engines
             mysql.py
         __init__.py
@@ -33,11 +33,11 @@ follows::
 
 
 Before you start writing a new model please take a look at the
-:obj:`~invenio.ext.sqlalchemy.db` object.  It will also make it easier to
+``invenio_ext.sqlalchemy.db`` object.  It will also make it easier to
 understand the following example of a simple model written using SQLAlchemy::
 
     # General imports.
-    from invenio.ext.sqlalchemy import db
+    from invenio_ext.sqlalchemy import db
 
     # Create your models here.
 
