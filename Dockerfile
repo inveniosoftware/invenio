@@ -57,6 +57,7 @@ RUN apt-get update && \
         mysql-client \
         poppler-utils \
         sudo \
+        vim-tiny \
         && \
     apt-get clean autoclean && \
     apt-get autoremove -y && \
@@ -64,6 +65,7 @@ RUN apt-get update && \
     (find /usr/share/doc -depth -type f ! -name copyright -delete || true) && \
     (find /usr/share/doc -empty -delete || true) && \
     rm -rf /usr/share/man/* /usr/share/groff/* /usr/share/info/* && \
+    ln -s /usr/bin/vim.tiny /usr/bin/vim && \
     pip install --upgrade pip && \
     pip install ipdb \
         ipython \
@@ -132,7 +134,7 @@ RUN pip install --editable .[$REXTRAS] && \
 ###############################################################################
 
 # step back
-# in general code should not be writeable, especially because we are using
+# in general code should not be writable, especially because we are using
 # `pip install -e`
 RUN mkdir -p /code/src && \
     chown -R invenio:invenio /code && \
@@ -145,7 +147,7 @@ USER invenio
 # add volumes
 # do this AFTER `chown`, because otherwise directory permissions are not
 # preserved
-VOLUME ["/code", "/home/invenio", "/tmp"]
+VOLUME ["/code", "/tmp"]
 
 # install init scripts
 ENTRYPOINT ["/code/scripts/docker_boot.sh"]

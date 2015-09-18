@@ -38,6 +38,7 @@ web:
     - ./docs:/code/docs:rw
     - ./scripts:/code/scripts:ro
     - /code/invenio
+    - /home/invenio
   read_only: true
   links:
     - elasticsearch:es

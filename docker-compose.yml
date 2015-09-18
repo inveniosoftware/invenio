@@ -31,6 +31,8 @@ web:
     - ES_HOSTS=['es']
     - INVENIO_APP_CONFIG_ENVS=BROKER_URL,CELERY_RESULT_BACKEND,CACHE_REDIS_HOST,CFG_DATABASE_HOST,CFG_REDIS_HOSTS,ES_HOSTS
   read_only: true
+  volumes:
+    - /home/invenio
   links:
     - elasticsearch:es
     - mysql:db
