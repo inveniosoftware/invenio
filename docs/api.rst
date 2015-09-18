@@ -20,11 +20,6 @@
 API
 ===
 
-.. toctree::
-   :maxdepth: 1
-
-   base
-
 Legacy
 ------
 
