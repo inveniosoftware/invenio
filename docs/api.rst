@@ -25,26 +25,6 @@ API
 
    base
 
-Extensions
-----------
-
-.. toctree::
-   :maxdepth: 1
-
-   ext/assets
-   ext/arxiv
-   ext/crossref
-   ext/es
-   ext/fs
-   ext/jasmine
-   ext/logging
-   ext/login
-   ext/passlib
-   ext/script
-   ext/session
-   ext/sqlalchemy
-   ext/template
-
 Legacy
 ------
 
