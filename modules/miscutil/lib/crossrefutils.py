@@ -65,8 +65,18 @@ def get_marcxml_for_doi(doi):
     doi = doi.strip()
 
     # Getting the data from external source
-    url = "http://www.crossref.org/openurl/?pid=" +  CFG_CROSSREF_USERNAME \
-        + ":" + CFG_CROSSREF_PASSWORD + "&noredirect=tru&id=doi:" + doi
+
+    if CFG_CROSSREF_PASSWORD:
+        pid = '%s:%s' % (CFG_CROSSREF_USERNAME, CFG_CROSSREF_PASSWORD)
+    else:
+        pid = CFG_CROSSREF_USERNAME
+
+    query = urllib.urlencode({
+        'pid': pid,
+        'noredirect': 'true',
+        'id': 'doi:%s' % doi})
+
+    url = "http://www.crossref.org/openurl/?" + query
     request = urllib2.Request(url)
     response = CROSSREF_OPENER.open(request)
     header = response.info().getheader('Content-Type')
