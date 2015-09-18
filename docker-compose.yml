@@ -38,7 +38,7 @@ web:
     - redis:cache
 worker:
   build: .
-  command: celery worker --purge -E -A invenio.celery.celery --loglevel=DEBUG
+  command: celery worker --purge -E -A invenio_celery.celery --loglevel=DEBUG
   environment:
     - BROKER_URL=amqp://guest:guest@rabbit:5672//
     - CACHE_REDIS_HOST=cache

@@ -42,7 +42,7 @@ from invenio.legacy.bibsched.bibtask import task_init, \
                                             task_get_task_param, \
                                             task_low_level_submission
 from invenio.utils.shell import run_shell_command, escape_shell_arg
-from invenio.celery.utils import (
+from invenio_celery.utils import (
     enable_queue,
     get_queues,
     suspend_queues,
