@@ -20,14 +20,11 @@
 min_reviewers: 2
 
 components:
-- accounts
 - admin
 - alerts
 - archiver
 - arxiv
 - assets
-- authorprofiles
-- authors
 - babel
 - baskets
 - bulletin
@@ -38,7 +35,6 @@ components:
 - comments
 - communities
 - config
-- dashboard
 - debug_toolbar
 - docker
 - docs
@@ -69,8 +65,6 @@ components:
 - principal
 - ranker
 - records
-- redirector
-- refextract
 - registry
 - restful
 - script
@@ -84,7 +78,6 @@ components:
 - tags
 - tests
 - template
-- textminer
 - tickets
 - travis
 - version
