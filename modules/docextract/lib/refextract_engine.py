@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013
+##               2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -142,18 +143,20 @@ def handle_special_journals(citation_elements, kbs):
     e.g. JHEP 0301 instead of JHEP 01
     """
     for el in citation_elements:
-        if el['type'] == 'JOURNAL' and el['title'] in kbs['special_journals'] \
-                and re.match(r'\d{1,2}$', el['volume']):
+        if el['type'] == 'JOURNAL' and el['title'] in kbs['special_journals']:
+            if re.match(r'\d{1,2}$', el['volume']):
+                # Sometimes the page is omitted and the year is written in its place
+                # We can never be sure but it's very likely that page > 1900 is
+                # actually a year, so we skip this reference
+                if el['year'] == '' and re.match(r'(19|20)\d{2}$', el['page']):
+                    el['type'] = 'MISC'
+                    el['misc_txt'] = "%s,%s,%s" \
+                                        % (el['title'], el['volume'], el['page'])
 
-            # Sometimes the page is omitted and the year is written in its place
-            # We can never be sure but it's very likely that page > 1900 is
-            # actually a year, so we skip this reference
-            if el['year'] == '' and re.match(r'(19|20)\d{2}$', el['page']):
-                el['type'] = 'MISC'
-                el['misc_txt'] = "%s,%s,%s" \
-                                     % (el['title'], el['volume'], el['page'])
-
-            el['volume'] = el['year'][-2:] + '%02d' % int(el['volume'])
+                el['volume'] = el['year'][-2:] + '%02d' % int(el['volume'])
+            if el['page'].isdigit():
+                # JHEP and JCAP have always pages 3 digits long
+                el['page'] = '%03d' % int(el['page'])
 
     return citation_elements
 
