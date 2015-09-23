@@ -186,15 +186,13 @@ def extract_journal_reference(line):
 
     Parameter: line - field 773__x, the raw journal ref
     Return: list of tuples with data values"""
-    tagged_line = tag_reference_line(line, get_kbs(), {})[0]
-    if tagged_line is None:
-        return None
+    kbs = get_kbs()
+    references, dummy_m, dummy_c, dummy_co = parse_reference_line(line, kbs)
 
-    elements, dummy_marker, dummy_stats = parse_tagged_reference_line('', tagged_line, [], [])
-
-    for element in elements:
-        if element['type'] == 'JOURNAL':
-            return element
+    for elements in references:
+        for el in elements:
+            if el['type'] == 'JOURNAL':
+                return el
 
 
 def replace_references(recid):
