@@ -74,7 +74,7 @@ try:
 except ImportError:
     pass
 from invenio.legacy.dbquery import run_sql
-from invenio.utils.serializers import serialize_via_marshal
+from invenio_utils.serializers import serialize_via_marshal
 
 
 from invenio_base.i18n import gettext_set_language, wash_languages, wash_language

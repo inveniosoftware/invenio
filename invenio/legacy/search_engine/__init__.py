@@ -24,7 +24,7 @@
 
 import warnings
 
-from invenio.utils.deprecation import RemovedInInvenio23Warning
+from invenio_utils.deprecation import RemovedInInvenio23Warning
 
 warnings.warn("Legacy search_engine will be removed in 2.3. Please check "
               "'invenio_search' module.",
@@ -97,10 +97,10 @@ from invenio_access.local_config import VIEWRESTRCOLL, \
 
 from intbitset import intbitset
 from invenio.legacy.dbquery import InvenioDbQueryWildcardLimitError
-from invenio.utils.serializers import deserialize_via_marshal
+from invenio_utils.serializers import deserialize_via_marshal
 from invenio_access.engine import acc_authorize_action
 from invenio.ext.logging import register_exception
-from invenio.utils.text import encode_for_xml, wash_for_utf8, strip_accents
+from invenio_utils.text import encode_for_xml, wash_for_utf8, strip_accents
 from invenio.legacy import bibrecord
 
 from invenio.legacy.dbquery import run_sql, run_sql_with_limit, \
@@ -108,7 +108,7 @@ from invenio.legacy.dbquery import run_sql, run_sql_with_limit, \
 from invenio.legacy.webuser import getUid, collect_user_info
 from invenio_base.i18n import gettext_set_language
 
-from invenio.utils import apache
+from invenio_utils import apache
 
 from sqlalchemy.exc import DatabaseError
 

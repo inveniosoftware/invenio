@@ -27,12 +27,12 @@ from datetime import datetime
 from six import iteritems
 
 from invenio.modules.indexer.tokenizers.BibIndexAuthorTokenizer import BibIndexAuthorTokenizer as FNT
-from invenio.utils.date import GOT_DATEUTIL
+from invenio_utils.date import GOT_DATEUTIL
 if GOT_DATEUTIL:
-    from invenio.utils.date import du_parser, du_delta, relativedelta
-from invenio.utils.logic import to_cnf
+    from invenio_utils.date import du_parser, du_delta, relativedelta
+from invenio_utils.logic import to_cnf
 from invenio.config import CFG_WEBSEARCH_SPIRES_SYNTAX
-from invenio.utils.date import strptime, strftime
+from invenio_utils.date import strptime, strftime
 
 
 NameScanner = FNT()

@@ -19,7 +19,7 @@
 
 import warnings
 
-from invenio.utils.deprecation import RemovedInInvenio22Warning
+from invenio_utils.deprecation import RemovedInInvenio22Warning
 
 warnings.warn("Legacy MiscUtil will be removed in 2.2.",
               RemovedInInvenio22Warning)

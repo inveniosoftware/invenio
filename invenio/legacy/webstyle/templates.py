@@ -39,10 +39,10 @@ from invenio.config import \
      CFG_SITE_URL
 
 from invenio_base.i18n import gettext_set_language, language_list_long
-from invenio.utils.url import make_canonical_urlargd, create_html_link
-from invenio.utils.date import convert_datecvs_to_datestruct
+from invenio_utils.url import make_canonical_urlargd, create_html_link
+from invenio_utils.date import convert_datecvs_to_datestruct
 from invenio_formatter import format_record
-from invenio.utils.html import get_mathjax_header
+from invenio_utils.html import get_mathjax_header
 
 
 class Template:

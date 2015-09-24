@@ -88,7 +88,7 @@ bibrecord_tests.py and bibupload_regression_tests.py.
 
 import warnings
 
-from invenio.utils.deprecation import RemovedInInvenio23Warning
+from invenio_utils.deprecation import RemovedInInvenio23Warning
 
 warnings.warn("Legacy BibRecord will be removed in 2.3.",
               RemovedInInvenio23Warning)
@@ -112,7 +112,7 @@ from invenio.legacy.bibrecord.bibrecord_config import CFG_MARC21_DTD, \
     CFG_BIBRECORD_WARNING_MSGS, CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL, \
     CFG_BIBRECORD_DEFAULT_CORRECT, CFG_BIBRECORD_PARSERS_AVAILABLE, \
     InvenioBibRecordParserError, InvenioBibRecordFieldError
-from invenio.utils.text import encode_for_xml
+from invenio_utils.text import encode_for_xml
 
 run_sql = lazy_import("invenio.legacy.dbquery.run_sql")
 

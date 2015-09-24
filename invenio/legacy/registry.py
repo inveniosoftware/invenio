@@ -25,7 +25,7 @@ from flask_registry import RegistryProxy, ImportPathRegistry, \
     ModuleAutoDiscoveryRegistry
 
 from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
-from invenio.utils.datastructures import LazyDict
+from invenio_utils.datastructures import LazyDict
 
 legacy_modules = RegistryProxy('legacy', ImportPathRegistry,
                                initial=['invenio.legacy.*'])

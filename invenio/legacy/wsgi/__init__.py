@@ -31,14 +31,14 @@ from six import iteritems
 from wsgiref.util import FileWrapper
 
 from invenio.legacy.wsgi.utils import table
-from invenio.utils.apache import \
+from invenio_utils.apache import \
     HTTP_STATUS_MAP, SERVER_RETURN, OK, DONE, \
     HTTP_NOT_FOUND, HTTP_INTERNAL_SERVER_ERROR
 from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
     CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST, CFG_DEVEL_SITE, CFG_SITE_URL, \
     CFG_SITE_SECURE_URL, CFG_WEBSTYLE_REVERSE_PROXY_IPS
 from invenio.ext.logging import register_exception
-from invenio.utils.datastructures import flatten_multidict
+from invenio_utils.datastructures import flatten_multidict
 # TODO for future reimplementation of stream_file
 from flask import request, after_this_request, session
 
@@ -604,7 +604,7 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
                 form[key] = value
 
         if (CFG_FULL_HTTPS or CFG_HAS_HTTPS_SUPPORT and session.need_https) and not req.is_https():
-            from invenio.utils.url import redirect_to_url
+            from invenio_utils.url import redirect_to_url
             # We need to isolate the part of the URI that is after
             # CFG_SITE_URL, and append that to our CFG_SITE_SECURE_URL.
             original_parts = urlparse(req.unparsed_uri)

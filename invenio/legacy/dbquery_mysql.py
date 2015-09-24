@@ -41,7 +41,7 @@ import time
 from flask import current_app
 
 from invenio_base.globals import cfg
-from invenio.utils.datastructures import LazyDict
+from invenio_utils.datastructures import LazyDict
 
 from MySQLdb import OperationalError as MySQLdbOperationalError
 
@@ -431,8 +431,8 @@ def log_sql_query(dbhost, sql, param=None):
     in run_sql() above. Useful for fine-level debugging only!
     """
     from flask import current_app
-    from invenio.utils.date import convert_datestruct_to_datetext
-    from invenio.utils.text import indent_text
+    from invenio_utils.date import convert_datestruct_to_datetext
+    from invenio_utils.text import indent_text
     date_of_log = convert_datestruct_to_datetext(time.localtime())
     message = date_of_log + '-->\n'
     message += indent_text('Host:\n' + indent_text(str(dbhost), 2, wrap=True),

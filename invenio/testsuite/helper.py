@@ -53,7 +53,7 @@ from invenio.config import (CFG_SITE_URL,
                             CFG_JSTESTDRIVER_PORT,
                             CFG_WEBDIR,
                             CFG_BASE_URL)
-from invenio.utils.w3c_validator import (w3c_validate,
+from invenio_utils.w3c_validator import (w3c_validate,
                                    w3c_errors_to_str,
                                    CFG_TESTS_REQUIRE_HTML_VALIDATION)
 

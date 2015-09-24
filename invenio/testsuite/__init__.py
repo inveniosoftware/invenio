@@ -213,7 +213,7 @@ class InvenioTestCase(TestCase):
     def login(self, username, password):
         """Log in as username and password."""
         from invenio.config import CFG_SITE_SECURE_URL
-        # from invenio.utils.url import rewrite_to_secure_url
+        # from invenio_utils.url import rewrite_to_secure_url
         return self.client.post(url_for('webaccount.login'),
                                 base_url=CFG_SITE_SECURE_URL,
                                 # rewrite_to_secure_url(request.base_url),
@@ -475,7 +475,7 @@ def test_web_page_content(url,
     :return: empty list in case of no problems, otherwise list of error
         messages that may have been encountered during processing of page.
     """
-    from invenio.utils.w3c_validator import (w3c_validate, w3c_errors_to_str,
+    from invenio_utils.w3c_validator import (w3c_validate, w3c_errors_to_str,
                                              CFG_TESTS_REQUIRE_HTML_VALIDATION)
     if require_validate_p is None:
         require_validate_p = CFG_TESTS_REQUIRE_HTML_VALIDATION

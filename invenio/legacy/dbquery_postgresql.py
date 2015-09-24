@@ -210,8 +210,8 @@ def log_sql_query(dbhost, sql, param=None):
     In order to enable logging of all SQL queries, please uncomment one line
     in run_sql() above. Useful for fine-level debugging only!
     """
-    from invenio.utils.date import convert_datestruct_to_datetext
-    from invenio.utils.text import indent_text
+    from invenio_utils.date import convert_datestruct_to_datetext
+    from invenio_utils.text import indent_text
     date_of_log = convert_datestruct_to_datetext(time.localtime())
     message = date_of_log + '-->\n'
     message += indent_text('Host:\n' +

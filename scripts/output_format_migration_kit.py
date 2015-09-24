@@ -72,7 +72,7 @@ def run(output):
     from invenio.legacy.dbquery import run_sql
     from flask_registry import PkgResourcesDirDiscoveryRegistry, \
         ModuleAutoDiscoveryRegistry, RegistryProxy
-    from invenio.utils.datastructures import LazyDict
+    from invenio_utils.datastructures import LazyDict
 
     output_formats_directories = RegistryProxy(
         'legacy_output_formats_directories',
