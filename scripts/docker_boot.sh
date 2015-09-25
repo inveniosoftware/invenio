@@ -155,7 +155,7 @@ EOF
     fi
 
     # load dev config
-    /code/scripts/setup_devmode.sh
+    /src/invenio/scripts/setup_devmode.sh
 
 
     # final shot
