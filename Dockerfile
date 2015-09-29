@@ -29,7 +29,7 @@ EXPOSE 28080
 RUN useradd --home-dir /home/invenio --create-home --shell /bin/bash --uid 1000 invenio
 
 # set work dir
-WORKDIR /code
+WORKDIR /src/invenio
 
 # iojs, detects distribution and adds the right repo
 RUN apt-get update && \
@@ -57,6 +57,7 @@ RUN apt-get update && \
         mysql-client \
         poppler-utils \
         sudo \
+        vim-tiny \
         && \
     apt-get clean autoclean && \
     apt-get autoremove -y && \
@@ -64,6 +65,7 @@ RUN apt-get update && \
     (find /usr/share/doc -depth -type f ! -name copyright -delete || true) && \
     (find /usr/share/doc -empty -delete || true) && \
     rm -rf /usr/share/man/* /usr/share/groff/* /usr/share/info/* && \
+    ln -s /usr/bin/vim.tiny /usr/bin/vim && \
     pip install --upgrade pip && \
     pip install ipdb \
         ipython \
@@ -91,8 +93,8 @@ ENV INVENIOBASE_INSTANCE_PATH="/home/invenio/instance" \
 #ENV REQUIREMENTS release
 
 # add requirement files
-COPY ./requirements-devel.txt ./requirements.py ./setup.cfg ./setup.py /code/
-COPY ./invenio/version.py /code/invenio/version.py
+COPY ./requirements-devel.txt ./requirements.py ./setup.cfg ./setup.py /src/invenio/
+COPY ./invenio/version.py /src/invenio/invenio/version.py
 
 # install python requirements
 # the different levels get composed from different sources
@@ -102,16 +104,19 @@ COPY ./invenio/version.py /code/invenio/version.py
 RUN python requirements.py --extras=$REXTRAS --level=min > requirements.py.lowest.txt && \
     python requirements.py --extras=$REXTRAS --level=pypi > requirements.py.release.txt && \
     python requirements.py --extras=$REXTRAS --level=dev > requirements.py.devel.txt && \
-    pip install --requirement requirements.py.$REQUIREMENTS.txt --allow-all-external && \
-    (python -O -m compileall || true)
+    # Pip will install packages in /src
+    cd / && \
+    pip install --requirement src/invenio/requirements.py.$REQUIREMENTS.txt --allow-all-external && \
+    (python -O -m compileall /src || true) && \
+    cd /src/invenio
 
 
 ###############################################################################
-## 3. Code (changing)                                                        ##
+## 3. src (changing)                                                        ##
 ###############################################################################
 
-# add current directory as `/code`.
-COPY . /code
+# add current directory as `/src/invenio`.
+COPY . /src/invenio
 
 
 ###############################################################################
@@ -122,9 +127,11 @@ COPY . /code
 #  - update Python bytecode
 #  - build translation catalog
 #  - clean up
-RUN pip install --editable .[$REXTRAS] && \
-    (python -O -m compileall . || true) && \
-    rm -rf /tmp/* /var/tmp/* /var/lib/{cache,log}/ /root/.cache/*
+RUN cd / && \
+    pip install --editable /src/invenio/.[$REXTRAS] && \
+    (python -O -m compileall /src || true) && \
+    rm -rf /tmp/* /var/tmp/* /var/lib/{cache,log}/ /root/.cache/* && \
+    cd /src/invenio
 
 
 ###############################################################################
@@ -132,23 +139,22 @@ RUN pip install --editable .[$REXTRAS] && \
 ###############################################################################
 
 # step back
-# in general code should not be writeable, especially because we are using
+# in general code should not be writable, especially because we are using
 # `pip install -e`
-RUN mkdir -p /code/src && \
-    chown -R invenio:invenio /code && \
-    chown -R root:root /code/invenio && \
-    chown -R root:root /code/scripts && \
-    chown -R root:root /code/setup.* && \
-    chown -R root:root /code/src
+RUN mkdir -p /src/invenio && \
+    chown -R invenio:invenio /src && \
+    chown -R root:root /src/invenio/invenio && \
+    chown -R root:root /src/invenio/scripts && \
+    chown -R root:root /src/invenio/setup.*
 USER invenio
 
 # add volumes
 # do this AFTER `chown`, because otherwise directory permissions are not
 # preserved
-VOLUME ["/code", "/home/invenio", "/tmp"]
+VOLUME ["/tmp"]
 
 # install init scripts
-ENTRYPOINT ["/code/scripts/docker_boot.sh"]
+ENTRYPOINT ["/src/invenio/scripts/docker_boot.sh"]
 
 # default to bash
 CMD ["bash"]

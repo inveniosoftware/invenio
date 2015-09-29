@@ -155,11 +155,13 @@ EOF
     fi
 
     # load dev config
-    /code/scripts/setup_devmode.sh
+    /src/invenio/scripts/setup_devmode.sh
 
 
     # final shot
+    echo "inveniomanage database init"
     inveniomanage database init --user=root --password=mysecretpassword --yes-i-know
+    echo "inveniomanage database create"
     inveniomanage database create
 }
 
@@ -181,7 +183,7 @@ wait_for_services
         touch $CFG_MARKER_RUNNING
 
         init
-
+        echo "init done"
 
         # remember that we reached this point
         touch $CFG_MARKER_DONE
