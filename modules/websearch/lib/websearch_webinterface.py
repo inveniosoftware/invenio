@@ -200,7 +200,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage', 'references',
                 'export', 'citations', 'holdings', 'edit', 'keywords',
-                'multiedit', 'merge', 'plots', 'linkbacks', 'hepdata']
+                'multiedit', 'merge', 'plots', 'linkbacks', 'data']
 
     #_exports.extend(output_formats)
 
@@ -218,7 +218,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         self.holdings = WebInterfaceHoldingsPages(self.recid)
         self.citations = self
         self.plots = self
-        self.hepdata = self
+        self.data = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
         self.edit = WebInterfaceEditPages(self.recid)
         self.merge = WebInterfaceMergePages(self.recid)
@@ -268,7 +268,14 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         if not isUserSuperAdmin(user_info):
             argd['verbose'] = 0
 
-        if auth_code and user_info['email'] == 'guest':
+        if auth_code == 2:
+            # Temporary not available (e.g. because of webcoll running)
+            page = page_not_authorized(req, "../", \
+                text=auth_msg, \
+                navmenuid='search')
+            req.status = apache.HTTP_SERVICE_UNAVAILABLE
+            return page
+        elif auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                     make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_SECURE_URL + req.unparsed_uri}, {})
@@ -308,7 +315,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage', 'references',
                 'export', 'citations', 'holdings', 'edit', 'keywords',
-                'multiedit', 'merge', 'plots', 'linkbacks', 'hepdata']
+                'multiedit', 'merge', 'plots', 'linkbacks', 'data']
 
     #_exports.extend(output_formats)
 
@@ -330,7 +337,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         self.edit = WebInterfaceEditPages(self.recid)
         self.merge = WebInterfaceMergePages(self.recid)
         self.linkbacks = WebInterfaceRecordLinkbacksPages(self.recid)
-        self.hepdata = self
+        self.data = self
 
     def __call__(self, req, form):
         argd = wash_search_urlargd(form)
@@ -713,7 +720,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                 if path[1] in ['', 'files', 'reviews', 'comments', 'usage',
                                'references', 'citations', 'holdings', 'edit',
                                'keywords', 'multiedit', 'merge', 'plots',
-                               'linkbacks', 'hepdata']:
+                               'linkbacks', 'data']:
                     tab = path[1]
                 elif path[1] == 'export':
                     tab = ''
@@ -846,6 +853,7 @@ def display_collection(req, c, aas, verbose, ln, em=""):
         page_body = '<p>' + (_("You may want to start browsing from %s.") % ('<a href="' + CFG_SITE_URL + '?ln=' + ln + '">' + get_coll_i18nname(CFG_SITE_NAME, ln) + '</a>')) + '</p>'
         if req.header_only:
             raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+        req.status = apache.HTTP_NOT_FOUND
         return page(title=_("Collection %s Not Found") % cgi.escape(c),
                     body=page_body,
                     description=(CFG_SITE_NAME + ' - ' + _("Not found") + ': ' + cgi.escape(str(c))),

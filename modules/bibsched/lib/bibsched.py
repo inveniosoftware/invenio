@@ -57,6 +57,7 @@ from invenio.dbquery import run_sql, real_escape_string
 from invenio.errorlib import register_exception, register_emergency
 from invenio.shellutils import run_shell_command
 
+#If you change this variable, please check bibsched_task_finished, etc.
 CFG_VALID_STATUS = ('WAITING', 'SCHEDULED', 'RUNNING', 'CONTINUING',
                     '% DELETED', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'STOPPED',
                     'SLEEPING', 'KILLED', 'NOW STOP', 'ERRORS REPORTED')
@@ -201,6 +202,7 @@ def spawn_task(command, wait=False):
                     stderr=devnull, stdout=devnull)
     if wait:
         process.wait()
+    return process
 
 
 def bibsched_get_host(task_id):
@@ -214,6 +216,37 @@ def bibsched_set_host(task_id, host=""):
     """Update the progress of task_id."""
     return run_sql("UPDATE schTASK SET host=%s WHERE id=%s", (host, task_id))
 
+def bibsched_task_finished_successfully(task_id):
+    """Check if the task has finished and no errors occurred."""
+    status = bibsched_get_status(task_id)
+    return status in ('ACK DONE', 'DONE')
+
+def bibsched_task_finished(task_id):
+    """Check if the task has finished."""
+    return bibsched_task_finished_successfully(task_id) or \
+        bibsched_task_finished_with_error(task_id)
+
+def bibsched_task_deleted(task_id):
+    """Check if the task has been deleted."""
+    status = bibsched_get_status(task_id)
+    return status.endswith('DELETED')
+
+def bibsched_task_waiting(task_id):
+    """Check if the task is waiting to be executed."""
+    status = bibsched_get_status(task_id)
+    return status == 'WAITING'
+
+def bibsched_task_running(task_id):
+    """Check if the task is currently running."""
+    status = bibsched_get_status(task_id)
+    return status in ('NOW STOP', 'SLEEPING') or status in ACTIVE_STATUS
+
+def bibsched_task_finished_with_error(task_id):
+    """Check if the tash has finished and errors occurred."""
+    status = bibsched_get_status(task_id)
+    return status in ('ACK DONE WITH ERRORS', 'ACK ERROR', 'CERROR',
+                      'ACK ERRORS REPORTED', 'ERRORS REPORTED', 'ERROR',
+                      'STOPPED', 'KILLED', 'ACK STOPPED', 'ACK KILLED')
 
 def bibsched_get_status(task_id):
     """Retrieve the task status."""
@@ -625,7 +658,7 @@ class BibSched(object):
                     if self.tie_task_to_host(task.id):
                         Log("Task #%d (%s) started" % (task.id, task.proc))
                         ### Relief the lock for the BibTask, it is safe now to do so
-                        spawn_task(command, wait=is_monotask(task.proc))
+                        process = spawn_task(command, wait=is_monotask(task.proc))
                         count = 10
                         while run_sql("""SELECT status FROM schTASK
                                          WHERE id=%s AND status='SCHEDULED'""",
@@ -633,8 +666,11 @@ class BibSched(object):
                             ## Polling to wait for the task to really start,
                             ## in order to avoid race conditions.
                             if count <= 0:
-                                Log("Process %s (task_id: %s) was launched but seems not to be able to reach RUNNING status." % (task.proc, task.id))
-                                bibsched_set_status(task.id, "ERROR", "SCHEDULED")
+                                if process.poll() is None:
+                                    Log("Process %s (task_id: %s) was launched but seems not to be able to reach RUNNING status. However it seems to be alive, so I will continue anyway." % (task.proc, task.id))
+                                else:
+                                    Log("Process %s (task_id: %s) was launched but seems not to be able to reach RUNNING status." % (task.proc, task.id))
+                                    bibsched_set_status(task.id, "ERROR", "SCHEDULED")
                                 return True
                             time.sleep(CFG_BIBSCHED_REFRESHTIME)
                             count -= 1
@@ -806,9 +842,13 @@ class BibSched(object):
 
         try:
             self.check_errors()
-        except RecoverableError, msg:
-            register_emergency('Light emergency from %s: BibTask failed: %s'
-                                                         % (CFG_SITE_URL, msg))
+        except RecoverableError as msg:
+            if "bibupload ->" in str(msg) or "bibupload:" in str(msg):
+                register_exception(alert_admin=True)
+            else:
+                register_emergency(
+                    'Light emergency from {0}: BibTask failed: {1}'.format(CFG_SITE_URL, msg)
+                )
 
         # Update our tasks list (to know who is running, sleeping, etc.)
         self.calculate_rows()
@@ -848,13 +888,15 @@ class BibSched(object):
                     self.tick()
                 else:
                     time.sleep(CFG_BIBSCHED_REFRESHTIME)
-        except Exception, err:
+        except Exception as err:
             register_exception(alert_admin=True)
-            try:
-                register_emergency('Emergency from %s: BibSched halted: %s'
-                                                         % (CFG_SITE_URL, err))
-            except NotImplementedError:
-                pass
+            if "bibupload ->" not in str(err) and "bibupload:" not in str(err):
+                try:
+                    register_emergency(
+                        'Emergency from {0}: BibSched halted: {1}'.format(CFG_SITE_URL, err)
+                    )
+                except NotImplementedError:
+                    pass
             raise
 
 
@@ -1163,6 +1205,9 @@ def stop(verbose=True, debug=False):
     if verbose:
         print "\nStopped"
     Log("BibSched and all BibTasks stopped")
+
+class UnknownBibschedStatus(Exception):
+    pass
 
 
 def main():

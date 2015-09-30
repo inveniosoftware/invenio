@@ -360,7 +360,7 @@ def is_user_viewer_of_record(user_info, recid):
             return True
     return False
 
-def check_user_can_view_record(user_info, recid):
+def check_user_can_view_record(user_info, recid, ln=CFG_SITE_LANG):
     """
     Check if the user is authorized to view the given recid. The function
     grants access in two cases: either user has author rights on this
@@ -375,6 +375,7 @@ def check_user_can_view_record(user_info, recid):
     authorization is not granted
     @rtype: (int, string)
     """
+    _ = gettext_set_language(ln)
     policy = CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY.strip().upper()
     if isinstance(recid, str):
         recid = int(recid)
@@ -416,11 +417,11 @@ def check_user_can_view_record(user_info, recid):
             return (0, '')
         else:
             ## Too bad. Let's print a nice message:
-            return (1, """The record you are trying to access has just been
+            return (2, _("""The record you are trying to access has just been
 submitted to the system and needs to be assigned to the
 proper collections. It is currently restricted for security reasons
 until the assignment will be fully completed. Please come back later to
-properly access this record.""")
+properly access this record."""))
     else:
         ## The record either does not exists or has been deleted.
         ## Let's handle these situations outside of this code.
@@ -791,7 +792,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
 
     # FIXME: quick hack for the journal index
     if f == 'journal':
-        opfts.append(['+', p, f, 'w'])
+        opfts.append(['+', p, f, 'e'])
         return opfts
 
     ## check arguments: is desired matching type set?
@@ -2144,12 +2145,6 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     if CFG_INSPIRE_SITE and of.startswith('h'):
         # fulltext/caption search warnings for INSPIRE:
         fields_to_be_searched = [f for dummy_o, p, f, m in basic_search_units]
-        if 'fulltext' in fields_to_be_searched:
-            write_warning(_("Full-text search is currently available for all arXiv papers, many theses, a few report series and some journal articles"), req=req)
-        elif 'caption' in fields_to_be_searched:
-            write_warning(_("Warning: figure caption search is only available for a subset of papers mostly from %(x_range_from_year)s-%(x_range_to_year)s.") %
-                          {'x_range_from_year': '2008',
-                           'x_range_to_year': '2012'}, req=req)
 
     for idx_unit in xrange(len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
@@ -2209,6 +2204,9 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             if re.search(r'[^a-zA-Z0-9\s\:]', bsu_p) and bsu_f != 'refersto' and bsu_f != 'citedby':
                 if bsu_p.startswith('"') and bsu_p.endswith('"'): # is it ACC query?
                     bsu_pn = re.sub(r'[^a-zA-Z0-9\s\:]+', "*", bsu_p)
+                elif bsu_f == 'journal' and len(bsu_p.split(',')) == 3 and '-' in bsu_p.split(',')[-1]:
+                    jrn, vol, page = bsu_p.split(',')
+                    bsu_pn = "%s,%s,%s" % (jrn, vol, page.split('-')[0])
                 else: # it is WRD query
                     bsu_pn = re.sub(r'[^a-zA-Z0-9\s\:]+', " ", bsu_p)
                 if verbose and of.startswith('h') and req:
@@ -2227,6 +2225,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                     if of.startswith('h') and display_nearest_terms_box:
                         if req:
                             if bsu_f == "recid":
+                                req.status = apache.HTTP_NOT_FOUND
                                 write_warning(_("Requested record does not seem to exist."), req=req)
                             else:
                                 write_warning(create_nearest_terms_box(req.argd, bsu_p, bsu_f, bsu_m, ln=ln), req=req)
@@ -2236,6 +2235,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 if of.startswith('h') and display_nearest_terms_box:
                     if req:
                         if bsu_f == "recid":
+                            req.status = apache.HTTP_NOT_FOUND
                             write_warning(_("Requested record does not seem to exist."), req=req)
                         else:
                             write_warning(create_nearest_terms_box(req.argd, bsu_p, bsu_f, bsu_m, ln=ln), req=req)
@@ -2600,6 +2600,7 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress, wl=0):
         raise InvenioWebSearchWildcardLimitError(hitset)
     # okay, return result set:
     return hitset
+
 
 def search_unit_in_idxpairs(p, f, search_type, wl=0):
     """Searches for pair 'p' inside idxPAIR table for field 'f' and
@@ -3107,6 +3108,9 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, of="hb
         else:
             permitted_restricted_collections = user_info.get('precached_permitted_restricted_collections', [])
 
+        if verbose and of.startswith("h"):
+            write_warning("Search stage 4: Your permitted collections: %s" % (str(permitted_restricted_collections),), req=req)
+
         # let's build the list of the both public and restricted
         # child collections of the collection from which the user
         # started his/her search. This list of children colls will be
@@ -3121,6 +3125,9 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, of="hb
         # children of 'cc' (real, virtual, restricted), rest of 'c' that are  not cc's children
         colls_to_be_displayed = [coll for coll in current_coll_children if coll in colls or coll in permitted_restricted_collections]
         colls_to_be_displayed.extend([coll for coll in colls if coll not in colls_to_be_displayed])
+
+        if verbose and of.startswith("h"):
+            write_warning("Search stage 4: Collections to display: %s" % (str(colls_to_be_displayed),), req=req)
 
         if policy == 'ANY':# the user needs to have access to at least one collection that restricts the records
             #we need this to be able to remove records that are both in a public and restricted collection
@@ -3143,6 +3150,9 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, of="hb
         for coll in colls_to_be_displayed:
             results[coll] = results.get(coll, intbitset()) | (records_that_can_be_displayed & get_collection_reclist(coll))
             results_nbhits += len(results[coll])
+
+        if verbose and of.startswith("h"):
+            write_warning("Search stage 4: Final results (%d): %s " % (results_nbhits, str(results),), req=req)
 
     if results_nbhits == 0:
         # no hits found, try to search in Home and restricted and/or hidden collections:
@@ -3449,7 +3459,7 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
 
     # FIXME: quick hack for the journal index
     if f == 'journal':
-        return get_nearest_terms_in_bibwords(p, f, n_below, n_above)
+        return get_nearest_terms_in_idxphrase(p, f, n_below, n_above)
 
     ## We are going to take max(n_below, n_above) as the number of
     ## values to ferch from bibXXx.  This is needed to work around
@@ -3597,7 +3607,7 @@ def get_nbhits_in_bibxxx(p, f, in_hitset=None):
 
     # FIXME: quick hack for the journal index
     if f == 'journal':
-        return get_nbhits_in_bibwords(p, f)
+        return get_nbhits_in_idxphrases(p, f)
 
     ## construct 'tl' which defines the tag list (MARC tags) to search in:
     tl = []
@@ -4760,7 +4770,8 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                         selfcited = get_self_cited_by(recid)
                         selfcited = rank_by_citations(get_self_cited_by(recid), verbose=verbose)
                         selfcited = reversed(selfcited[0])
-                        selfcited = [recid for recid, dummy in selfcited]
+                        # recid is already used, let's use recordid
+                        selfcited = [recordid for recordid, dummy in selfcited]
                         req.write(websearch_templates.tmpl_detailed_record_citations_self_cited(recid,
                                   ln, selfcited=selfcited, citinglist=citinglist))
                         # Co-cited
@@ -4784,6 +4795,8 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
 
                         # Citation log
                         entries = get_citers_log(recid)
+                        if verbose > 3:
+                            write_warning("Citation log debug: %s" % len(entries), req=req)
                         req.write(websearch_templates.tmpl_detailed_record_citations_citation_log(ln, entries))
 
 
@@ -4806,7 +4819,8 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                     elif tab == 'keywords':
                         from invenio.bibclassify_webinterface import main_page
                         main_page(req, recid, tabs, ln,
-                                  webstyle_templates)
+                                  webstyle_templates,
+                                  websearch_templates)
                     elif tab == 'plots':
                         req.write(webstyle_templates.detailed_record_container_top(recid,
                                                                                    tabs,
@@ -4818,7 +4832,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                       tabs,
                                                                                       ln))
 
-                    elif tab == 'hepdata':
+                    elif tab == 'data':
                         req.write(webstyle_templates.detailed_record_container_top(recid,
                                                                                    tabs,
                                                                                    ln,
@@ -5011,8 +5025,9 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
     # the record is included in the collections to which bibauthorid is limited.
     if user_info:
         display_claim_this_paper = (user_info.get("precached_viewclaimlink", False) and
+                                (not BIBAUTHORID_LIMIT_TO_COLLECTIONS or
                                 recID in intbitset.union(*[get_collection_reclist(x)
-                                for x in BIBAUTHORID_LIMIT_TO_COLLECTIONS]))
+                                for x in BIBAUTHORID_LIMIT_TO_COLLECTIONS])))
     else:
         display_claim_this_paper = False
 
@@ -5085,7 +5100,7 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
             record = get_record(recID)
             if not can_see_hidden:
                 for tag in CFG_BIBFORMAT_HIDDEN_TAGS:
-                    del record[tag]
+                    record.pop(tag, None)
                 ot = list(set(ot) - set(CFG_BIBFORMAT_HIDDEN_TAGS))
             out += record_xml_output(record, ot)
         else:
@@ -5895,7 +5910,9 @@ def prs_detailed_record(kwargs=None, req=None, of=None, cc=None, aas=None, ln=No
             if req.header_only:
                 raise apache.SERVER_RETURN(apache.HTTP_NOT_FOUND)
             else:
+                req.status = apache.HTTP_NOT_FOUND
                 write_warning(_("Requested record does not seem to exist."), req=req)
+
 
 
 def prs_browse(kwargs=None, req=None, of=None, cc=None, aas=None, ln=None, uid=None, _=None, p=None,
@@ -5957,6 +5974,7 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
             if req.header_only:
                 raise apache.SERVER_RETURN(apache.HTTP_NOT_FOUND)
             else:
+                req.status = apache.HTTP_NOT_FOUND
                 write_warning(_("Requested record does not seem to exist."), req=req)
         if of == "id":
             return []
@@ -6048,6 +6066,7 @@ def prs_search_cocitedwith(kwargs=None, req=None, of=None, cc=None, pl_in_url=No
     if record_exists(recID) != 1:
         # record does not exist
         if of.startswith("h"):
+            req.status = apache.HTTP_NOT_FOUND
             write_warning(_("Requested record does not seem to exist."), req=req)
         if of == "id":
             return []
@@ -6398,7 +6417,7 @@ def prs_split_into_collections(kwargs=None, results_final=None, colls_to_search=
     # we have to avoid counting it multiple times.  The price to
     # pay for this accuracy of results_final_nb_total is somewhat
     # increased CPU time.
-    if results_final.keys() == 1:
+    if len(results_final.keys()) == 1:
         # only one collection; no need to union them
         results_final_for_all_selected_colls = results_final.values()[0]
         results_final_nb_total = results_final_nb.values()[0]
@@ -6754,8 +6773,10 @@ def prs_search_common(kwargs=None, req=None, of=None, cc=None, ln=None, uid=None
 
 def prs_intersect_with_colls_and_apply_search_limits(results_in_any_collection,
                                                kwargs=None, req=None, of=None,
-                                               **dummy):
+                                               verbose=None, **dummy):
     # search stage 4: intersection with collection universe:
+    if verbose and of.startswith("h"):
+        write_warning("Search stage 4: Starting with %s hits." % str(results_in_any_collection), req=req)
     results_final = {}
     output = prs_intersect_results_with_collrecs(results_final, results_in_any_collection, kwargs, **kwargs)
     if output is not None:
@@ -6771,6 +6792,8 @@ def prs_intersect_with_colls_and_apply_search_limits(results_in_any_collection,
         raise Exception
 
     # search stage 5: apply search option limits and restrictions:
+    if verbose and of.startswith("h"):
+        write_warning("Search stage 5: Starting with %s hits." % str(results_final), req=req)
     output = prs_apply_search_limits(results_final, kwargs=kwargs, **kwargs)
     kwargs['results_final'] = results_final
     if output is not None:

@@ -893,7 +893,9 @@ def cli_cmd_load_demo_records(conf):
                 "%s/bin/bibsort 7" % CFG_PREFIX,
                 "%s/bin/oairepositoryupdater -u admin" % CFG_PREFIX,
                 "%s/bin/oairepositoryupdater 8" % CFG_PREFIX,
-                "%s/bin/bibupload 9" % CFG_PREFIX,]:
+                "%s/bin/bibupload 9" % CFG_PREFIX,
+                "%s/bin/bibauthorid -u admin --update-personid" % CFG_PREFIX,
+                "%s/bin/bibauthorid 10" % CFG_PREFIX]:
         if os.system(cmd):
             print "ERROR: failed execution of", cmd
             sys.exit(1)
@@ -1430,7 +1432,7 @@ def detect_apache_version():
     """
     from invenio.shellutils import run_shell_command
     out = []
-    dummy1, cmd_out, dummy2 = run_shell_command("locate bin/httpd bin/apache")
+    dummy1, cmd_out, dummy2 = run_shell_command("which httpd || which apache2")
     for apache in cmd_out.split("\n"):
         apache_version = _grep_version_from_executable(apache, '^Apache\/')
         if apache_version:

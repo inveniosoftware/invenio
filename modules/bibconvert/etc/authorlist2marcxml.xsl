@@ -68,15 +68,26 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
   <!-- FUNCTION  print-i-authorinspireid: prints the authors INSPIRE ID inside xxx__i subfield -->
   <xsl:template name="print-i-authorinspireid">
     <xsl:param name="authorid"/>
-    <xsl:if test="not(contains($authorid, 'UNDEFINED')) and $authorid!=''">
+    <xsl:if test="not(contains($authorid, 'UNDEFINED')) and not(contains($authorid, 'undefined')) and $authorid!='' and contains($authorid, 'INSPIRE') ">
       <subfield code="i"><xsl:value-of select="normalize-space($authorid)"/></subfield>
+    </xsl:if>
+    <xsl:if test="not(contains($authorid, 'UNDEFINED')) and not(contains($authorid, 'undefined')) and not(contains($authorid, 'INSPIRE'))  and $authorid!=''">
+      <subfield code="i">INSPIRE-<xsl:value-of select="normalize-space($authorid)"/></subfield>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- FUNCTION  print-j-authororcid: prints the authors ORCID inside xxx__j subfield -->
+  <xsl:template name="print-j-authororcid">
+    <xsl:param name="orcid"/>
+    <xsl:if test="not(contains($orcid, 'UNDEFINED')) and not(contains($orcid, 'undefined')) and $orcid!=''">
+      <subfield code="j">ORCID:<xsl:value-of select="normalize-space($orcid)"/></subfield>
     </xsl:if>
   </xsl:template>
 
   <!-- FUNCTION  print-h-authorid: prints the authors ID inside xxx__h subfield -->
   <xsl:template name="print-h-authorid">
     <xsl:param name="authorid"/>
-    <xsl:if test="not(contains($authorid, 'UNDEFINED'))">
+    <xsl:if test="not(contains($authorid, 'UNDEFINED')) and not(contains($authorid, 'undefined'))">
       <subfield code="h"><xsl:value-of select="normalize-space(@source)" />-<xsl:value-of select="normalize-space($authorid)"/></subfield>
     </xsl:if>
   </xsl:template>
@@ -84,13 +95,19 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
   <!-- FUNCTION  print-u-affiliation: prints the authors affiliation inside xxx__u subfield -->
   <xsl:template name="print-u-affiliation">
     <xsl:param name="orgid"/>
-    <xsl:variable name="orgname" select="//foaf:Organization[@id=$orgid]/cal:orgName[@source='spiresICN'] | //foaf:Organization[@id=$orgid]/cal:orgName[@source='inspire'] | //foaf:Organization[@id=$orgid]/cal:orgName[@source='INSPIRE']" />
-    <xsl:choose>
-      <xsl:when test="not(contains($orgname, 'UNDEFINED')) and $orgname!=''">
+    <xsl:variable name="orgname" select="//foaf:Organization[@id=$orgid]/cal:orgName[@source='spiresICN'] |
+                                         //foaf:Organization[@id=$orgid]/cal:orgName[@source='inspire'] |
+                                         //foaf:Organization[@id=$orgid]/cal:orgName[@source='INSPIRE']" />
+          <xsl:choose>
+      <xsl:when test="not(contains($orgname, 'UNDEFINED')) and $orgname!=''" >
         <subfield code="u"><xsl:value-of select="normalize-space($orgname)"/></subfield>
       </xsl:when>
       <xsl:otherwise>
-        <subfield code="u">UNDEFINED, <xsl:value-of select="//foaf:Organization[@id=$orgid]/foaf:name"/></subfield>
+          <xsl:for-each select="//collaborationauthorlist/cal:organizations/foaf:Organization">
+            <xsl:if test="cal:group[@with=$orgid]">
+              <subfield code="u"><xsl:value-of select="cal:orgName[@source='INSPIRE']"/></subfield>
+            </xsl:if>
+          </xsl:for-each>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -100,21 +117,30 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
     <xsl:param name="person"/>
     <!-- Fetch authors familyname, givenname and create 100/700__a subfield-->
     <xsl:call-template name="print-a-authorname"/>
+
+
     <!-- Go through each author affiliation and create 100/700__u subfield(s) -->
     <xsl:for-each select="./cal:authorAffiliations/cal:authorAffiliation">
       <xsl:variable name="orgid" select="@organizationid" />
+
       <!-- Print spiresICN if defined, otherwise print full name -->
       <xsl:call-template name="print-u-affiliation">
         <xsl:with-param name="orgid" select="$orgid"/>
       </xsl:call-template>
     </xsl:for-each>
+
     <!-- Fetch Inspire ID and create 100/700__i subfield -->
     <xsl:for-each select="./cal:authorIDs/cal:authorID">
       <xsl:if test="not(.//*[contains(., 'UNDEFINED')])">
         <xsl:choose>
-            <xsl:when test="@source='INSPIRE'">
+            <xsl:when test="@source='INSPIRE' or @source='Inspire ID'">
                 <xsl:call-template name="print-i-authorinspireid">
                     <xsl:with-param name="authorid" select="."/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="@source='ORCID' or @source='orcid'">
+                <xsl:call-template name="print-j-authororcid">
+                    <xsl:with-param name="orcid" select="."/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
@@ -128,9 +154,14 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
     <xsl:for-each select="./cal:authorids/cal:authorid">
       <xsl:if test="not(.//*[contains(., 'UNDEFINED')])">
         <xsl:choose>
-            <xsl:when test="@source='INSPIRE'">
+            <xsl:when test="@source='INSPIRE' or @source='Inspire ID'">
                 <xsl:call-template name="print-i-authorinspireid">
                     <xsl:with-param name="authorid" select="."/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="@source='ORCID' or @source='orcid'">
+                <xsl:call-template name="print-j-authororcid">
+                    <xsl:with-param name="orcid" select="."/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>

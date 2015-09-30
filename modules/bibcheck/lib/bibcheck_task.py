@@ -63,6 +63,7 @@ from invenio.dbquery import run_sql
 from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.shellutils import split_cli_ids_arg
 from invenio.jsonutils import json
+from invenio.websearch_webcoll import get_cache_last_updated_timestamp
 
 CFG_BATCH_SIZE = 1000
 
@@ -190,17 +191,20 @@ class AmendableRecord(dict):
         tag, localpos, subfieldpos = position
         tag = tag.replace("_", " ")
 
-        old_value = self._queryval(position)
-        if new_value != old_value:
-            if position[2] is None:
-                fields = self[tag[0:3]]
-                fields[localpos] = fields[localpos][0:3] + (new_value,)
-            else:
-                self._query(position[:2] + (None,))[0][subfieldpos] = (tag[5], new_value)
-            if message == '':
-                message = u"Changed field %s from '%s' to '%s'" % (position[0],
-                        old_value.decode('utf-8'), new_value.decode('utf-8'))
-            self.set_amended(message)
+        try:
+            old_value = self._queryval(position)
+            if new_value != old_value:
+                if position[2] is None:
+                    fields = self[tag[0:3]]
+                    fields[localpos] = fields[localpos][0:3] + (new_value,)
+                else:
+                    self._query(position[:2] + (None,))[0][subfieldpos] = (tag[5], new_value)
+                if message == '':
+                    message = u"Changed field %s from '%s' to '%s'" % (position[0],
+                            old_value.decode('utf-8'), new_value.decode('utf-8'))
+                self.set_amended(message)
+        except Exception as err:
+            self.set_invalid("Error when trying to amend the record at position %s: %s. Maybe there is an empty subfield code?" % (position, err))
 
     def delete_field(self, position, message=""):
         """
@@ -278,8 +282,7 @@ def task_parse_options(key, val, *_):
     """ Must be defined for bibtask to create a task """
 
     if key in ("--all", "-a"):
-        for rule_name in val.split(","):
-            reset_rule_last_run(rule_name)
+        task_set_option("reset_rules", set(val.split(",")))
     elif key in ("--enable-rules", "-e"):
         task_set_option("enabled_rules", set(val.split(",")))
     elif key in ("--id", "-i"):
@@ -305,10 +308,26 @@ def task_run_core():
 
     Returns True when run successfully. False otherwise.
     """
+    rules_to_reset = task_get_option("reset_rules")
+    if rules_to_reset:
+        write_message("Resetting the following rules: %s" % rules_to_reset)
+        for rule in rules_to_reset:
+            reset_rule_last_run(rule)
     plugins = load_plugins()
     rules = load_rules(plugins)
+    write_message("Loaded rules: %s" % rules, verbose=9)
     task_set_option('plugins', plugins)
     recids_for_rules = get_recids_for_rules(rules)
+    write_message("recids for rules: %s" % recids_for_rules, verbose=9)
+
+    update_database = not (task_has_option('record_ids') or
+                           task_get_option('no_upload', False) or
+                           task_get_option('no_tickets', False))
+
+    if update_database:
+        next_starting_dates = {}
+        for rule_name, rule in rules.iteritems():
+            next_starting_dates[rule_name] = get_next_starting_date(rule)
 
     all_recids = intbitset([])
     single_rules = set()
@@ -371,9 +390,10 @@ def task_run_core():
     if records_to_upload_replace:
         upload_amendments(records_to_upload_replace, False)
 
-    # Update the database with the last time the rules was ran
-    for rule in rules.keys():
-        update_rule_last_run(rule)
+    # Update the database with the last time each rule was ran
+    if update_database:
+        for rule_name, rule in rules.iteritems():
+            update_rule_last_run(rule_name, next_starting_dates[rule_name])
 
     return True
 
@@ -479,22 +499,51 @@ def get_rule_lastrun(rule_name):
         return res[0][0]
 
 
-def update_rule_last_run(rule_name):
-    """
-    Set the last time a rule was run to now. This function should be called
-    after a rule has been ran.
-    """
+def get_next_starting_date(rule):
+    """Calculate the date the next bibcheck run should consider as initial.
 
-    if task_has_option('record_ids') or task_get_option('no_upload', False) \
-            or task_get_option('no_tickets', False):
-        return   # We don't want to update the database in this case
+    If no filter has been specified then the time that is set is the time the
+    task was started. Otherwise, it is set to the earliest date among last time
+    webcoll was run and the last bibindex last_update as the last_run to prevent
+    records that have yet to be categorized from being perpetually ignored.
+    """
+    def dt(t):
+        return datetime.strptime(t, "%Y-%m-%d %H:%M:%S")
+
+    # Upper limit
+    task_starting_time = dt(task_get_task_param('task_starting_time'))
+
+    for key, val in rule.iteritems():
+        if key.startswith("filter_") and val:
+            break
+    else:
+        return task_starting_time
+
+    # Lower limit
+    min_last_updated = run_sql("select min(last_updated) from idxINDEX")[0][0]
+    cache_last_updated = dt(get_cache_last_updated_timestamp())
+
+    if not min_last_updated or not cache_last_updated:
+        # Some tables have never been initialized. Let's return the Epoch
+        return datetime(1970, 1, 1)
+
+    return min(min_last_updated, task_starting_time, cache_last_updated)
+
+
+def update_rule_last_run(rule_name, next_starting_date):
+    """
+    Set the last time a rule was run.
+
+    This function should be called after a rule has been ran.
+    """
+    next_starting_date_str = datetime.strftime(next_starting_date,
+                                               "%Y-%m-%d %H:%M:%S")
 
     updated = run_sql("UPDATE bibcheck_rules SET last_run=%s WHERE name=%s;",
-                      (task_get_task_param('task_starting_time'), rule_name,))
+                      (next_starting_date_str, rule_name,))
     if not updated: # rule not in the database, insert it
         run_sql("INSERT INTO bibcheck_rules(name, last_run) VALUES (%s, %s)",
-                (rule_name, task_get_task_param('task_starting_time')))
-
+                (rule_name, next_starting_date_str))
 
 def reset_rule_last_run(rule_name):
     """

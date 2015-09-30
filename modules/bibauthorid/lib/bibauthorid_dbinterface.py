@@ -954,7 +954,7 @@ def get_author_info_of_confirmed_paper(sig):   ### personid_name_from_signature
                              and flag > -2""",
                              sig )
 
-    assert len(conf_author) < 2, "More that one author hold the same signature: %s" % conf_author
+    assert len(conf_author) < 2, "More than one author hold the same signature: %s" % str(conf_author)
 
     return conf_author
 
@@ -1128,7 +1128,7 @@ def get_authors_by_name_regexp(name_regexp):   ### get_all_personids_by_name
                       (name_regexp,) )
 
 
-def get_authors_by_name(name):   ### find_pids_by_exact_name
+def get_authors_by_name(name, limit_to_recid=False):   ### find_pids_by_exact_name
     '''
     Gets all authors who have records with the specified name.
 
@@ -1138,8 +1138,14 @@ def get_authors_by_name(name):   ### find_pids_by_exact_name
     @return: author identifiers
     @rtype: set set((int),)
     '''
-    return set(_select_from_aidpersonidpapers_where(select=['personid'], name=name))
-
+    if limit_to_recid:
+        pids = run_sql("select personid from aidPERSONIDPAPERS where name=%s and bibrec=%s and flag>-2",
+                       (name, limit_to_recid))
+        return set(pids)
+    else:
+        pids = run_sql("select personid from aidPERSONIDPAPERS where name=%s and flag>-2",
+                       (name,))
+        return set(pids)
 
 def get_paper_to_author_and_status_mapping():   ### get_bibrefrec_to_pid_flag_mapping
     '''
@@ -2696,12 +2702,12 @@ def get_papers_affected_since(since):   ### personid_get_recids_affected_since
     '''
     recs = set(_split_signature_string(sig[0])[2] for sig in run_sql("""select distinct value
                                                                        from aidUSERINPUTLOG
-                                                                       where timestamp > %s""",
+                                                                       where timestamp >= %s""",
                                                                        (since,) ) if ',' in sig[0] and ':' in sig[0])
 
     pids = set(int(pid[0]) for pid in run_sql("""select distinct personid
                                                  from aidUSERINPUTLOG
-                                                 where timestamp > %s""",
+                                                 where timestamp >= %s""",
                                                  (since,) ) if pid[0] > 0)
 
     if pids:
@@ -4124,6 +4130,8 @@ def get_all_valid_papers():   ### get_all_valid_bibrecs
     @return: paper identifiers
     @rtype: list [int,]
     '''
+    if not bconfig.LIMIT_TO_COLLECTIONS:
+        return perform_request_search(p="")
     collection_restriction_pattern = " or ".join(["980__a:\"%s\"" % x for x in bconfig.LIMIT_TO_COLLECTIONS])
 
     return perform_request_search(p="%s" % collection_restriction_pattern, rg=0)

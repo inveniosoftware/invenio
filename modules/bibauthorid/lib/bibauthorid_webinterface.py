@@ -1046,7 +1046,8 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                 pinfo['should_check_to_autoclaim'] = True
                 pinfo["login_info_message"] = "confirm_success"
                 session.dirty = True
-                redirect_to_url(req, '%s/author/manage_profile/%s' % (CFG_SITE_URL, urllib.quote(redirect_pid)))
+                redirect_to_url(req, '%s/author/manage_profile/%s'
+                                % (CFG_SITE_URL, urllib.quote(str(redirect_pid))))
             # if someone have already claimed this profile it redirects to choose_profile with an error message
             else:
                 param=''
@@ -1632,7 +1633,12 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
         uid = getUid(req)
         tid = int(tid)
 
-        rt_ticket = get_validated_request_tickets_for_author(pid, tid)[0]
+        try:
+            rt_ticket = get_validated_request_tickets_for_author(pid, tid)[0]
+        except IndexError:
+            msg = """This ticket with the tid: %s has already been
+                     removed.""" % tid
+            return self._error_page(req, message=msg)
 
         for action, bibrefrec in rt_ticket['operations']:
             operation_parts = {'pid': pid,
@@ -1933,6 +1939,10 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
         primary_pid = webapi.get_person_id_from_canonical_id(primary_cname)
         is_available = webapi.is_profile_available(primary_pid)
 
+        if not session['personinfo']['merge_primary_profile']:
+            session['personinfo']['merge_primary_profile'] = [primary_cname, '1' if is_available else '0']
+            session.dirty = True
+
         body = ''
 
         cname = ''
@@ -2111,7 +2121,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                                 if prof[0] == profile:
                                     profiles_to_merge.remove(prof)
                         primary_profile = session["personinfo"]["merge_primary_profile"]
-                        if primary_profile not in profiles_to_merge:
+                        if primary_profile and primary_profile not in profiles_to_merge:
                             profiles_to_merge.append(primary_profile)
                         session["personinfo"]["merge_primary_profile"] = [profile, profile_availability]
                         session.dirty = True
@@ -2863,10 +2873,10 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         self.person_id = -1   # -1 is a non valid author identifier
 
         if identifier is None or not isinstance(identifier, str):
+            self.original_identifier = " "
             return
 
         self.original_identifier = identifier
-
         # check if it's a canonical id: e.g. "J.R.Ellis.1"
 
         try:
@@ -3033,10 +3043,15 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         orcid_info = pinfo['orcid']
 
         # author should have already an orcid if this method was triggered
-        orcid_id = get_orcid_id_of_author(pinfo['pid'])[0][0]
+        try:
+            orcid_id = get_orcid_id_of_author(pinfo['pid'])[0][0]
+        except IndexError:
+            #weird, no orcid id in the database? Let's not do anything...
+            orcid_id = None
         orcid_dois = get_dois_from_orcid(orcid_id)
+
         # TODO: what to do in case some ORCID server error occurs?
-        if orcid_dois is None:
+        if orcid_id is None or orcid_dois is None:
             redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, pinfo['pid']))
 
         # TODO: it would be smarter if:
@@ -3102,6 +3117,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         except:
             return self._fail(req, apache.HTTP_NOT_FOUND)
 
+        webapi.session_bareinit(req)
         session = get_session(req)
         pinfo = session['personinfo']
         if not self._is_admin(pinfo):

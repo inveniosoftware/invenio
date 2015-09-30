@@ -28,6 +28,8 @@ import sys
 import Queue
 import threading
 import signal
+import time
+
 
 from invenio.config import (CFG_CACHEDIR,
                             CFG_HEPDATA_URL,
@@ -59,7 +61,8 @@ import cPickle
 from invenio.bibtask import task_init, write_message, \
     task_set_option, task_has_option, task_get_option, \
     task_low_level_submission, task_update_progress, \
-    task_read_status, task_sleep_now_if_required
+    task_read_status, task_sleep_now_if_required, \
+    task_get_task_param
 
 # helper functions
 
@@ -1464,6 +1467,13 @@ def hepdata_log(category, msg):
 
 # The harvesting daemon
 
+def hepdata_get_latest_changes_identifiers(starting_date):
+    url = CFG_HEPDATA_URL + "/AllIds/" + starting_date
+    page_content = download_with_retry(url)
+    matches = re.search("<pre>([^<]*)</pre>", page_content)
+    json_string = matches.groups()[0].replace(",,", ",0,")
+    return json.loads(json_string)[:-1] # We ommit the last 0,0,0 entry
+
 def hepdata_get_all_identifiers():
     page_content = download_with_retry(get_hepdata_allids_url())
     matches = re.search("<pre>([^<]*)</pre>", page_content)
@@ -1471,7 +1481,7 @@ def hepdata_get_all_identifiers():
     return json.loads(json_string)[:-1] # We ommit the last 0,0,0 entry
 
 
-def hepdata_harvest_get_identifiers():
+def hepdata_harvest_get_identifiers(starting_date=None):
     """
     Retrieves identifiers of records that should be processed searching for
     corresponding HEPData entry
@@ -1480,11 +1490,16 @@ def hepdata_harvest_get_identifiers():
         yield task_get_option('record_to_harvest')
     else:
         used_ids = set() # sometimes records are reported many times
-        for res in hepdata_get_all_identifiers():
-            if res[0] and not res[0] in used_ids:
-                used_ids.add(res[0])
-                yield res[0]
-
+        if starting_date:
+            for res in hepdata_get_latest_changes_identifiers(starting_date):
+                if res[0] and not res[0] in used_ids:
+                    used_ids.add(res[0])
+                    yield res[0]
+        else:
+            for res in hepdata_get_all_identifiers():
+                if res[0] and not res[0] in used_ids:
+                    used_ids.add(res[0])
+                    yield res[0]
 
 
 def prepare_hepdata_for_upload(recid, hepdata, insert_stream, correct_stream,
@@ -1640,6 +1655,8 @@ def hepdata_harvest_task_submit_elaborate_specific_parameter(key, value, opts, a
         task_set_option('threads_number', value)
     elif key in ("--force-reupload", "-f"):
         task_set_option('force_reupload', True)
+    elif key in ("--starting-date", "-d"):
+        task_set_option('starting_date', value)
     else:
         return False
     return True
@@ -1666,8 +1683,8 @@ Examples:
   -f, --force-reupload Forces the harvester to reupload all data files
 """,
             version=__revision__,
-            specific_params=("r:n:f",
-                 [ "recid=", "nthreads=", "force-reupload" ]),
+            specific_params=("r:n:f:d:",
+                 [ "recid=", "nthreads=", "force-reupload", "starting-date=" ]),
             task_submit_elaborate_specific_parameter_fnc =
               hepdata_harvest_task_submit_elaborate_specific_parameter,
             task_run_fnc = hepdata_harvest_task_core)
@@ -1841,15 +1858,39 @@ def get_forceupload_param():
         return bool(task_get_option("force_reupload"))
     return False
 
+def get_starting_date_param():
+    """Read the task parameters or the config file to retrieve the starting date for harvest
+        If is not provided, it will start from the beginning of times
+    """
+    # if forced
+    if task_has_option("starting_date"):
+        return str(task_get_option("starting_date"))
+    # from file
+    try:
+        return open(CFG_TMPSHAREDDIR + "/hepdata-lastharvest.txt", "r+").read()
+    except IOError:
+        # not provided
+        return "19700101"
+
+def update_last_harvest():
+    """ Updates the last harvest date
+    """
+    starting_time = task_get_task_param('task_starting_time')
+    starting_date = time.strftime("%Y%m%d", time.strptime(starting_time, "%Y-%m-%d %H:%M:%S"))
+    open(CFG_TMPSHAREDDIR + "/hepdata-lastharvest.txt", "w").write(starting_date)
+    write_message("Updated last harvesest: %s" % starting_date)
+
 def hepdata_harvest_task_core():
     def kill_handler(signum, frame):
         write_message('KILLED')
         exit(0)
     signal.signal(signal.SIGTERM, kill_handler)
 
-
     number_threads = get_number_of_harvesting_threads()
     force_reupload = get_forceupload_param()
+    starting_date = get_starting_date_param()
+
+    write_message("STARTING DATE: %s" % starting_date)
 
     task_stats = {
         "new_hepdata_records" : 0,
@@ -1878,10 +1919,9 @@ def hepdata_harvest_task_core():
 
     write_message("STAGE0: Harvesting data and building the input")
 
-
     # feed the input queue
     total_recs = 0
-    for recid in hepdata_harvest_get_identifiers():
+    for recid in hepdata_harvest_get_identifiers(starting_date):
         recs_queue.put_nowait(recid)
         total_recs += 1
     # spawn necessary number of workers (try not to spawn more than necessary)
@@ -1919,7 +1959,6 @@ def hepdata_harvest_task_core():
 
     else:
         #just perform calculations
-
         write_message("started single processing thread")
         process_single_thread(recs_queue, insert_queue, correct_queue, failed_ids, task_stats, None, None, None, 1, total_recs = total_recs, force_reupload = force_reupload)
 
@@ -1969,7 +2008,7 @@ def hepdata_harvest_task_core():
                       % task_stats)
     write_message("   Spawned BibUpload tasks: insert: %i, correct: %i" % \
                       (insert_tasknum, correct_tasknum))
-
+    update_last_harvest()
     return True
 
 

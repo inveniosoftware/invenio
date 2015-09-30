@@ -33,7 +33,7 @@ from invenio import webinterface_handler_config
 from invenio.bibauthorid_webauthorprofileinterface import is_valid_canonical_id, \
     is_valid_bibref, get_person_id_from_paper, get_person_id_from_canonical_id, \
     search_person_ids_by_name, get_papers_by_person_id, get_person_redirect_link, \
-    author_has_papers
+    author_has_papers, get_authors_by_name
 from invenio.bibauthorid_webapi import history_log_visit
 
 from invenio.webauthorprofile_corefunctions import get_pubs, get_person_names_dicts, \
@@ -227,11 +227,13 @@ class WebAuthorPages(WebInterfaceDirectory):
             return self.index(req, form)
 
         recid = argd['recid']
+
         if recid > -1:
-            possible_authors = search_person_ids_by_name(self.original_search_parameter, limit_to_recid = recid)
+            possible_authors = get_authors_by_name(self.original_search_parameter,
+                                                         limit_to_recid = recid)
 
             if len(possible_authors) == 1:
-                self.person_id = possible_authors[0][0]
+                self.person_id = possible_authors.pop()[0]
                 self.cid = get_person_redirect_link(self.person_id)
                 redirect_to_url(req, '%s/author/profile/%s%s' % (CFG_SITE_URL, self.cid, encoded))
 
@@ -270,7 +272,12 @@ class WebAuthorPages(WebInterfaceDirectory):
         debug = "verbose" in argd and argd["verbose"] > 0
 
         # Create Page Markup and Menu
-        cname = webapi.get_canonical_id_from_person_id(self.person_id)
+        try:
+            int(self.person_id)
+        except ValueError:
+            cname = self.person_id
+        else:
+            cname = webapi.get_canonical_id_from_person_id(self.person_id)
         menu = WebProfileMenu(str(cname), "profile", ln, self._is_profile_owner(pinfo['pid']), self._is_admin(pinfo))
 
         profile_page = WebProfilePage("profile", webapi.get_longest_name_from_pid(self.person_id))

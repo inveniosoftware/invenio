@@ -59,7 +59,9 @@ from invenio.refextract_re import (get_reference_line_numeration_marker_patterns
                                    re_tagged_citation,
                                    re_numeration_no_ibid_txt,
                                    re_roman_numbers,
-                                   re_recognised_numeration_for_title_plus_series)
+                                   re_recognised_numeration_for_title_plus_series,
+                                   remove_year,
+                                   re_year_in_misc_txt)
 
 
 description = """
@@ -466,11 +468,21 @@ def add_year_elements(splitted_citations):
                                                               and 'year' in el:
                 year = el['year']
                 break
+
+        if not year:
+            for el in citation:
+                m = re_year_in_misc_txt.search(el['misc_txt'])
+                if m:
+                    year = m.group(0)
+
         if year:
             citation.append({'type': 'YEAR',
                              'year': year,
                              'misc_txt': '',
                             })
+            for el in citation:
+                if year in el['misc_txt']:
+                    el['misc_txt'] = remove_year(el['misc_txt'], year)
 
     return splitted_citations
 
@@ -609,18 +621,18 @@ def parse_reference_line(ref_line, kbs, bad_titles_count={}):
     # Split the reference in multiple ones if needed
     splitted_citations = split_citations(citation_elements)
 
-    # Look for books in misc field
-    look_for_undetected_books(splitted_citations, kbs)
     # Look for implied ibids
     look_for_implied_ibids(splitted_citations)
+    # Find year
+    add_year_elements(splitted_citations)
+    # Look for books in misc field
+    look_for_undetected_books(splitted_citations, kbs)
     # Associate recids to the newly added ibids/books
     associate_recids_catchup(splitted_citations)
     # Remove references with only misc text
     # splitted_citations = remove_invalid_references(splitted_citations)
     # Merge references with only misc text
     # splitted_citations = merge_invalid_references(splitted_citations)
-    # Find year
-    add_year_elements(splitted_citations)
     # Remove duplicate authors
     remove_duplicated_authors(splitted_citations)
     # Remove duplicate DOIs
@@ -633,6 +645,16 @@ def parse_reference_line(ref_line, kbs, bad_titles_count={}):
     return splitted_citations, line_marker, counts, bad_titles_count
 
 
+def year_from_citation(citation):
+    citation_year = None
+
+    for el in citation:
+        if el['type'] == 'YEAR':
+            citation_year = el['year']
+            break
+
+    return citation_year
+
 
 def look_for_undetected_books(splitted_citations, kbs):
     for citation in splitted_citations:
@@ -643,43 +665,46 @@ def look_for_undetected_books(splitted_citations, kbs):
 def search_for_book_in_misc(citation, kbs):
     """Searches for books in the misc_txt field if the citation is not recognized as anything like a journal, book, etc.
     """
+    citation_year = year_from_citation(citation)
     for citation_element in citation:
-        if citation_element['type'] == 'MISC':
-            write_message('* Unknown citation found. Searching for book title in: %s' % citation_element['misc_txt'], verbose=9)
-            for title in kbs['books']:
-                startIndex = find_substring_ignore_special_chars(citation_element['misc_txt'], title)
-                if startIndex != -1:
-                    line = kbs['books'][title.upper()]
-                    book_year = line[2].strip(';')
-                    book_authors = line[0]
-                    book_found = False
-                    if citation_element['misc_txt'].find(book_year) != -1:
-                        # For now consider the citation as valid, we are using
-                        # an exact search, we don't need to check the authors
-                        # However, the code below will be useful if we decide
-                        # to introduce fuzzy matching.
-                        book_found = True
+        write_message('* Searching for book title in: %s' % citation_element['misc_txt'], verbose=9)
+        for title in kbs['books']:
+            startIndex = find_substring_ignore_special_chars(citation_element['misc_txt'], title)
+            if startIndex != -1:
+                line = kbs['books'][title.upper()]
+                book_year = line[2].strip(';')
+                book_authors = line[0]
+                book_found = False
+                if citation_year == book_year:
+                    # For now consider the citation as valid, we are using
+                    # an exact search, we don't need to check the authors
+                    # However, the code below will be useful if we decide
+                    # to introduce fuzzy matching.
+                    book_found = True
 
-                        for author in get_possible_author_names(citation):
-                            if find_substring_ignore_special_chars(book_authors, author) != -1:
-                                book_found = True
+                    for author in get_possible_author_names(citation):
+                        if find_substring_ignore_special_chars(book_authors, author) != -1:
+                            book_found = True
 
-                        for author in re.findall('[a-zA-Z]{4,}', book_authors):
-                            if find_substring_ignore_special_chars(citation_element['misc_txt'], author) != -1:
-                                book_found = True
+                    for author in re.findall('[a-zA-Z]{4,}', book_authors):
+                        if find_substring_ignore_special_chars(citation_element['misc_txt'], author) != -1:
+                            book_found = True
 
-                        if book_found is True:
-                            write_message('* Book found: %s' % title, verbose=9)
-                            book_element = {'type': 'BOOK',
-                                            'misc_txt': '',
-                                            'authors': book_authors,
-                                            'title': line[1],
-                                            'year': book_year}
-                            citation.append(book_element)
-                            citation_element['misc_txt'] = cut_substring_with_special_chars(citation_element['misc_txt'], title, startIndex)
-                            return True
+                    if book_found:
+                        write_message('* Book found: %s' % title, verbose=9)
+                        book_element = {'type': 'BOOK',
+                                        'misc_txt': '',
+                                        'authors': book_authors,
+                                        'title': line[1],
+                                        'year': book_year}
+                        citation.append(book_element)
+                        citation_element['misc_txt'] = cut_substring_with_special_chars(citation_element['misc_txt'], title, startIndex)
+                        # Remove year from misc txt
+                        citation_element['misc_txt'] = remove_year(citation_element['misc_txt'], book_year)
+                        return True
 
-            write_message('  * Book not found!', verbose=9)
+        write_message('  * Book not found!', verbose=9)
+
     return False
 
 def get_possible_author_names(citation):
@@ -691,11 +716,12 @@ def get_possible_author_names(citation):
 def find_substring_ignore_special_chars(s, substr):
     s = s.upper()
     substr = substr.upper()
-    clean_s, subs_in_s = re.subn('[^A-Z0-9]', '', s)
-    clean_substr, subs_in_substr = re.subn('[^A-Z0-9]', '', substr)
+    clean_s, dummy_subs_in_s = re.subn('[^A-Z0-9]', '', s)
+    clean_substr, dummy_subs_in_substr = re.subn('[^A-Z0-9]', '', substr)
     startIndex = clean_s.find(clean_substr)
     if startIndex != -1:
         i = 0
+        real_index = 0
         re_alphanum = re.compile('[A-Z0-9]')
         for real_index, char in enumerate(s):
             if re_alphanum.match(char):
@@ -720,7 +746,7 @@ def cut_substring_with_special_chars(s, sub, startIndex):
         #end of substrin reached?
         if subPosition >= len(clean_sub):
             #include everything till a space, open bracket or a normal character
-            counter += len(re.split('[ [{(a-zA-Z0-9]',s[startIndex+counter:],1)[0])
+            counter += len(re.split('[ [{(a-zA-Z0-9]', s[startIndex+counter:], 1)[0])
 
             return s[0:startIndex].strip()+ ' ' +s[startIndex+counter:].strip()
 
@@ -1150,8 +1176,8 @@ def parse_tagged_reference_line(line_marker,
         # Increment the stats counters:
         count_misc += 1
         identified_citation_element = {
-            'type'       : "MISC",
-            'misc_txt'   : "%s" % cur_misc_txt,
+            'type'    : "MISC",
+            'misc_txt': cur_misc_txt,
         }
         citation_elements.append(identified_citation_element)
 

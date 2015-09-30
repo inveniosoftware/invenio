@@ -78,6 +78,10 @@ RE_SPECIAL_URI = re.compile('^/%s/\d+|^/collection/.+' % CFG_SITE_RECORD)
 _RE_BAD_MSIE = re.compile("MSIE\s+(\d+\.\d+)")
 
 
+class ClientDisconnected(Exception):
+    pass
+
+
 def _debug(req, msg):
     """
     Log the message.
@@ -352,7 +356,8 @@ def create_handler(root):
                     profile_dump.append(strstream.getvalue())
             profile_dump = '\n'.join(profile_dump)
             profile_dump += '\nYou can use profile=%s or profile=memory' % existing_sorts
-            req.write("\n<pre>%s</pre>" % profile_dump)
+            if req.content_type == 'text/html':
+                req.write("\n<pre>%s</pre>" % profile_dump)
             return ret
         elif 'debug' in args and args['debug']:
             #remote_debugger.start(["3"]) # example starting debugger on demand
@@ -432,16 +437,21 @@ def create_handler(root):
                 ## bibdocfile have a special treatment for HEAD
                 return root._traverse(req, path, False, guest_p)
         except TraversalError:
-            raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+            raise apache.SERVER_RETURN(apache.HTTP_NOT_FOUND)
         except apache.SERVER_RETURN:
             ## This is one of mod_python way of communicating
             raise
         except IOError, exc:
-            if 'Write failed, client closed connection' not in "%s" % exc:
+            if not ('Write failed, client closed connection' in str(exc) or 'request data read error' in str(exc)):
                 ## Workaround for considering as false positive exceptions
                 ## rised by mod_python when the user close the connection
                 ## or in some other rare and not well identified cases.
                 register_exception(req=req, alert_admin=True)
+                raise
+            else:
+                raise apache.SERVER_RETURN(apache.HTTP_BAD_REQUEST)
+        except ClientDisconnected:
+            # This is handled one step up
             raise
         except Exception:
             # send the error message, much more convenient than log hunting
@@ -455,7 +465,7 @@ def create_handler(root):
             raise
 
         # Serve an error by default.
-        raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+        raise apache.SERVER_RETURN(apache.HTTP_NOT_FOUND)
     return _profiler
 
 

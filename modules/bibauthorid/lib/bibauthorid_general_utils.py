@@ -31,7 +31,6 @@ try:
 except ImportError:
     from xml.etree import ElementTree as ET
 from urllib import urlopen
-from urllib2 import HTTPError
 from collections import deque
 
 import multiprocessing as mp
@@ -47,6 +46,9 @@ FO = bconfig.DEBUG_LOG_TO_PIDFILE
 TERMINATOR = '\r'
 if NEWLINE or FO:
     TERMINATOR = '\n'
+
+import socket
+from urllib2 import URLError
 
 import os
 PID = os.getpid
@@ -247,8 +249,14 @@ def is_arxiv_id_or_doi(identifier):
 def get_title_of_doi(doi):
     try:
         xml = get_marcxml_for_doi(doi)
-    except CrossrefError:
+    except (CrossrefError, socket.timeout):
         return doi
+    except URLError, e:
+    # For python 2.6 socket.timeout cannot be caught directly    
+        if hasattr(e, "reason") and isinstance(e.reason, socket.timeout):
+            return doi
+        else:  # We make sure we don't cut out other URLErrors.
+            raise
 
     root = ET.fromstring(xml)
 
@@ -302,7 +310,14 @@ def get_title_of_arxiv_pubid(arxiv_pubid):
         xml = fxml.read()
         fxml.close()
         root = ET.fromstring(xml)
-    except HTTPError:
+    except URLError, e:
+    # For python 2.6 socket.timeout cannot be caught directly
+        if hasattr(e, "reason") and isinstance(e.reason, socket.timeout):
+            return arxiv_pubid
+        else:  # We make sure we don't cut out other URLErrors.
+            raise
+    except socket.timeout:
+        # Python 2.7
         return arxiv_pubid
 
     title = get_title_from_arxiv_xml(root, deque(['GetRecord', 'record', 'metadata', 'dc', 'title']))

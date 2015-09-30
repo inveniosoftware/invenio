@@ -561,6 +561,16 @@ def task_init(authorization_action="",
     if to_be_submitted:
         _task_submit(argv, authorization_action, authorization_msg)
     else:
+        ## BibTasks typically are going to work on several records
+        ## and recreating data. Caching is typically done at the
+        ## Python level, so there's no point in having a not
+        ## exploited SQL cache.
+        try:
+            run_sql("SET SESSION query_cache_type = OFF;")
+        except Exception:
+            ## Very likely query_cache_type is already disabled globally.
+            ## See: http://bugs.mysql.com/bug.php?id=69396
+            pass
         try:
             try:
                 if task_get_task_param('profile'):
@@ -619,7 +629,8 @@ def task_init(authorization_action="",
                 register_exception(alert_admin=True)
                 write_message("Unexpected error occurred: %s." % e, sys.stderr)
                 write_message("Traceback is:", sys.stderr)
-                write_messages(''.join(traceback.format_tb(sys.exc_info()[2])), sys.stderr)
+                from invenio.errorlib import get_pretty_traceback
+                write_messages(get_pretty_traceback(), sys.stderr)
                 write_message("Exiting.", sys.stderr)
                 if task_get_task_param('stop_queue_on_error'):
                     task_update_status("ERROR")
@@ -1174,9 +1185,11 @@ def _task_run(task_run_fnc):
             task_update_status("DONE")
         else:
             task_update_status("DONE WITH ERRORS")
+            write_message("Task #%d finished with errors." % _TASK_PARAMS['task_id'])
             if not task_get_task_param('email_logs_to') and task_get_task_param('email_logs_on_error'):
                 email_error_logs_to = get_email_from_username(task_get_task_param('user'))
                 _task_email_logs(email_error_logs_to)
+                write_message("Reported errors to %s." % (str(email_error_logs_to),))
                 task_update_status("ERRORS REPORTED")
 
     finally:
@@ -1213,16 +1226,21 @@ def _task_run(task_run_fnc):
 
     #Lets call the post-process tasklets
     if task_get_task_param("post-process"):
-
         split = re.compile(r"(bst_.*)\[(.*)\]")
         for tasklet in task_get_task_param("post-process"):
-            if not split.match(tasklet): # wrong syntax
+            if not split.match(tasklet):  # wrong syntax
                 _usage(1, "There is an error in the post processing option "
-                        "for this task.")
+                       "for this task.")
 
             aux_tasklet = split.match(tasklet)
-            _TASKLETS[aux_tasklet.group(1)](**eval("dict(%s)" % (aux_tasklet.group(2))))
+            task = aux_tasklet.group(1)
+            passed_parameters = task_get_task_param("post_process_params") or dict()
+            parameters = eval("dict(%s)" % (aux_tasklet.group(2)))
+            parameters.update(passed_parameters)
+            _TASKLETS[task](**parameters)
+
     return True
+
 
 def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
     """Prints usage info."""

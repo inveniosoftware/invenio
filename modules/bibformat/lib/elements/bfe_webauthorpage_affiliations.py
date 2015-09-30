@@ -27,18 +27,19 @@ def format_element(bfo):
     """
     Return list of profile affiliations.
     """
-    fields = bfo.fields("100__")
-    fields2 = bfo.fields("700__")
+    fields = bfo.fields("100__", repeatable_subfields_p=True)
+    fields2 = bfo.fields("700__", repeatable_subfields_p=True)
     dic = {}
     recid = bfo.recID
 
     for f in fields + fields2:
         if f.has_key('a') and f.has_key('u') and f['u']:
-            u = f['u']
-            try:
-                dic[f['a']].append(u)
-            except KeyError:
-                dic[f['a']] = [u]
+            us = f['u']
+            for u in us:
+                try:
+                    dic[f['a'][0]].append(u)
+                except KeyError:
+                    dic[f['a'][0]] = [u]
 
     return serialize([recid, dic])
 

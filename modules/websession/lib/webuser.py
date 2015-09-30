@@ -83,6 +83,8 @@ from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
     CFG_WEBACCESS_MSGS, CFG_WEBACCESS_WARNING_MSGS, CFG_EXTERNAL_AUTH_DEFAULT, \
     CFG_TEMP_EMAIL_ADDRESS
 from invenio.webuser_config import CFG_WEBUSER_USER_TABLES
+from invenio.webinterface_handler_config import HTTP_FORBIDDEN, \
+    HTTP_INTERNAL_SERVER_ERROR, HTTP_SERVICE_UNAVAILABLE
 import invenio.template
 tmpl = invenio.template.load('websession')
 
@@ -128,6 +130,7 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
         referer = req.unparsed_uri
 
     if not CFG_ACCESS_CONTROL_LEVEL_SITE:
+        req.status = HTTP_FORBIDDEN
         title = CFG_WEBACCESS_MSGS[5]
         if not uid:
             uid = getUid(req)
@@ -150,15 +153,21 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
                         body = CFG_WEBACCESS_WARNING_MSGS[4] + CFG_WEBACCESS_MSGS[2]
 
         except OperationalError, e:
+            req.status = HTTP_INTERNAL_SERVER_ERROR
             body = _("Database problem") + ': ' + str(e)
 
 
     elif CFG_ACCESS_CONTROL_LEVEL_SITE == 1:
+        req.status = HTTP_SERVICE_UNAVAILABLE
         title = CFG_WEBACCESS_MSGS[8]
         body = "%s %s" % (CFG_WEBACCESS_MSGS[7], CFG_WEBACCESS_MSGS[2])
 
     elif CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
+        req.status = HTTP_SERVICE_UNAVAILABLE
         title = CFG_WEBACCESS_MSGS[6]
+        body = "%s %s" % (CFG_WEBACCESS_MSGS[4], CFG_WEBACCESS_MSGS[2])
+    else:
+        title = CFG_WEBACCESS_MSGS[7]
         body = "%s %s" % (CFG_WEBACCESS_MSGS[4], CFG_WEBACCESS_MSGS[2])
 
     return page(title=title,
@@ -1108,12 +1117,9 @@ def get_uid_based_on_pref(prefname, prefvalue):
     return the_uid
 
 def get_user_preferences(uid):
-    pref = run_sql("SELECT id, settings FROM user WHERE id=%s", (uid,))
-    if pref:
-        try:
-            return deserialize_via_marshal(pref[0][1])
-        except:
-            pass
+    pref = run_sql("SELECT settings FROM user WHERE id=%s", (uid,))
+    if pref and pref[0][0]:
+        return deserialize_via_marshal(pref[0][0])
     return get_default_user_preferences() # empty dict mean no preferences
 
 def set_user_preferences(uid, pref):
@@ -1298,7 +1304,14 @@ def collect_user_info(req, login_time=False, refresh=False):
         if user_info['guest'] == '0':
             user_info['group'] = [group[1] for group in get_groups(uid)]
             prefs = get_user_preferences(uid)
-            login_method = prefs['login_method']
+            try:
+                login_method = prefs['login_method']
+            except KeyError:
+                # login_method is missing for some reason, bad news..
+                msg = "Data error: The mandatory key 'login_method' is missing"
+                register_exception(prefix=msg,
+                                   alert_admin=True)
+                login_method = get_default_user_preferences()['login_method']
             ## NOTE: we fall back to default login_method if the login_method
             ## specified in the user settings does not exist (e.g. after
             ## a migration.)

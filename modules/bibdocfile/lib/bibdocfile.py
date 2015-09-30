@@ -242,6 +242,10 @@ def _generate_extensions():
                 _mimes.suffix_map.keys() + \
                 _mimes.types_map[1].keys() + \
                 CFG_BIBDOCFILE_ADDITIONAL_KNOWN_FILE_EXTENSIONS
+    # remove purely numerical extensions which usually are part of
+    # the basename and not an extension, e.g. fig.6.ps.gz
+    _tmp_extensions = [ext for ext in _tmp_extensions \
+                       if not ext.strip('.').isdigit()]
     extensions = []
     for ext in _tmp_extensions:
         if ext.startswith('.'):
@@ -410,6 +414,23 @@ def normalize_format(docformat, allow_subformat=True):
         }.get(docformat, docformat)
     return docformat + subformat
 
+def guess_via_magic(local_path):
+    """
+    Returns the guessed extension using the magic library.
+    """
+    if CFG_HAS_MAGIC == 1:
+        magic_cookie = _get_magic_cookies()[magic.MAGIC_MIME_TYPE]
+        mimetype = magic_cookie.file(local_path)
+    elif CFG_HAS_MAGIC == 2:
+        mimetype = _magic_wrapper(local_path, mime=True, mime_encoding=False)
+    if CFG_HAS_MAGIC:
+        if mimetype in CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING:
+            return normalize_format(CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING[mimetype])
+        else:
+            return normalize_format(_mimes.guess_extension(mimetype))
+    return ""
+
+
 def guess_format_from_url(url):
     """
     Given a URL tries to guess it's extension.
@@ -423,20 +444,6 @@ def guess_format_from_url(url):
         recognize it.
     @rtype: string
     """
-    def guess_via_magic(local_path):
-        try:
-            if CFG_HAS_MAGIC == 1:
-                magic_cookie = _get_magic_cookies()[magic.MAGIC_MIME_TYPE]
-                mimetype = magic_cookie.file(local_path)
-            elif CFG_HAS_MAGIC == 2:
-                mimetype = _magic_wrapper(local_path, mime=True, mime_encoding=False)
-            if CFG_HAS_MAGIC:
-                if mimetype in CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING:
-                    return normalize_format(CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING[mimetype])
-                else:
-                    return normalize_format(_mimes.guess_extension(mimetype))
-        except Exception:
-            pass
 
     ## Let's try to guess the extension by considering the URL as a filename
     ext = decompose_file(url, skip_version=True, only_known_extensions=True)[2]
@@ -1310,7 +1317,7 @@ class BibRecDocs(object):
         zero_version_bug = False
         if os.path.exists(bibdoc.basedir):
             from invenio.config import CFG_CERN_SITE, CFG_INSPIRE_SITE, CFG_BIBDOCFILE_AFS_VOLUME_PATTERN, CFG_BIBDOCFILE_AFS_VOLUME_QUOTA
-            if os.path.realpath(bibdoc.basedir).startswith('/afs') and (CFG_CERN_SITE or CFG_INSPIRE_SITE):
+            if os.path.realpath(bibdoc.basedir).startswith('/afs') and (CFG_CERN_SITE or CFG_INSPIRE_SITE) and CFG_BIBDOCFILE_AFS_VOLUME_PATTERN:
                 ## We are on AFS at CERN! Let's allocate directories the CERN/AFS way. E.g.
                 ## $ afs_admin create -q 1000000 /afs/cern.ch/project/cds/files/g40 p.cds.g40
                 ## NOTE: This might be extended to use low-level OpenAFS CLI tools
@@ -1720,7 +1727,7 @@ class BibDoc(object):
         # we create the corresponding storage directory
         if not os.path.exists(basedir):
             from invenio.config import CFG_CERN_SITE, CFG_INSPIRE_SITE, CFG_BIBDOCFILE_AFS_VOLUME_PATTERN, CFG_BIBDOCFILE_AFS_VOLUME_QUOTA
-            if os.path.realpath(basedir).startswith('/afs') and (CFG_CERN_SITE or CFG_INSPIRE_SITE):
+            if os.path.realpath(basedir).startswith('/afs') and (CFG_CERN_SITE or CFG_INSPIRE_SITE) and CFG_BIBDOCFILE_AFS_VOLUME_PATTERN:
                 ## We are on AFS at CERN! Let's allocate directories the CERN/AFS way. E.g.
                 ## $ afs_admin create -q 1000000 /afs/cern.ch/project/cds/files/g40 p.cds.g40
                 ## NOTE: This might be extended to use low-level OpenAFS CLI tools
@@ -2818,7 +2825,7 @@ class BibDoc(object):
         run_sql("DELETE FROM bibdocfsinfo WHERE id_bibdoc=%s", (self.id,))
         for afile in self.docfiles:
             run_sql("INSERT INTO bibdocfsinfo(id_bibdoc, version, format, last_version, cd, md, checksum, filesize, mime) VALUES(%s, %s, %s, false, %s, %s, %s, %s, %s)", (self.id, afile.get_version(), afile.get_format(), afile.cd, afile.md, afile.get_checksum(), afile.get_size(), afile.mime))
-            run_sql("UPDATE bibdocfsinfo SET last_version=true WHERE id_bibdoc=%s AND version=%s", (self.id, self.get_latest_version()))
+        run_sql("UPDATE bibdocfsinfo SET last_version=true WHERE id_bibdoc=%s AND version=%s", (self.id, self.get_latest_version()))
 
     def _build_related_file_list(self):
         """Lists all files attached to the bibdoc. This function should be

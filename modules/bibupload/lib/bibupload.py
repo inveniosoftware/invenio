@@ -53,6 +53,7 @@ from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_BIBUPLOAD_DISABLE_RECORD_REVISIONS, \
      CFG_BIBUPLOAD_CONFLICTING_REVISION_TICKET_QUEUE, \
      CFG_CERN_SITE, \
+     CFG_INSPIRE_SITE, \
      CFG_BIBUPLOAD_MATCH_DELETED_RECORDS
 
 from invenio.jsonutils import json, CFG_JSON_AVAILABLE
@@ -87,6 +88,7 @@ from invenio.errorlib import register_exception
 from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.intbitset import intbitset
 from invenio.urlutils import make_user_agent_string
+from invenio.textutils import wash_for_xml
 from invenio.config import CFG_BIBDOCFILE_FILEDIR
 from invenio.bibtask import task_init, write_message, \
     task_set_option, task_get_option, task_get_task_param, \
@@ -96,7 +98,7 @@ from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, \
     get_docname_from_url, check_valid_url, download_url, \
     KEEP_OLD_VALUE, decompose_bibdocfile_url, InvenioBibDocFileError, \
     bibdocfile_url_p, CFG_BIBDOCFILE_AVAILABLE_FLAGS, guess_format_from_url, \
-    BibRelation, MoreInfo
+    BibRelation, MoreInfo, guess_via_magic
 
 from invenio.search_engine import search_pattern
 
@@ -829,6 +831,7 @@ def open_marc_file(path):
 def xml_marc_to_records(xml_marc):
     """create the records"""
     # Creation of the records from the xml Marc in argument
+    xml_marc = wash_for_xml(xml_marc)
     recs = create_records(xml_marc, 1, 1)
     if recs == []:
         msg = "ERROR: Cannot parse MARCXML file."
@@ -1152,7 +1155,7 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
     if rec_id is None:
         # 5th step we look for the DOI.
         record_dois = record_extract_dois(record)
-        matching_recids = set()
+        matching_recids = intbitset()
         if record_dois:
             # try to find the corresponding rec id from the database
             for record_doi in record_dois:
@@ -1166,6 +1169,8 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
                           " database %s that match the DOI(s) in the input" \
                           " MARCXML %s" % (repr(matching_recids), repr(record_dois)),
                           verbose=1, stream=sys.stderr)
+                from invenio.bibrank_citation_indexer import record_duplicates_in_asana
+                record_duplicates_in_asana(record_doi, matching_recids)
                 return -1
             elif len(matching_recids) == 1:
                 rec_id = matching_recids.pop()
@@ -1214,7 +1219,7 @@ def check_record_doi_is_unique(rec_id, record):
     """
     record_dois = record_extract_dois(record)
     if record_dois:
-        matching_recids = set()
+        matching_recids = intbitset()
         for record_doi in record_dois:
             possible_recid = find_record_from_doi(record_doi)
             if possible_recid:
@@ -1224,6 +1229,8 @@ def check_record_doi_is_unique(rec_id, record):
             msg = "   Failed: Multiple records found in the" \
                       " database %s that match the DOI(s) in the input" \
                       " MARCXML %s" % (repr(matching_recids), repr(record_dois))
+            from invenio.bibrank_citation_indexer import record_duplicates_in_asana
+            record_duplicates_in_asana(", ".join(record_dois), matching_recids)
             return (False, msg)
         elif len(matching_recids) == 1:
             matching_recid = matching_recids.pop()
@@ -1232,6 +1239,8 @@ def check_record_doi_is_unique(rec_id, record):
                 msg = "   Failed: DOI(s) %s found in this record (#%s)" \
                       " already exist(s) in another other record (#%s)" % \
                       (repr(record_dois), rec_id, matching_recid)
+                from invenio.bibrank_citation_indexer import record_duplicates_in_asana
+                record_duplicates_in_asana(", ".join(record_dois), intbitset([int(matching_recid), int(rec_id)]))
                 return (False, msg)
     return (True, "")
 
@@ -2024,6 +2033,10 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 if url:
                     try:
                         downloaded_url = download_url(url, docformat)
+                        if CFG_INSPIRE_SITE and docformat == '.pdf':
+                            guessed_format = guess_via_magic(downloaded_url)
+                            if guessed_format != docformat:
+                                raise RuntimeError("Given URL %s was supposed to refer to format %s but was found to be of format %s. Is this document behind an authentication page?" % (url, docformat, guessed_format))
                         write_message("%s saved into %s" % (url, downloaded_url), verbose=9)
                     except Exception, err:
                         write_message("ERROR: in downloading '%s' because of: %s" % (url, err), stream=sys.stderr)

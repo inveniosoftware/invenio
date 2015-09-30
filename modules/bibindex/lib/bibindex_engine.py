@@ -360,22 +360,6 @@ def split_ranges(parse_string):
     return recIDs
 
 
-def get_word_tables(tables):
-    """ Given a list of table names it return a list of tuples
-    (index_id, index_name, index_tags).
-    """
-    wordTables = []
-    if tables:
-        for index in tables:
-            index_id = get_index_id_from_index_name(index)
-            if index_id:
-                wordTables.append((index_id, index, get_index_tags(index)))
-            else:
-                write_message("Error: There is no %s words table." % \
-                               index, sys.stderr)
-    return wordTables
-
-
 def get_date_range(var):
     "Returns the two dates contained as a low,high tuple"
     limits = var.split(",")
@@ -410,20 +394,10 @@ def create_range_list(res):
 
 def beautify_range_list(range_list):
     """Returns a non overlapping, maximal range list"""
-    ret_list = []
-    for new in range_list:
-        found = 0
-        for old in ret_list:
-            if new[0] <= old[0] <= new[1] + 1 or new[0] - 1 <= old[1] <= new[1]:
-                old[0] = min(old[0], new[0])
-                old[1] = max(old[1], new[1])
-                found = 1
-                break
-
-        if not found:
-            ret_list.append(new)
-
-    return ret_list
+    tmp_list = intbitset()
+    for range in range_list:
+        tmp_list |= intbitset(xrange(range[0], range[1]+1))
+    return create_range_list(tmp_list)
 
 
 def truncate_index_table(index_name):
@@ -519,8 +493,9 @@ def find_affected_records_for_index(indexes=None, recIDs=None, force_all_indexes
         all_recIDs = []
         for recIDs_range in recIDs:
             all_recIDs.extend(range(recIDs_range[0], recIDs_range[1]+1))
-        for index in indexes:
-            records_for_indexes[index] = all_recIDs
+        if all_recIDs:
+            for index in indexes:
+                records_for_indexes[index] = all_recIDs
         return records_for_indexes
 
     min_last_updated = get_min_last_updated(indexes)[0][0] or \
@@ -1416,7 +1391,7 @@ class WordTable(AbstractIndexTable):
         self.recIDs_in_mem.append([recID1, recID2])
         # special case of author indexes where we also add author
         # canonical IDs:
-        if self.index_name in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor'):
+        if 'author' in self.index_name:
             for recID in range(recID1, recID2 + 1):
                 if not wlist.has_key(recID):
                     wlist[recID] = []
@@ -1914,7 +1889,7 @@ def get_recIDs_by_date_bibliographic(dates, index_name, force_all=False):
                                         (dates[0], dates[1],)))
     # special case of author indexes where we need to re-index
     # those records that were affected by changed BibAuthorID attributions:
-    if index_name in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor'):
+    if 'author' in index_name:
         from invenio.bibauthorid_personid_maintenance import get_recids_affected_since
         # dates[1] is ignored, since BibAuthorID API does not offer upper limit search
         rec_list_author = intbitset(get_recids_affected_since(dates[0]))
@@ -2142,6 +2117,32 @@ def task_run_core():
         _last_word_table = None
         return True
 
+    # check tables consistency
+    if task_get_option("cmd") == "repair":
+        for index_name in indexes:
+            wordTable = WordTable(index_name=index_name,
+                                  table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                  wash_index_terms=50)
+            _last_word_table = wordTable
+            wordTable.repair(task_get_option("flush"))
+            task_sleep_now_if_required(can_stop_too=True)
+
+            wordTable = WordTable(index_name=index_name,
+                                  table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
+                                  wash_index_terms=100)
+            _last_word_table = wordTable
+            wordTable.repair(task_get_option("flush"))
+            task_sleep_now_if_required(can_stop_too=True)
+
+            wordTable = WordTable(index_name=index_name,
+                                  table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"],
+                                  wash_index_terms=0)
+            _last_word_table = wordTable
+            wordTable.repair(task_get_option("flush"))
+            task_sleep_now_if_required(can_stop_too=True)
+        _last_word_table = None
+        return True
+
     # virtual index: remove dependent index
     if task_get_option("remove-dependent-index"):
         remove_dependent_index(indexes,
@@ -2157,11 +2158,16 @@ def task_run_core():
 
     # regular index: initialization for Words,Pairs,Phrases
     recIDs_range = get_recIDs_from_cli(regular_indexes)
+    # FIXME: restore when the hstRECORD table race condition between
+    #        bibupload and bibindex is solved
+    # recIDs_for_index = find_affected_records_for_index(regular_indexes,
+    #                                                    recIDs_range,
+    #                                                    (task_get_option("force") or \
+    #                                                    task_get_option("reindex") or \
+    #                                                    task_get_option("cmd") == "del"))
     recIDs_for_index = find_affected_records_for_index(regular_indexes,
                                                        recIDs_range,
-                                                       (task_get_option("force") or \
-                                                       task_get_option("reindex") or \
-                                                       task_get_option("cmd") == "del"))
+                                                       True)
 
     if len(recIDs_for_index.keys()) == 0:
         write_message("Selected indexes/recIDs are up to date.")
@@ -2194,9 +2200,6 @@ def task_run_core():
             elif task_get_option("cmd") == "add":
                 final_recIDs = beautify_range_list(create_range_list(recIDs_for_index[index_name]))
                 wordTable.add_recIDs(final_recIDs, task_get_option("flush"))
-                task_sleep_now_if_required(can_stop_too=True)
-            elif task_get_option("cmd") == "repair":
-                wordTable.repair(task_get_option("flush"))
                 task_sleep_now_if_required(can_stop_too=True)
             else:
                 error_message = "Invalid command found processing %s" % \
@@ -2233,9 +2236,6 @@ def task_run_core():
             elif task_get_option("cmd") == "add":
                 final_recIDs = beautify_range_list(create_range_list(recIDs_for_index[index_name]))
                 wordTable.add_recIDs(final_recIDs, task_get_option("flush"))
-                task_sleep_now_if_required(can_stop_too=True)
-            elif task_get_option("cmd") == "repair":
-                wordTable.repair(task_get_option("flush"))
                 task_sleep_now_if_required(can_stop_too=True)
             else:
                 error_message = "Invalid command found processing %s" % \
@@ -2274,9 +2274,6 @@ def task_run_core():
                 wordTable.add_recIDs(final_recIDs, task_get_option("flush"))
                 if not task_get_option("id") and not task_get_option("collection"):
                     update_index_last_updated([index_name], task_get_task_param('task_starting_time'))
-                task_sleep_now_if_required(can_stop_too=True)
-            elif task_get_option("cmd") == "repair":
-                wordTable.repair(task_get_option("flush"))
                 task_sleep_now_if_required(can_stop_too=True)
             else:
                 error_message = "Invalid command found processing %s" % \

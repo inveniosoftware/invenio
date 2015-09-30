@@ -306,7 +306,7 @@ def build_reportnum_kb(fpath):
             for classification in preprint_classifications:
                 search_pattern_str = ur'(?:^|[^a-zA-Z0-9\/\.\-])([\[\(]?(?P<categ>' \
                                      + classification[0].strip() + u')' \
-                                     + numeration_regexp + u'[\]\)]?)'
+                                     + numeration_regexp + ur'[\]\)]?)'
 
                 re_search_pattern = re.compile(search_pattern_str,
                                                  re.UNICODE)
@@ -730,7 +730,7 @@ def build_journals_kb(knowledgebase):
     for seek_phrase, repl in knowledgebase:
         # We match on a simplified line, thus dots are replaced
         # with spaces
-        seek_phrase = seek_phrase.replace('.', ' ').upper()
+        seek_phrase = seek_phrase.replace('.', ' ').decode('utf-8').upper()
 
         # good KB line
         # Add the 'replacement term' into the dictionary of
