@@ -28,12 +28,12 @@
 
 
 # location of the folder that gets shared between containers
-CFG_SHARED_FOLDER=/home/invenio
+export CFG_SHARED_FOLDER=${CFG_SHARED_FOLDER:=/opt/invenio}
+export CFG_STATIC_FOLDER=${INVENIOBASE_STATIC_FOLDER:=/opt/invenio_static}
 
 CFG_MARKER_LOCK=$CFG_SHARED_FOLDER/boot.lock
 CFG_MARKER_DONE=$CFG_SHARED_FOLDER/boot.initialized
 CFG_MARKER_RUNNING=$CFG_SHARED_FOLDER/boot.running
-
 # echo function for stderr
 echoerr() { echo "$@" 1>&2; }
 
@@ -109,10 +109,9 @@ wait_for_services() {
 init() {
     # prepare bower installation
     # bower is not able to handle absolute paths very well
-    mkdir -p $CFG_SHARED_FOLDER/static/vendors
-    ln -s $CFG_SHARED_FOLDER/static/vendors bower_components
+    mkdir -p $CFG_STATIC_FOLDER/vendors
+    ln -s $CFG_STATIC_FOLDER/vendors bower_components
     rm .bowerrc
-
 
     # set some additional configs to be in sync with the docker-compose
     # setup. do this before the dev setup, because it sets some paths to
@@ -128,22 +127,22 @@ init() {
 CFG_SITE_URL = u'http://localhost:28080'
 CFG_SITE_SECURE_URL = u'http://localhost:28080'
 
-CFG_BATCHUPLOADER_DAEMON_DIR = u'/home/invenio/var/batchupload'
-CFG_BIBDOCFILE_FILEDIR = u'/home/invenio/var/data/files'
-CFG_BIBEDIT_CACHEDIR = u'/home/invenio/var/tmp-shared/bibedit-cache'
-CFG_BIBSCHED_LOGDIR = u'/home/invenio/var/log/bibsched'
+CFG_BATCHUPLOADER_DAEMON_DIR = u'/opt/invenio/var/batchupload'
+CFG_BIBDOCFILE_FILEDIR = u'/opt/invenio/var/data/files'
+CFG_BIBEDIT_CACHEDIR = u'/opt/invenio/var/tmp-shared/bibedit-cache'
+CFG_BIBSCHED_LOGDIR = u'/opt/invenio/var/log/bibsched'
 CFG_BINDIR = u'/usr/local/bin'
-CFG_CACHEDIR = u'/home/invenio/var/cache'
-CFG_ETCDIR = u'/home/invenio/etc'
-CFG_LOCALEDIR = u'/home/invenio/share/locale'
-CFG_LOGDIR = u'/home/invenio/var/log'
+CFG_CACHEDIR = u'/opt/invenio/var/cache'
+CFG_ETCDIR = u'/opt/invenio/etc'
+CFG_LOCALEDIR = u'/opt/invenio/share/locale'
+CFG_LOGDIR = u'/opt/invenio/var/log'
 CFG_PYLIBDIR = u'/usr/local/lib/python2.7'
-CFG_RUNDIR = u'/home/invenio/var/run'
+CFG_RUNDIR = u'/opt/invenio/var/run'
 CFG_TMPDIR = u'/tmp/invenio-`hostname`'
-CFG_TMPSHAREDDIR = u'/home/invenio/var/tmp-shared'
-CFG_WEBDIR = u'/home/invenio/var/www'
+CFG_TMPSHAREDDIR = u'/opt/invenio/var/tmp-shared'
+CFG_WEBDIR = u'/opt/invenio/var/www'
 
-DEPOSIT_STORAGEDIR = u'/home/invenio/var/data/deposit/storage'
+DEPOSIT_STORAGEDIR = u'/opt/invenio/var/data/deposit/storage'
 EOF
 
     # additional config through hook
@@ -155,11 +154,12 @@ EOF
     fi
 
     # load dev config
-    /code/scripts/setup_devmode.sh
-
+    /src/scripts/setup_devmode.sh
 
     # final shot
+    echo "inveniomanage database init"
     inveniomanage database init --user=root --password=mysecretpassword --yes-i-know
+    echo "inveniomanage database create"
     inveniomanage database create
 }
 
@@ -181,7 +181,7 @@ wait_for_services
         touch $CFG_MARKER_RUNNING
 
         init
-
+        echo "init done"
 
         # remember that we reached this point
         touch $CFG_MARKER_DONE
