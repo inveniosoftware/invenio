@@ -26,11 +26,24 @@
 # !!! Do NOT use these configurations in production without adjustement !!!
 #
 
-echo "Load predefined configuration. Please ADJUST this before running in production mode!"
+database_config(){
+  if [ "$1" != "postgresql" ]; then
+    echo "CFG_DATABASE_TYPE='mysql'"
+    echo "CFG_DATABASE_PORT=3306"
+  else
+    echo "CFG_DATABASE_TYPE='postgresql'"
+    echo "CFG_DATABASE_PORT=5432"
+  fi
+}
+
+echo "Load developer configuration. Do NOT use this in production mode!"
 
 # initialize Invenio configuration and search for the reported config file path
 inveniomanage config create secret-key
 cfgfile=$(inveniomanage config locate)
+
+# config database
+database_config $1 > $cfgfile
 
 # add a bunch of config flags to the config file this is faster than calling
 # `inveniomanaga config set` multiple times
