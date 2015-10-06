@@ -18,19 +18,9 @@
 
 """Invenio Web Page Functions"""
 
-__revision__ = "$Id$"
-
 from flask_login import current_user
 
-from invenio.config import \
-     CFG_WEBSTYLE_CDSPAGEBOXLEFTBOTTOM, \
-     CFG_WEBSTYLE_CDSPAGEBOXLEFTTOP, \
-     CFG_WEBSTYLE_CDSPAGEBOXRIGHTBOTTOM, \
-     CFG_WEBSTYLE_CDSPAGEBOXRIGHTTOP, \
-     CFG_SITE_LANG, \
-     CFG_SITE_URL, \
-     CFG_SITE_NAME_INTL, \
-     CFG_SITE_NAME, CFG_SITE_SECURE_URL
+from invenio_base.globals import cfg
 from invenio_base.i18n import gettext_set_language
 
 from invenio.legacy.dbquery import run_sql
@@ -58,13 +48,13 @@ def create_userinfobox_body(req, uid, language="en"):
 
     if req:
         if req.is_https():
-            url_referer = CFG_SITE_SECURE_URL + req.unparsed_uri
+            url_referer = cfg['CFG_SITE_SECURE_URL'] + req.unparsed_uri
         else:
-            url_referer = CFG_SITE_URL + req.unparsed_uri
+            url_referer = cfg['CFG_SITE_URL'] + req.unparsed_uri
         if '/youraccount/logout' in url_referer:
             url_referer = ''
     else:
-        url_referer = CFG_SITE_URL
+        url_referer = cfg['CFG_SITE_URL']
 
     return ""
 
@@ -74,31 +64,30 @@ def create_navtrailbox_body(title,
                             prolog="",
                             separator=""" &gt; """,
                             epilog="",
-                            language=CFG_SITE_LANG):
+                            language=cfg['CFG_SITE_LANG']):
     """Create navigation trail box body
        input: title = page title;
               previous_links = the trail content from site title until current page (both ends exclusive).
        output: text containing the navtrail
     """
 
-    return webstyle_templates.tmpl_navtrailbox_body(ln = language,
-                                                    title = title,
-                                                    previous_links = \
-                                                    previous_links,
-                                                    separator = separator,
-                                                    prolog = prolog,
-                                                    epilog = epilog)
+    return webstyle_templates.tmpl_navtrailbox_body(ln=language,
+                                                    title=title,
+                                                    previous_links=previous_links,
+                                                    separator=separator,
+                                                    prolog=prolog,
+                                                    epilog=epilog)
+
 
 def page(title, body, navtrail="", description="", keywords="",
          metaheaderadd="", uid=None,
          cdspageheaderadd="", cdspageboxlefttopadd="",
          cdspageboxleftbottomadd="", cdspageboxrighttopadd="",
          cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="",
-         language=CFG_SITE_LANG, verbose=1, titleprologue="",
+         language=cfg['CFG_SITE_LANG'], verbose=1, titleprologue="",
          titleepilogue="", secure_page_p=0, req=None, errors=None, warnings=None, navmenuid="admin",
-         navtrail_append_title_p=1, of="", rssurl=CFG_SITE_URL+"/rss", show_title_p=True,
+         navtrail_append_title_p=1, of="", rssurl=cfg['CFG_SITE_URL'] + "/rss", show_title_p=True,
          body_css_classes=None, show_header=True, show_footer=True):
-
     """page(): display CDS web page
         input: title of the page
                body of the page in html format
@@ -134,10 +123,10 @@ def page(title, body, navtrail="", description="", keywords="",
             uid = current_user.get_id()
         secure_page_p = req.is_https() and 1 or 0
     if uid is None:
-        ## 0 means generic guest user.
+        # 0 means generic guest user.
         uid = 0
     if of == 'xx':
-        #xml output (e.g. AJAX calls) => of=xx
+        # xml output (e.g. AJAX calls) => of=xx
         req.content_type = 'text/xml'
         impl = getDOMImplementation()
         output = impl.createDocument(None, "invenio-message", None)
@@ -146,48 +135,53 @@ def page(title, body, navtrail="", description="", keywords="",
         body_text = output.createCDATASection(unicode(body, 'utf_8'))
         body_node.appendChild(body_text)
         root.appendChild(body_node)
-        return output.toprettyxml(encoding="utf-8" )
+        return output.toprettyxml(encoding="utf-8")
 
     else:
         return webstyle_templates.tmpl_page(req, ln=language,
-                          description = description,
-                          keywords = keywords,
-                          metaheaderadd = metaheaderadd,
-                          userinfobox = create_userinfobox_body(req, uid, language),
-                          navtrailbox = create_navtrailbox_body(navtrail_append_title_p \
-                                                                and title or '',
-                                                                navtrail,
-                                                                language=language),
-                          uid = uid,
-                          secure_page_p = secure_page_p,
-                          pageheaderadd = cdspageheaderadd,
-                          boxlefttop = CFG_WEBSTYLE_CDSPAGEBOXLEFTTOP,
-                          boxlefttopadd = cdspageboxlefttopadd,
-                          boxleftbottomadd = cdspageboxleftbottomadd,
-                          boxleftbottom = CFG_WEBSTYLE_CDSPAGEBOXLEFTBOTTOM,
-                          boxrighttop = CFG_WEBSTYLE_CDSPAGEBOXRIGHTTOP,
-                          boxrighttopadd = cdspageboxrighttopadd,
-                          boxrightbottomadd = cdspageboxrightbottomadd,
-                          boxrightbottom = CFG_WEBSTYLE_CDSPAGEBOXRIGHTBOTTOM,
-                          titleprologue = titleprologue,
-                          title = title,
-                          titleepilogue = titleepilogue,
-                          body = body,
-                          lastupdated = lastupdated,
-                          pagefooteradd = cdspagefooteradd,
-                          navmenuid = navmenuid,
-                          rssurl = rssurl,
-                          show_title_p = show_title_p,
-                          body_css_classes=body_css_classes,
-                          show_header=show_header,
-                          show_footer=show_footer)
+                                            description=description,
+                                            keywords=keywords,
+                                            metaheaderadd=metaheaderadd,
+                                            userinfobox=create_userinfobox_body(
+                                                req, uid, language),
+                                            navtrailbox=create_navtrailbox_body(navtrail_append_title_p
+                                                                                and title or '',
+                                                                                navtrail,
+                                                                                language=language),
+                                            uid=uid,
+                                            secure_page_p=secure_page_p,
+                                            pageheaderadd=cdspageheaderadd,
+                                            boxlefttop=cfg[
+                                                'CFG_WEBSTYLE_CDSPAGEBOXLEFTTOP'],
+                                            boxlefttopadd=cdspageboxlefttopadd,
+                                            boxleftbottomadd=cdspageboxleftbottomadd,
+                                            boxleftbottom=cfg[
+                                                'CFG_WEBSTYLE_CDSPAGEBOXLEFTBOTTOM'],
+                                            boxrighttop=cfg[
+                                                'CFG_WEBSTYLE_CDSPAGEBOXRIGHTTOP'],
+                                            boxrighttopadd=cdspageboxrighttopadd,
+                                            boxrightbottomadd=cdspageboxrightbottomadd,
+                                            boxrightbottom=cfg[
+                                                'CFG_WEBSTYLE_CDSPAGEBOXRIGHTBOTTOM'],
+                                            titleprologue=titleprologue,
+                                            title=title,
+                                            titleepilogue=titleepilogue,
+                                            body=body,
+                                            lastupdated=lastupdated,
+                                            pagefooteradd=cdspagefooteradd,
+                                            navmenuid=navmenuid,
+                                            rssurl=rssurl,
+                                            show_title_p=show_title_p,
+                                            body_css_classes=body_css_classes,
+                                            show_header=show_header,
+                                            show_footer=show_footer)
 
 
 def pageheaderonly(title, navtrail="", description="", keywords="", uid=0,
-                   cdspageheaderadd="", language=CFG_SITE_LANG, req=None,
+                   cdspageheaderadd="", language=cfg['CFG_SITE_LANG'], req=None,
                    secure_page_p=0, verbose=1, navmenuid="admin",
                    navtrail_append_title_p=1, metaheaderadd="",
-                   rssurl=CFG_SITE_URL+"/rss", body_css_classes=None):
+                   rssurl=cfg['CFG_SITE_URL'] + "/rss", body_css_classes=None):
     """Return just the beginning of page(), with full headers.
        Suitable for the search results page and any long-taking scripts."""
     if req is not None:
@@ -195,42 +189,46 @@ def pageheaderonly(title, navtrail="", description="", keywords="", uid=0,
             uid = current_user.get_id(uid)
         secure_page_p = req.is_https() and 1 or 0
     return webstyle_templates.tmpl_pageheader(req,
-                      ln = language,
-                      headertitle = title,
-                      description = description,
-                      keywords = keywords,
-                      metaheaderadd = metaheaderadd,
-                      userinfobox = create_userinfobox_body(req, uid, language),
-                      navtrailbox = create_navtrailbox_body(navtrail_append_title_p \
-                                                            and title or '',
-                                                            navtrail,
-                                                            language=language),
-                      uid = uid,
-                      secure_page_p = secure_page_p,
-                      pageheaderadd = cdspageheaderadd,
-                      navmenuid = navmenuid,
-                      rssurl = rssurl,
-                      body_css_classes=body_css_classes)
+                                              ln=language,
+                                              headertitle=title,
+                                              description=description,
+                                              keywords=keywords,
+                                              metaheaderadd=metaheaderadd,
+                                              userinfobox=create_userinfobox_body(
+                                                  req, uid, language),
+                                              navtrailbox=create_navtrailbox_body(navtrail_append_title_p
+                                                                                  and title or '',
+                                                                                  navtrail,
+                                                                                  language=language),
+                                              uid=uid,
+                                              secure_page_p=secure_page_p,
+                                              pageheaderadd=cdspageheaderadd,
+                                              navmenuid=navmenuid,
+                                              rssurl=rssurl,
+                                              body_css_classes=body_css_classes)
+
 
 def pagefooteronly(cdspagefooteradd="", lastupdated="",
-                   language=CFG_SITE_LANG, req=None, verbose=1):
+                   language=cfg['CFG_SITE_LANG'], req=None, verbose=1):
     """Return just the ending of page(), with full footer.
        Suitable for the search results page and any long-taking scripts."""
     return webstyle_templates.tmpl_pagefooter(req,
                                               ln=language,
-                                              lastupdated = lastupdated,
-                                              pagefooteradd = cdspagefooteradd)
+                                              lastupdated=lastupdated,
+                                              pagefooteradd=cdspagefooteradd)
 
-def create_error_box(req, title=None, verbose=1, ln=CFG_SITE_LANG, errors=None):
+
+def create_error_box(req, title=None, verbose=1, ln=cfg['CFG_SITE_LANG'], errors=None):
     """Analyse the req object and the sys traceback and return a text
        message box with internal information that would be suitful to
        display when something bad has happened.
     """
-    return webstyle_templates.tmpl_error_box(title = title,
-                                             ln = ln,
-                                             verbose = verbose,
-                                             req = req,
-                                             errors = errors)
+    return webstyle_templates.tmpl_error_box(title=title,
+                                             ln=ln,
+                                             verbose=verbose,
+                                             req=req,
+                                             errors=errors)
+
 
 def adderrorbox(header='', datalist=[]):
     """used to create table around main data on a page, row based"""
@@ -240,56 +238,61 @@ def adderrorbox(header='', datalist=[]):
     except ZeroDivisionError:
         perc = 1
 
-    output  = '<table class="errorbox">'
-    output += '<thead><tr><th class="errorboxheader" colspan="%s">%s</th></tr></thead>' % (len(datalist), header)
+    output = '<table class="errorbox">'
+    output += '<thead><tr><th class="errorboxheader" colspan="%s">%s</th></tr></thead>' % (
+        len(datalist), header)
     output += '<tbody>'
     for row in [datalist]:
         output += '<tr>'
         for data in row:
-            output += '<td style="vertical-align: top; margin-top: 5px; width: %s;">' % (perc, )
+            output += '<td style="vertical-align: top; margin-top: 5px; width: %s;">' % (
+                perc, )
             output += data
             output += '</td>'
         output += '</tr>'
     output += '</tbody></table>'
     return output
 
-def error_page(title, req, ln=CFG_SITE_LANG):
+
+def error_page(title, req, ln=cfg['CFG_SITE_LANG']):
     # load the right message language
     _ = gettext_set_language(ln)
 
-    site_name = CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)
+    site_name = cfg['CFG_SITE_NAME_INTL'].get(ln, cfg['CFG_SITE_NAME'])
 
-    return page(title = _("Error"),
-                body = create_error_box(req, title=str(title), verbose=0, ln=ln),
+    return page(title=_("Error"),
+                body=create_error_box(req, title=str(title), verbose=0, ln=ln),
                 description="%s - Internal Error" % site_name,
                 keywords="%s, Internal Error" % site_name,
-                uid = current_user.get_id(req),
+                uid=current_user.get_id(req),
                 language=ln,
                 req=req)
 
-def warning_page(title, req, ln=CFG_SITE_LANG):
+
+def warning_page(title, req, ln=cfg['CFG_SITE_LANG']):
     # load the right message language
     _ = gettext_set_language(ln)
 
-    site_name = CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)
+    site_name = cfg['CFG_SITE_NAME_INTL'].get(ln, cfg['CFG_SITE_NAME'])
 
-    return page(title = _("Warning"),
-                body = title,
+    return page(title=_("Warning"),
+                body=title,
                 description="%s - Internal Error" % site_name,
                 keywords="%s, Internal Error" % site_name,
-                uid = current_user.get_id(req),
+                uid=current_user.get_id(req),
                 language=ln,
                 req=req)
+
 
 def write_warning(msg, type='', prologue='<br />', epilogue='<br />', req=None):
     """Prints warning message and flushes output."""
     if msg:
         ret = webstyle_templates.tmpl_write_warning(
-                   msg = msg,
-                   type = type,
-                   prologue = prologue,
-                   epilogue = epilogue,
-                 )
+            msg=msg,
+            type=type,
+            prologue=prologue,
+            epilogue=epilogue,
+        )
         if req is None:
             return ret
         else:

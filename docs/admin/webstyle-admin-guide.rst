@@ -163,13 +163,13 @@ named ``webstyle_templates_ithaca.py`` with the following content:
 
     ::
 
-        from invenio.config import CFG_SITE_LANG
+        from invenio_base.globals import cfg
         from invenio.legacy.webstyle.templates import Template as DefaultTemplate
 
         class Template(DefaultTemplate):
             """Ithaca style templates."""
 
-            def tmpl_pagefooter(self, req=None, ln=CFG_SITE_LANG, lastupdated=None,
+            def tmpl_pagefooter(self, req=None, ln=cfg['CFG_SITE_LANG'], lastupdated=None,
                                 pagefooteradd=""):
                 """
                 Ithaca style page footer.  See the default function for

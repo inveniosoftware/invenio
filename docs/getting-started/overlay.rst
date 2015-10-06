@@ -131,7 +131,7 @@ it later on. Here is its minimal content.
             "Invenio>=2"
         ],
         entry_points={
-            "invenio.config": ["myoverlay = myoverlay.config"]
+            "invenio_base.globals.cfg": ["myoverlay = myoverlay.config"]
         }
     )
 

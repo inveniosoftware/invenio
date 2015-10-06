@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
 #               2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
@@ -18,8 +18,6 @@
 """
 WebStyle templates. Customize the look of pages of Invenio
 """
-__revision__ = \
-    "$Id$"
 
 import time
 import cgi
@@ -30,13 +28,7 @@ import string
 
 from bs4 import BeautifulSoup
 from invenio.ext.template import render_template_to_string
-from invenio.config import \
-     CFG_SITE_LANG, \
-     CFG_SITE_NAME, \
-     CFG_SITE_NAME_INTL, \
-     CFG_SITE_SUPPORT_EMAIL, \
-     CFG_BASE_URL, \
-     CFG_SITE_URL
+from invenio_base.globals import cfg
 
 from invenio_base.i18n import gettext_set_language, language_list_long
 from invenio_utils.url import make_canonical_urlargd, create_html_link
@@ -75,14 +67,14 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        if title == CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME):
+        if title == cfg['CFG_SITE_NAME_INTL'].get(ln, cfg['CFG_SITE_NAME']):
             return ""
 
         # Breadcrumbs
         # breadcrumb objects should provide properties 'text' and 'url'
 
         # First element
-        breadcrumbs = [dict(text=_("Home"), url=CFG_SITE_URL), ]
+        breadcrumbs = [dict(text=_("Home"), url=cfg['CFG_SITE_URL']), ]
 
         # Decode previous elements
         if previous_links:
@@ -172,7 +164,7 @@ class Template:
 
           - HTML code of the page
         """
-        ctx = dict(ln=CFG_SITE_LANG, description="",
+        ctx = dict(ln=cfg['CFG_SITE_LANG'], description="",
                    keywords="", userinfobox="", useractivities_menu="",
                    adminactivities_menu="", navtrailbox="",
                    pageheaderadd="", boxlefttop="", boxlefttopadd="",
@@ -182,7 +174,7 @@ class Template:
                    titleprologue="", title="", titleepilogue="",
                    body="", lastupdated=None, pagefooteradd="", uid=0,
                    secure_page_p=0, navmenuid="", metaheaderadd="",
-                   rssurl=CFG_SITE_URL+"/rss",
+                   rssurl=cfg['CFG_SITE_URL'] + "/rss",
                    show_title_p=True, body_css_classes=None,
                    show_header=True, show_footer=True)
         ctx.update(kwargs)
@@ -230,12 +222,12 @@ class Template:
           - HTML code of the page headers
         """
 
-        ctx = dict(ln=CFG_SITE_LANG, headertitle="",
+        ctx = dict(ln=cfg['CFG_SITE_LANG'], headertitle="",
                    description="", keywords="", userinfobox="",
                    useractivities_menu="", adminactivities_menu="",
                    navtrailbox="", pageheaderadd="", uid=0,
                    secure_page_p=0, navmenuid="admin", metaheaderadd="",
-                   rssurl=CFG_SITE_URL+"/rss", body_css_classes=None)
+                   rssurl=cfg['CFG_SITE_URL'] + "/rss", body_css_classes=None)
         ctx.update(kwargs)
         if ctx['body_css_classes'] is None:
             ctx['body_css_classes'] = [ctx.get('navmenuid', '')]
@@ -264,7 +256,8 @@ class Template:
 
           - HTML code of the page headers
         """
-        ctx = dict(ln=CFG_SITE_LANG, lastupdated=None, pagefooteradd=None)
+        ctx = dict(
+            ln=cfg['CFG_SITE_LANG'], lastupdated=None, pagefooteradd=None)
         ctx.update(kwargs)
         lastupdated = ctx.get('lastupdated')
         if lastupdated and lastupdated != '$Date$':
@@ -278,7 +271,7 @@ class Template:
             **ctx
         ).encode('utf8')
 
-    def tmpl_language_selection_box(self, req, language=CFG_SITE_LANG):
+    def tmpl_language_selection_box(self, req, language=cfg['CFG_SITE_LANG']):
         """Take URLARGS and LANGUAGE and return textual language
            selection box for the given page.
 
@@ -302,12 +295,14 @@ class Template:
 
         for (lang, lang_namelong) in language_list_long():
             if lang == language:
-                parts.append('<span class="langinfo">%s</span>' % lang_namelong)
+                parts.append('<span class="langinfo">%s</span>' %
+                             lang_namelong)
             else:
                 # Update the 'ln' argument in the initial request
                 argd['ln'] = lang
                 if req and req.uri:
-                    args = urllib.quote(req.uri, '/:?') + make_canonical_urlargd(argd, {})
+                    args = urllib.quote(
+                        req.uri, '/:?') + make_canonical_urlargd(argd, {})
                 else:
                     args = ""
                 parts.append(create_html_link(args,
@@ -315,10 +310,10 @@ class Template:
                                               {'class': "langinfo"}))
         if len(parts) > 1:
             return _("This site is also available in the following languages:") + \
-                 "<br />" + ' &nbsp;'.join(parts)
+                "<br />" + ' &nbsp;'.join(parts)
         else:
-            ## There is only one (or zero?) languages configured,
-            ## so there so need to display language alternatives.
+            # There is only one (or zero?) languages configured,
+            # so there so need to display language alternatives.
             return ""
 
     def tmpl_error_box(self, ln, title, verbose, req, errors):
@@ -357,7 +352,7 @@ class Template:
                 host_s = req.hostname
                 page_s = req.unparsed_uri
                 client_s = req.remote_ip
-            except: # FIXME: bad except
+            except:  # FIXME: bad except
                 browser_s += ': ' + info_not_available
                 host_s = page_s = client_s = info_not_available
         else:
@@ -375,11 +370,11 @@ class Template:
                 errs = ''
                 for error_tuple in errors:
                     try:
-                        errs += "%s%s : %s\n " % (' '*6, error_tuple[0],
+                        errs += "%s%s : %s\n " % (' ' * 6, error_tuple[0],
                                                   error_tuple[1])
                     except:
-                        errs += "%s%s\n" % (' '*6, error_tuple)
-                errs = errs[6:-2] # get rid of trainling ','
+                        errs += "%s%s\n" % (' ' * 6, error_tuple)
+                errs = errs[6:-2]  # get rid of trainling ','
                 error_s = _("Error") + ': %s")' % errs + "\n"
             else:
                 error_s = _("Error") + ': ' + info_not_available
@@ -416,38 +411,38 @@ URI: http://%(host)s%(page)s
                 </tbody>
               </table>
               """ % {
-                'title'     : cgi.escape(title).replace('"', '&quot;'),
-                'time_label': _("Time"),
-                'client_label': _("Client"),
-                'send_error_label': \
-                       _("Please send an error report to the administrator."),
-                'send_label': _("Send error report"),
-                'sys1'  : cgi.escape(str((sys.exc_info()[0] or ''))).replace('"', '&quot;'),
-                'sys2'  : cgi.escape(str((sys.exc_info()[1] or ''))).replace('"', '&quot;'),
-                'contact'   : \
-                    _("Please contact %(x_name)s quoting the following information:",
-                      x_name=('<a href="mailto:' + urllib.quote(CFG_SITE_SUPPORT_EMAIL) +'">' + CFG_SITE_SUPPORT_EMAIL + '</a>')),
-                'host'      : cgi.escape(host_s),
-                'page'      : cgi.escape(page_s),
-                'time'      : time.strftime("%d/%b/%Y:%H:%M:%S %z"),
-                'browser'   : cgi.escape(browser_s).replace('"', '&quot;'),
-                'client'    : cgi.escape(client_s).replace('"', '&quot;'),
-                'error'     : cgi.escape(error_s).replace('"', '&quot;'),
-                'traceback' : cgi.escape(traceback_s).replace('"', '&quot;'),
-                'sys_error' : cgi.escape(sys_error_s).replace('"', '&quot;'),
-                'siteurl'    : CFG_BASE_URL,
-                'referer'   : page_s!=info_not_available and \
-                                 ("http://" + host_s + page_s) or \
-                                 info_not_available
-              }
+            'title': cgi.escape(title).replace('"', '&quot;'),
+            'time_label': _("Time"),
+            'client_label': _("Client"),
+            'send_error_label':
+            _("Please send an error report to the administrator."),
+            'send_label': _("Send error report"),
+            'sys1': cgi.escape(str((sys.exc_info()[0] or ''))).replace('"', '&quot;'),
+            'sys2': cgi.escape(str((sys.exc_info()[1] or ''))).replace('"', '&quot;'),
+                'contact':
+            _("Please contact %(x_name)s quoting the following information:",
+              x_name=('<a href="mailto:' + urllib.quote(cfg['CFG_SITE_SUPPORT_EMAIL']) + '">' + cfg['CFG_SITE_SUPPORT_EMAIL'] + '</a>')),
+            'host': cgi.escape(host_s),
+            'page': cgi.escape(page_s),
+            'time': time.strftime("%d/%b/%Y:%H:%M:%S %z"),
+                'browser': cgi.escape(browser_s).replace('"', '&quot;'),
+                'client': cgi.escape(client_s).replace('"', '&quot;'),
+                'error': cgi.escape(error_s).replace('"', '&quot;'),
+                'traceback': cgi.escape(traceback_s).replace('"', '&quot;'),
+                'sys_error': cgi.escape(sys_error_s).replace('"', '&quot;'),
+                'siteurl': cfg['CFG_BASE_URL'],
+                'referer': page_s != info_not_available and
+            ("http://" + host_s + page_s) or
+            info_not_available
+        }
         return out
 
-    def detailed_record_container_top(self, recid, tabs, ln=CFG_SITE_LANG,
+    def detailed_record_container_top(self, recid, tabs, ln=cfg['CFG_SITE_LANG'],
                                       show_similar_rec_p=True,
                                       creationdate=None,
                                       modificationdate=None, show_short_rec_p=True,
                                       citationnum=-1, referencenum=-1, discussionnum=-1,
-                                      include_jquery = False, include_mathjax = False):
+                                      include_jquery=False, include_mathjax=False):
         """Prints the box displayed in detailed records pages, with tabs at the top.
 
         Returns content as it is if the number of tabs for this record
@@ -498,22 +493,21 @@ URI: http://%(host)s%(page)s
                 css_class = ' class="%s"' % ' '.join(css_class)
                 if not enabled:
                     out_tabs += '<li%(class)s><a>%(label)s %(addnum)s</a></li>' % \
-                                {'class':css_class,
-                                 'label':label,
-                                 'addnum':addnum}
+                                {'class': css_class,
+                                 'label': label,
+                                 'addnum': addnum}
                 else:
                     out_tabs += '<li%(class)s><a href="%(url)s">%(label)s %(addnum)s </a></li>' % \
-                                {'class':css_class,
-                                 'url':url,
-                                 'label':label,
-                                 'addnum':addnum}
+                                {'class': css_class,
+                                 'url': url,
+                                 'label': label,
+                                 'addnum': addnum}
         if out_tabs != '':
             out_tabs = '''        <div class="detailedrecordtabs">
             <div>
                 <ul class="detailedrecordtabs">%s</ul>
             <div id="tabsSpacer" style="clear:both;height:0px">&nbsp;</div></div>
         </div>''' % out_tabs
-
 
         # Add the clip icon and the brief record reminder if necessary
         record_brief = ''
@@ -531,11 +525,10 @@ URI: http://%(host)s%(page)s
         additional_scripts = ""
         if include_jquery:
             additional_scripts += """<script type="text/javascript" src="%s/js/jquery.min.js">' \
-            '</script>\n""" % (CFG_BASE_URL, )
+            '</script>\n""" % (cfg['CFG_BASE_URL'], )
         if include_mathjax:
 
             additional_scripts += get_mathjax_header()
-
 
         # Print the content
         out = """
@@ -549,13 +542,13 @@ URI: http://%(host)s%(page)s
                 <p class="notopgap">&nbsp;</p>-->
                 %(record_brief)s
                 """ % {'additional_scripts': additional_scripts,
-                       'tabs':out_tabs,
-                       'record_brief':record_brief}
+                       'tabs': out_tabs,
+                       'record_brief': record_brief}
 
         out = restriction_flag + out
         return out
 
-    def detailed_record_container_bottom(self, recid, tabs, ln=CFG_SITE_LANG,
+    def detailed_record_container_bottom(self, recid, tabs, ln=cfg['CFG_SITE_LANG'],
                                          show_similar_rec_p=True,
                                          creationdate=None,
                                          modificationdate=None, show_short_rec_p=True):
@@ -590,17 +583,16 @@ URI: http://%(host)s%(page)s
     </div>
     <br/>
     """ % {
-           'dates' : creationdate and '<div class="recordlastmodifiedbox" style="position:relative;margin-left:1px">&nbsp;%(dates)s</div>' % {
+            'dates': creationdate and '<div class="recordlastmodifiedbox" style="position:relative;margin-left:1px">&nbsp;%(dates)s</div>' % {
                 'dates': _("Record created %(x_date_creation)s, last modified %(x_date_modification)s",
                            x_date_creation=creationdate,
                            x_date_modification=modificationdate),
-                } or ''
-           }
+            } or ''
+        }
 
         return out
 
-
-    def detailed_record_mini_panel(self, recid, ln=CFG_SITE_LANG,
+    def detailed_record_mini_panel(self, recid, ln=cfg['CFG_SITE_LANG'],
                                    format='hd',
                                    files='',
                                    reviews='',
@@ -638,16 +630,16 @@ URI: http://%(host)s%(page)s
         <div class="bottom-left"></div><div class="bottom-right"></div>
         </div>
         """ % {
-        'siteurl': CFG_BASE_URL,
-        'ln':ln,
-        'recid':recid,
-        'files': files,
-        'reviews':reviews,
-        'actions': actions,
+            'siteurl': cfg['CFG_BASE_URL'],
+            'ln': ln,
+            'recid': recid,
+            'files': files,
+            'reviews': reviews,
+            'actions': actions,
         }
         return out
 
-    def tmpl_error_page(self, ln=CFG_SITE_LANG, status="", admin_was_alerted=True):
+    def tmpl_error_page(self, ln=cfg['CFG_SITE_LANG'], status="", admin_was_alerted=True):
         """
         Display an error page.
 
@@ -658,11 +650,11 @@ URI: http://%(host)s%(page)s
         <p>%(message)s</p>
         <p>%(alerted)s</p>
         <p>%(doubts)s</p>""" % {
-            'status' : status,
-            'message' : _("The server encountered an error while dealing with your request."),
-            'alerted' : admin_was_alerted and _("The system administrators have been alerted.") or '',
-            'doubts' : _("In case of doubt, please contact %(x_admin_email)s.",
-                         x_admin_email='<a href="mailto:%(admin)s">%(admin)s</a>' % {'admin' : CFG_SITE_SUPPORT_EMAIL})
+            'status': status,
+            'message': _("The server encountered an error while dealing with your request."),
+            'alerted': admin_was_alerted and _("The system administrators have been alerted.") or '',
+            'doubts': _("In case of doubt, please contact %(x_admin_email)s.",
+                        x_admin_email='<a href="mailto:%(admin)s">%(admin)s</a>' % {'admin': cfg['CFG_SITE_SUPPORT_EMAIL']})
         }
         return out
 

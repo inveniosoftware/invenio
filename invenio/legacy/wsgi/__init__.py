@@ -34,16 +34,14 @@ from invenio.legacy.wsgi.utils import table
 from invenio_utils.apache import \
     HTTP_STATUS_MAP, SERVER_RETURN, OK, DONE, \
     HTTP_NOT_FOUND, HTTP_INTERNAL_SERVER_ERROR
-from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
-    CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST, CFG_DEVEL_SITE, CFG_SITE_URL, \
-    CFG_SITE_SECURE_URL, CFG_WEBSTYLE_REVERSE_PROXY_IPS
+from invenio_base.globals import cfg
 from invenio.ext.logging import register_exception
 from invenio_utils.datastructures import flatten_multidict
 # TODO for future reimplementation of stream_file
 from flask import request, after_this_request, session
 
 
-# Magic regexp to search for usage of CFG_SITE_URL within src/href or
+# Magic regexp to search for usage of cfg['CFG_SITE_URL'] within src/href or
 # any src usage of an external website
 _RE_HTTPS_REPLACES = re.compile(r"\b((?:src\s*=|url\s*\()\s*[\"']?)http\://", re.I)
 
@@ -55,15 +53,15 @@ _RE_IPADDRESS_START = re.compile("^\d+\.")
 
 def _http_replace_func(match):
     ## src external_site -> CFG_SITE_SECURE_URL/sslredirect/external_site
-    return match.group(1) + CFG_SITE_SECURE_URL + '/sslredirect/'
+    return match.group(1) + cfg['CFG_SITE_SECURE_URL'] + '/sslredirect/'
 
-_ESCAPED_CFG_SITE_URL = cgi.escape(CFG_SITE_URL, True)
-_ESCAPED_CFG_SITE_SECURE_URL = cgi.escape(CFG_SITE_SECURE_URL, True)
+_ESCAPED_cfg['CFG_SITE_URL'] = cgi.escape(cfg['CFG_SITE_URL'], True)
+_ESCAPED_cfg['CFG_SITE_SECURE_URL'] = cgi.escape(cfg['CFG_SITE_SECURE_URL'], True)
 
 
 def https_replace(html):
-    html = html.decode('utf-8').replace(_ESCAPED_CFG_SITE_URL,
-                                        _ESCAPED_CFG_SITE_SECURE_URL)
+    html = html.decode('utf-8').replace(_ESCAPED_cfg['CFG_SITE_URL'],
+                                        _ESCAPED_cfg['CFG_SITE_SECURE_URL'])
     return _RE_HTTPS_REPLACES.sub(_http_replace_func, html)
 
 
@@ -215,9 +213,9 @@ class SimulatedModPythonRequest(object):
 
     def get_full_uri(self):
         if self.is_https():
-            return CFG_SITE_SECURE_URL + self.get_unparsed_uri()
+            return cfg['CFG_SITE_SECURE_URL'] + self.get_unparsed_uri()
         else:
-            return CFG_SITE_URL + self.get_unparsed_uri()
+            return cfg['CFG_SITE_URL'] + self.get_unparsed_uri()
 
     def get_headers_in(self):
         return request.headers
@@ -235,9 +233,9 @@ class SimulatedModPythonRequest(object):
         if 'X-FORWARDED-FOR' in self.__headers_in and \
                self.__headers_in.get('X-FORWARDED-SERVER', '') == \
                self.__headers_in.get('X-FORWARDED-HOST', '') == \
-               urlparse(CFG_SITE_URL)[1]:
+               urlparse(cfg['CFG_SITE_URL'])[1]:
             # we are using proxy setup
-            if self.__environ.get('REMOTE_ADDR') in CFG_WEBSTYLE_REVERSE_PROXY_IPS:
+            if self.__environ.get('REMOTE_ADDR') in cfg['CFG_WEBSTYLE_REVERSE_PROXY_IPS']:
                 # we trust this proxy
                 ip_list = self.__headers_in['X-FORWARDED-FOR'].split(',')
                 for ip in ip_list:
@@ -248,7 +246,7 @@ class SimulatedModPythonRequest(object):
             else:
                 # we don't trust this proxy
                 register_exception(prefix="You are running in a proxy configuration, but the " + \
-                                   "CFG_WEBSTYLE_REVERSE_PROXY_IPS variable does not contain " + \
+                                   "cfg['CFG_WEBSTYLE_REVERSE_PROXY_IPS'] variable does not contain " + \
                                    "the IP of your proxy, thus the remote IP addresses of your " + \
                                    "clients are not trusted.  Please configure this variable.",
                                    alert_admin=True)
@@ -440,11 +438,11 @@ class SimulatedModPythonRequest(object):
 def alert_admin_for_server_status_p(status, referer):
     """
     Check the configuration variable
-    CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST to see if the exception should
+    cfg['CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST'] to see if the exception should
     be registered and the admin should be alerted.
     """
     status = str(status)
-    for pattern in CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST:
+    for pattern in cfg['CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST']:
         pattern = pattern.lower()
         must_have_referer = False
         if pattern.endswith('r'):
@@ -524,7 +522,7 @@ def generate_error_page(req, admin_was_alerted=True, page_already_started=False)
     from invenio.legacy.webpage import page
     from invenio.legacy import template
     webstyle_templates = template.load('webstyle')
-    ln = req.form.get('ln', CFG_SITE_LANG)
+    ln = req.form.get('ln', cfg['CFG_SITE_LANG'])
     if page_already_started:
         return [webstyle_templates.tmpl_error_page(status=req.get_wsgi_status(), ln=ln, admin_was_alerted=admin_was_alerted)]
     else:
@@ -532,20 +530,20 @@ def generate_error_page(req, admin_was_alerted=True, page_already_started=False)
 
 def is_static_path(path):
     """
-    Returns True if path corresponds to an exsting file under CFG_WEBDIR.
+    Returns True if path corresponds to an exsting file under cfg['CFG_WEBDIR'].
     @param path: the path.
     @type path: string
-    @return: True if path corresponds to an exsting file under CFG_WEBDIR.
+    @return: True if path corresponds to an exsting file under cfg['CFG_WEBDIR'].
     @rtype: bool
     """
-    path = os.path.abspath(CFG_WEBDIR + path)
-    if path.startswith(CFG_WEBDIR) and os.path.isfile(path):
+    path = os.path.abspath(cfg['CFG_WEBDIR'] + path)
+    if path.startswith(cfg['CFG_WEBDIR']) and os.path.isfile(path):
         return path
     return None
 
 def is_mp_legacy_publisher_path(path):
     """
-    Checks path corresponds to an exsting Python file under CFG_WEBDIR.
+    Checks path corresponds to an exsting Python file under cfg['CFG_WEBDIR'].
     @param path: the path.
     @type path: string
     @return: the path of the module to load and the function to call there.
@@ -572,7 +570,7 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
     """
     mod_python legacy publisher minimum implementation.
     """
-    from invenio.ext.legacy.handler import CFG_HAS_HTTPS_SUPPORT, CFG_FULL_HTTPS
+    from invenio.ext.legacy.handler import cfg['CFG_HAS_HTTPS_SUPPORT'], cfg['CFG_FULL_HTTPS']
     if possible_module.endswith('.pyc'):
         possible_module = possible_module[:-1]
     the_module = open(possible_module).read()
@@ -603,13 +601,13 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
                 ## have a file (Field) instance instead of a string.
                 form[key] = value
 
-        if (CFG_FULL_HTTPS or CFG_HAS_HTTPS_SUPPORT and session.need_https) and not req.is_https():
+        if (cfg['CFG_FULL_HTTPS'] or cfg['CFG_HAS_HTTPS_SUPPORT'] and session.need_https) and not req.is_https():
             from invenio_utils.url import redirect_to_url
             # We need to isolate the part of the URI that is after
-            # CFG_SITE_URL, and append that to our CFG_SITE_SECURE_URL.
+            # cfg['CFG_SITE_URL'], and append that to our cfg['CFG_SITE_SECURE_URL'].
             original_parts = urlparse(req.unparsed_uri)
-            plain_prefix_parts = urlparse(CFG_SITE_URL)
-            secure_prefix_parts = urlparse(CFG_SITE_SECURE_URL)
+            plain_prefix_parts = urlparse(cfg['CFG_SITE_URL'])
+            secure_prefix_parts = urlparse(cfg['CFG_SITE_SECURE_URL'])
 
             # Compute the new path
             plain_path = original_parts[2]
@@ -633,7 +631,7 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
                 expected_defaults = list(inspected_args[3])
                 expected_args.reverse()
                 expected_defaults.reverse()
-                register_exception(req=req, prefix="Wrong GET parameter set in calling a legacy publisher handler for %s: expected_args=%s, found_args=%s" % (possible_handler, repr(expected_args), repr(req.form.keys())), alert_admin=CFG_DEVEL_SITE)
+                register_exception(req=req, prefix="Wrong GET parameter set in calling a legacy publisher handler for %s: expected_args=%s, found_args=%s" % (possible_handler, repr(expected_args), repr(req.form.keys())), alert_admin=cfg['CFG_DEVEL_SITE'])
                 cleaned_form = {}
                 for index, arg in enumerate(expected_args):
                     if arg == 'req':

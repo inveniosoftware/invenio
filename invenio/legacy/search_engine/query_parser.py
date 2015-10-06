@@ -31,7 +31,7 @@ from invenio_utils.date import GOT_DATEUTIL
 if GOT_DATEUTIL:
     from invenio_utils.date import du_parser, du_delta, relativedelta
 from invenio_utils.logic import to_cnf
-from invenio.config import CFG_WEBSEARCH_SPIRES_SYNTAX
+from invenio_base.globals import cfg
 from invenio_utils.date import strptime, strftime
 
 
@@ -736,14 +736,14 @@ class SpiresToInvenioSyntaxConverter:
         Return true if query begins with find, fin, or f, or if it contains
         a SPIRES-specific keyword (a, t, etc.), or if it contains the invenio
         author: field search. """
-        if not CFG_WEBSEARCH_SPIRES_SYNTAX:
+        if not cfg['CFG_WEBSEARCH_SPIRES_SYNTAX']:
             #SPIRES syntax is switched off
             return False
         query = query.lower()
         if self._re_spires_find_keyword.match(query):
             #leading 'find' is present and SPIRES syntax is switched on
             return True
-        if CFG_WEBSEARCH_SPIRES_SYNTAX > 1:
+        if cfg['CFG_WEBSEARCH_SPIRES_SYNTAX'] > 1:
             query = self._re_pattern_double_quotes.sub('', query)
             for word in query.split(' '):
                 if word in self._SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS:

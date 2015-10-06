@@ -43,8 +43,7 @@ import zlib
 
 from flask_login import current_user
 
-from invenio.config import CFG_SITE_NAME, CFG_SITE_LANG, CFG_SITE_URL, \
-    CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS
+from invenio_base.globals import cfg
 
 # import Invenio stuff:
 from invenio.legacy.bibrecord import get_fieldvalues
@@ -56,27 +55,26 @@ from invenio.base.i18n import gettext_set_language
 from invenio.modules.collections.models import Collection
 
 # em possible values
-EM_REPOSITORY={"body" : "B",
-               "header" : "H",
-               "footer" : "F",
-               "search_box" : "S",
-               "see_also_box" : "L",
-               "basket" : "K",
-               "alert" : "A",
-               "search_info" : "I",
-               "overview" : "O",
-               "all_portalboxes" : "P",
-               "te_portalbox" : "Pte",
-               "tp_portalbox" : "Ptp",
-               "np_portalbox" : "Pnp",
-               "ne_portalbox" : "Pne",
-               "lt_portalbox" : "Plt",
-               "rt_portalbox" : "Prt",
-               "search_services": "SER"};
+EM_REPOSITORY = {"body": "B",
+                 "header": "H",
+                 "footer": "F",
+                 "search_box": "S",
+                 "see_also_box": "L",
+                 "basket": "K",
+                 "alert": "A",
+                 "search_info": "I",
+                 "overview": "O",
+                 "all_portalboxes": "P",
+                 "te_portalbox": "Pte",
+                 "tp_portalbox": "Ptp",
+                 "np_portalbox": "Pnp",
+                 "ne_portalbox": "Pne",
+                 "lt_portalbox": "Plt",
+                 "rt_portalbox": "Prt",
+                 "search_services": "SER"}
 
 
-
-def create_navtrail_links(cc=CFG_SITE_NAME, aas=0, ln=CFG_SITE_LANG, self_p=1, tab=''):
+def create_navtrail_links(cc=cfg['CFG_SITE_NAME'], aas=0, ln=cfg['CFG_SITE_LANG'], self_p=1, tab=''):
     """Creates navigation trail links, i.e. links to collection
     ancestors (except Home collection).  If aas==1, then links to
     Advanced Search interfaces; otherwise Simple Search.
@@ -110,7 +108,7 @@ def get_coll_ancestors(coll):
 
 
 def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0,
-                   ln=CFG_SITE_LANG, display_nearest_terms_box=True, wl=0):
+                   ln=cfg['CFG_SITE_LANG'], display_nearest_terms_box=True, wl=0):
     """Search for complex pattern 'p' within field 'f' according to
        matching type 'm'.  Return hitset of recIDs.
 
@@ -156,17 +154,18 @@ def guess_primary_collection_of_a_record(recID):
        testing 980 identifier.
        May lead to bad guesses when a collection is defined dynamically
        via dbquery.
-       In that case, return 'CFG_SITE_NAME'."""
-    out = CFG_SITE_NAME
+       In that case, return 'cfg['CFG_SITE_NAME']'."""
+    out = cfg['CFG_SITE_NAME']
     dbcollids = get_fieldvalues(recID, "980__a")
     for dbcollid in dbcollids:
         variants = ("collection:" + dbcollid,
                     'collection:"' + dbcollid + '"',
                     "980__a:" + dbcollid,
                     '980__a:"' + dbcollid + '"',
-                    '980:' + dbcollid ,
+                    '980:' + dbcollid,
                     '980:"' + dbcollid + '"')
-        res = run_sql("SELECT name FROM collection WHERE dbquery IN (%s,%s,%s,%s,%s,%s)", variants)
+        res = run_sql(
+            "SELECT name FROM collection WHERE dbquery IN (%s,%s,%s,%s,%s,%s)", variants)
         if res:
             out = res[0][0]
             break
@@ -175,6 +174,8 @@ def guess_primary_collection_of_a_record(recID):
 
 
 _re_collection_url = re.compile('/collection/(.+)')
+
+
 def guess_collection_of_a_record(recID, referer=None, recreate_cache_if_needed=True):
     """Return collection name a record recid belongs to, by first testing
        the referer URL if provided and otherwise returning the
@@ -183,7 +184,7 @@ def guess_collection_of_a_record(recID, referer=None, recreate_cache_if_needed=T
         dummy, hostname, path, dummy, query, dummy = urlparse.urlparse(referer)
         # requests can come from different invenio installations, with
         # different collections
-        if CFG_SITE_URL.find(hostname) < 0:
+        if cfg['CFG_SITE_URL'].find(hostname) < 0:
             return guess_primary_collection_of_a_record(recID)
         g = _re_collection_url.match(path)
         if g:
@@ -209,9 +210,9 @@ def slice_records(recIDs, jrec, rg):
     if not jrec:
         jrec = 1
     if rg:
-        recIDs = recIDs[jrec-1:jrec-1+rg]
+        recIDs = recIDs[jrec - 1:jrec - 1 + rg]
     else:
-        recIDs = recIDs[jrec-1:]
+        recIDs = recIDs[jrec - 1:]
     return recIDs
 
 
@@ -223,17 +224,17 @@ def get_interval_for_records_to_sort(nb_found, jrec=None, rg=None):
         jrec = 1
 
     if not rg:
-        #return all
-        return jrec-1, nb_found
+        # return all
+        return jrec - 1, nb_found
 
-    if rg == -9999: # print all records
+    if rg == -9999:  # print all records
         rg = nb_found
     else:
         rg = abs(rg)
-    if jrec < 1: # sanity checks
+    if jrec < 1:  # sanity checks
         jrec = 1
     if jrec > nb_found:
-        jrec = max(nb_found-rg+1, 1)
+        jrec = max(nb_found - rg + 1, 1)
 
     # will sort records from irec_min to irec_max excluded
     irec_min = jrec - 1
@@ -257,7 +258,8 @@ def get_record(recid):
     except AttributeError:
         return api.Record.create({'recid': recid}, 'json').legacy_create_recstruct()
 
-def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.decompress,
+
+def print_record(recID, format='hb', ot='', ln=cfg['CFG_SITE_LANG'], decompress=zlib.decompress,
                  search_pattern=None, user_info=None, verbose=0, sf='', so='d',
                  sp='', rm='', brief_links=True):
     """
@@ -281,8 +283,8 @@ def create_add_to_search_pattern(p, p1, f1, m1, op1):
         return p
     init_search_pattern = p
     # operation: AND, OR, AND NOT
-    if op1 == 'a' and p: # we don't want '+' at the begining of the query
-        op =  ' +'
+    if op1 == 'a' and p:  # we don't want '+' at the begining of the query
+        op = ' +'
     elif op1 == 'o':
         op = ' |'
     elif op1 == 'n':
@@ -305,7 +307,7 @@ def create_add_to_search_pattern(p, p1, f1, m1, op1):
         start = end = "'"
     elif m1 == 'r':
         start = end = '/'
-    else: # m1 == 'o' or m1 =='a'
+    else:  # m1 == 'o' or m1 =='a'
         words = p1.strip().split(' ')
         if len(words) == 1:
             start = end = ''
@@ -314,21 +316,23 @@ def create_add_to_search_pattern(p, p1, f1, m1, op1):
             pattern = ' |'.join([field + word for word in words])
         else:
             pattern = ' '.join([field + word for word in words])
-        #avoid having field:(word1 word2) since this is not currently correctly working
+        # avoid having field:(word1 word2) since this is not currently
+        # correctly working
         return init_search_pattern + op + start + pattern + end
     if not pattern:
         return ''
-    #avoid having field:(word1 word2) since this is not currently correctly working
+    # avoid having field:(word1 word2) since this is not currently correctly
+    # working
     return init_search_pattern + op + field + start + pattern + end
 
 
-### CALLABLES
+# CALLABLES
 
-def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=None, sf="", so="a", sp="", rm="", of="id", ot="", aas=0,
-                        p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc=0, jrec=0,
-                        recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="", d1="",
-                        d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=CFG_SITE_LANG, ec=None, tab="",
-                        wl=0, em=""):
+def perform_request_search(req=None, cc=cfg['CFG_SITE_NAME'], c=None, p="", f="", rg=None, sf="", so="a", sp="", rm="", of="id", ot="", aas=0,
+                           p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc=0, jrec=0,
+                           recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="", d1="",
+                           d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=cfg['CFG_SITE_LANG'], ec=None, tab="",
+                           wl=0, em=""):
     kwargs = prs_wash_arguments(req=req, cc=cc, c=c, p=p, f=f, rg=rg, sf=sf, so=so, sp=sp, rm=rm, of=of, ot=ot, aas=aas,
                                 p1=p1, f1=f1, m1=m1, op1=op1, p2=p2, f2=f2, m2=m2, op2=op2, p3=p3, f3=f3, m3=m3, sc=sc, jrec=jrec,
                                 recid=recid, recidb=recidb, sysno=sysno, id=id, idb=idb, sysnb=sysnb, action=action, d1=d1,
@@ -345,12 +349,12 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=No
     return Query(p).search(collection=cc)
 
 
-def prs_wash_arguments(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS,
-                      sf="", so="d", sp="", rm="", of="id", ot="", aas=0,
-                      p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="",
-                      sc=0, jrec=0, recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="", d1="",
-                      d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=CFG_SITE_LANG,
-                      ec=None, tab="", uid=None, wl=0, em="", **dummy):
+def prs_wash_arguments(req=None, cc=cfg['CFG_SITE_NAME'], c=None, p="", f="", rg=cfg['CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS'],
+                       sf="", so="d", sp="", rm="", of="id", ot="", aas=0,
+                       p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="",
+                       sc=0, jrec=0, recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="", d1="",
+                       d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=cfg['CFG_SITE_LANG'],
+                       ec=None, tab="", uid=None, wl=0, em="", **dummy):
     """
     Sets the (default) values and checks others for the PRS call
     """
@@ -369,7 +373,6 @@ def prs_wash_arguments(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WE
     f3 = wash_field(f3)
     (d1y, d1m, d1d, d2y, d2m, d2d) = map(int, (d1y, d1m, d1d, d2y, d2m, d2d))
     datetext1, datetext2 = wash_dates(d1, d1y, d1m, d1d, d2, d2y, d2m, d2d)
-
 
     if id > 0 and recid == -1:
         recid = id
