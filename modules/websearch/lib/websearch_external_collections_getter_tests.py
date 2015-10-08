@@ -39,7 +39,7 @@ class AsyncDownloadTest(unittest.TestCase):
         ##   - test 1 bad IP: 1.2.3.4
         ## Return the list of errors.
         checks = [
-            {'url': 'http://invenio-software.org', 'content': 'About Invenio'},
+            {'url': 'http://invenio-software.org', 'content': 'Invenio'},
             {'url': 'http://rjfreijoiregjreoijgoirg.fr'},
             {'url': 'http://1.2.3.4/'} ]
 
