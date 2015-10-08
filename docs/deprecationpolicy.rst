@@ -20,6 +20,3 @@
 ==================
 Deprecation policy
 ==================
-
-.. automodule:: invenio.utils.deprecation
-   :members:

@@ -20,60 +20,16 @@
 notifications:
   email: false
 
-services:
-  - mysql
-  - redis
-  - elasticsearch
-
 sudo: false
 
 language: python
 
-cache:
-  - apt
-  - pip
-
-env:
-  - REQUIREMENTS=lowest REXTRAS=docs
-  - REQUIREMENTS=release REXTRAS=docs
-  - REQUIREMENTS=devel REXTRAS=docs
-
 python:
-# FIXME: the build times out on Python 2.6 (inveniosoftware/invenio#1789)
-#  - "2.6"
   - "2.7"
 
-addons:
-  apt:
-    packages:
-      - apache2
-      - git
-      - liblzma-dev
-      - nodejs
-      - poppler-utils
-
-before_install:
-  - "travis_retry pip install --upgrade pip"
-  - "travis_retry pip install mock"
-  - "python requirements.py --extras=$REXTRAS --level=min > .travis-lowest-requirements.txt"
-  - "python requirements.py --extras=$REXTRAS --level=pypi > .travis-release-requirements.txt"
-  - "python requirements.py --extras=$REXTRAS --level=dev > .travis-devel-requirements.txt"
-
 install:
-  - "travis_retry pip install unittest2"
-  - "travis_retry pip install -r .travis-$REQUIREMENTS-requirements.txt --allow-all-external"
-  - "travis_retry pip install -e .[$REXTRAS] --process-dependency-links"
-  - "npm update"
-  - "npm install --silent -g bower less clean-css uglify-js requirejs"
-  # All the step below this points are solely for test purposes, don't use them
-  # to setup your invenio installation. Please do RTFM instead (INSTALL.rst).
-  - "./scripts/setup_devmode.sh"
-
-before_script:
-  - "inveniomanage apache create-config"
-  - "inveniomanage database init --yes-i-know || echo ':('"
-  - "inveniomanage database create --quiet || echo ':('"
+  - travis_retry pip install sphinx
 
 script:
-  - "sphinx-build -qnNW docs docs/_build/html"
-  - "python setup.py test"
+  - sphinx-build -qnNW docs docs/_build/html
+  - python setup.py build_sphinx
