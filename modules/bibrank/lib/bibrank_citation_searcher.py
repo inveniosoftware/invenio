@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -159,6 +159,8 @@ def get_records_with_num_cites(numstr, allrecs=intbitset([]),
         num = int(singlenum[0])
         if num == 0:
             #we return recids that are not in keys
+            if not allrecs:
+                allrecs = intbitset(run_sql("SELECT id FROM bibrec"))
             return allrecs - citations_keys
         else:
             return intbitset([recid for recid, cit_count
@@ -172,7 +174,9 @@ def get_records_with_num_cites(numstr, allrecs=intbitset([]),
         sec = int(firstsec[0][1])
         if first == 0:
             # Start with those that have no cites..
-    	    matches = allrecs - citations_keys
+            if not allrecs:
+                allrecs = intbitset(run_sql("SELECT id FROM bibrec"))
+            matches = allrecs - citations_keys
         if first <= sec:
             matches += intbitset([recid for recid, cit_count
                              in cache_cited_by_dictionary_counts
