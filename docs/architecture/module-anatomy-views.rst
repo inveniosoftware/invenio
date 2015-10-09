@@ -15,10 +15,22 @@
     along with Invenio; if not, write to the Free Software Foundation, Inc.,
     59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-License
-=======
+Module views
+============
 
-Invenio is licensed under GNU GPLv2.
+If your module has several web interface entry points, such as an admin area and a user area.
+``views`` are defined inside their own folder::
 
-.. include:: ../COPYING
-   :literal:
+    invenio/modules/
+        mymodule/
+            views/
+                __init__.py
+                admin.py
+                user.py
+
+The ``__init__.py`` file then contains special code to include the views::
+
+    from .user import blueprint as user_blueprint
+    from .admin import blueprint as admin_blueprint
+
+    blueprints = [user_blueprint, admin_blueprint]

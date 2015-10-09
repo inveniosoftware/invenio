@@ -15,18 +15,11 @@
    along with Invenio; if not, write to the Free Software Foundation, Inc.,
    59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-.. _community:
+Blogs
+=====
 
-=========
-Community
-=========
+There are several Invenio developers blogging about (not only) Invenio related
+matters:
 
-.. toctree::
-   :maxdepth: 2
+- `<http://tiborsimko.org/>`_
 
-   code-of-conduct
-   mailinglists
-   chatrooms
-   forum
-   twitter
-   blogs

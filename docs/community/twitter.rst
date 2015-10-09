@@ -15,18 +15,15 @@
    along with Invenio; if not, write to the Free Software Foundation, Inc.,
    59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-.. _community:
+Twitter
+=======
 
-=========
-Community
-=========
+The official Twitter account for Invenio software is used mostly for announcing
+new releases and talks at conferences:
 
-.. toctree::
-   :maxdepth: 2
+- `<https://twitter.com/inveniosoftware>`_
 
-   code-of-conduct
-   mailinglists
-   chatrooms
-   forum
-   twitter
-   blogs
+There are several Invenio developers actively using Twitter and tweeting about
+(not only) Invenio related matters. You can follow the aggregation list:
+
+- `<https://twitter.com/inveniosoftware/lists/invenio-developers>`_

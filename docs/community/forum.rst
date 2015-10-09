@@ -15,18 +15,10 @@
    along with Invenio; if not, write to the Free Software Foundation, Inc.,
    59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-.. _community:
+Forum
+=====
 
-=========
-Community
-=========
-
-.. toctree::
-   :maxdepth: 2
-
-   code-of-conduct
-   mailinglists
-   chatrooms
-   forum
-   twitter
-   blogs
+Every Monday at 16:00 CEST we get together for an hour of live discussions. We
+call it the "Invenio Developer Forum". It is possible to join via
+videoconference. Please see dedicated `Invenio Developer Forum
+<https://indico.cern.ch/category/6046/>`_ website with instructions and agenda.

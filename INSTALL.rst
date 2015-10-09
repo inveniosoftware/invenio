@@ -1,14 +1,14 @@
 Invenio installation
 ====================
 
-1. About
---------
+About
+-----
 
 This document specifies how to quickly install Invenio v2.0.0 for the first
 time. See RELEASE-NOTES if you are upgrading from a previous Invenio release.
 
-2. Prerequisites
-----------------
+Prerequisites
+-------------
 
 Here is the software you need to have around before you start installing
 Invenio for development.
@@ -18,8 +18,8 @@ Invenio at CERN are GNU/Linux distributions Debian, Gentoo, Scientific Linux
 (RHEL-based), Ubuntu, but we also develop on Mac OS X.  Basically any Unix
 system supporting the software listed below should do.
 
-2.1. Debian / Ubuntu LTS
-~~~~~~~~~~~~~~~~~~~~~~~~
+Debian / Ubuntu LTS
+~~~~~~~~~~~~~~~~~~~
 
 If you are using Ubuntu 13.10 or later, then you can install Invenio by
 following this tutorial. **Note:** the recommended Python version is 2.7.5+
@@ -38,8 +38,8 @@ following this tutorial. **Note:** the recommended Python version is 2.7.5+
     $ sudo pip install -U virtualenvwrapper pip
     $ source .bashrc
 
-2.1.1. MySQL
-++++++++++++
+MySQL
++++++
 
 MySQL Server will ask you for a password, you will need it later and we will
 refer to it as ``$MYSQL_ROOT``.
@@ -48,8 +48,8 @@ refer to it as ``$MYSQL_ROOT``.
 
     $ sudo apt-get install mysql-server
 
-2.1.2. Io.js
-++++++++++++++
+Io.js
++++++
 
 `io.js <http://iojs.org/>`_ and `npm <https://www.npmjs.org/>`_ can be
 installed using io.js's script.
@@ -59,8 +59,8 @@ installed using io.js's script.
     $ curl -sL https://deb.nodesource.com/setup_iojs_2.x | sudo bash -
     $ sudo apt-get install iojs
 
-2.2. Centos / RHEL
-~~~~~~~~~~~~~~~~~~
+Centos / RHEL
+~~~~~~~~~~~~~
 
 If you are using Redhat, Centos or Scientific Linux this will setup everything
 you need. We are assuming that sudo has been installed and configured nicely.
@@ -79,8 +79,8 @@ you need. We are assuming that sudo has been installed and configured nicely.
     $ sudo pip install -U virtualenvwrapper pip
     $ source /usr/bin/virtualenvwrapper.sh
 
-2.2.1. MySQL
-++++++++++++
+MySQL
++++++
 
 Setting up MySQL Server requires you to give some credentials for the root
 user. You will need the root password later on and we will refer to it as
@@ -109,8 +109,8 @@ parameter to rpm.
     $ sudo mysql_secure_installation
     # follow the instructions
 
-2.2.2. Io.js / Node.js
-++++++++++++++++++++++
+Io.js / Node.js
++++++++++++++++
 
 Io.js or Node.js require a bit more manual work to install it from the sources.
 We are following the tutorial: `digital ocean: tutorial on how to install
@@ -136,8 +136,8 @@ node.js on centos
 .. _OS X:
 
 
-2.3. OS X
-~~~~~~~~~~
+OS X
+~~~~
 
 The steps below can be used to install Invenio on a machine running OS X 10.9 or later.
 
@@ -244,8 +244,8 @@ The commands for ``OS X`` are the same as in ``Linux``.
 
 .. _MySQL on OS X:
 
-2.3.1. MySQL
-++++++++++++
+MySQL
++++++
 
 We will install MySQL but without a root password.
 It should be easy to set the root password once you are connected in MySQL.
@@ -268,8 +268,8 @@ You can start, stop, or restart MySQL server by typing:
 
 .. _Node on OS X:
 
-2.3.2. Node.js
-++++++++++++++
+Node.js
++++++++
 
 Install ``node`` by typing:
 
@@ -278,11 +278,11 @@ Install ``node`` by typing:
     $ brew install node
 
 
-2.4. Extra tools
-~~~~~~~~~~~~~~~~
+Extra tools
+~~~~~~~~~~~
 
-2.4.1. Bower
-++++++++++++
+Bower
++++++
 
 Bower is used to manage the static assets such as JavaScript libraries (e.g.,
 jQuery) and CSS stylesheets (e.g., Bootstrap). It's much easier to install them
@@ -296,8 +296,8 @@ globally (``-g``) but you're free to choose your preferred way.
     $ npm install bower
 
 
-2.4.2 ``git-new-workdir`` (optional)
-++++++++++++++++++++++++++++++++++++
+``git-new-workdir`` (optional)
+++++++++++++++++++++++++++++++
 
 For the rest of the tutorial you may want to use ``git-new-workdir``. It's a
 tool that will let you working on the same repository from different locations.
@@ -317,18 +317,12 @@ Just like you would do with subversion branches.
     $ export PATH+=:$HOME/bin
 
 
-3. Quick instructions for the impatient Invenio developer
----------------------------------------------------------
+Installation
+------------
 
 This installation process is tailored for running the development version of
 Invenio, check out the :py:ref:`overlay` documentation for the production
 setup.
-
-
-.. _Installation:
-
-3.1. Installation
-~~~~~~~~~~~~~~~~~
 
 The first step of the installation is to download the development version of
 Invenio and the Invenio Demosite. This development is done in the ``master``
@@ -441,11 +435,8 @@ dependencies defined by each bundle.
 The last step, which is very important will be to collect all the assets, but
 it will be done after the configuration step.
 
-
-.. _Configuration:
-
-3.2. Configuration
-~~~~~~~~~~~~~~~~~~
+Configuration
+-------------
 
 Generate the secret key for your installation.
 
@@ -501,11 +492,8 @@ the original files. As a developer you may want to have symbolic links instead.
     vendors
     ...
 
-
-.. _Development:
-
-3.3. Development
-~~~~~~~~~~~~~~~~
+Development
+-----------
 
 Once you have everything installed, you can create the database and populate it
 with demo records.
@@ -576,8 +564,8 @@ register python argcomplete for inveniomanage.
 
     eval "$(register-python-argcomplete inveniomanage)"
 
-4. Final words
---------------
+Final words
+------------
 
 Happy hacking and thanks for flying Invenio.
 

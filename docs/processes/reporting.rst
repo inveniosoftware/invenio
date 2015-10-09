@@ -15,18 +15,12 @@
    along with Invenio; if not, write to the Free Software Foundation, Inc.,
    59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-.. _community:
-
 =========
-Community
+Reporting
 =========
 
-.. toctree::
-   :maxdepth: 2
+Bug reports and feature requests
+--------------------------------
 
-   code-of-conduct
-   mailinglists
-   chatrooms
-   forum
-   twitter
-   blogs
+If you find a bug or have a feature request, please search for already reported
+problems before submitting a new issue.

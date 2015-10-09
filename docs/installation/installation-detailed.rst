@@ -15,10 +15,8 @@
     along with Invenio; if not, write to the Free Software Foundation, Inc.,
     59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-License
-=======
+Detailed installation guide
+===========================
 
-Invenio is licensed under GNU GPLv2.
-
-.. include:: ../COPYING
-   :literal:
+.. include:: ../../INSTALL.rst
+   :start-after: ====================
