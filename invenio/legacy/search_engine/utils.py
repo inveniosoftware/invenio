@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013,
+#               2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -30,8 +31,9 @@ def record_exists(recID):
        Return 0 if it doesn't exist.
        Return -1 if it exists but is marked as deleted.
     """
-    from invenio.config import CFG_CERN_SITE
-    try: # if recid is '123foo', mysql will return id=123, and we don't want that
+    from invenio_base.globals import cfg
+    # if recid is '123foo', mysql will return id=123, and we don't want that
+    try:
         recID = int(recID)
     except (ValueError, TypeError):
         return 0
@@ -41,8 +43,8 @@ def record_exists(recID):
     if res:
         # record exists; now check whether it isn't marked as deleted:
         dbcollids = get_fieldvalues(recID, "980__%")
-        if ("DELETED" in dbcollids) or (CFG_CERN_SITE and "DUMMY" in dbcollids):
-            out = -1 # exists, but marked as deleted
+        if ("DELETED" in dbcollids) or (cfg['CFG_CERN_SITE'] and "DUMMY" in dbcollids):
+            out = -1  # exists, but marked as deleted
         else:
-            out = 1 # exists fine
+            out = 1  # exists fine
     return out

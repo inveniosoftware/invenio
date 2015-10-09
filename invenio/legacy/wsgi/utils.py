@@ -51,7 +51,7 @@ import cgi
 import cStringIO
 import tempfile
 from types import TypeType, ClassType, BuiltinFunctionType, MethodType, ListType
-from invenio.config import CFG_TMPDIR, CFG_TMPSHAREDDIR
+from invenio_base.globals import cfg
 from invenio_utils.apache import \
     SERVER_RETURN, \
     HTTP_LENGTH_REQUIRED, \
@@ -568,9 +568,9 @@ class FieldStorage:
                     file = file_callback(disp_options["filename"])
                 else:
                     if to_tmp_shared:
-                        file = tempfile.NamedTemporaryFile(dir=CFG_TMPSHAREDDIR)
+                        file = tempfile.NamedTemporaryFile(dir=cfg['CFG_TMPSHAREDDIR'])
                     else:
-                        file = tempfile.NamedTemporaryFile(dir=CFG_TMPDIR)
+                        file = tempfile.NamedTemporaryFile(dir=cfg['CFG_TMPDIR'])
             else:
                 if field_callback and callable(field_callback):
                     file = field_callback()

@@ -80,7 +80,7 @@ except ImportError:
 #         return f
 
 
-CFG_TESTUTILS_VERBOSE = 1
+cfg['CFG_TESTUTILS_VERBOSE'] = 1
 
 nottest = unittest.skip('nottest')
 
@@ -212,10 +212,10 @@ class InvenioTestCase(TestCase):
 
     def login(self, username, password):
         """Log in as username and password."""
-        from invenio.config import CFG_SITE_SECURE_URL
+        from invenio_base.globals import cfg
         # from invenio_utils.url import rewrite_to_secure_url
         return self.client.post(url_for('webaccount.login'),
-                                base_url=CFG_SITE_SECURE_URL,
+                                base_url=cfg['CFG_SITE_SECURE_URL'],
                                 # rewrite_to_secure_url(request.base_url),
                                 data=dict(nickname=username,
                                           password=password),
@@ -223,9 +223,9 @@ class InvenioTestCase(TestCase):
 
     def logout(self):
         """Log out."""
-        from invenio.config import CFG_SITE_SECURE_URL
+        from invenio_base.globals import cfg
         return self.client.get(url_for('webaccount.logout'),
-                               base_url=CFG_SITE_SECURE_URL,
+                               base_url=cfg['CFG_SITE_SECURE_URL'],
                                follow_redirects=True)
 
     def shortDescription(self):
@@ -292,11 +292,11 @@ class FlaskSQLAlchemyTest(InvenioTestCase):
 def make_flask_test_suite(*test_cases):
     """Build up a Flask test suite given separate test cases."""
     from operator import add
-    from invenio.config import CFG_DEVEL_TEST_DATABASE_ENGINES as engines
+    from invenio_base.globals import cfg
 
     def create_type(c):
         return [type(k + c.__name__, (c,), d)
-                for k, d in iteritems(engines)]
+                for k, d in iteritems(cfg['CFG_DEVEL_TEST_DATABASE_ENGINES'])]
 
     return unittest.TestSuite([unittest.makeSuite(case, 'test')
                                for case in reduce(add, map(create_type,
@@ -317,9 +317,9 @@ def run_test_suite(testsuite, warn_user=False):
 
 def make_url(path, **kargs):
     """Helper to generate an absolute invenio URL with query arguments."""
-    from invenio.config import CFG_SITE_URL
+    from invenio_base.globals import cfg
 
-    url = CFG_SITE_URL + path
+    url = cfg['CFG_SITE_URL'] + path
 
     if kargs:
         url += '?' + urlencode(kargs, doseq=True)
@@ -329,8 +329,8 @@ def make_url(path, **kargs):
 
 def make_surl(path, **kargs):
     """Generate an absolute invenio Secure URL with query arguments."""
-    from invenio.config import CFG_SITE_SECURE_URL
-    url = CFG_SITE_SECURE_URL + path
+    from invenio_base.globals import cfg
+    url = cfg['CFG_SITE_SECURE_URL'] + path
 
     if kargs:
         url += '?' + urlencode(kargs, doseq=True)
@@ -431,8 +431,8 @@ def get_authenticated_mechanize_browser(username="guest", password=""):
     browser.set_handle_robots(False)  # ignore robots.txt, since we test gently
     if username == "guest":
         return browser
-    from invenio.config import CFG_SITE_SECURE_URL
-    browser.open(CFG_SITE_SECURE_URL + "/youraccount/login")
+    from invenio_base.globals import cfg
+    browser.open(cfg['CFG_SITE_SECURE_URL'] + "/youraccount/login")
     browser.select_form(nr=0)
     browser['nickname'] = username
     browser['password'] = password
@@ -576,9 +576,9 @@ def test_web_page_content(url,
                              'validate:\n %s' % \
                              (url, username, w3c_errors_to_str(
                               errors, warnings))
-                from invenio.config import CFG_LOGDIR
+                from invenio_base.globals import cfg
                 open('%s/w3c-markup-validator.log' %
-                     CFG_LOGDIR, 'a').write(error_text)
+                     cfg['CFG_LOGDIR'], 'a').write(error_text)
                 raise InvenioTestUtilsBrowserException(error_text)
 
     except InvenioTestUtilsBrowserException as msg:
@@ -588,8 +588,8 @@ def test_web_page_content(url,
 
     try:
         # logout after tests:
-        from invenio.config import CFG_SITE_SECURE_URL
-        browser.open(CFG_SITE_SECURE_URL + "/youraccount/logout")
+        from invenio_base.globals import cfg
+        browser.open(cfg['CFG_SITE_SECURE_URL'] + "/youraccount/logout")
         browser.response().read()
         browser.close()
     except UnboundLocalError:
@@ -598,7 +598,7 @@ def test_web_page_content(url,
         # Raises 401 if you were not logged in before.
         pass
 
-    if CFG_TESTUTILS_VERBOSE >= 9:
+    if cfg['CFG_TESTUTILS_VERBOSE'] >= 9:
         print("%s test_web_page_content(), tested page `%s', login `%s', "
               "expected text `%s', errors `%s'." %
               (time.strftime("%Y-%m-%d %H:%M:%S -->", time.localtime()),
@@ -628,10 +628,10 @@ def build_and_run_unit_test_suite():
     a complete test suite of them, and run it.
     Called by 'inveniocfg --run-unit-tests'.
     """
-    from invenio.config import CFG_PYLIBDIR
+    from invenio_base.globals import cfg
     from invenio.pluginutils import PluginContainer
     test_modules_map = PluginContainer(
-        os.path.join(CFG_PYLIBDIR, 'invenio', '*_unit_tests.py'),
+        os.path.join(cfg['CFG_PYLIBDIR'], 'invenio', '*_unit_tests.py'),
         lambda plugin_name, plugin_code: getattr(plugin_code, "TEST_SUITE"))
     test_modules = [test_modules_map[name] for name in test_modules_map]
 
@@ -656,10 +656,10 @@ def build_and_run_regression_test_suite():
     '*_regression_tests.py', build a complete test suite of them, and
     run it.  Called by 'inveniocfg --run-regression-tests'.
     """
-    from invenio.config import CFG_PYLIBDIR
+    from invenio_base.globals import cfg
     from invenio.pluginutils import PluginContainer
     test_modules_map = PluginContainer(
-        os.path.join(CFG_PYLIBDIR, 'invenio', '*_regression_tests.py'),
+        os.path.join(cfg['CFG_PYLIBDIR'], 'invenio', '*_regression_tests.py'),
         lambda plugin_name, plugin_code: getattr(plugin_code, "TEST_SUITE"))
     test_modules = test_modules_map.values()
 
@@ -687,10 +687,10 @@ def build_and_run_web_test_suite():
     '*_web_tests.py', build a complete test suite of them, and
     run it.  Called by 'inveniocfg --run-web-tests'.
     """
-    from invenio.config import CFG_PYLIBDIR
+    from invenio_base.globals import cfg
     from invenio.pluginutils import PluginContainer
     test_modules_map = PluginContainer(
-        os.path.join(CFG_PYLIBDIR, 'invenio', '*_web_tests.py'),
+        os.path.join(cfg['CFG_PYLIBDIR'], 'invenio', '*_web_tests.py'),
         lambda plugin_name, plugin_code: getattr(plugin_code, "TEST_SUITE"))
     test_modules = test_modules_map.values()
 
@@ -940,8 +940,8 @@ class InvenioWebTestCase(InvenioTestCase):
         self.fill_textbox(textbox_name="password", text=password)
         self.find_element_by_name_with_timeout("action")
         self.browser.find_element_by_name("action").click()
-        from invenio.config import CFG_SITE_NAME_INTL
-        if force_ln and (CFG_SITE_NAME_INTL[force_ln]
+        from invenio_base.globals import cfg
+        if force_ln and (cfg['CFG_SITE_NAME_INTL'][force_ln]
                          not in self.browser.page_source):
             splitted_url = list(urlsplit(self.browser.current_url))
             query = cgi.parse_qs(splitted_url[3])
