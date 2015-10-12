@@ -44,9 +44,10 @@ CFG_TMPDIR = u'/tmp'
 COLLECT_STORAGE = u'flask_collect.storage.link'
 EOF
 
+echo "inveniomanage bower/collect/assets"
 # fetch and build assets
 inveniomanage bower -i bower-base.json > bower.json
-bower install --silent
+bower install --quiet
 inveniomanage collect > /dev/null
 inveniomanage assets build
 

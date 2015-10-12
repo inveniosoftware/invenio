@@ -30,6 +30,8 @@ web:
     - "CFG_REDIS_HOSTS={'default': [{'db': 0, 'host': 'cache', 'port': 6379}]}"
     - ES_HOSTS=['es']
     - INVENIO_APP_CONFIG_ENVS=BROKER_URL,CELERY_RESULT_BACKEND,CACHE_REDIS_HOST,CFG_DATABASE_HOST,CFG_REDIS_HOSTS,ES_HOSTS
+  volumes:
+    - /opt/invenio_static
   read_only: true
   links:
     - elasticsearch:es

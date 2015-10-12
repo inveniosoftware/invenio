@@ -34,11 +34,9 @@ web:
     - ES_HOSTS=['es']
     - INVENIO_APP_CONFIG_ENVS=ASSETS_DEBUG,BROKER_URL,CELERY_RESULT_BACKEND,CACHE_REDIS_HOST,CFG_DATABASE_HOST,CFG_REDIS_HOSTS,DEBUG,DEBUG_TB_INTERCEPT_REDIRECTS,ES_HOSTS
   volumes:
-    - ./invenio:/code/invenio:ro
-    - ./docs:/code/docs:rw
-    - ./scripts:/code/scripts:ro
-    - /code/invenio
-  read_only: true
+    - ./invenio:/src/invenio/invenio:ro
+    - ./docs:/src/invenio/docs:rw
+    - ./scripts:/src/invenio/scripts:ro
   links:
     - elasticsearch:es
     - mysql:db
@@ -60,7 +58,6 @@ worker:
     - INVENIO_APP_CONFIG_ENVS=ASSETS_DEBUG,BROKER_URL,CELERY_RESULT_BACKEND,CACHE_REDIS_HOST,CFG_DATABASE_HOST,CFG_REDIS_HOSTS,DEBUG,DEBUG_TB_INTERCEPT_REDIRECTS,ES_HOSTS
   volumes_from:
     - web
-  read_only: true
   links:
     - elasticsearch:es
     - mysql:db
