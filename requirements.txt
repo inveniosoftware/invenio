@@ -29,3 +29,5 @@ redis==2.9.0
 nydus==0.10.6
 Cerberus==0.5
 matplotlib
+PyZ3950==2.04
+ply

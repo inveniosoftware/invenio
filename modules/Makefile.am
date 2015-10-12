@@ -35,6 +35,7 @@ SUBDIRS = bibauthorid \
           bibrank \
           bibrecord \
           bibsched \
+          bibz39 \
           bibsort \
           bibsword \
           bibupload \
