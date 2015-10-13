@@ -2442,7 +2442,7 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
         hitset = search_unit_by_times_cited(p[6:])
     elif p.startswith("citedexcludingselfcites:"):
         # we are doing search by the citation count
-        hitset = search_unit_by_times_cited(p[6:], exclude_selfcites=True)
+        hitset = search_unit_by_times_cited(p[24:], exclude_selfcites=True)
     else:
         # we are doing bibwords search by default
         hitset = search_unit_in_bibwords(p, f, wl=wl)
@@ -2918,15 +2918,7 @@ def search_unit_by_times_cited(p, exclude_selfcites=False):
     Usually P looks like '10->23'.
     """
     numstr = '"'+p+'"'
-    #this is sort of stupid but since we may need to
-    #get the records that do _not_ have cites, we have to
-    #know the ids of all records, too
-    #but this is needed only if bsu_p is 0 or 0 or 0->0
-    allrecs = []
-    if p == 0 or p == "0" or \
-       p.startswith("0->") or p.endswith("->0"):
-        allrecs = intbitset(run_sql("SELECT id FROM bibrec"))
-    return get_records_with_num_cites(numstr, allrecs,
+    return get_records_with_num_cites(numstr,
                                       exclude_selfcites=exclude_selfcites)
 
 def search_unit_refersto(query):
