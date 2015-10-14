@@ -50,6 +50,8 @@ RUN apt-get update && \
         git \
         iojs \
         libffi-dev \
+        libfreetype6-dev \
+        libjpeg-dev \
         liblzma-dev \
         libmysqlclient-dev \
         libssl-dev \
