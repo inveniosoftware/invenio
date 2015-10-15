@@ -1226,6 +1226,16 @@ def emails_from_hepnames(record):
     return record_get_field_values(record, '371', '', '', 'm')
 
 
+def wikipedia_from_hepnames(record):
+    """Extract wikipedia url to be displayed in author profile personal box."""
+    field_instances = record_get_field_instances(record, tag="035")
+    for field in field_instances:
+        values = dict(field[0])
+        if values.get('9', '').lower() == "wikipedia" and values.get('a'):
+            wikipedia_id = escape(values.get('a'), True)
+            return '<a href="https://wikipedia.org/wiki/' + wikipedia_id + '">'+ wikipedia_id +'</a>'
+
+
 def map_subfields(sub_fields, mapping):
     output = {}
     for code, value in sub_fields:
@@ -1398,6 +1408,7 @@ def hepnames_context(record):
         'display_name': display_name_from_hepnames(record),
         'native_name': native_name_from_hepnames(record),
         'urls': record_get_field_values(record, '856', '4', '', 'u'),
+        'wikipedia_url': wikipedia_from_hepnames(record),
         'fields': record_get_field_values(record, '650', '1', '7', 'a'),
         'experiments': record_get_field_values(record, '693', '', '', 'e'),
         'identifiers': context_for_identifiers(identifiers),
