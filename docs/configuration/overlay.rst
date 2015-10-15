@@ -250,17 +250,16 @@ configured using two files:
 - `.bowerrc`: tells where the assets are downloaded
 - `bower.json`: lists the dependencies to be downloaded
 
-.. code-block:: json
-
-    {
-        "directory": "myoverlay/base/static/vendors"
-    }
-
-The ``bower.json`` can be automagically generated.
+The ``bower.json`` can be automagically generated through the `inveniomanage`
+command. However, we will have to tell `bower` the path we want the libraries
+downloaded to. In most cases, it will be in the instance directory under the
+`static/vendors` path.
 
 .. code-block:: console
 
     $ sudo su -c "npm install -g bower less clean-css requirejs uglify-js"
+    (myoverlay)$ cdvirtualenv var/invenio.base-instance
+    (myoverlay)$ echo '{"directory": "static/vendors"}' > .bowerrc
     (myoverlay)$ inveniomanage bower > bower.json
     (myoverlay)$ bower install
 
