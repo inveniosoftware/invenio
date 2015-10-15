@@ -53,7 +53,7 @@ The global setup
 ----------------
 
 Some softwares and libraries are required to work on your overlay. It's mostly
-Python, MySQL, Redis as well as XML, XSLT and graphical libraries. Io.js is
+Python, MySQL, Redis as well as XML, XSLT and graphical libraries. Node.js is
 solely required for development purposes.
 
 .. code-block:: console
@@ -73,9 +73,9 @@ solely required for development purposes.
     # Install MySQL server, and keep the root password somewhere safe.
     $ sudo apt-get install mysql-server
 
-    # Install io.js
-    $ curl -sL https://deb.nodesource.com/setup_iojs_2.x | sudo bash -
-    $ sudo apt-get install iojs
+    # Install node.js
+    $ curl -sL https://deb.nodesource.com/setup_4.x | sudo bash -
+    $ sudo apt-get install nodejs
 
 The virtual environment
 -----------------------
@@ -457,7 +457,7 @@ Before deploying anything, we need to locally prepare the python package to be
 installed. Thanks to our ``setup.py`` file, it's very simple.
 
 Beforehand, we have to generate the static assets into our static folder. By
-doing so, it's not required to install anything related to io.js on your
+doing so, it's not required to install anything related to node.js on your
 server (no ``bower``, ``less``, ``uglifyjs``, etc.).
 
 .. code-block:: python

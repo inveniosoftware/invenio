@@ -31,24 +31,25 @@ RUN useradd --home-dir /home/invenio --create-home --shell /bin/bash --uid 1000 
 # set work dir
 WORKDIR /code
 
-# iojs, detects distribution and adds the right repo
+# nodejs, detects distribution and adds the right repo
 RUN apt-get update && \
     apt-get -qy install --fix-missing --no-install-recommends \
         curl \
         && \
-    curl -sL https://deb.nodesource.com/setup_iojs_2.x | bash -
+    curl -sL https://deb.nodesource.com/setup_4.x | bash -
 
 #  - package cache updates
 #  - install requirements from repos
 #  - clean up
 #  - install python requirements
-#  - install iojs requirements
+#  - install nodejs requirements
 RUN apt-get update && \
     apt-get -qy upgrade --fix-missing --no-install-recommends && \
     apt-get -qy install --fix-missing --no-install-recommends \
+        cython \
         gcc \
         git \
-        iojs \
+        nodejs \
         libffi-dev \
         libfreetype6-dev \
         libjpeg-dev \
