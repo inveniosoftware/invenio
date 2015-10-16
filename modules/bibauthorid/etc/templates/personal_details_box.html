@@ -115,6 +115,14 @@
 			</td>
 			</tr>
 		{% endif %}
+    {% if record.wikipedia_url -%}
+    <tr>
+      <th>Wikipedia</th>
+      <td>
+      {{ record.wikipedia_url }}
+      </td>
+    </tr>
+    {% endif %}
 		{{ multi_value_row("Links", record.urls, url=True) if record.urls }}
 		{{ multi_value_row("Fields", record.fields) if record.fields }}
 		{{ multi_value_row("Experiments", record.experiments) if record.experiments }}
