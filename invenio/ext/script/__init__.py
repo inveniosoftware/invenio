@@ -43,7 +43,7 @@ They are assigned by the following parameters, in decreasing priority:
 from __future__ import print_function
 
 import functools
-
+import mimetypes
 import re
 
 from types import FunctionType
@@ -190,6 +190,14 @@ def set_serve_static_files(sender, *args, **kwargs):
     current_app.config.setdefault('CFG_FLASK_SERVE_STATIC_FILES', True)
 
 pre_command.connect(set_serve_static_files, sender=Server)
+
+
+def set_extra_mimetypes(sender, *args, **kwargs):
+    """Add extra mimetypes to the static file server."""
+    if current_app.config.get('CFG_FLASK_SERVE_STATIC_FILES', False):
+        mimetypes.add_type('text/html', '.mustache', True)
+
+pre_command.connect(set_extra_mimetypes, sender=Server)
 
 
 def register_manager(manager):
