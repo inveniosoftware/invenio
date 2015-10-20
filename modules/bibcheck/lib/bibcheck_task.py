@@ -142,10 +142,10 @@ class Tickets(object):
             in ("per-rule", "per-rule-per-record") else "")
 
     @staticmethod
-    def _get_url(record):
+    def _get_url(record_id):
         """Resolve the URL required to edit a record."""
         return "%s/%s/%s/edit" % (CFG_SITE_URL, CFG_SITE_RECORD,
-                                  record.record_id)
+                                  record_id)
 
     def tickets_per_rule(self):
         """Generate with the `per-rule` policy."""
@@ -168,18 +168,18 @@ class Tickets(object):
         output = collections.defaultdict(list)
         for record in self.records:
             for issue in record.issues:
-                output[record].append((issue.nature, issue.msg))
-        for record in output.iterkeys():
+                output[record.record_id].append((issue.nature, issue.msg))
+        for record_id in output.iterkeys():
             msg = []
-            for issue in output[record]:
+            for issue in output[record_id]:
                 issue_nature, issue_msg = issue
                 msg.append("{issue_type}: {rule_messages}".
-                           format(record_id=record.record_id,
+                           format(record_id=record_id,
                                   issue_type=issue_nature,
                                   rule_messages=issue_msg))
-            msg.append("Edit record: {url}".format(url=self._get_url(record)))
-            msg_subject = self._generate_subject(None, record.record_id, None)
-            yield (msg_subject, "\n".join(msg), record.record_id)
+            msg.append("Edit record: {url}".format(url=self._get_url(record_id)))
+            msg_subject = self._generate_subject(None, record_id, None)
+            yield (msg_subject, "\n".join(msg), record_id)
 
     def tickets_per_rule_per_record(self):
         """Generate with the `per-rule-per-record` policy."""
@@ -333,16 +333,16 @@ class AmendableRecord(dict):
         :param complement: Change fields not matching pattern (False)
         :param subfield_filter: Apply only to fields with additional (code, filter_value)
         :param count: Maximum number of replacements to make (0 = unlimited)
-        
+
         Examples:
-        update_subfields(fields=['035__a', ], pattern='^[A-Za-z]+:[12][0-9]{3}[a-z]{2,3}$', 
+        update_subfields(fields=['035__a', ], pattern='^[A-Za-z]+:[12][0-9]{3}[a-z]{2,3}$',
                     new_code='z', complement=True, subfield_filter=('9', 'INSPIRETeX'))
-            moves texkeys with wrong syntax to $$z                  
+            moves texkeys with wrong syntax to $$z
             035__ $$9INSPIRETeX$$a:2015fwa
             ->
             035__ $$9INSPIRETeX$$z:2015fwa
-            
-        update_subfields(fields=['100__i','700__i'], pattern='[jJ][aA][cC][oO][wW]\D*', 
+
+        update_subfields(fields=['100__i','700__i'], pattern='[jJ][aA][cC][oO][wW]\D*',
                          replace='JACoW-', new_code='j')
             moves corrected JACoW-IDs from $$i to $$j
             700__ $$iJACoW-00012345
