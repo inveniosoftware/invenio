@@ -3101,6 +3101,8 @@ def get_records_that_can_be_displayed(user_info,
     """
     Return records that can be displayed.
     """
+    if hitset_in_any_collection is None:
+        hitset_in_any_collection = intbitset()
     records_that_can_be_displayed = intbitset()
 
     if colls is None:
