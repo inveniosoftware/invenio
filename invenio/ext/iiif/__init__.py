@@ -66,7 +66,10 @@ def setup_app(app):
         uuid_to_source_handler
     )
     iiif.uuid_to_image_opener_handler(uuid_to_source)
-    app.config['IIIF_CACHE_HANDLER'] = 'invenio.ext.cache:cache'
+    app.config.setdefault(
+        'IIIF_CACHE_HANDLER',
+        'invenio.ext.cache:cache'
+    )
 
     # protect the api
     iiif.api_decorator_handler(api_file_permission_check)
