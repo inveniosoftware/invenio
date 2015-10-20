@@ -442,7 +442,11 @@ def is_new_article(journal_name, issue, recid):
 
 ############################ CATEGORIES RELATED ######################
 
-def get_journal_categories(journal_name, issue=None):
+def get_journal_categories(
+        journal_name,
+        issue=None,
+        include_categories_with_no_articles=False
+):
     """
     List the categories for the given journal and issue.
     Returns categories in same order as in config file.
@@ -451,17 +455,21 @@ def get_journal_categories(journal_name, issue=None):
 
       journal_name  - *str* the name of the journal (as used in URLs)
 
-              issue - *str* the issue. Eg:'08/2007'. If None, consider
-                      all categories defined in journal config
+      issue - *str* the issue. Eg:'08/2007'. If None, consider
+        all categories defined in journal config
+
+      include_categories_with_no_articles - *boolean* whether the result
+        should include categories that have no articles for the given issue.
     """
     categories = []
 
     current_issue = get_current_issue(CFG_SITE_LANG, journal_name)
     config_strings = get_xml_from_config(["record/rule"], journal_name)
-    all_categories = [rule.split(',')[0] for rule in \
-                      config_strings["record/rule"]]
+    all_categories = [
+        rule.split(',')[0] for rule in config_strings["record/rule"]
+    ]
 
-    if issue is None:
+    if (issue is None) or include_categories_with_no_articles:
         return all_categories
 
     for category in all_categories:
@@ -472,6 +480,7 @@ def get_journal_categories(journal_name, issue=None):
             categories.append(category)
 
     return categories
+
 
 def get_category_query(journal_name, category):
     """
