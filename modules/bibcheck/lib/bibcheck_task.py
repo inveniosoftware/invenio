@@ -191,7 +191,7 @@ class Tickets(object):
             msg = []
             for issue_nature, issue_msg in output[(issue_rule, record)]:
                 msg.append("{issue_message}".format(issue_message=issue_msg))
-            msg.append("Edit record ({record_id}): {url}".format(url=self._get_url(record),
+            msg.append("Edit record ({record_id}): {url}".format(url=self._get_url(record.record_id),
                                                                  record_id=record.record_id))
             msg_subject = self._generate_subject(issue_nature, record.record_id,
                                                  issue_rule)
