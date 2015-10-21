@@ -159,7 +159,7 @@ class Tickets(object):
                 msg.append("{issue_nature}: {issue_msg}".format(
                     issue_nature=issue_nature, issue_msg=issue_msg))
                 msg.append("Edit record ({record_id}) {url}\n".format(
-                    record_id=record.record_id, url=self._get_url(record)))
+                    record_id=record.record_id, url=self._get_url(record.record_id)))
             msg_subject = self._generate_subject(None, None, rule_name)
             yield (msg_subject, "\n".join(msg), None)
 
