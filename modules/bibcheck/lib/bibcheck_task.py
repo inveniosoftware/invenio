@@ -875,8 +875,8 @@ def get_recids_for_rules(rules):
     override_record_ids = task_get_option("record_ids")
     recids = {}
     for rule_name, rule in rules.iteritems():
-        if "filter_pattern" in rule:
-            query = rule["filter_pattern"]
+        if "filter_pattern" in rule or "filter_collection" in rule:
+            query = rule.get("filter_pattern", '')
             if "filter_collection" in rule:
                 collections = rule["filter_collection"].split()
             else:
