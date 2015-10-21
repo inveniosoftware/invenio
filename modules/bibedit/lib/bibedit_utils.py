@@ -794,7 +794,7 @@ def get_record_collections(recid=0, recstruct=None):
     """
     if not recstruct:
         recstruct = get_record(recid)
-    return [collection for collection in record_get_field_values(recstruct,
+    return [collection.lower() for collection in record_get_field_values(recstruct,
                                                             tag="980",
                                                             ind1=" ",
                                                             ind2=" ",
@@ -810,7 +810,7 @@ def extend_record_with_template(recid=0, recstruct=None):
     rec_collections = get_record_collections(recid, recstruct)
 
     for collection in CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE:
-        if collection[0] in rec_collections:
+        if collection[0].lower() in rec_collections:
             return collection[1]
 
     return False
