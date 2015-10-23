@@ -270,15 +270,15 @@ class WebProfilePage():
 
     @staticmethod
     def render_citations_summary_content(citations, canonical_name):
-        
+
         def _get_breakdown_categories_bounds(pid):
             """
             An example of a category string would be 'Famous papers (250-499')
             This returns (250, 499) which are the lower and upper bound.
             """
-            
+
             bounds_str = category.split(')')[0].split('(')[1]
-            
+
             try:
                 return (int(bounds_str), 0)
             except ValueError:
@@ -552,9 +552,9 @@ class Template:
         #            % (profile, profile))
         h("</table>")
         h('<div id="mergeListButtonWrapper">')
-        h('<form action="%s/author/claim/action" method="get"><input type="hidden" name="cancel_merging" value="True" /> <input type="hidden" name="primary_profile" value="%s" />  <input type="submit" id="cancelMergeButton" class="aid_btn_red" value="%s" /></form>' %
+        h('<form action="%s/author/claim/action" method="post"><input type="hidden" name="cancel_merging" value="True" /> <input type="hidden" name="primary_profile" value="%s" />  <input type="submit" id="cancelMergeButton" class="aid_btn_red" value="%s" /></form>' %
          (CFG_SITE_URL, primary_cname, self._('Cancel merging')))
-        h('<form action="%s/author/claim/action" method="get"><input type="hidden" name="merge" value="True" /><input type="submit" id="mergeButton" class="aid_btn_green" value="%s" /></form>' %
+        h('<form action="%s/author/claim/action" method="post"><input type="hidden" name="merge" value="True" /><input type="submit" id="mergeButton" class="aid_btn_green" value="%s" /></form>' %
          (CFG_SITE_URL, self._('Merge profiles')))
         h(' </div>')
         h(' </div>')
@@ -1179,7 +1179,7 @@ class Template:
             h('<div> <strong> Person id </strong> <br> %s <br>' % person_id)
             h('<strong> <br> Canonical name setup </strong>')
             h('<div style="margin-top: 15px;"> Current canonical name: %s' % full_canonical_name)
-            h('<form method="GET" action="%s/author/claim/action" rel="nofollow">' % CFG_SITE_URL)
+            h('<form method="post" action="%s/author/claim/action" rel="nofollow">' % CFG_SITE_URL)
             h('<input type="hidden" name="set_canonical_name" value="True" />')
             h('<input name="canonical_name" id="canonical_name" type="text" style="border:1px solid #333; width:500px;" value="%s" /> ' %
               canonical_name)
@@ -2264,13 +2264,13 @@ You can also assign publications to other authors. This will help %s provide mor
             add_missing_text = _('suggest missing ids')
             add_missing_parameter = 'suggest_missing_external_ids'
 
-        html_ext_ids += '<form method="GET" action="%s/author/claim/action" rel="nofollow">' % (CFG_SITE_URL)
+        html_ext_ids += '<form method="post" action="%s/author/claim/action" rel="nofollow">' % (CFG_SITE_URL)
         html_ext_ids += '<input type="hidden" name="%s" value="True">' % (add_missing_parameter,)
         html_ext_ids += '<input type="hidden" name="pid" value="%s">' % ext_ids_data['person_id']
         html_ext_ids += '<br> <input type="submit" class="btn btn-default" value="%s"> </form>' % (add_missing_text,)
 
         if 'ext_ids' in ext_ids_data and ext_ids_data['ext_ids']:
-            html_ext_ids += '<form method="GET" action="%s/author/claim/action" rel="nofollow">' % (CFG_SITE_URL)
+            html_ext_ids += '<form method="post" action="%s/author/claim/action" rel="nofollow">' % (CFG_SITE_URL)
             html_ext_ids += '   <input type="hidden" name="%s" value="True">' % (remove_parameter,)
             html_ext_ids += '   <input type="hidden" name="pid" value="%s">' % ext_ids_data['person_id']
             for key in ext_ids_data['ext_ids']:
@@ -2288,7 +2288,7 @@ You can also assign publications to other authors. This will help %s provide mor
             html_ext_ids += 'UserID: There are no external users associated to this profile!'
 
         html_ext_ids += '<br> <br>'
-        html_ext_ids += '<form method="GET" action="%s/author/claim/action" rel="nofollow">' % (CFG_SITE_URL)
+        html_ext_ids += '<form method="post" action="%s/author/claim/action" rel="nofollow">' % (CFG_SITE_URL)
         html_ext_ids += '   <input type="hidden" name="%s" value="True">' % (add_parameter,)
         html_ext_ids += '   <input type="hidden" name="pid" value="%s">' % ext_ids_data['person_id']
         html_ext_ids += '   <select name="ext_system">'
@@ -2306,7 +2306,7 @@ You can also assign publications to other authors. This will help %s provide mor
         html_ext_ids += "Current user id: %s <br>" % repr(int_ids_data['uid'])
         html_ext_ids += "Previous user ids: %s <br> " % repr(int_ids_data['old_uids'])
         html_ext_ids += '<br>'
-        html_ext_ids += '<form method="GET" action="%s/author/claim/action" rel="nofollow">' % (CFG_SITE_URL)
+        html_ext_ids += '<form method="post" action="%s/author/claim/action" rel="nofollow">' % (CFG_SITE_URL)
         html_ext_ids += '   <input type="text" name="uid" id="uid" style="border:1px solid #333; width:350px;">'
         html_ext_ids += '   <input type="hidden" name="%s" value="True">' % ('set_uid',)
         html_ext_ids += '   <input type="hidden" name="pid" value="%s">' % ext_ids_data['person_id']
