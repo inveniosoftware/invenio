@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,45 +19,31 @@
 
 '''Utils for fetching data for ORCID library.'''
 
+import re
+
 import orcid
 import requests
-import re
-import sys
-
-from requests.exceptions import HTTPError
-from requests.exceptions import RequestException
-
 from invenio import bibtask
-
 from invenio.access_control_config import CFG_OAUTH2_CONFIGURATIONS
 from invenio.bibauthorid_backinterface import get_orcid_id_of_author
 # TO DO: change name of the function
-from invenio.bibauthorid_dbinterface import delete_token
-from invenio.bibauthorid_dbinterface import get_all_tokens
-from invenio.bibauthorid_dbinterface import get_doi_for_paper
-from invenio.bibauthorid_dbinterface import get_name_by_bibref
-from invenio.bibauthorid_dbinterface import get_orcid_id_of_author
-from invenio.bibauthorid_dbinterface import get_papers_of_author
-from invenio.bibauthorid_dbinterface import \
-    get_personid_signature_association_for_paper
-from invenio.bibauthorid_dbinterface import get_signatures_of_paper
-from invenio.bibauthorid_dbinterface import get_token
-from invenio.bibauthorid_dbinterface import trigger_aidtoken_change
+from invenio.bibauthorid_dbinterface import (delete_token, get_all_tokens,
+                                             get_doi_for_paper,
+                                             get_papers_of_author,
+                                             get_signatures_of_paper,
+                                             trigger_aidtoken_change)
 from invenio.bibauthorid_general_utils import get_doi
 from invenio.bibformat import format_record as bibformat_record
-from invenio.bibrecord import record_get_field_instances
-from invenio.bibrecord import record_get_field_value
-from invenio.bibrecord import record_get_field_values
-from invenio.config import CFG_SITE_URL
-from invenio.config import CFG_ORCIDUTILS_BLACKLIST_FILE
+from invenio.bibrecord import (record_get_field_instances,
+                               record_get_field_value, record_get_field_values)
+from invenio.config import CFG_ORCIDUTILS_BLACKLIST_FILE, CFG_SITE_URL
 from invenio.dateutils import convert_simple_date_to_array
-from invenio.errorlib import get_pretty_traceback
 from invenio.errorlib import register_exception
 from invenio.orcid_xml_exporter import OrcidXmlExporter
 from invenio.search_engine import get_record
-from invenio.textutils import encode_for_jinja_and_xml
-from invenio.textutils import RE_ALLOWED_XML_1_0_CHARS
-
+from invenio.textutils import (RE_ALLOWED_XML_1_0_CHARS,
+                               encode_for_jinja_and_xml)
+from requests.exceptions import HTTPError, RequestException
 
 try:
     import json
@@ -148,8 +134,8 @@ def _get_extids_from_orcid(orcid_id):
         for work in orcid_profile['works']['group']:
             try:
                 for identifier in work['identifiers']['identifier']:
-                    identifier_type = identifier['external-identifier-type'
-                                                 ].lower()
+                    identifier_type = identifier[
+                        'external-identifier-type'].lower()
                     value = identifier['external-identifier-id']
                     if identifier_type in ext_ids_dict:
                         if identifier_type == "doi":
@@ -189,7 +175,7 @@ def get_dois_from_orcid(orcid_id, get_titles=False):
             register_exception(alert_admin=True)
 
     dois = list()
-    if not orcid_profile:
+    if orcid_profile is None:
         return dois
 
     try:
@@ -208,7 +194,7 @@ def get_dois_from_orcid(orcid_id, get_titles=False):
                                     dois.append(current_dois[0])
                                 else:
                                     title = work['work-summary'][0]['title'][
-                                                 'title']['value']
+                                        'title']['value']
                                     dois.append((doi, title))
             except KeyError:
                 # No identifiers on this work.
@@ -294,8 +280,7 @@ def _push_few_works(doid, short_list, number, pid, token):
 
     headers = {'Accept': 'application/vnd.orcid+xml',
                'Content-Type': 'application/vnd.orcid+xml',
-               'Authorization': 'Bearer ' + token
-               }
+               'Authorization': 'Bearer ' + token}
 
     response = requests.post(url, xml_to_push, headers=headers)
 
@@ -419,21 +404,21 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids, orcid):
         work_dict['work_external_identifiers'] = external_ids
 
         work_dict['work_title']['title'] = \
-            encode_for_jinja_and_xml(record_get_field_value(recstruct,
-                                     '245', '', '', 'a'))
+            encode_for_jinja_and_xml(record_get_field_value(
+                recstruct, '245', '', '', 'a'))
 
         short_descriptions = \
             record_get_field_values(recstruct, '520', '', '', 'a')
         if short_descriptions:
             work_dict['short_description'] = encode_for_jinja_and_xml(
-                                             short_descriptions[0])[
-                                             :MAX_DESCRIPTION_LENGTH
-                                             ].rsplit(' ', 1)[0]
+                short_descriptions[0])[
+                    :MAX_DESCRIPTION_LENGTH
+                ].rsplit(' ', 1)[0]
 
         journal_title = record_get_field_value(recstruct, '773', '', '', 'p')
         if journal_title:
-            work_dict['journal-title'] = \
-                encode_for_jinja_and_xml(journal_title)
+            work_dict['journal-title'] = encode_for_jinja_and_xml(
+                journal_title)
 
         citation = _get_citation(recid)
         if citation:
@@ -494,8 +479,8 @@ def _get_date_from_field_number(recstruct, field, subfield):
     """
     result = {}
 
-    publication_date = \
-        record_get_field_value(recstruct, field, '', '', subfield)
+    publication_date = record_get_field_value(recstruct, field, '', '',
+                                              subfield)
     publication_array = convert_simple_date_to_array(publication_date)
     if len(publication_array) > 0 and \
             re.match(r'[12]\d{3}$', publication_array[0]):
@@ -593,7 +578,7 @@ def _get_citation(recid):
     """
     tex_str = bibformat_record(recid, 'hx')
     bibtex_content = encode_for_jinja_and_xml(tex_str[tex_str.find('@'):
-                                              tex_str.rfind('}')+1])
+                                                      tex_str.rfind('}')+1])
 
     return ('bibtex', bibtex_content)
 
@@ -645,7 +630,8 @@ def _get_external_ids(recid, url, recstruct, old_external_ids, orcid):
                 try:
                     _stub_method()
                 except DoubledIds:
-                    register_exception(subject="The paper %s contains the same doi %s twice." %
+                    register_exception(subject="The paper %s contains the same"
+                                       " doi %s twice." %
                                        (recid, encoded), alert_admin=True)
             else:
                 external_ids.append(('doi', encoded))
@@ -675,8 +661,8 @@ def _get_external_ids(recid, url, recstruct, old_external_ids, orcid):
                     _stub_method()
                 except DoubledIds:
                     register_exception(subject="The paper %s contains the"
-                                       "same ArXiv id %s twice." % (recid,
-                                                                    encoded),
+                                       " same arXiv id %s twice."
+                                       % (recid, encoded),
                                        alert_admin=True)
             else:
                 external_ids.append(('arxiv', encoded))
