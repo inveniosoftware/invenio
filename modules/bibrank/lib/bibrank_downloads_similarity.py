@@ -22,7 +22,7 @@ __revision__ = \
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
-     CFG_CERN_SITE
+     CFG_CERN_SITE, CFG_INSPIRE_SITE
 from invenio.dbquery import run_sql
 from invenio.bibrank_downloads_indexer import database_tuples_to_single_list
 from invenio.search_engine_utils import get_fieldvalues
@@ -70,7 +70,7 @@ def calculate_reading_similarity_list(recid, type="pageviews"):
        depending whether we want to obtain page view similarity or
        download similarity.
     """
-    if CFG_CERN_SITE:
+    if CFG_CERN_SITE or CFG_INSPIRE_SITE:
         return [] # CERN hack 2009-11-23 to ease the load
     if type == "downloads":
         tablename = "rnkDOWNLOADS"
