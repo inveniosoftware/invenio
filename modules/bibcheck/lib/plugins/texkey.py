@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,29 +20,38 @@
 """ Bibcheck plugin to add tex keys """
 
 from invenio.bibrecord import record_add_field
-from invenio.sequtils_texkey import TexkeySeq, TexkeyNoAuthorError
+from invenio.sequtils_texkey import TexkeyNoAuthorError, \
+    TexkeyNoYearError, TexkeySeq
 
-def check_record(record, texkey_field="035__a", extra_subfields=()):
+
+def check_record(record, texkey_field="035__a",
+                 provenances=None, extra_subfields=()):
     """
     Add a tex key to a record, checking that it doesn't have one already.
     """
+
+    if provenances is None:
+        provenances = ["SPIRESTeX", "INSPIRETeX"]
+
+    for provenance in provenances:
+        for _, val in record.iterfield(texkey_field,
+                                       subfield_filter=('9', provenance)):
+            if len(val) > 6:  # texkey composition <name>:\d{4}<randchars>
+                return
+
+    try:
+        texkey = TexkeySeq().next_value(bibrecord=record)
+    except TexkeyNoAuthorError:
+        record.warn("No first author or collaboration")
+        return
+    except TexkeyNoYearError:
+        record.warn("No suitable year/date info")
+        return
+
     tag = texkey_field[:3]
     ind1, ind2, subfield = texkey_field[3:]
-
-    provenances = list(record.iterfield(texkey_field[:5] + "9"))
-    if len(provenances) and provenances[0][1] in ("SPIRESTeX", "INSPIRETeX"):
-        for _, val in record.iterfield(texkey_field[:5] + "z"):
-            if val:
-                return # Record already has a texkey
-
-    if len(list(record.iterfield(texkey_field))) == 0:
-        try:
-            texkey =  TexkeySeq().next_value(bibrecord=record)
-        except TexkeyNoAuthorError:
-            record.warn("No first author or collaboration")
-            return
-        subfields_to_add = [(subfield, texkey)] + map(tuple, extra_subfields)
-        record_add_field(record, tag=tag, ind1=ind1, ind2=ind2,
-                subfields=subfields_to_add)
-        record.set_amended("Added Tex key '%s' to field %s" % (texkey, texkey_field))
-
+    subfields_to_add = [(subfield, texkey)] + map(tuple, extra_subfields)
+    record_add_field(record, tag=tag, ind1=ind1, ind2=ind2,
+                     subfields=subfields_to_add)
+    record.set_amended("Added Tex key '%s' to field %s"
+                       % (texkey, texkey_field))
