@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,9 +20,12 @@
 
 {%- for bundle in get_bundle('js') %}
   {%- if config.get("DEBUG") %}
-  <!-- {{ bundle.weight }}: {{ bundle.output }} -->
+    <!-- {{ bundle.weight }}: {{ bundle.output }} -->
   {%- endif %}
   {%- assets bundle %}
-  <script type="text/javascript" src="{{ EXTRA.static_url_path }}{{ ASSET_URL }}"></script>
+    {%- for cdn_url in bundle.externals %}
+      <script type="text/javascript" src="{{ cdn_url }}"></script>
+    {%- endfor %}
+      <script type="text/javascript" src="{{ EXTRA.static_url_path }}{{ ASSET_URL }}"></script>
   {%- endassets %}
-{%- endfor %}
+{%- endfor -%}

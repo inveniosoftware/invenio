@@ -20,12 +20,15 @@
 
 import argparse
 import os
-import pkg_resources
 import warnings
 
 from flask import current_app, json
+
 from flask_assets import ManageAssets
+
 from flask_script import Command, Option
+
+import pkg_resources
 
 from .registry import bundles
 
@@ -92,7 +95,12 @@ class BowerCommand(Command):
         for pkg, bundle in bundles:
             if bundle.bower:
                 current_app.logger.debug((pkg, bundle.bower))
-            output['dependencies'].update(bundle.bower)
+                externals = list(bundle.externals)
+                for library, version in bundle.bower.items():
+                    if not isinstance(version, basestring):
+                        output['dependencies'][library] = version[1]
+                    elif version not in externals:
+                        output['dependencies'][library] = version
 
         # Remove together with override kwarg, and Option object.
         if override:
