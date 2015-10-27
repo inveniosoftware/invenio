@@ -1,10 +1,9 @@
-Invenio NEWS
-============
+Changes
+=======
 
-Here is a short summary of the most notable changes in Invenio
+Here is a summary of the most notable changes in Invenio
 releases.  For more information about the current release, please
-consult RELEASE-NOTES.  For more information about changes, please
-consult ChangeLog.
+consult RELEASE-NOTES for each individual release.
 
 Invenio v2.1.1 -- released 2015-09-01
 -------------------------------------
@@ -2304,7 +2303,7 @@ Invenio v2.0.0 -- released 2015-03-04
     Flask-Login session fix; settings widget closing fix; customizable
     settings widgets; login redirection fix; partial regression tests
     fix; user agent in current user fix; reporting errors in
-    *_user_settings.py (#1570); fix empty password registrations.;
+    ``*_user_settings.py`` (#1570); fix empty password registrations.;
     user registration initial Flask port; external authentication port
     to Flask (#1338); fix guest user uid in current_user;
     authentication with email address (#1338); fix typo in setUid
@@ -3725,7 +3724,7 @@ Invenio v1.1.0 -- released 2012-10-21
     buckets
 
   - BibUpload: new automatic generation of MARC tag 005, new
-    `--callback-url' CLI parameter, fixes for appending existing
+    `--callback-url` CLI parameter, fixes for appending existing
     files, fixes for multiple 001 tags, and more
 
   - WebAccess: new external person ID support, performance
@@ -3755,7 +3754,7 @@ Invenio v1.1.0 -- released 2012-10-21
     Open Graph markup, new Google Scholar friendly metadata in page
     header, new limit option for wildcard queries, new support for
     access to merged records, new next/previous/back link support, new
-    `authorcount' indexing and searching, new relative date search
+    `authorcount` indexing and searching, new relative date search
     facility, clean OpenSearch support, improved speed, improvements
     to SPIRES query syntax support, improvements to self-cite math,
     primary collection guessing, other numerous fixes
@@ -3924,7 +3923,7 @@ Invenio v1.0.1 -- released 2012-06-28
   - WebSubmit: capitalise doctypes in Doc File Manager; check
     authorizations in endaction; check for problems when archiving;
     ensure unique tmp file name for upload; fix email formatting; fix
-    Move_to_Done function; remove 8564_ field from demo templates;
+    Move_to_Done function; remove ``8564_`` field from demo templates;
     skip file upload if necessary; update CERN-specific config
 
   - bibdocfile: BibRecDocs recID argument type check
@@ -4159,7 +4158,7 @@ Invenio v1.0.0-rc0 -- released 2010-12-21
   - new facility for external robot-like login method (WebAccess)
 
   - numerous improvements to the journal creation facility, new
-    journal `Atlantis Times' demo journal (WebJournal)
+    journal `Atlantis Times` demo journal (WebJournal)
 
   - refactored and improved OAI exporter and harvester (BibHarvest)
 
@@ -4220,7 +4219,7 @@ CDS Invenio v0.99.3 -- released 2010-12-13
   - keyword extractor is now compatible with rdflib releases older
     than 2.3.2 (BibClassify)
 
-  - output of `bibsched status' now shows the queue mode status as
+  - output of `bibsched status` now shows the queue mode status as
     AUTOMATIC or MANUAL to help queue monitoring (BibSched)
 
 CDS Invenio v0.99.2 -- released 2010-10-20
@@ -4239,9 +4238,9 @@ CDS Invenio v0.99.2 -- released 2010-10-20
     full-text indexing of remote files (BibSched)
 
   - fixed full-text indexing and improved handling of files of
-    `unexpected' extensions (BibIndex, WebSubmit)
+    `unexpected` extensions (BibIndex, WebSubmit)
 
-  - streaming of files of `unknown' MIME type now defaults to
+  - streaming of files of `unknown` MIME type now defaults to
     application/octet-stream (WebSubmit)
 
   - fixed addition of new MARC fields in the record editor (BibEdit)
@@ -4845,7 +4844,7 @@ CDS Invenio v0.90.0 -- released 2006-06-30
 CDSware v0.7.1 -- released 2005-05-04
 -------------------------------------
 
-  - important bugfix for bibconvert's ``source data in a directory''
+  - important bugfix for bibconvert's "source data in a directory"
     mode, as invoked by the web submission system (BibConvert)
 
   - minor bugfix in the search engine, thanks to Frederic Gobry
@@ -4853,8 +4852,8 @@ CDSware v0.7.1 -- released 2005-05-04
 
   - minor bugfix in the WebSearch Admin interface (WebSearch)
 
-  - automatic linking to Google Print in the ``Haven't found what you
-    were looking for...'' page box (WebSearch)
+  - automatic linking to Google Print in the "Haven't found what you
+    were looking for..." page box (WebSearch)
 
   - BibFormat Admin Guide cleaned, thanks to Ferran Jorba
 
@@ -4937,7 +4936,7 @@ CDSware v0.5.0 -- released 2004-12-17
   - Search Tips split into a brief Search Tips page and detailed
     Search Guide page (WebSearch)
 
-  - improvements to the ``Try your search on'' hints (WebSearch)
+  - improvements to the "Try your search on'' hints (WebSearch)"
 
   - author search hints introduced (WebSearch)
 
@@ -5006,7 +5005,7 @@ CDSware v0.3.3 (DEVELOPMENT) -- released 2004-07-16
   - improved XML MARC parsing and cumulative record count in case of
     uploading of several files in one go (BibUpload)
 
-  - personal `your admin activities' page introduced (WebSession)
+  - personal `your admin activities` page introduced (WebSession)
 
   - added option to fulltext-index local files only (BibIndex)
 
@@ -5094,7 +5093,7 @@ CDSware v0.3.1 (DEVELOPMENT) -- released 2004-03-12
     WebAccess, BibFormat, WebSession, WebAlert)
 
   - uniform technique for on-the-fly formatting of search results via
-    `hb_' and `hd_' output format parameters (WebSearch)
+    `hb_` and `hd_` output format parameters (WebSearch)
 
   - check for presence of pcntl and mysql PHP libraries (BibUpload)
 

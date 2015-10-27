@@ -19,4 +19,4 @@ Detailed installation guide
 ===========================
 
 .. include:: ../../INSTALL.rst
-   :start-after: ====================
+   :start-after: ============

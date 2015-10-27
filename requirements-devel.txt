@@ -1,35 +1,35 @@
--e git+git://github.com/mitsuhiko/werkzeug.git#egg=Werkzeug
--e git+git://github.com/gorakhargosh/watchdog.git#egg=watchdog
--e git+git://github.com/mitsuhiko/jinja2.git#egg=Jinja2
--e git+git://github.com/mitsuhiko/itsdangerous.git#egg=itsdangerous
--e git+git://github.com/jek/blinker.git#egg=blinker
--e git+git://github.com/mitsuhiko/flask.git#egg=flask
--e git+git://github.com/flask-admin/flask-admin.git#egg=Flask-Admin
--e git+git://github.com/lepture/flask-wtf.git#egg=Flask-WTF
+# -*- coding: utf-8 -*-
+#
+# This file is part of Invenio.
+# Copyright (C) 2015 CERN.
+#
+# Invenio is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
 
--e git+git://github.com/inveniosoftware/dictdiffer.git#egg=dictdiffer
--e git+git://github.com/inveniosoftware/flask-breadcrumbs.git#egg=flask-breadcrumbs
--e git+git://github.com/inveniosoftware/flask-iiif.git#egg=flask-iiif
--e git+git://github.com/inveniosoftware/flask-menu.git#egg=flask-menu
--e git+git://github.com/inveniosoftware/flask-registry.git#egg=flask-registry
--e git+git://github.com/inveniosoftware/flask-sso.git#egg=flask-sso
--e git+git://github.com/inveniosoftware/idutils.git#egg=idutils
--e git+git://github.com/inveniosoftware/intbitset.git#egg=intbitset
--e git+git://github.com/inveniosoftware/invenio-access.git#egg=invenio-access
--e git+git://github.com/inveniosoftware/invenio-accounts.git#egg=invenio-accounts
--e git+git://github.com/inveniosoftware/invenio-base.git#egg=invenio-base
--e git+git://github.com/inveniosoftware/invenio-client.git#egg=invenio-client
--e git+git://github.com/inveniosoftware/invenio-collections.git#egg=invenio-collections
--e git+git://github.com/inveniosoftware/invenio-comments.git#egg=invenio-comments
--e git+git://github.com/inveniosoftware/invenio-deposit.git#egg=invenio-deposit
--e git+git://github.com/inveniosoftware/invenio-documents.git#egg=invenio-documents
--e git+git://github.com/inveniosoftware/invenio-ext.git#egg=invenio-ext
--e git+git://github.com/inveniosoftware/invenio-groups.git#egg=invenio-groups
--e git+git://github.com/inveniosoftware/invenio-oauthclient.git#egg=invenio-oauthclient
--e git+git://github.com/inveniosoftware/invenio-pidstore.git#egg=invenio-pidstore
--e git+git://github.com/inveniosoftware/invenio-records.git#egg=invenio-records
--e git+git://github.com/inveniosoftware/invenio-search.git#egg=invenio-search
--e git+git://github.com/inveniosoftware/invenio-upgrader.git#egg=invenio-upgrader
--e git+git://github.com/inveniosoftware/invenio-utils.git#egg=invenio-utils
--e git+git://github.com/inveniosoftware/invenio-workflows.git#egg=invenio-workflows
--e git+git://github.com/inveniosoftware/workflow.git#egg=workflow
+-e git+git://github.com/inveniosoftware/invenio-accounts.git@next#egg=invenio-accounts
+-e git+git://github.com/inveniosoftware/invenio-assets.git#egg=invenio-assets
+-e git+git://github.com/inveniosoftware/invenio-base.git@next#egg=invenio-base
+-e git+git://github.com/inveniosoftware/invenio-celery.git#egg=invenio-celery
+-e git+git://github.com/inveniosoftware/invenio-config.git#egg=invenio-config
+-e git+git://github.com/inveniosoftware/invenio-db.git#egg=invenio-db
+-e git+git://github.com/inveniosoftware/invenio-i18n.git#egg=invenio-i18n
+-e git+git://github.com/inveniosoftware/invenio-mail.git#egg=invenio-mail
+-e git+git://github.com/inveniosoftware/invenio-records.git@next#egg=invenio-records
+-e git+git://github.com/inveniosoftware/invenio-theme.git#egg=invenio-theme
+-e git+git://github.com/mitsuhiko/flask.git#egg=Flask

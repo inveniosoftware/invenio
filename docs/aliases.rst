@@ -59,6 +59,7 @@ Flask-Login
 
    Sorry not valid intersphinx were found for: ``flask_login.UserMixin``.
 
+
 Flask-Script
 ============
 

@@ -1,73 +1,59 @@
-include *.json
-include *.py
-include *.rst
-include *.txt
-include *.yml
-include .bowerrc
+# -*- coding: utf-8 -*-
+#
+# This file is part of Invenio.
+# Copyright (C) 2015 CERN.
+#
+# Invenio is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+
+
+# TODO: Generate this manifest file by running the following commands:
+#
+#  git init
+#  git add -A
+#  pip install -e .[all]
+#  check-manifest -u
+
+# Check manifest will not automatically add these two files:
 include .dockerignore
 include .editorconfig
+
+include *.rst
+include *.sh
+include *.txt
 include ABOUT-NLS
-include AUTHORS
+include babel.ini
 include COPYING
-include ChangeLog
-include Dockerfile
-include NEWS
-include Procfile*
-include RELEASE-NOTES
+include LICENSE
+include pytest.ini
 include THANKS
-include TODO
-include UNINSTALL
-include babel.cfg
-include mapping.cfg
-include requirements*.txt
-
-recursive-include docs *
-recursive-exclude docs/_build *
-
-recursive-include invenio *.bfo
-recursive-include invenio *.bft
-recursive-include invenio *.cfg
-recursive-include invenio *.dat
-recursive-include invenio *.dia
-recursive-include invenio *.dtd
-recursive-include invenio *.edited
-recursive-include invenio *.html
-recursive-include invenio *.in
-recursive-include invenio *.java
-recursive-include invenio *.jpeg
-recursive-include invenio *.js
-recursive-include invenio *.json
-recursive-include invenio *.kb
-recursive-include invenio *.lisp
-recursive-include invenio *.lua
-recursive-include invenio *.png
-recursive-include invenio *.ps
-recursive-include invenio *.py
-recursive-include invenio *.sql
-recursive-include invenio *.tex
-recursive-include invenio *.txt
-recursive-include invenio *.wsgi
-recursive-include invenio *.xml
-recursive-include invenio *.xsd
-recursive-include invenio *.xsl
-recursive-include invenio *.yml
-
-recursive-include invenio/base/static *
-recursive-include invenio/base/templates *
-recursive-include invenio/base/translations *.mo *.po *.pot
-
-recursive-include invenio/legacy *.webdoc
-recursive-include invenio/legacy/miscutil/solrutils *.java
-
-recursive-include invenio/modules/*/static *
-recursive-include invenio/modules/*/templates *
-recursive-include invenio/modules/*/testsuite *
-recursive-include invenio/modules/*/translations *.mo *.po *.pot
-
-recursive-include invenio/testsuite *
-
-recursive-include scripts *.sh
-recursive-include scripts *.py
-
-recursive-exclude * *.py[co]
-recursive-exclude * *.php
+recursive-include docs *.bat
+recursive-include docs *.css
+recursive-include docs *.gif
+recursive-include docs *.jpeg
+recursive-include docs *.jpg
+recursive-include docs *.plantuml
+recursive-include docs *.png
+recursive-include docs *.py
+recursive-include docs *.rst
+recursive-include docs *.svg
+recursive-include docs Makefile
+recursive-include misc *.py
+recursive-include misc *.rst
+recursive-include tests *.py
