@@ -17,17 +17,17 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Bibcheck plugin to add tex keys """
+""" Bibcheck plugin to add texkeys """
 
 from invenio.bibrecord import record_add_field
-from invenio.sequtils_texkey import TexkeyNoAuthorError, \
-    TexkeyNoYearError, TexkeySeq
+from invenio.sequtils_texkey import (TexkeyNoAuthorError, TexkeyNoYearError,
+                                     TexkeySeq)
 
 
 def check_record(record, texkey_field="035__a",
-                 provenances=None, extra_subfields=()):
+                 provenances=None, extra_subfields=None):
     """
-    Add a tex key to a record, checking that it doesn't have one already.
+    Add a texkey to a record, checking that it doesn't have one already.
     """
 
     if provenances is None:
@@ -47,6 +47,9 @@ def check_record(record, texkey_field="035__a",
     except TexkeyNoYearError:
         record.warn("No suitable year/date info")
         return
+
+    if extra_subfields is None:
+        extra_subfields = [('9', 'INSPIRETeX')]
 
     tag = texkey_field[:3]
     ind1, ind2, subfield = texkey_field[3:]
