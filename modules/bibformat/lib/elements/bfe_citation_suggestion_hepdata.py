@@ -54,9 +54,13 @@ def cite_as(bfo, publisher):
         if coll not in colls:
             colls.append(coll)
 
-    parent_recid = int(bfo.field("786__w"))
-    bfo_parent = BibFormatObject(parent_recid)
-    year = get_year(bfo_parent)
+    try:
+        parent_recid = int(bfo.field("786__w"))
+        bfo_parent = BibFormatObject(parent_recid)
+        year = get_year(bfo_parent)
+    except ValueError:
+        # No parent record available
+        year = get_year(bfo)
 
     if publisher == 'HEPDATA':
         publisher = 'HepData'
@@ -87,7 +91,7 @@ def cite_as(bfo, publisher):
 def dataverse_cite_as(bfo):
     """
     Dataverse format example:
-        Cranmer, Kyle; Allanach, Ben; Lester, Christopher; Weber, Arne, "Replication data for: 
+        Cranmer, Kyle; Allanach, Ben; Lester, Christopher; Weber, Arne, "Replication data for:
         "Natural Priors, CMSSM Fits and LHC Weather Forecasts"", http://hdl.handle.net/1902.1/21804
     """
     authors = ""
@@ -98,7 +102,7 @@ def dataverse_cite_as(bfo):
     out += authors[:-2] + ", "
 
     title = bfo.field("245__a")
-    out += '"' + title + '", <br /> ' 
+    out += '"' + title + '", <br /> '
 
     pid_type = bfo.field("0247_2")
     pid = bfo.field("0247_a")

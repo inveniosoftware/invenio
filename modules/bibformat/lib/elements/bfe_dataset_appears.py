@@ -29,7 +29,12 @@ def format_element(bfo):
     from invenio.bibformat_engine import BibFormatObject
     from invenio.config import CFG_BASE_URL, CFG_SITE_RECORD
 
-    parent_recid = int(bfo.field("786__w"))
+    try:
+        parent_recid = int(bfo.field("786__w"))
+    except ValueError:
+        # No parent record available
+        return ''
+
     bfo_parent = BibFormatObject(parent_recid)
 
     title = bfo_parent.field("245__a")
