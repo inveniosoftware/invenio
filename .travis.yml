@@ -34,9 +34,8 @@ cache:
   - pip
 
 env:
-# Disabled until dependent packages have been released:
-#  - REQUIREMENTS=lowest
-#  - REQUIREMENTS=release
+  - REQUIREMENTS=lowest
+  - REQUIREMENTS=release
   - REQUIREMENTS=devel
 
 python:
@@ -61,3 +60,14 @@ script:
 
 after_success:
   - coveralls
+
+deploy:
+  provider: pypi
+  user: lnielsen
+  password:
+    secure: VR963pGTKJlFMhiQq/eerCDfciJeEKxxWlBK5qsnnVssxwoBwjGeiWABf/U/4il/64TgmShauc1g2GPGYNgZvdZXuOtPRW5rLMEU8lDb1KSe0kpJnPgj7NAMVKbLPYF7orBY8eU1UKvP3t2rWqLBpGJ5k2ia+Hrtp3Ki3u0gAeI=
+  distributions: "compile_catalog sdist bdist_wheel"
+  on:
+    tags: true
+    python: "2.7"
+    condition: $REQUIREMENTS = release

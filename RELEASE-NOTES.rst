@@ -2,7 +2,7 @@
  Invenio v3.0.0
 ================
 
-Invenio v3.0.0 was released on TBD, 2016.
+Invenio v3.0.0 was released on October 30, 2015.
 
 About
 -----

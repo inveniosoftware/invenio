@@ -45,16 +45,24 @@ tests_require = [
 ]
 
 extras_require = {
+    'accounts': [
+        'invenio-accounts>=1.0.0a1,<1.1.0',
+    ],
+    'records': [
+        'invenio-pidstore>=1.0.0a1,<1.1.0',
+        'invenio-records>=1.0.0a2,<1.1.0',
+        'invenio-records-ui>=1.0.0a1,<1.1.0',
+        'invenio-records-rest>=1.0.0a2,<1.1.0',
+    ],
     'theme': [
         'invenio-assets>=1.0.0a1,<1.1.0',
-        'invenio-theme>=1.0.0a1,<1.1.0',
-    ],
-    'accounts': [
-        'invenio-accounts>=1.0.0.dev20150000,<1.1.0',
+        'invenio-theme>=1.0.0a3,<1.1.0',
     ],
     'utils': [
         'invenio-mail>=1.0.0a1,<1.1.0',
-        'invenio-db>=1.0.0a1,<1.1.0',
+        'invenio-db>=1.0.0a5,<1.1.0',
+        'invenio-rest>=1.0.0a2,<1.1.0',
+        'invenio-logging>=1.0.0a1,<1.1.0',
     ],
     'docs': [
         'Sphinx>=1.3',
@@ -68,8 +76,7 @@ extras_require = {
 #
 aliases = {
     'minimal': ['accounts', 'theme', 'utils', ],
-    'repository': ['accounts', 'theme', 'utils', ],
-    'oaisstore': [],
+    'full': ['accounts', 'records', 'theme', 'utils', ],
 }
 
 for name, requires in aliases.items():
@@ -91,8 +98,8 @@ setup_requires = [
 ]
 
 install_requires = [
-    'invenio-base>=1.0.0.dev20150000,<1.1.0',
-    'invenio-celery>=1.0.0.dev20150000,<1.1.0',
+    'invenio-base>=1.0.0a2,<1.1.0',
+    'invenio-celery>=1.0.0a1,<1.1.0',
     'invenio-config>=1.0.0a1,<1.1.0',
     'invenio-i18n>=1.0.0a1,<1.1.0',
 ]
@@ -172,7 +179,7 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
-        'Development Status :: 1 - Planning',
+        'Development Status :: 3 - Alpha',
     ],
     cmdclass={'test': PyTest},
 )
