@@ -379,8 +379,6 @@ class AmendableRecord(dict):
 
             if new_code:
                 message += ': move from %s to %s' % (source_field[5], new_code)
-            else:
-                new_code = source_field[5]
 
             if not new_val == val:
                 message += ': replace %s by %s' % (val, new_val)
@@ -388,7 +386,7 @@ class AmendableRecord(dict):
                 message += ': %s' % (val)
 
             if bool(pattern_matches) != bool(complement):
-                record_modify_subfield(self, source_field[0:3], new_code, new_val,
+                record_modify_subfield(self, source_field[0:3], new_code or source_field[5], new_val,
                                        pos[2], field_position_local=pos[1])
                 self.set_amended(message)
 
