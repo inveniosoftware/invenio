@@ -56,7 +56,7 @@ class BibIndexCountryTokenizer(BibIndexMultiFieldTokenizer):
 
     # 100__u: first author affiliation (es. INFN di Padova, Italy)
     # 700__u: non-first authors affiliation
-    institution_tags = ['100__u', '700__u']
+    institution_tags = ['100__u', '700__u', '371__a']
     institution_name_field = "110__u"
     # 371__d: full name of the country (es. Italy)
     # 371__g: country code (es. IT)
