@@ -726,7 +726,7 @@ def get_next_starting_date(rule):
         return task_starting_time
 
     # Lower limit
-    min_last_updated = run_sql("select min(last_updated) from idxINDEX")[0][0]
+    min_last_updated = run_sql("select min(last_updated) from idxINDEX WHERE last_updated<>'0000-00-00'")[0][0]
     cache_last_updated = dt(get_cache_last_updated_timestamp())
 
     if not min_last_updated or not cache_last_updated:
