@@ -298,6 +298,7 @@ class AmendableRecord(dict):
                     else:
                         # `code` is code from `field`
                         # `subfield_code` is from `field_obj` (storage)
+                        filter_position = None
                         if filter_enabled:
                             for subfield_position, subfield_tuple in enumerate(field_obj[0]):
                                 subfield_code, value = subfield_tuple
