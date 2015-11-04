@@ -198,10 +198,10 @@ model as described in
 `man 7 gitworkflows <http://www.kernel.org/pub/software/scm/git/docs/gitworkflows.html>`_
 and elsewhere.
 
-In summary, the new patchlevel releases (X.Y.Z) happen from the
-``maint`` branch, the new minor feature releases (X.Y) happen from the
-``master`` branch, and new major feature releases (X) happen after they
-mature in the ``next`` branch.  A more detailed description follows.
+In summary, the new patchlevel releases (X.Y.Z) happen from the ``maint``
+branch, the new minor feature releases (X.Y) happen from the ``master``
+branch, and new major feature releases (X) happen after they mature in the
+optional ``next`` branch.  A more detailed description follows.
 
 ``maint``
 ~~~~~~~~~
@@ -241,8 +241,8 @@ are not covered by usual ``inveniomanage`` update statements, so people
 should be prepared to study the differences and update DB schemata and
 config files themselves.
 
-``next``
-~~~~~~~~
+``next (optional)``
+~~~~~~~~~~~~~~~~~~~
 
 If a new feature is well implemented, tested and considered stable, it
 goes directly into the ``master`` branch described previously.  If it is
