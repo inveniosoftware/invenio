@@ -24,12 +24,16 @@
 
 -e git+git://github.com/inveniosoftware/invenio-accounts.git#egg=invenio-accounts
 -e git+git://github.com/inveniosoftware/invenio-assets.git#egg=invenio-assets
--e git+git://github.com/inveniosoftware/invenio-base.git@next#egg=invenio-base
+-e git+git://github.com/inveniosoftware/invenio-base.git#egg=invenio-base
 -e git+git://github.com/inveniosoftware/invenio-celery.git#egg=invenio-celery
 -e git+git://github.com/inveniosoftware/invenio-config.git#egg=invenio-config
 -e git+git://github.com/inveniosoftware/invenio-db.git#egg=invenio-db
 -e git+git://github.com/inveniosoftware/invenio-i18n.git#egg=invenio-i18n
 -e git+git://github.com/inveniosoftware/invenio-mail.git#egg=invenio-mail
--e git+git://github.com/inveniosoftware/invenio-records.git@next#egg=invenio-records
+-e git+git://github.com/inveniosoftware/invenio-pidstore.git#egg=invenio-pidstore
+-e git+git://github.com/inveniosoftware/invenio-records-rest.git#egg=invenio-records-rest
+-e git+git://github.com/inveniosoftware/invenio-records-ui.git#egg=invenio-records-ui
+-e git+git://github.com/inveniosoftware/invenio-records.git#egg=invenio-records
+-e git+git://github.com/inveniosoftware/invenio-rest.git#egg=invenio-rest
 -e git+git://github.com/inveniosoftware/invenio-theme.git#egg=invenio-theme
 -e git+git://github.com/mitsuhiko/flask.git#egg=Flask

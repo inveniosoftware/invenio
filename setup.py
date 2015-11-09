@@ -46,11 +46,11 @@ tests_require = [
 
 extras_require = {
     'accounts': [
-        'invenio-accounts>=1.0.0a1,<1.1.0',
+        'invenio-accounts>=1.0.0a2,<1.1.0',
     ],
     'records': [
         'invenio-pidstore>=1.0.0a1,<1.1.0',
-        'invenio-records>=1.0.0a2,<1.1.0',
+        'invenio-records>=1.0.0a3,<1.1.0',
         'invenio-records-ui>=1.0.0a1,<1.1.0',
         'invenio-records-rest>=1.0.0a2,<1.1.0',
     ],
@@ -98,8 +98,8 @@ setup_requires = [
 ]
 
 install_requires = [
-    'invenio-base>=1.0.0a2,<1.1.0',
-    'invenio-celery>=1.0.0a1,<1.1.0',
+    'invenio-base>=1.0.0a3,<1.1.0',
+    'invenio-celery>=1.0.0a2,<1.1.0',
     'invenio-config>=1.0.0a1,<1.1.0',
     'invenio-i18n>=1.0.0a1,<1.1.0',
 ]
