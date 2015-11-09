@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,12 +19,14 @@
 
 """Records bundles."""
 
+from invenio.base.bundles import jquery as _jquery
+
 from invenio.ext.assets import Bundle, RequireJSFilter
 
 
 js = Bundle(
     "js/records/init.js",
-    filters=RequireJSFilter(),
+    filters=RequireJSFilter(exclude=[_jquery]),
     output="records.js",
     weight=20
 )
