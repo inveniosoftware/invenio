@@ -26,7 +26,7 @@
 notifications:
   email: false
 
-sudo: false
+sudo: true
 
 language: python
 
@@ -45,6 +45,7 @@ python:
   - "3.5"
 
 before_install:
+  - "sudo apt-get install graphviz"
   - "travis_retry pip install --upgrade pip setuptools py"
   - "travis_retry pip install twine wheel coveralls requirements-builder"
   - "requirements-builder --level=min setup.py > .travis-lowest-requirements.txt"

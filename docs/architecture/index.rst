@@ -23,6 +23,5 @@ Architecture
    :maxdepth: 2
 
    system-overview
-   system-framework
    package-anatomy
    module-anatomy
