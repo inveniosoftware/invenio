@@ -1,5 +1,5 @@
 ..  This file is part of Invenio
-    Copyright (C) 2014 CERN.
+    Copyright (C) 2014, 2015 CERN.
 
     Invenio is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -26,99 +26,162 @@ Detailed installation guide
 Prerequisites
 -------------
 
-Invenio v3.0 needs several prerequisite software packages to function:
+Invenio v3.0 needs several prerequisite software packages to function, such as:
 
 - `Elasticsearch <https://www.elastic.co/products/elasticsearch>`_
 - `PostgreSQL <http://www.postgresql.org/>`_
 - `RabbitMQ <http://www.rabbitmq.com/>`_
 - `Redis <http://redis.io/>`_
 
-For example, on Debian GNU/Linux, you can install them as follows:
+You may install the prerequisites as follows. The instructions below are fit for
+Ubuntu 14.04 LTS (Trusty Tahr) operating system. Note that for this and other
+operating systems such as CentOS 7, you can run ``kickstart.sh`` script that is
+coming with the Invenio tarball and that performs all the installation steps
+mentioned below in an automated unattended way.
 
-.. code-block:: shell
+First, let's install some useful system tools:
 
-   sudo apt-get install elasticsearch \
-                        postgresql \
-                        rabbitmq-server \
-                        redis-server
+.. include:: ../../scripts/kickstart.sh
+   :start-after: # sphinxdoc-install-useful-system-tools-begin
+   :end-before: # sphinxdoc-install-useful-system-tools-end
+   :literal:
+
+We need to add external repository for Elasticsearch:
+
+.. include:: ../../scripts/kickstart.sh
+   :start-after: # sphinxdoc-add-elasticsearch-external-repository-begin
+   :end-before: # sphinxdoc-add-elasticsearch-external-repository-end
+   :literal:
+
+and for Node.js:
+
+.. include:: ../../scripts/kickstart.sh
+   :start-after: # sphinxdoc-add-nodejs-external-repository-begin
+   :end-before: # sphinxdoc-add-nodejs-external-repository-end
+   :literal:
+
+Now we can install all the pre-requisite software packages:
+
+.. include:: ../../scripts/kickstart.sh
+   :start-after: # sphinxdoc-install-prerequisites-begin
+   :end-before: # sphinxdoc-install-prerequisites-end
+   :literal:
+
+Let's install Bower and CSS/JS filters globally:
+
+.. include:: ../../scripts/kickstart.sh
+   :start-after: # sphinxdoc-install-bower-and-css-js-filters-begin
+   :end-before: # sphinxdoc-install-bower-and-css-js-filters-end
+   :literal:
+
+Finally, we install Python virtual environment wrapper tools and activate them
+in the current shell process:
+
+.. include:: ../../scripts/kickstart.sh
+   :start-after: # sphinxdoc-install-virtualenvwrapper-begin
+   :end-before: # sphinxdoc-install-virtualenvwrapper-end
+   :literal:
 
 Installation
 ------------
 
-Let's start by creating a new virtual environment that will hold our Invenio
-v3.0 instance:
+Now that all the prerequisite software packages have been installed, we can
+proceed with the installation of the Invenio itself. Let's start by creating a
+fresh new Python virtual environment that will hold our Invenio v3.0 instance:
+
+.. include:: ../../scripts/kickstart.sh
+   :start-after: # sphinxdoc-create-virtual-environment-begin
+   :end-before: # sphinxdoc-create-virtual-environment-end
+   :literal:
+
+Let's install Invenio v3.0 base package and most of its available modules (using
+option ``full`` as opposed to using option ``minimal``) from PyPI:
+
+.. include:: ../../scripts/kickstart.sh
+   :start-after: # sphinxdoc-install-invenio-full-begin
+   :end-before: # sphinxdoc-install-invenio-full-end
+   :literal:
+
+This installs Invenio base package and its modules. We proceed with the creation
+of a new Invenio instance called "mysite":
+
+.. include:: ../../scripts/kickstart.sh
+   :start-after: # sphinxdoc-create-instance-begin
+   :end-before: # sphinxdoc-create-instance-end
+   :literal:
+
+In the instance folder, we run Bower to install any JavaScript libraries that
+Invenio depends on:
+
+.. include:: ../../scripts/kickstart.sh
+   :start-after: # sphinxdoc-run-bower-begin
+   :end-before: # sphinxdoc-run-bower-end
+   :literal:
+
+We can now collect and build CSS/JS assets for our Invenio instance:
+
+.. include:: ../../scripts/kickstart.sh
+   :start-after: # sphinxdoc-collect-and-build-assets-begin
+   :end-before: # sphinxdoc-collect-and-build-assets-end
+   :literal:
+
+We proceed by creating a dedicated database that will hold persistent data of
+our installation, such as bibliographic records or user accounts. Invenio
+supports MySQL, PostgreSQL, and SQLite databases. PostgreSQL is recommended, but
+SQLite is used by default. The database can be created as follows:
+
+.. include:: ../../scripts/kickstart.sh
+   :start-after: # sphinxdoc-create-database-begin
+   :end-before: # sphinxdoc-create-database-end
+   :literal:
+
+We continue by creating a user account:
+
+.. include:: ../../scripts/kickstart.sh
+   :start-after: # sphinxdoc-create-user-account-begin
+   :end-before: # sphinxdoc-create-user-account-end
+   :literal:
+
+Let's now start Celery worker that will execute instance tasks:
+
+.. include:: ../../scripts/kickstart.sh
+   :start-after: # sphinxdoc-start-celery-worker-begin
+   :end-before: # sphinxdoc-start-celery-worker-end
+   :literal:
+
+Now that Celery is running, we can populate our Invenio instance with demo
+records:
+
+.. include:: ../../scripts/kickstart.sh
+   :start-after: # sphinxdoc-populate-with-demo-records-begin
+   :end-before: # sphinxdoc-populate-with-demo-records-end
+   :literal:
+
+Let's register persistent identifiers for the uploaded demo records:
+
+.. include:: ../../scripts/kickstart.sh
+   :start-after: # sphinxdoc-register-pid-begin
+   :end-before: # sphinxdoc-register-pid-end
+   :literal:
+
+Finally, let's start the web application (in debugging mode):
+
+.. include:: ../../scripts/kickstart.sh
+   :start-after: # sphinxdoc-start-application-begin
+   :end-before: # sphinxdoc-start-application-end
+   :literal:
+
+We should now see our demo record on the web:
 
 .. code-block:: shell
 
-   mkvirtualenv invenio3mysite
+   firefox http://localhost:5000/records/1
 
-Install Invenio v3.0 base package and most of their available modules (using
-option ``full`` as opposed to using option ``minimal``):
-
-.. code-block:: shell
-
-   cdvirtualenv
-   mkdir src && cd src
-   pip install invenio[full]
-
-Create a new instance of Invenio named "mysite":
-
-.. code-block:: shell
-
-   inveniomanage instance create mysite
-
-Run bower to install any necessary JavaScript assets the Invenio modules
-depend on:
-
-.. code-block:: shell
-
-   cd mysite
-   python manage.py bower
-   cdvirtualenv var/mysite-instance/
-   bower install
-   cd -
-   python manage.py collect -v
-   python manage.py assets build
-
-Create database to hold persistent data:
-
-.. code-block:: shell
-
-   python manage.py db init
-   python manage.py db create
-
-Create a user account:
-
-.. code-block:: shell
-
-   python manage.py accounts usercreate -e info@inveniosoftware.org -a
-
-Start Celery worker to execute tasks:
-
-.. code-block:: shell
-
-   # temporary step (ensures celery tasks are discovered)
-   echo "from invenio_records.tasks import *" >> mysite/celery.py
-   # run celery worker (in a new window)
-   celery worker -A mysite.celery -l INFO
-
-Now we can create our first record:
-
-.. code-block:: shell
-
-   echo '{"title":"Invenio 3 Rocks", "recid": 1}'| \
-        python manage.py records create
-
-Start the web application (in debugging mode):
-
-.. code-block:: shell
-
-   python manage.py --debug run
-
-We should now see our record on ``http://localhost:5000/records/1`` and we can
-access it via REST API:
+and we can access it via REST API:
 
 .. code-block:: shell
 
    curl -i -H "Accept: application/json" \
         http://localhost:5000/api/records/1
+
+We are done! Our first Invenio v3.0 instance is fully up and running.

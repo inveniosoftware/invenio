@@ -56,4 +56,5 @@ recursive-include docs *.svg
 recursive-include docs Makefile
 recursive-include misc *.py
 recursive-include misc *.rst
+recursive-include scripts *.sh
 recursive-include tests *.py
