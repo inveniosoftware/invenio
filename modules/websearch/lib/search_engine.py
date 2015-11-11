@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -4247,7 +4247,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         else:
             if of.startswith('h'):
                 write_warning(_("Sorry, %s does not seem to be a valid sort option. The records will not be sorted.") % cgi.escape(error_field), "Error", req=req)
-            return slice_records(recIDs, jrec, rg)
+            return sort_records_latest(recIDs, jrec, rg, sort_order)
     elif tags:
         for sort_method in sorting_methods:
             definition = sorting_methods[sort_method]
@@ -4259,7 +4259,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         #we do not have this sort_field in BibSort tables -> do the old fashion sorting
         return sort_records_bibxxx(req, recIDs, tags, sort_field, sort_order, sort_pattern, verbose, of, ln, rg, jrec)
     else:
-        return slice_records(recIDs, jrec, rg)
+        return sort_records_latest(recIDs, jrec, rg, sort_order)
 
 
 def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=1, sort_or_rank='s', sorting_methods=SORTING_METHODS):
@@ -4372,12 +4372,12 @@ def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_p
 
     ## check arguments:
     if not sort_field:
-        return slice_records(recIDs, jrec, rg)
+        return sort_records_latest(recIDs, jrec, rg, sort_order)
 
     if len(recIDs) > CFG_WEBSEARCH_NB_RECORDS_TO_SORT:
         if of.startswith('h'):
             write_warning(_("Sorry, sorting is allowed on sets of up to %d records only. Using default sort order.") % CFG_WEBSEARCH_NB_RECORDS_TO_SORT, "Warning", req=req)
-        return slice_records(recIDs, jrec, rg)
+        return sort_records_latest(recIDs, jrec, rg, sort_order)
 
     recIDs_dict = {}
     recIDs_out = []
@@ -4389,7 +4389,7 @@ def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_p
         if error_field:
             if of.startswith('h'):
                 write_warning(_("Sorry, %s does not seem to be a valid sort option. The records will not be sorted.") % cgi.escape(error_field), "Error", req=req)
-            return slice_records(recIDs, jrec, rg)
+            return sort_records_latest(recIDs, jrec, rg, sort_order)
 
     if verbose >= 3 and of.startswith('h'):
         write_warning("Sorting by tags %s." % cgi.escape(repr(tags)), req=req)
