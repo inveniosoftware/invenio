@@ -361,12 +361,7 @@ def get_datasets(person_id):
     return retrieve_update_cache('datasets_pubs', 'pid:' + str(person_id), _get_datasets, person_id)
 
 def _get_datasets(person_id):
-    recs =  get_confirmed_papers_of_author(person_id)
-    data_recs = set()
-
-    for rec in recs:
-        data_recs_tmp = perform_request_search(p="%s" % str(rec), f='786__w', cc='Data', rg=0)
-        data_recs.update(set(data_recs_tmp))
+    data_recs = perform_request_search(p='author:"%s"' % canonical_name(person_id), cc='Data')
 
     datasets_pubs = dict()
     for rec in data_recs:
