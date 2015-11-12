@@ -1,5 +1,5 @@
 ..  This file is part of Invenio
-    Copyright (C) 2014 CERN.
+    Copyright (C) 2014, 2015 CERN.
 
     Invenio is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -18,9 +18,11 @@
 Quick installation guide
 ========================
 
-If you would like to see what Invenio looks like, the quickest way is to use
-Docker. For example, you can get Invenio v2.0 demo site up and running in
-fifteen minutes by doing::
+Using Docker
+------------
+
+You can get Invenio v2.0 demo site up and running in fifteen minutes using
+Docker::
 
   mkdir -p ~/private/src
   cd ~/private/src
@@ -37,4 +39,32 @@ fifteen minutes by doing::
   docker exec -i -t -u invenio inveniodemosite_web_1 \
       inveniomanage demosite populate \
       --packages=invenio_demosite.base --yes-i-know
-  w3m http://127.0.0.1:28080/
+  firefox http://127.0.0.1:28080/
+
+Using Vagrant
+-------------
+
+You can get Invenio v3.0 demo site up and running using Vagrant::
+
+  vagrant up
+  vagrant ssh web -c 'source .inveniorc && /vagrant/scripts/install.sh'
+  vagrant ssh web -c 'curl http://0.0.0.0:5000/records/1'
+
+Using kickstart scripts
+-----------------------
+
+You can set some environment variables and run kickstart provisioning and
+installation scripts manually::
+
+  vim .inveniorc
+  source .inveniorc
+  scripts/provision-web.sh
+  scripts/provision-postgresql.sh
+  scripts/provision-elasticsearch.sh
+  scripts/provision-redis.sh
+  scripts/provision-rabbitmq.sh
+  scripts/provision-worker.sh
+  scripts/install.sh
+  firefox http://127.0.0.1:5000/
+
+See :ref:`installation_detailed` for more information.

@@ -33,6 +33,8 @@
 # Check manifest will not automatically add these two files:
 include .dockerignore
 include .editorconfig
+include .inveniorc
+include Vagrantfile
 
 include *.rst
 include *.sh
