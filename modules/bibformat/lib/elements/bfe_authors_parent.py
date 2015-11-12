@@ -79,25 +79,28 @@ def format_element(bfo, limit, separator='; ',
     authors = []
     lastauthor = ''
 
-    # HepData and only-INSPIRE data records inherit the list of authors from the original paper
-    if (bfo.field("520__9") == "HEPDATA") or (bfo.field("520__9") == "INSPIRE"):
-        parent_recid = bfo.field("786__w")
-        bfo_parent = BibFormatObject(int(parent_recid))
-
-        authors = []
-        authors_1 = bfo_parent.fields('100__', repeatable_subfields_p=True)
-        authors_2 = bfo_parent.fields('700__', repeatable_subfields_p=True)
-    # other datasources should have a list of authors
-    else:
-        authors = []
-        authors_1 = bfo.fields('100__', repeatable_subfields_p=True)
-        authors_2 = bfo.fields('700__', repeatable_subfields_p=True)
+    authors = []
+    authors_1 = bfo.fields('100__', repeatable_subfields_p=True)
+    authors_2 = bfo.fields('700__', repeatable_subfields_p=True)
 
     authors.extend(authors_1)
     authors.extend(authors_2)
 
+    # HepData and only-INSPIRE data records inherit the list of authors from the original paper
+    if not authors and (bfo.field("520__9") == "HEPDATA") or (bfo.field("520__9") == "INSPIRE"):
+        parent_recid = bfo.field("786__w")
+        if parent_recid and parent_recid.isdigit():
+            bfo_parent = BibFormatObject(int(parent_recid))
+
+            authors = []
+            authors_1 = bfo_parent.fields('100__', repeatable_subfields_p=True)
+            authors_2 = bfo_parent.fields('700__', repeatable_subfields_p=True)
+            authors.extend(authors_1)
+            authors.extend(authors_2)
+
+
     # If there are no author check for corporate author in 110__a field
-    if len(authors) == 0:
+    if not authors:
         authors = bfo.fields('110__', repeatable_subfields_p=True)
         # For corporate authors we don't want to reverse names order
         name_last_first = 'yes'

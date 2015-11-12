@@ -48,6 +48,8 @@ def cite_as(bfo, publisher):
 
     if publisher == "Dataverse":
         return dataverse_cite_as(bfo)
+    elif publisher == 'authors':
+        return ""
 
     colls = []
     for coll in bfo.fields("710__g"):
