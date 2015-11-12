@@ -184,6 +184,16 @@ def get_author_canonical_ids_for_recid_range(recID1, recID2):
         AND tag='canonical_name' AND flag>-2""", (recID1, recID2))
 
 
+def get_author_canonical_ids_for_recid(recID):
+    """
+    Return list of author canonical IDs (e.g. `J.Ellis.1')) for
+    the given range of records.  Done by consulting BibAuthorID module.
+    """
+    return [elem[0] for elem in run_sql("""SELECT data FROM aidPERSONIDDATA
+        JOIN aidPERSONIDPAPERS USING (personid) WHERE bibrec=%s
+        AND tag='canonical_name' AND flag>-2""", (recID, ))]
+
+
 def swap_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
     """Atomically swap reindexed temporary table with the original one.
     Delete the now-old one."""
@@ -1416,6 +1426,39 @@ class WordTable(AbstractIndexTable):
             collector.set_special_tags(self.special_tags)
             wlist = collector.collect(nonmarc, wlist)
 
+        # HACK: total INSPIRE hack to expand author for Data records
+        if 'author' in self.index_name:
+            for i in range(recID1, recID2 + 1):
+                if i not in wlist:
+                    # Ha! this record has not author declared. Let's see if
+                    # it has a corresponding paper.
+                    recids = run_sql("""SELECT b.value FROM bib78x AS b, bibrec_bib78x AS bb
+                                        WHERE bb.id_bibrec=%s AND bb.id_bibxxx=b.id AND tag='786__w'""", (i, ))
+                    recids = [int(recid[0]) for recid in recids if recid[0].isdigit()]
+                    if not recids:
+                        continue
+                    write_message("Record %s missing author information, fetching it from record %s" % (i, recids[0]), verbose=2)
+                    collector = TermCollector(self.tokenizer,
+                                            self.tokenizer_type,
+                                            self.table_type,
+                                            self.tags,
+                                            [recids[0], recids[0]])
+                    collector.set_special_tags(self.special_tags)
+                    referred_marc, dummy = self.find_nonmarc_records(recids[0], recids[0])
+                    wlist = collector.collect(referred_marc, wlist)
+                    if recids[0] in wlist:
+                        wlist[i] = wlist[recids[0]]
+                    write_message("... discovered this author information: %s" % wlist[i], verbose=2)
+                    for term in get_author_canonical_ids_for_recid(recids[0]):
+                        if not wlist.has_key(i):
+                            wlist[i] = []
+                        wlist[i].append(term)
+                        write_message("... and added this BAI: %s" % term, verbose=2)
+
+        # HACK: just to be sure. this code has become spaghetti
+        for i in wlist:
+            wlist[i] = list(set(wlist[i]))
+
         # lookup index-time synonyms:
         synonym_kbrs = get_all_synonym_knowledge_bases()
         if synonym_kbrs.has_key(self.index_name):
@@ -2079,6 +2122,19 @@ def update_virtual_indexes(virtual_indexes, reindex=False):
 
             task_sleep_now_if_required(can_stop_too=True)
 
+_DATA_PAPER_MAPPING = None
+def get_data_paper_mapping():
+    global _DATA_PAPER_MAPPING
+    if _DATA_PAPER_MAPPING is None:
+        data_paper_list = [(int(paper_recid), data_recid) for (data_recid, paper_recid) in run_sql(
+        "SELECT bb.id_bibrec, b.value FROM bib78x AS b, bibrec_bib78x AS bb WHERE bb.id_bibxxx=b.id AND tag='786__w'") if paper_recid.isdigit()]
+        _DATA_PAPER_MAPPING = {}
+        for paper_recid, data_recid in data_paper_list:
+            if paper_recid not in _DATA_PAPER_MAPPING:
+                _DATA_PAPER_MAPPING[paper_recid] = intbitset([data_recid])
+            else:
+                _DATA_PAPER_MAPPING[paper_recid].add(data_recid)
+    return _DATA_PAPER_MAPPING
 
 def task_run_core():
     """Runs the task by fetching arguments from the BibSched task queue.
@@ -2170,6 +2226,25 @@ def task_run_core():
     recIDs_for_index = find_affected_records_for_index(regular_indexes,
                                                        recIDs_range,
                                                        True)
+
+    data_paper_mapping = get_data_paper_mapping()
+
+    # HACK: What follows is a total INSPIRE hack :-)
+    if [index_name for index_name in recIDs_for_index if 'author' in index_name]:
+        # author indexes are affected: we need to expand them with corresponding
+        # Data records.
+        affected_records = intbitset()
+        for recids in [recIDs_for_index[index_name] for index_name in recIDs_for_index if 'author' in index_name]:
+            affected_records |= intbitset(recids)
+        affected_data_records = intbitset()
+        for recid in affected_records:
+            affected_data_records |= data_paper_mapping.get(recid, intbitset())
+        for index_name, recids in recIDs_for_index.iteritems():
+            if 'author' in index_name:
+                write_message("Adding %s Data records to be reindexed for the %s index" % (len(affected_data_records), index_name), verbose=2)
+                recIDs_for_index[index_name] = intbitset(recids) | affected_data_records
+    # End of the HACK
+
 
     if len(recIDs_for_index.keys()) == 0:
         write_message("Selected indexes/recIDs are up to date.")
