@@ -1453,7 +1453,7 @@ class WordTable(AbstractIndexTable):
                             # be indexed in this request.
                             # Better remove it to be better safe than sorry.
                             del wlist[recids[0]]
-                    write_message("... discovered this author information: %s" % wlist[i], verbose=2)
+                        write_message("... discovered this author information: %s" % wlist[i], verbose=2)
                     for term in get_author_canonical_ids_for_recid(recids[0]):
                         if not wlist.has_key(i):
                             wlist[i] = []
