@@ -44,6 +44,8 @@ tests_require = [
     'pytest>=2.8.0',
 ]
 
+invenio_db_version = '>=1.0.0a5,<1.1.0'
+
 extras_require = {
     'accounts': [
         'invenio-accounts>=1.0.0a2,<1.1.0',
@@ -60,9 +62,14 @@ extras_require = {
     ],
     'utils': [
         'invenio-mail>=1.0.0a1,<1.1.0',
-        'invenio-db>=1.0.0a5,<1.1.0',
         'invenio-rest>=1.0.0a2,<1.1.0',
         'invenio-logging>=1.0.0a1,<1.1.0',
+    ],
+    'mysql': [
+        'invenio-db[mysql]' + invenio_db_version,
+    ],
+    'postgresql': [
+        'invenio-db[postgresql]' + invenio_db_version,
     ],
     'docs': [
         'Sphinx>=1.3',
@@ -86,7 +93,9 @@ for name, requires in aliases.items():
 
 # All alias to install every possible dependency.
 extras_require['all'] = []
-for reqs in extras_require.values():
+for name, reqs in extras_require.items():
+    if name in {'mysql', 'postgresql'}:
+        continue
     extras_require['all'].extend(reqs)
 
 #
