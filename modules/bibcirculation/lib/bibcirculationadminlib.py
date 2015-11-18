@@ -4936,6 +4936,25 @@ def ill_request_details_step2(req, delete_key, ill_request_id, new_status,
         barcode = db.get_ill_barcode(ill_request_id)
         db.update_ill_loan_status(borrower_id, barcode, return_date, 'ill')
 
+    # ill recall letter issue
+    try:
+        from invenio.dbquery import run_sql
+        _query = ('SELECT due_date from crcILLREQUEST where id = "{0}"')
+        _due = run_sql(_query.format(ill_request_id))[0][0]
+
+        # Since we don't know if the due_date is a string or datetime
+        try:
+            _due_date = datetime.datetime.strptime(due_date, '%Y-%m-%d')
+        except TypeError:
+            _due_date = due_date
+
+        # This means that the ILL got extended, we therefore reset the 
+        # overdue_letter_numer
+        if _due < _due_date:
+            db.update_ill_request_letter_number(ill_request_id, 0)
+    except Exception:
+        pass
+
     db.update_ill_request(ill_request_id, library_id, request_date,
                           expected_date, arrival_date, due_date, return_date,
                           new_status, cost, barcode,

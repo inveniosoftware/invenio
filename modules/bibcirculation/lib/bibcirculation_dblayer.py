@@ -2700,6 +2700,11 @@ def get_purchase_request_borrower_details(ill_request_id):
     else:
         return None
 
+def update_ill_request_letter_number(ill_request_id, overdue_letter_number):
+    query = ('UPDATE crcILLREQUEST set overdue_letter_number={0} '
+             'where id="{1}"')
+    run_sql(query.format(overdue_letter_number, ill_request_id))
+
 def update_ill_request(ill_request_id, library_id, request_date,
                        expected_date, arrival_date, due_date, return_date,
                        status, cost, barcode, library_notes):
