@@ -146,7 +146,7 @@ First, some useful system tools are installed:
    :literal:
 
 Second, an external Node.js package repository is enabled. We'll be needing to
-install and run Bower on the web node later. The Node.js repository is enabled
+install and run Npm on the web node later. The Node.js repository is enabled
 as follows:
 
 * on Ubuntu 14.04 LTS (Trusty Tahr):
@@ -197,14 +197,14 @@ install corresponding libraries too:
    :end-before: # sphinxdoc-install-web-libpostgresql-centos7-end
    :literal:
 
-Fourth, now that Node.js is installed, we can proceed with installing Bower and
+Fourth, now that Node.js is installed, we can proceed with installing Npm and
 associated CSS/JS filter tools. Let's do it globally:
 
 * on either of the operating systems:
 
 .. include:: ../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-bower-and-css-js-filters-begin
-   :end-before: # sphinxdoc-install-bower-and-css-js-filters-end
+   :start-after: # sphinxdoc-install-npm-and-css-js-filters-begin
+   :end-before: # sphinxdoc-install-npm-and-css-js-filters-end
    :literal:
 
 Finally, we'll install Python virtual environment wrapper tools and activate
@@ -430,12 +430,12 @@ multi-server environment:
    :end-before: # sphinxdoc-customise-instance-end
    :literal:
 
-In the instance folder, we run Bower to install any JavaScript libraries that
+In the instance folder, we run Npm to install any JavaScript libraries that
 Invenio needs:
 
 .. include:: ../../scripts/install.sh
-   :start-after: # sphinxdoc-run-bower-begin
-   :end-before: # sphinxdoc-run-bower-end
+   :start-after: # sphinxdoc-run-npm-begin
+   :end-before: # sphinxdoc-run-npm-end
    :literal:
 
 We can now collect and build CSS/JS assets of our Invenio instance:

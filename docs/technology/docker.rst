@@ -130,7 +130,7 @@ Code changes and live reloading
     you are using one of these setups, you have to restart the Docker
     containers to reload the code and templates.
 
-As long as you do not add new requirements (python and bower) and only change
+As long as you do not add new requirements (python and npm) and only change
 files inside the `invenio` package, it is not required to rebuild the docker
 images. Code changes are mirrored to the containers. If Flask supports it, on
 your system it will automatically reload the application when changes are

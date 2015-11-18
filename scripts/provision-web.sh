@@ -107,12 +107,12 @@ provision_web_libpostgresql_centos7 () {
     # sphinxdoc-install-web-libpostgresql-centos7-end
 }
 
-setup_bower_and_css_js_filters () {
+setup_npm_and_css_js_filters () {
 
-    # sphinxdoc-install-bower-and-css-js-filters-begin
-    sudo su -c "npm install -g bower"
+    # sphinxdoc-install-npm-and-css-js-filters-begin
+    sudo su -c "npm install -g npm"
     sudo su -c "npm install -g node-sass clean-css requirejs uglify-js"
-    # sphinxdoc-install-bower-and-css-js-filters-end
+    # sphinxdoc-install-npm-and-css-js-filters-end
 
 }
 
@@ -176,7 +176,7 @@ main () {
     fi
 
     # finish with common setups:
-    setup_bower_and_css_js_filters
+    setup_npm_and_css_js_filters
     setup_virtualenvwrapper
 
 }

@@ -127,14 +127,14 @@ echo "BROKER_URL='redis://${INVENIO_REDIS_HOST}:6379/0'" >> ../var/${INVENIO_WEB
 echo "CELERY_RESULT_BACKEND='redis://${INVENIO_REDIS_HOST}:6379/1'" >> ../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
 # sphinxdoc-customise-instance-end
 
-# sphinxdoc-run-bower-begin
+# sphinxdoc-run-npm-begin
 cd ${INVENIO_WEB_INSTANCE}
 pip install ipaddr # FIXME this seems explicitly needed on Python-2.7
-python manage.py bower
-cdvirtualenv var/${INVENIO_WEB_INSTANCE}-instance/
-CI=true bower install
+python manage.py npm
+cdvirtualenv var/${INVENIO_WEB_INSTANCE}-instance/static
+CI=true npm install
 cd -
-# sphinxdoc-run-bower-end
+# sphinxdoc-run-npm-end
 
 # sphinxdoc-collect-and-build-assets-begin
 python manage.py collect -v

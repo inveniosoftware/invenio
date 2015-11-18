@@ -21,6 +21,11 @@
  How to create an Invenio overlay
 ==================================
 
+.. admonition:: CAVEAT LECTOR
+
+   The following overlay guide was written for Invenio v2.0 release series. It
+   is to be updated for Invenio v3.0.x
+
 .. admonition:: TODO
 
     The following items are still missing from this document, feel free to
