@@ -468,7 +468,7 @@ def get_time_estimator(total):
         count[0] += step
         t2 = time.time()
         t3 = 1.0 * (t2 - t1) / count[0] * (total - count[0])
-        return t3, t3 + t1
+        return t3, t3 + t2
     return estimate_needed_time
 
 # This library does not support strftime's "%s" or "%y" format strings.
