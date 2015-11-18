@@ -28,14 +28,26 @@ set -o errexit
 # quit on unbound symbols:
 set -o nounset
 
+# sphinxdoc-install-detect-sudo-begin
+# runs as root or needs sudo?
+if [[ "$EUID" -ne 0 ]]; then
+    sudo='sudo'
+else
+    sudo=''
+fi
+# sphinxdoc-install-detect-sudo-end
+
+# unattended installation:
+export DEBIAN_FRONTEND=noninteractive
+
 provision_web_common_ubuntu_trusty () {
 
     # sphinxdoc-install-useful-system-tools-trusty-begin
     # update list of available packages:
-    sudo DEBIAN_FRONTEND=noninteractive apt-get -y update
+    $sudo apt-get -y update
 
     # install useful system tools:
-    sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
+    $sudo apt-get -y install \
          curl \
          git \
          rlwrap \
@@ -43,18 +55,18 @@ provision_web_common_ubuntu_trusty () {
          vim
 
     # install uuid generator (useful for loading demo records):
-    sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
+    $sudo apt-get -y install \
          uuid
     # sphinxdoc-install-useful-system-tools-trusty-end
 
     # sphinxdoc-add-nodejs-external-repository-trusty-begin
     if [[ ! -f /etc/apt/sources.list.d/nodesource.list ]]; then
-        curl -sL https://deb.nodesource.com/setup_4.x | sudo bash -
+        curl -sL https://deb.nodesource.com/setup_4.x | $sudo bash -
     fi
     # sphinxdoc-add-nodejs-external-repository-trusty-end
 
     # sphinxdoc-install-web-common-trusty-begin
-    sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
+    $sudo apt-get -y install \
          libffi-dev \
          libfreetype6-dev \
          libjpeg-dev \
@@ -72,7 +84,7 @@ provision_web_common_ubuntu_trusty () {
 provision_web_libpostgresql_ubuntu_trusty () {
 
     # sphinxdoc-install-web-libpostgresql-trusty-begin
-    sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
+    $sudo apt-get -y install \
          libpq-dev
     # sphinxdoc-install-web-libpostgresql-trusty-end
 }
@@ -81,7 +93,7 @@ provision_web_common_centos7 () {
 
     # sphinxdoc-install-useful-system-tools-centos7-begin
     # install useful system tools:
-    sudo yum install -y \
+    $sudo yum install -y \
          curl \
          git \
          rlwrap \
@@ -89,20 +101,20 @@ provision_web_common_centos7 () {
          vim
 
     # install uuid generator (useful for loading demo records):
-    sudo yum install -y \
+    $sudo yum install -y \
          uuid
     # sphinxdoc-install-useful-system-tools-centos7-end
 
     # sphinxdoc-add-nodejs-external-repository-centos7-begin
     # add EPEL external repository:
-    sudo yum install -y epel-release
+    $sudo yum install -y epel-release
     # sphinxdoc-add-nodejs-external-repository-centos7-end
 
     # sphinxdoc-install-web-common-centos7-begin
     # install development tools:
-    sudo yum update -y
-    sudo yum groupinstall -y "Development Tools"
-    sudo yum install -y \
+    $sudo yum update -y
+    $sudo yum groupinstall -y "Development Tools"
+    $sudo yum install -y \
          libffi-devel \
          libxml2-devel \
          libxslt-devel \
@@ -116,7 +128,7 @@ provision_web_common_centos7 () {
 provision_web_libpostgresql_centos7 () {
 
     # sphinxdoc-install-web-libpostgresql-centos7-begin
-    sudo yum install -y \
+    $sudo yum install -y \
          postgresql-devel
     # sphinxdoc-install-web-libpostgresql-centos7-end
 }
@@ -124,8 +136,8 @@ provision_web_libpostgresql_centos7 () {
 setup_npm_and_css_js_filters () {
 
     # sphinxdoc-install-npm-and-css-js-filters-begin
-    sudo su -c "npm install -g npm"
-    sudo su -c "npm install -g node-sass clean-css requirejs uglify-js"
+    $sudo su -c "npm install -g npm"
+    $sudo su -c "npm install -g node-sass clean-css requirejs uglify-js"
     # sphinxdoc-install-npm-and-css-js-filters-end
 
 }
@@ -137,7 +149,7 @@ setup_virtualenvwrapper () {
     set +o nounset
 
     # sphinxdoc-install-virtualenvwrapper-begin
-    sudo pip install -U virtualenvwrapper pip
+    $sudo pip install -U virtualenvwrapper pip
     if ! grep -q virtualenvwrapper ~/.bashrc; then
         mkdir -p $HOME/.virtualenvs
         echo "export WORKON_HOME=$HOME/.virtualenvs" >> $HOME/.bashrc
@@ -168,7 +180,11 @@ main () {
     fi
 
     # call appropriate provisioning functions:
-    if [ "$os_distribution" = "Ubuntu" ]; then
+    if [ -f /.dockerinit ]; then
+        # running inside Docker
+        provision_web_common_ubuntu_trusty
+        provision_web_libpostgresql_ubuntu_trusty
+    elif [ "$os_distribution" = "Ubuntu" ]; then
         if [ "$os_release" = "14.04" ]; then
             provision_web_common_ubuntu_trusty
             provision_web_libpostgresql_ubuntu_trusty

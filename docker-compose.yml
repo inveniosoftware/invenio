@@ -1,0 +1,77 @@
+# -*- coding: utf-8 -*-
+#
+# This file is part of Invenio.
+# Copyright (C) 2015, 2016 CERN.
+#
+# Invenio is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+
+web:
+  build: .
+  command: /bin/bash -c "invenio3 --debug run -h 0.0.0.0"
+  environment:
+    - PATH=/home/invenio/.virtualenvs/invenio3/bin:$PATH
+    - VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python
+    - INVENIO_WEB_HOST=127.0.0.1
+    - INVENIO_WEB_INSTANCE=invenio3
+    - INVENIO_WEB_VENV=invenio3
+    - INVENIO_USER_EMAIL=info@inveniosoftware.org
+    - INVENIO_USER_PASS=uspass123
+    - INVENIO_POSTGRESQL_HOST=postgresql
+    - INVENIO_POSTGRESQL_DBNAME=invenio3
+    - INVENIO_POSTGRESQL_DBUSER=invenio3
+    - INVENIO_POSTGRESQL_DBPASS=dbpass123
+    - INVENIO_REDIS_HOST=redis
+    - INVENIO_ELASTICSEARCH_HOST=elasticsearch
+    - INVENIO_RABBITMQ_HOST=rabbitmq
+    - INVENIO_WORKER_HOST=127.0.0.1
+  volumes:
+    - .:/code
+  links:
+    - postgresql
+    - redis
+    - elasticsearch
+    - rabbitmq
+  ports:
+    - "5000:5000"
+
+postgresql:
+  image: postgres
+  environment:
+    - POSTGRES_USER=invenio3
+    - POSTGRES_DB=invenio3
+    - POSTGRES_PASSWORD=dbpass123
+  ports:
+    - "127.0.0.1:25432:5432"
+
+redis:
+  image: redis
+  ports:
+    - "127.0.0.1:26379:6379"
+
+elasticsearch:
+  image: elasticsearch
+  ports:
+    - "29200:9200"
+    - "29300:9300"
+
+rabbitmq:
+  image: rabbitmq
+  ports:
+    - "25672:5672"

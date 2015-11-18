@@ -1,5 +1,5 @@
 ..  This file is part of Invenio
-    Copyright (C) 2014, 2015 CERN.
+    Copyright (C) 2014, 2015, 2016 CERN.
 
     Invenio is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -21,25 +21,12 @@ Quick installation guide
 Using Docker
 ------------
 
-You can get Invenio v2.0 demo site up and running in fifteen minutes using
-Docker::
+You can get Invenio v3.0 demo site up and running using Docker::
 
-  mkdir -p ~/private/src
-  cd ~/private/src
-  git clone git@github.com/inveniosoftware/invenio
-  git clone git@github.com/inveniosoftware/invenio-demosite
-  cd ~/private/src/invenio
-  git checkout maint-2.0
-  docker build -t invenio:2.0 .
-  cd ~/private/src/invenio-demosite
-  git checkout maint-2.0
-  docker-compose -f docker-compose-dev.yml build
-  docker-compose -f docker-compose-dev.yml up
-  # now wait until all daemons are fully up and running
-  docker exec -i -t -u invenio inveniodemosite_web_1 \
-      inveniomanage demosite populate \
-      --packages=invenio_demosite.base --yes-i-know
-  firefox http://127.0.0.1:28080/
+  docker-compose build
+  docker-compose up -d
+  docker-compose run --rm web ./scripts/populate-instance.sh
+  firefox http://127.0.0.1:5000/records/1
 
 Using Vagrant
 -------------
@@ -47,8 +34,10 @@ Using Vagrant
 You can get Invenio v3.0 demo site up and running using Vagrant::
 
   vagrant up
-  vagrant ssh web -c 'source .inveniorc && /vagrant/scripts/install.sh'
-  vagrant ssh web -c 'curl http://0.0.0.0:5000/records/1'
+  vagrant ssh web -c 'source .inveniorc && /vagrant/scripts/create-instance.sh --devel'
+  vagrant ssh web -c 'source .inveniorc && /vagrant/scripts/populate-instance.sh'
+  vagrant ssh web -c 'source .inveniorc && nohup /vagrant/scripts/start-instance.sh'
+  firefox http://127.0.0.1:5000/records/1
 
 Using kickstart scripts
 -----------------------
@@ -64,7 +53,9 @@ installation scripts manually::
   scripts/provision-redis.sh
   scripts/provision-rabbitmq.sh
   scripts/provision-worker.sh
-  scripts/install.sh
-  firefox http://127.0.0.1:5000/
+  scripts/create-instance.sh --devel
+  scripts/populate-instance.sh
+  scripts/start-instance.sh
+  firefox http://127.0.0.1:5000/records/1
 
 See :ref:`installation_detailed` for more information.

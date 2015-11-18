@@ -129,7 +129,14 @@ the following script:
 
 Let's see in detail what the web provisioning script does.
 
-First, some useful system tools are installed:
+First, let's see if using ``sudo`` will be required:
+
+.. include:: ../../scripts/provision-web.sh
+   :start-after: # sphinxdoc-install-detect-sudo-begin
+   :end-before: # sphinxdoc-install-detect-sudo-end
+   :literal:
+
+Second, some useful system tools are installed:
 
 * on Ubuntu 14.04 LTS (Trusty Tahr):
 
@@ -145,9 +152,9 @@ First, some useful system tools are installed:
    :end-before: # sphinxdoc-install-useful-system-tools-centos7-end
    :literal:
 
-Second, an external Node.js package repository is enabled. We'll be needing to
-install and run Npm on the web node later. The Node.js repository is enabled
-as follows:
+Third, an external Node.js package repository is enabled. We'll be needing to
+install and run Npm on the web node later. The Node.js repository is enabled as
+follows:
 
 * on Ubuntu 14.04 LTS (Trusty Tahr):
 
@@ -163,7 +170,7 @@ as follows:
    :end-before: # sphinxdoc-add-nodejs-external-repository-centos7-end
    :literal:
 
-Third, all the common prerequisite software libraries and packages that Invenio
+Fourth, all the common prerequisite software libraries and packages that Invenio
 needs are installed:
 
 * on Ubuntu 14.04 LTS (Trusty Tahr):
@@ -197,7 +204,7 @@ install corresponding libraries too:
    :end-before: # sphinxdoc-install-web-libpostgresql-centos7-end
    :literal:
 
-Fourth, now that Node.js is installed, we can proceed with installing Npm and
+Fifth, now that Node.js is installed, we can proceed with installing Npm and
 associated CSS/JS filter tools. Let's do it globally:
 
 * on either of the operating systems:
@@ -387,20 +394,27 @@ Now that all the prerequisites have been set up, we can proceed with the
 installation of the Invenio itself. The installation is happening on the web
 node (192.168.50.10).
 
-The installation of Invenio can be done in an automated unattended way by
-running the following script:
+We start by creating and configuring a new Invenio instance, continue by
+populating it with some example records, and finally we start the web
+application. This can be done in an automated unattended way by running the
+following scripts:
 
 .. code-block:: shell
 
    source .inveniorc
-   ./scripts/install.sh
+   ./scripts/create-instance.sh
+   ./scripts/populate-instance.sh
+   ./scripts/start-instance.sh
 
-Let's see in detail what the Invenio installation script does.
+Let’s see in detail about every Invenio installation step.
+
+Create instance
+~~~~~~~~~~~~~~~
 
 We start by creating a fresh new Python virtual environment that will hold our
-Invenio v3.0 instance:
+brand new Invenio v3.0 instance:
 
-.. include:: ../../scripts/install.sh
+.. include:: ../../scripts/create-instance.sh
    :start-after: # sphinxdoc-create-virtual-environment-begin
    :end-before: # sphinxdoc-create-virtual-environment-end
    :literal:
@@ -409,7 +423,7 @@ We continue by installing Invenio v3.0 base package and most of its available
 modules (by using option ``full`` as opposed to using option ``minimal``) from
 PyPI:
 
-.. include:: ../../scripts/install.sh
+.. include:: ../../scripts/create-instance.sh
    :start-after: # sphinxdoc-install-invenio-full-begin
    :end-before: # sphinxdoc-install-invenio-full-end
    :literal:
@@ -421,7 +435,7 @@ from GitHub, you can run the following in the Invenio source code directory::
 
 We can now create a new Invenio instance:
 
-.. include:: ../../scripts/install.sh
+.. include:: ../../scripts/create-instance.sh
    :start-after: # sphinxdoc-create-instance-begin
    :end-before: # sphinxdoc-create-instance-end
    :literal:
@@ -429,7 +443,7 @@ We can now create a new Invenio instance:
 We can now install the newly created instance by means of provided ``setup.py``
 script:
 
-.. include:: ../../scripts/install.sh
+.. include:: ../../scripts/create-instance.sh
    :start-after: # sphinxdoc-install-instance-begin
    :end-before: # sphinxdoc-install-instance-end
    :literal:
@@ -438,7 +452,7 @@ Let's briefly customise our instance with respect to the location of the
 database server, the Redis server, the Elasticsearch server, and all the other
 dependent services in our multi-server environment:
 
-.. include:: ../../scripts/install.sh
+.. include:: ../../scripts/create-instance.sh
    :start-after: # sphinxdoc-customise-instance-begin
    :end-before: # sphinxdoc-customise-instance-end
    :literal:
@@ -446,45 +460,44 @@ dependent services in our multi-server environment:
 In the instance folder, we run Npm to install any JavaScript libraries that
 Invenio needs:
 
-.. include:: ../../scripts/install.sh
+.. include:: ../../scripts/create-instance.sh
    :start-after: # sphinxdoc-run-npm-begin
    :end-before: # sphinxdoc-run-npm-end
    :literal:
 
 We can now collect and build CSS/JS assets of our Invenio instance:
 
-.. include:: ../../scripts/install.sh
+.. include:: ../../scripts/create-instance.sh
    :start-after: # sphinxdoc-collect-and-build-assets-begin
    :end-before: # sphinxdoc-collect-and-build-assets-end
    :literal:
+
+Our first new Invenio instance is created and ready for loading some example
+records.
+
+Populate instance
+~~~~~~~~~~~~~~~~~
 
 We proceed by creating a dedicated database that will hold persistent data of
 our installation, such as bibliographic records or user accounts. The database
 tables can be created as follows:
 
-.. include:: ../../scripts/install.sh
+.. include:: ../../scripts/populate-instance.sh
    :start-after: # sphinxdoc-create-database-begin
    :end-before: # sphinxdoc-create-database-end
    :literal:
 
 We continue by creating a user account:
 
-.. include:: ../../scripts/install.sh
+.. include:: ../../scripts/populate-instance.sh
    :start-after: # sphinxdoc-create-user-account-begin
    :end-before: # sphinxdoc-create-user-account-end
    :literal:
 
-Let's now start Celery worker that will execute instance tasks:
+We proceed by populating our Invenio instance with demo MARCXML records that are
+taken from the ``invenio-records`` package:
 
-.. include:: ../../scripts/install.sh
-   :start-after: # sphinxdoc-start-celery-worker-begin
-   :end-before: # sphinxdoc-start-celery-worker-end
-   :literal:
-
-Now that Celery is running, we can populate our Invenio instance with demo
-records:
-
-.. include:: ../../scripts/install.sh
+.. include:: ../../scripts/populate-instance.sh
    :start-after: # sphinxdoc-populate-with-demo-records-begin
    :end-before: # sphinxdoc-populate-with-demo-records-end
    :literal:
@@ -492,14 +505,17 @@ records:
 Let's register incremental numerical persistent identifiers for the uploaded
 demo records:
 
-.. include:: ../../scripts/install.sh
+.. include:: ../../scripts/populate-instance.sh
    :start-after: # sphinxdoc-register-pid-begin
    :end-before: # sphinxdoc-register-pid-end
    :literal:
 
+Start instance
+~~~~~~~~~~~~~~
+
 Finally, let's start the web application (in debugging mode):
 
-.. include:: ../../scripts/install.sh
+.. include:: ../../scripts/start-instance.sh
    :start-after: # sphinxdoc-start-application-begin
    :end-before: # sphinxdoc-start-application-end
    :literal:
