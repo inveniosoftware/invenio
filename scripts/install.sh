@@ -104,9 +104,8 @@ set -o errexit
 set -o nounset
 
 # sphinxdoc-install-invenio-full-begin
-# FIXME we pin older version that works:
-pip install invenio-records==v1.0.0a3
-# FIXME we need to install PostgreSQL DB connect option explicitly:
+# FIXME we need to install PostgreSQL DB connect option explicitly
+# (for Invenio versions less than v3.0.0a3)
 pip install invenio-db[postgresql]
 # now we can install full Invenio:
 pip install invenio[full] --pre
@@ -159,16 +158,22 @@ celery worker -A ${INVENIO_WEB_INSTANCE}.celery -l INFO &
 # sphinxdoc-start-celery-worker-end
 
 # sphinxdoc-populate-with-demo-records-begin
-echo '{"title":"Invenio 3 Rocks", "recid": 1}'| \
-    python manage.py records create
+echo "from invenio_db import db; \
+from invenio_records import Record; \
+Record.create({'title': 'Invenio 3 rocks'}, \
+  id_='4b0714f6-9fe4-43d3-a08f-38c2b309afba'); \
+db.session.commit()" | python manage.py shell
 # sphinxdoc-populate-with-demo-records-end
 
 # sphinxdoc-register-pid-begin
 echo "from invenio_db import db; \
+from uuid import uuid4; \
 from invenio_pidstore.models import PersistentIdentifier; \
-pid = PersistentIdentifier.create('recid', '1', 'recid'); \
-pid.assign('rec', '1'); \
-pid.register(); \
+from invenio_pidstore.models import PIDStatus; \
+pid = PersistentIdentifier.create('recid', '1', \
+  object_type='rec', \
+  object_uuid='4b0714f6-9fe4-43d3-a08f-38c2b309afba', \
+  status=PIDStatus.REGISTERED); \
 db.session.commit()" | python manage.py shell
 # sphinxdoc-register-pid-end
 
