@@ -104,9 +104,11 @@ set -o errexit
 set -o nounset
 
 # sphinxdoc-install-invenio-full-begin
-# FIXME we need to install PostgreSQL DB connect option explicitly
-# (for Invenio versions less than v3.0.0a3)
-pip install invenio-db[postgresql]
+# FIXME needed for invenio-search
+pip install requests
+# FIXME next two commands needed only for invenio<v3.0.0a3
+pip install invenio-db[postgresql] --pre
+pip install invenio-search --pre
 # now we can install full Invenio:
 pip install invenio[full] --pre
 # sphinxdoc-install-invenio-full-end
@@ -124,6 +126,9 @@ echo "# Redis" >> ../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE
 echo "CACHE_REDIS_HOST='${INVENIO_REDIS_HOST}'" >> ../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
 echo "BROKER_URL='redis://${INVENIO_REDIS_HOST}:6379/0'" >> ../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
 echo "CELERY_RESULT_BACKEND='redis://${INVENIO_REDIS_HOST}:6379/1'" >> ../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
+echo "" >> ../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
+echo "# Elasticsearch" >> ../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
+echo "SEARCH_ELASTIC_HOSTS='${INVENIO_ELASTICSEARCH_HOST}'" >> ../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
 # sphinxdoc-customise-instance-end
 
 # sphinxdoc-run-npm-begin

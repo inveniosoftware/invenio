@@ -53,7 +53,18 @@ provision_elasticsearch_ubuntu_trusty () {
     sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
          elasticsearch \
          openjdk-7-jre
+
+    # allow network connections:
+    if ! sudo grep -q "network.host: ${INVENIO_ELASTICSEARCH_HOST}" \
+         /etc/elasticsearch/elasticsearch.yml; then
+        echo "network.host: ${INVENIO_ELASTICSEARCH_HOST}" | \
+            sudo tee -a /etc/elasticsearch/elasticsearch.yml
+    fi
+
+    # enable Elasticsearch upon reboot:
     sudo update-rc.d elasticsearch defaults 95 10
+
+    # start Elasticsearch:
     sudo /etc/init.d/elasticsearch restart
     # sphinxdoc-install-elasticsearch-trusty-end
 
@@ -84,8 +95,11 @@ enabled=1" | \
          java
 
     # allow network connections:
-    echo "network.host: ${INVENIO_ELASTICSEARCH_HOST}" | \
-        sudo tee -a /etc/elasticsearch/elasticsearch.yml
+    if ! sudo grep -q "network.host: ${INVENIO_ELASTICSEARCH_HOST}" \
+         /etc/elasticsearch/elasticsearch.yml; then
+        echo "network.host: ${INVENIO_ELASTICSEARCH_HOST}" | \
+            sudo tee -a /etc/elasticsearch/elasticsearch.yml
+    fi
 
     # open firewall ports:
     if firewall-cmd --state | grep -q running; then

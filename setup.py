@@ -56,6 +56,9 @@ extras_require = {
         'invenio-records-ui>=1.0.0a1,<1.1.0',
         'invenio-records-rest>=1.0.0a2,<1.1.0',
     ],
+    'search': [
+        'invenio-search>=1.0.0a1,<1.1.0',
+    ],
     'theme': [
         'invenio-assets>=1.0.0a1,<1.1.0',
         'invenio-theme>=1.0.0a3,<1.1.0',
@@ -83,7 +86,7 @@ extras_require = {
 #
 aliases = {
     'minimal': ['accounts', 'theme', 'utils', ],
-    'full': ['accounts', 'records', 'theme', 'utils', ],
+    'full': ['accounts', 'records', 'search', 'theme', 'utils'],
 }
 
 for name, requires in aliases.items():

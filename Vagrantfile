@@ -42,6 +42,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "web" do |web|
     web.vm.box = OS
+    web.vm.hostname = 'web'
     web.vm.provision "file", source: ".inveniorc", destination: ".inveniorc"
     web.vm.provision "shell", inline: "source .inveniorc && /vagrant/scripts/provision-web.sh", privileged: false
     web.vm.network "forwarded_port", guest: 5000, host: 5000
@@ -50,6 +51,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "postgresql" do |postgresql|
     postgresql.vm.box = OS
+    postgresql.vm.hostname = 'postgresql'
     postgresql.vm.provision "file", source: ".inveniorc", destination: ".inveniorc"
     postgresql.vm.provision "shell", inline: "source .inveniorc && /vagrant/scripts/provision-postgresql.sh", privileged: false
     postgresql.vm.network "private_network", ip: ENV.fetch('INVENIO_POSTGRESQL_HOST','192.168.50.11')
@@ -57,6 +59,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "redis" do |redis|
     redis.vm.box = OS
+    redis.vm.hostname = 'redis'
     redis.vm.provision "file", source: ".inveniorc", destination: ".inveniorc"
     redis.vm.provision "shell", inline: "source .inveniorc && /vagrant/scripts/provision-redis.sh", privileged: false
     redis.vm.network "private_network", ip: ENV.fetch('INVENIO_REDIS_HOST','192.168.50.12')
@@ -64,6 +67,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "elasticsearch" do |elasticsearch|
     elasticsearch.vm.box = OS
+    elasticsearch.vm.hostname = 'elasticsearch'
     elasticsearch.vm.provision "file", source: ".inveniorc", destination: ".inveniorc"
     elasticsearch.vm.provision "shell", inline: "source .inveniorc && /vagrant/scripts/provision-elasticsearch.sh", privileged: false
     elasticsearch.vm.network "private_network", ip: ENV.fetch('INVENIO_ELASTICSEARCH_HOST','192.168.50.13')
@@ -71,6 +75,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "rabbitmq" do |rabbitmq|
     rabbitmq.vm.box = OS
+    rabbitmq.vm.hostname = 'rabbitmq'
     rabbitmq.vm.provision "file", source: ".inveniorc", destination: ".inveniorc"
     rabbitmq.vm.provision "shell", inline: "source .inveniorc && /vagrant/scripts/provision-rabbitmq.sh", privileged: false
     rabbitmq.vm.network "private_network", ip: ENV.fetch('INVENIO_RABBITMQ_HOST','192.168.50.14')
@@ -78,6 +83,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "worker" do |worker|
     worker.vm.box = OS
+    worker.vm.hostname = 'worker'
     worker.vm.provision "file", source: ".inveniorc", destination: ".inveniorc"
     worker.vm.provision "shell", inline: "source .inveniorc && /vagrant/scripts/provision-worker.sh", privileged: false
     worker.vm.network "private_network", ip: ENV.fetch('INVENIO_WORKER_HOST','192.168.50.15')
