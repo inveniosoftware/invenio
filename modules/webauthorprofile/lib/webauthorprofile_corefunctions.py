@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -678,7 +678,7 @@ def _get_fieldtuples_bai_tup(pubs, person_id):
     @param person_id: int person id
     '''
     tup = get_most_popular_field_values(pubs,
-                            CFG_WEBAUTHORPROFILE_FIELDCODE_TAG, count_repetitive_values=True)
+                                        CFG_WEBAUTHORPROFILE_FIELDCODE_TAG, count_repetitive_values=False)
     if CFG_WEBAUTHORPROFILE_USE_ALLOWED_FIELDCODES and CFG_WEBAUTHORPROFILE_ALLOWED_FIELDCODES:
         return tuple([x for x in tup if x[0] in CFG_WEBAUTHORPROFILE_ALLOWED_FIELDCODES])
     return tup
@@ -686,7 +686,7 @@ def _get_fieldtuples_bai_tup(pubs, person_id):
 
 def _get_collabtuples_bai(pubs, person_id):
     '''
-    Returns the list keyword tuples for given personid.
+    Returns the list collaboration tuples for given personid.
     @param person_id: int person id
     '''
     tup = get_most_popular_field_values(pubs,
