@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2010, 2011 CERN.
+## Copyright (C) 2008, 2010, 2011, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -53,6 +53,8 @@ def cvify_records(recids, of, req=None, so='d'):
     elif of == 'tlcv':
         HEADER = r'''
 \documentclass{article}
+\usepackage{textcomp} %% text version of symbols in TS1, e.g. \textrightarrow{}
+\usepackage{amstext} %% proper support of frequently used \text{} command
 %%To use pdflatex, uncomment these lines, as well as the \href lines
 %%in each entry
 %%\usepackage[pdftex,
