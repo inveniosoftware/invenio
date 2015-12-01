@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+# Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -595,6 +595,9 @@ def get_item_info_for_search_result(recid):
                              get_fieldvalues(recid, "260__c"))
 
     book_copies = '  '.join(get_fieldvalues(recid, "964__a"))
+    if not book_copies:
+        book_copies = db.get_number_copies(recid)
+
 
     book_infos = (book_author, book_editor, book_copies)
 
