@@ -421,9 +421,17 @@ We can now create a new Invenio instance:
    :end-before: # sphinxdoc-create-instance-end
    :literal:
 
+We can now install the newly created instance by means of provided ``setup.py``
+script:
+
+.. include:: ../../scripts/install.sh
+   :start-after: # sphinxdoc-install-instance-begin
+   :end-before: # sphinxdoc-install-instance-end
+   :literal:
+
 Let's briefly customise our instance with respect to the location of the
-database server, the Redis server, and all the other dependent services in our
-multi-server environment:
+database server, the Redis server, the Elasticsearch server, and all the other
+dependent services in our multi-server environment:
 
 .. include:: ../../scripts/install.sh
    :start-after: # sphinxdoc-customise-instance-begin

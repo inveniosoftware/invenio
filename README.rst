@@ -99,9 +99,10 @@ Public Licence (GPL).  It is provided on an "as is" basis, in the hope
 that it will be useful, but without any warranty.  There is a
 possibility to get commercial support in case of interest.
 
-Invenio runs on Unix-like systems and requires MySQL database server
-and Apache/Python web application server.  Please consult the INSTALL
-file for more information.
+Invenio runs on Unix-like systems and requires Python/Flask web application
+server, MySQL, PostgreSQL or SQLite database server, Elasticsearch for
+information retrieval and Redis for caching. Please consult the INSTALL file for
+more information.
 
 Happy hacking and thanks for flying Invenio.
 

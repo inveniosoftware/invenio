@@ -76,6 +76,13 @@ provision_postgresql_ubuntu_trusty () {
             sudo tee -a /etc/postgresql/9.3/main/pg_hba.conf
     fi
 
+    # grant database creation rights via SQLAlchemy-Utils:
+    if ! sudo grep -q host.*template1.*${INVENIO_POSTGRESQL_DBUSER} \
+         /etc/postgresql/9.3/main/pg_hba.conf; then
+        echo "host template1 ${INVENIO_POSTGRESQL_DBUSER} ${INVENIO_WEB_HOST}/32 md5" | \
+            sudo tee -a /etc/postgresql/9.3/main/pg_hba.conf
+    fi
+
     # restart PostgreSQL server:
     sudo /etc/init.d/postgresql restart
     # sphinxdoc-install-postgresql-trusty-end
@@ -107,6 +114,13 @@ provision_postgresql_centos7 () {
     if ! sudo grep -q host.*${INVENIO_POSTGRESQL_DBNAME}.*${INVENIO_POSTGRESQL_DBUSER} \
          /var/lib/pgsql/data/pg_hba.conf; then
         echo "host ${INVENIO_POSTGRESQL_DBNAME} ${INVENIO_POSTGRESQL_DBUSER} ${INVENIO_WEB_HOST}/32 md5" | \
+            sudo tee -a /var/lib/pgsql/data/pg_hba.conf
+    fi
+
+    # grant database creation rights via SQLAlchemy-Utils:
+    if ! sudo grep -q host.*template1.*${INVENIO_POSTGRESQL_DBUSER} \
+         /var/lib/pgsql/data/pg_hba.conf; then
+        echo "host template1 ${INVENIO_POSTGRESQL_DBUSER} ${INVENIO_WEB_HOST}/32 md5" | \
             sudo tee -a /var/lib/pgsql/data/pg_hba.conf
     fi
 

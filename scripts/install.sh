@@ -104,10 +104,9 @@ set -o errexit
 set -o nounset
 
 # sphinxdoc-install-invenio-full-begin
-# FIXME needed for invenio-search
-pip install requests
-# FIXME next two commands needed only for invenio<v3.0.0a3
+# FIXME the next three commands are needed only for invenio<3.0.0a3
 pip install invenio-db[postgresql] --pre
+pip install invenio-access[postgresql] --pre
 pip install invenio-search --pre
 # now we can install full Invenio:
 pip install invenio[full] --pre
@@ -117,41 +116,49 @@ pip install invenio[full] --pre
 inveniomanage instance create ${INVENIO_WEB_INSTANCE}
 # sphinxdoc-create-instance-end
 
+# sphinxdoc-install-instance-begin
+cd ${INVENIO_WEB_INSTANCE}
+python setup.py install
+# sphinxdoc-install-instance-end
+
 # sphinxdoc-customise-instance-begin
-mkdir -p ../var/${INVENIO_WEB_INSTANCE}-instance/
-echo "# Database" > ../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
-echo "SQLALCHEMY_DATABASE_URI='postgresql+psycopg2://${INVENIO_POSTGRESQL_DBUSER}:${INVENIO_POSTGRESQL_DBPASS}@${INVENIO_POSTGRESQL_HOST}:5432/${INVENIO_POSTGRESQL_DBNAME}'" >> ../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
-echo "" >> ../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
-echo "# Redis" >> ../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
-echo "CACHE_REDIS_HOST='${INVENIO_REDIS_HOST}'" >> ../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
-echo "BROKER_URL='redis://${INVENIO_REDIS_HOST}:6379/0'" >> ../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
-echo "CELERY_RESULT_BACKEND='redis://${INVENIO_REDIS_HOST}:6379/1'" >> ../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
-echo "" >> ../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
-echo "# Elasticsearch" >> ../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
-echo "SEARCH_ELASTIC_HOSTS='${INVENIO_ELASTICSEARCH_HOST}'" >> ../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
+mkdir -p ../../var/${INVENIO_WEB_INSTANCE}-instance/
+echo "# Database" > ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
+echo "SQLALCHEMY_DATABASE_URI='postgresql+psycopg2://${INVENIO_POSTGRESQL_DBUSER}:${INVENIO_POSTGRESQL_DBPASS}@${INVENIO_POSTGRESQL_HOST}:5432/${INVENIO_POSTGRESQL_DBNAME}'" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
+echo "" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
+echo "# Redis" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
+echo "CACHE_REDIS_HOST='${INVENIO_REDIS_HOST}'" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
+echo "" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
+echo "# Celery" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
+echo "BROKER_URL='redis://${INVENIO_REDIS_HOST}:6379/0'" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
+echo "CELERY_RESULT_BACKEND='redis://${INVENIO_REDIS_HOST}:6379/1'" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
+echo "CELERY_ALWAYS_EAGER=True" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
+echo "CELERY_EAGER_PROPAGATES_EXCEPTIONS=True" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
+echo "" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
+echo "# Elasticsearch" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
+echo "SEARCH_ELASTIC_HOSTS='${INVENIO_ELASTICSEARCH_HOST}'" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
 # sphinxdoc-customise-instance-end
 
 # sphinxdoc-run-npm-begin
 cd ${INVENIO_WEB_INSTANCE}
-pip install ipaddr # FIXME this seems explicitly needed on Python-2.7
-python manage.py npm
+${INVENIO_WEB_INSTANCE} npm
 cdvirtualenv var/${INVENIO_WEB_INSTANCE}-instance/static
 CI=true npm install
 cd -
 # sphinxdoc-run-npm-end
 
 # sphinxdoc-collect-and-build-assets-begin
-python manage.py collect -v
-python manage.py assets build
+${INVENIO_WEB_INSTANCE} collect -v
+${INVENIO_WEB_INSTANCE} assets build
 # sphinxdoc-collect-and-build-assets-end
 
 # sphinxdoc-create-database-begin
-# python manage.py db init # FIXME our database is initialised already
-python manage.py db create
+${INVENIO_WEB_INSTANCE} db init
+${INVENIO_WEB_INSTANCE} db create
 # sphinxdoc-create-database-end
 
 # sphinxdoc-create-user-account-begin
-python manage.py users create \
+${INVENIO_WEB_INSTANCE} users create \
        --email ${INVENIO_USER_EMAIL} \
        --password ${INVENIO_USER_PASS} \
        --active
@@ -159,15 +166,14 @@ python manage.py users create \
 
 # sphinxdoc-start-celery-worker-begin
 # FIXME we should run celery worker on another node
-celery worker -A ${INVENIO_WEB_INSTANCE}.celery -l INFO &
+# NOTE The celery worker command is not needed since we run with CELERY_ALWAYS_EAGER
+# celery worker -A ${INVENIO_WEB_INSTANCE}.celery -l INFO &
 # sphinxdoc-start-celery-worker-end
 
 # sphinxdoc-populate-with-demo-records-begin
-echo "from invenio_db import db; \
-from invenio_records import Record; \
-Record.create({'title': 'Invenio 3 rocks'}, \
-  id_='4b0714f6-9fe4-43d3-a08f-38c2b309afba'); \
-db.session.commit()" | python manage.py shell
+echo '{"title": "Invenio 3 rocks"}' | \
+  ${INVENIO_WEB_INSTANCE} records create \
+    -i 4b0714f6-9fe4-43d3-a08f-38c2b309afba
 # sphinxdoc-populate-with-demo-records-end
 
 # sphinxdoc-register-pid-begin
@@ -179,9 +185,9 @@ pid = PersistentIdentifier.create('recid', '1', \
   object_type='rec', \
   object_uuid='4b0714f6-9fe4-43d3-a08f-38c2b309afba', \
   status=PIDStatus.REGISTERED); \
-db.session.commit()" | python manage.py shell
+db.session.commit()" | ${INVENIO_WEB_INSTANCE} shell
 # sphinxdoc-register-pid-end
 
 # sphinxdoc-start-application-begin
-python manage.py --debug run &
+${INVENIO_WEB_INSTANCE} --debug run -h 0.0.0.0 &
 # sphinxdoc-start-application-end

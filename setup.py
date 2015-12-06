@@ -44,16 +44,19 @@ tests_require = [
     'pytest>=2.8.0',
 ]
 
-invenio_db_version = '>=1.0.0a5,<1.1.0'
+invenio_db_version = '>=1.0.0a7,<1.1.0'
 
 extras_require = {
+    'access': [
+        'invenio-access>=1.0.0a2,<1.1.0',
+    ],
     'accounts': [
         'invenio-accounts>=1.0.0a2,<1.1.0',
     ],
     'records': [
         'invenio-pidstore>=1.0.0a1,<1.1.0',
-        'invenio-records>=1.0.0a3,<1.1.0',
-        'invenio-records-ui>=1.0.0a1,<1.1.0',
+        'invenio-records>=1.0.0a8,<1.1.0',
+        'invenio-records-ui>=1.0.0a4,<1.1.0',
         'invenio-records-rest>=1.0.0a2,<1.1.0',
     ],
     'search': [
@@ -61,7 +64,7 @@ extras_require = {
     ],
     'theme': [
         'invenio-assets>=1.0.0a1,<1.1.0',
-        'invenio-theme>=1.0.0a3,<1.1.0',
+        'invenio-theme>=1.0.0a6,<1.1.0',
     ],
     'utils': [
         'invenio-mail>=1.0.0a1,<1.1.0',
@@ -86,7 +89,7 @@ extras_require = {
 #
 aliases = {
     'minimal': ['accounts', 'theme', 'utils', ],
-    'full': ['accounts', 'records', 'search', 'theme', 'utils'],
+    'full': ['access', 'accounts', 'records', 'search', 'theme', 'utils'],
 }
 
 for name, requires in aliases.items():
