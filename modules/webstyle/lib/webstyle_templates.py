@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -511,6 +511,8 @@ template function generated it.
         """
         canonical_url, alternate_urls = get_canonical_and_alternates_urls(url, quote_path=quote_path)
         out = """  <link rel="canonical" href="%s" />\n""" % cgi.escape(canonical_url, True)
+        out += """  <link rel="alternate" hreflang="x-default" href="%s" />\n""" \
+               % cgi.escape(canonical_url, True)
         for ln, alternate_url in alternate_urls.iteritems():
             ln = ln.replace('_', '-') ## zh_CN -> zh-CN
             out += """  <link rel="alternate" hreflang="%s" href="%s" />\n""" % (ln, cgi.escape(alternate_url, True))
