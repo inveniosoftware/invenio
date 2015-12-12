@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2013 CERN.
+# Copyright (C) 2011, 2012, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -2891,11 +2891,12 @@ def get_papers_affected_since(date_from, date_to=None):  # personid_get_recids_a
     @return type: intbitset
     """
     recs = run_sql("""select bibrec from aidPERSONIDPAPERS where
-                      last_updated >= %s or personid in
+                      last_updated >= %s UNION ALL select bibrec
+                      from aidPERSONIDPAPERS where personid in
                       (select personid from aidPERSONIDDATA where
                       last_updated >= %s)""", (date_from, date_from))
 
-    return intbitset([rec[0] for rec in recs])
+    return intbitset(recs)
 
 
 
