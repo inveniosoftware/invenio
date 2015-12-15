@@ -3041,36 +3041,35 @@ def update_item_info_step6(req, tup_infos, ln=CFG_SITE_LANG):
             else:
                 infos.append(_("Item <strong>[%s]</strong> updated, but the <strong>barcode was not modified</strong> because it was not found (!?).") % (old_barcode))
 
-        copies = db.get_item_copies_details(recid)
-        requests = db.get_item_requests(recid)
-        loans = db.get_item_loans(recid)
-        purchases = db.get_item_purchases(CFG_BIBCIRCULATION_ACQ_STATUS_NEW, recid)
+    copies = db.get_item_copies_details(recid)
+    requests = db.get_item_requests(recid)
+    loans = db.get_item_loans(recid)
+    purchases = db.get_item_purchases(CFG_BIBCIRCULATION_ACQ_STATUS_NEW, recid)
 
-        req_hist_overview = db.get_item_requests_historical_overview(recid)
-        loans_hist_overview = db.get_item_loans_historical_overview(recid)
-        purchases_hist_overview = db.get_item_purchases(CFG_BIBCIRCULATION_ACQ_STATUS_RECEIVED, recid)
+    req_hist_overview = db.get_item_requests_historical_overview(recid)
+    loans_hist_overview = db.get_item_loans_historical_overview(recid)
+    purchases_hist_overview = db.get_item_purchases(CFG_BIBCIRCULATION_ACQ_STATUS_RECEIVED, recid)
 
-        body = bc_templates.tmpl_get_item_details(recid=recid,
-                                            copies=copies,
-                                            requests=requests,
-                                            loans=loans,
-                                            purchases=purchases,
-                                            req_hist_overview=req_hist_overview,
-                                            loans_hist_overview=loans_hist_overview,
-                                            purchases_hist_overview=purchases_hist_overview,
-                                            infos=infos,
-                                            ln=ln)
+    infos.append(_('If you wish, you can now open the <a href="%s">Record Editor</a> to modify the bibliographic information of this item.') % (CFG_SITE_SECURE_URL + "/record/edit/#state=edit&recid=" + str(recid)))
 
-        return page(title=_("Update item information"),
-                    uid=id_user,
-                    req=req,
-                    body=body, language=ln,
-                    navtrail=navtrail_previous_links,
-                    lastupdated=__lastupdated__)
+    body = bc_templates.tmpl_get_item_details(recid=recid,
+                                        copies=copies,
+                                        requests=requests,
+                                        loans=loans,
+                                        purchases=purchases,
+                                        req_hist_overview=req_hist_overview,
+                                        loans_hist_overview=loans_hist_overview,
+                                        purchases_hist_overview=purchases_hist_overview,
+                                        infos=infos,
+                                        ln=ln)
 
-    else:
-        return redirect_to_url(req, CFG_SITE_SECURE_URL +
-                                    "/record/edit/#state=edit&recid=" + str(recid))
+    return page(title=_("Update item information"),
+                uid=id_user,
+                req=req,
+                body=body, language=ln,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
 
 def item_search(req, infos=[], ln=CFG_SITE_LANG):
     """
