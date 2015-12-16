@@ -414,6 +414,11 @@ PyPI:
    :end-before: # sphinxdoc-install-invenio-full-end
    :literal:
 
+Alternatively, if you want to install the very-bleeding-edge Invenio packages
+from GitHub, you can run the following in the Invenio source code directory::
+
+  pip install -r requirements-devel.txt
+
 We can now create a new Invenio instance:
 
 .. include:: ../../scripts/install.sh

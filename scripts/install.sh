@@ -92,6 +92,9 @@ fi
 # load virtualenvrapper:
 source $(which virtualenvwrapper.sh)
 
+# detect pathname of this script:
+scriptpathname=$(cd "$(dirname $0)" && pwd)
+
 # sphinxdoc-create-virtual-environment-begin
 mkvirtualenv ${INVENIO_WEB_VENV}
 cdvirtualenv
@@ -103,6 +106,7 @@ cd src
 set -o errexit
 set -o nounset
 
+if [[ "$@" != *"--devel"* ]]; then
 # sphinxdoc-install-invenio-full-begin
 # FIXME the next three commands are needed only for invenio<3.0.0a3
 pip install invenio-db[postgresql] --pre
@@ -111,6 +115,9 @@ pip install invenio-search --pre
 # now we can install full Invenio:
 pip install invenio[full] --pre
 # sphinxdoc-install-invenio-full-end
+else
+    pip install -r $scriptpathname/../requirements-devel.txt
+fi
 
 # sphinxdoc-create-instance-begin
 inveniomanage instance create ${INVENIO_WEB_INSTANCE}
