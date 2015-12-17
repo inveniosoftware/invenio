@@ -38,6 +38,9 @@ set -o nounset
 provision_redis_ubuntu_trusty () {
 
     # sphinxdoc-install-redis-trusty-begin
+    # update list of available packages:
+    sudo DEBIAN_FRONTEND=noninteractive apt-get -y update
+
     # install Redis server:
     sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
          redis-server

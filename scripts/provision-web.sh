@@ -31,6 +31,10 @@ set -o nounset
 provision_web_common_ubuntu_trusty () {
 
     # sphinxdoc-install-useful-system-tools-trusty-begin
+    # update list of available packages:
+    sudo DEBIAN_FRONTEND=noninteractive apt-get -y update
+
+    # install useful system tools:
     sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
          curl \
          git \

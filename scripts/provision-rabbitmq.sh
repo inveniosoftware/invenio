@@ -31,6 +31,10 @@ set -o nounset
 provision_rabbitmq_ubuntu_trusty () {
 
     # sphinxdoc-install-rabbitmq-trusty-begin
+    # update list of available packages:
+    sudo DEBIAN_FRONTEND=noninteractive apt-get -y update
+
+    # install RabbitMQ server:
     sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
          rabbitmq-server
     # sphinxdoc-install-rabbitmq-trusty-end

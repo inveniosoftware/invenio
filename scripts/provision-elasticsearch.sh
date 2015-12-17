@@ -38,7 +38,9 @@ set -o nounset
 provision_elasticsearch_ubuntu_trusty () {
 
     # sphinxdoc-install-elasticsearch-trusty-begin
+    # install curl:
     sudo apt-get -y install curl
+
     # add external Elasticsearch repository:
     if [[ ! -f /etc/apt/sources.list.d/elasticsearch-2.x.list ]]; then
         curl -sL https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -

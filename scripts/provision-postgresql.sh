@@ -58,6 +58,9 @@ set -o nounset
 provision_postgresql_ubuntu_trusty () {
 
     # sphinxdoc-install-postgresql-trusty-begin
+    # update list of available packages:
+    sudo DEBIAN_FRONTEND=noninteractive apt-get -y update
+
     # install PostgreSQL:
     sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
          postgresql
