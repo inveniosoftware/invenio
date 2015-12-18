@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -108,10 +108,11 @@ set -o nounset
 
 if [[ "$@" != *"--devel"* ]]; then
 # sphinxdoc-install-invenio-full-begin
-# FIXME the next three commands are needed only for invenio<3.0.0a3
+# FIXME the next pip commands are needed only for invenio<3.0.0a3
 pip install invenio-db[postgresql] --pre
 pip install invenio-access[postgresql] --pre
 pip install invenio-search --pre
+pip install dojson --pre
 # now we can install full Invenio:
 pip install invenio[full] --pre
 # sphinxdoc-install-invenio-full-end
@@ -173,26 +174,36 @@ ${INVENIO_WEB_INSTANCE} users create \
 
 # sphinxdoc-start-celery-worker-begin
 # FIXME we should run celery worker on another node
-# NOTE The celery worker command is not needed since we run with CELERY_ALWAYS_EAGER
+# NOTE The celery worker command is not needed since we run
+#      with CELERY_ALWAYS_EAGER
 # celery worker -A ${INVENIO_WEB_INSTANCE}.celery -l INFO &
 # sphinxdoc-start-celery-worker-end
 
 # sphinxdoc-populate-with-demo-records-begin
-echo '{"title": "Invenio 3 rocks"}' | \
-  ${INVENIO_WEB_INSTANCE} records create \
-    -i 4b0714f6-9fe4-43d3-a08f-38c2b309afba
+# discover the location of demo MARC21 record file:
+demomarc21pathname=$(echo "from __future__ import print_function; \
+import pkg_resources; \
+print(pkg_resources.resource_filename('invenio_records', \
+  'data/marc21/bibliographic.xml'))" | python)
+
+# count the number of demo MARC21 records:
+demomarc21nbrecs=$(grep -c '</record>' $demomarc21pathname)
+
+# convert demo records from MARC21 to JSON and load them
+# using randomly generated UUIDs:
+demouuids=$(dojson do -i $demomarc21pathname -l marcxml marc21 | \
+             ${INVENIO_WEB_INSTANCE} records create \
+                $(for i in $(seq 1 $demomarc21nbrecs); \
+                   do echo "-i " $(uuid); done))
 # sphinxdoc-populate-with-demo-records-end
 
 # sphinxdoc-register-pid-begin
-echo "from invenio_db import db; \
-from uuid import uuid4; \
-from invenio_pidstore.models import PersistentIdentifier; \
-from invenio_pidstore.models import PIDStatus; \
-pid = PersistentIdentifier.create('recid', '1', \
-  object_type='rec', \
-  object_uuid='4b0714f6-9fe4-43d3-a08f-38c2b309afba', \
-  status=PIDStatus.REGISTERED); \
-db.session.commit()" | ${INVENIO_WEB_INSTANCE} shell
+recid=1
+for demouuid in $demouuids; do
+    ${INVENIO_WEB_INSTANCE} pid create \
+         -t rec -i $demouuid -s REGISTERED recid $recid
+    let recid=recid+1
+done
 # sphinxdoc-register-pid-end
 
 # sphinxdoc-start-application-begin

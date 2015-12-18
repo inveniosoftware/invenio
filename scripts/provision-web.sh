@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -41,6 +41,10 @@ provision_web_common_ubuntu_trusty () {
          rlwrap \
          screen \
          vim
+
+    # install uuid generator (useful for loading demo records):
+    sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
+         uuid
     # sphinxdoc-install-useful-system-tools-trusty-end
 
     # sphinxdoc-add-nodejs-external-repository-trusty-begin
@@ -76,12 +80,17 @@ provision_web_libpostgresql_ubuntu_trusty () {
 provision_web_common_centos7 () {
 
     # sphinxdoc-install-useful-system-tools-centos7-begin
+    # install useful system tools:
     sudo yum install -y \
          curl \
          git \
          rlwrap \
          screen \
          vim
+
+    # install uuid generator (useful for loading demo records):
+    sudo yum install -y \
+         uuid
     # sphinxdoc-install-useful-system-tools-centos7-end
 
     # sphinxdoc-add-nodejs-external-repository-centos7-begin
@@ -90,6 +99,7 @@ provision_web_common_centos7 () {
     # sphinxdoc-add-nodejs-external-repository-centos7-end
 
     # sphinxdoc-install-web-common-centos7-begin
+    # install development tools:
     sudo yum update -y
     sudo yum groupinstall -y "Development Tools"
     sudo yum install -y \

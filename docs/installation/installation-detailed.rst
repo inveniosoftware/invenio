@@ -1,5 +1,5 @@
 ..  This file is part of Invenio
-    Copyright (C) 2014, 2015 CERN.
+    Copyright (C) 2014, 2015, 2016 CERN.
 
     Invenio is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -489,7 +489,8 @@ records:
    :end-before: # sphinxdoc-populate-with-demo-records-end
    :literal:
 
-Let's register persistent identifiers for the uploaded demo records:
+Let's register incremental numerical persistent identifiers for the uploaded
+demo records:
 
 .. include:: ../../scripts/install.sh
    :start-after: # sphinxdoc-register-pid-begin
@@ -503,17 +504,17 @@ Finally, let's start the web application (in debugging mode):
    :end-before: # sphinxdoc-start-application-end
    :literal:
 
-We should now see our demo record on the web:
+We should now see our demo records on the web:
 
 .. code-block:: shell
 
    firefox http://localhost:5000/records/1
 
-and we can access it via REST API:
+and we can access them via REST API:
 
 .. code-block:: shell
 
    curl -i -H "Accept: application/json" \
         http://localhost:5000/api/records/1
 
-We are done! Our first Invenio v3.0 instance is fully up and running.
+We are done! Our first Invenio v3.0 demo instance is fully up and running.
