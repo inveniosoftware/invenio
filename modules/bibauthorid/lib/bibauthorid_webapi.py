@@ -234,7 +234,7 @@ def get_most_frequent_name_from_pid(person_id=-1, allow_none=False):
             return "This person does not seem to have a name!"
 
 
-def get_papers_by_person_id(person_id=-1, rec_status=-2, ext_out=False):
+def get_papers_by_person_id(person_id=-1, rec_status=-2, ext_out=False, earliest_date_out=False):
     '''
     Returns all the papers written by the person
 
@@ -244,6 +244,8 @@ def get_papers_by_person_id(person_id=-1, rec_status=-2, ext_out=False):
     @type rec_status: int
     @param ext_out: Extended output (w/ author aff and date)
     @type ext_out: boolean
+    @param earliest_date_out: earliest_date output
+    @type earliest_date_out: boolean
 
     @return: list of record info
     @rtype: list of lists of info
@@ -269,9 +271,12 @@ def get_papers_by_person_id(person_id=-1, rec_status=-2, ext_out=False):
                                               show_affiliations=ext_out,
                                               show_date=ext_out,
                                               show_experiment=ext_out)
-    if not ext_out:
+    if not ext_out and not earliest_date_out:
         records = [[int(row["data"].split(",")[1]), row["data"], row["flag"],
                     row["authorname"]] for row in db_data]
+    elif not ext_out and earliest_date_out:
+        records = [[int(row["data"].split(",")[1]), row["data"], row["flag"],
+                    row["authorname"], row["earliest_date"]] for row in db_data]
     else:
         for row in db_data:
             recid = row["data"].split(",")[1]
@@ -281,10 +286,7 @@ def get_papers_by_person_id(person_id=-1, rec_status=-2, ext_out=False):
             rt_status = row['rt_status']
             authoraff = ", ".join(row['affiliation'])
 
-            try:
-                date = sorted(row['date'], key=len)[0]
-            except IndexError:
-                date = "Not available"
+            date = row.get('earliest_date', "Not available")
 
             exp = ", ".join(row['experiment'])
             # date = ""

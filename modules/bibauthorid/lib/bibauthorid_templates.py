@@ -1501,7 +1501,7 @@ class Template:
 
             for paper in papers:
                 h("<li>%s</li>"
-                  % (format_record(int(paper[0]), "ha")))
+                  % (format_record(int(paper), "ha")))
 
             h("</ul>")
         elif not papers:

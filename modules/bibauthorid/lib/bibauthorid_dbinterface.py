@@ -2997,6 +2997,12 @@ def get_papers_info_of_author(pid, flag,  # get_person_papers
         if show_date:
             record_info['date'] = (record_get_field_value(recstruct, '269', '', '', 'c'),)
 
+        try:
+            record_info['earliest_date'] = run_sql("SELECT earliest_date FROM bibrec WHERE id=%s", (rec, ))[0][0].strftime("%Y-%m-%d")
+        except:
+            # Too bad
+            pass
+
         if show_experiment:
             record_info['experiment'] = (record_get_field_value(recstruct, '693', '', '', 'e'),)
 

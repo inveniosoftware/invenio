@@ -1937,8 +1937,8 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
             if req_type == 'getPapers':
                 if 'personId' in json_data:
                     pId = json_data['personId']
-                    papers = sorted([[p[0]] for p in webapi.get_papers_by_person_id(int(pId), -1)],
-                                    key=itemgetter(0))
+                    papers = [p[0] for p in sorted(webapi.get_papers_by_person_id(int(pId), -1, earliest_date_out=True),
+                                    key=itemgetter(4), reverse=True)]
                     papers_html = TEMPLATE.tmpl_gen_papers(papers[0:MAX_NUM_SHOW_PAPERS])
                     json_response.update({'result': "\n".join(papers_html)})
                     json_response.update({'totalPapers': len(papers)})
