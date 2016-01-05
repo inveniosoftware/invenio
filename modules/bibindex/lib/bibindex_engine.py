@@ -1804,6 +1804,8 @@ def main():
   --force\t\tforce indexing of all records for provided indexes
   -Z, --remove-dependent-index=w  name of an index for removing from virtual index
   -l --all-virtual\t\t set of all virtual indexes; the same as: -w virtual_ind1, virtual_ind2, ...
+  --index-children-records\tindex affected children records (INSPIRE specific to reindex
+                          \tData record attached to papers when authors have changed)
 """,
             version=__revision__,
             specific_params=("adi:m:c:w:krRM:f:oZ:l", [
@@ -1820,7 +1822,8 @@ def main():
                 "flush=",
                 "force",
                 "remove-dependent-index=",
-                "all-virtual"
+                "all-virtual",
+                "index-children-records",
             ]),
             task_stop_helper_fnc=task_stop_table_close_fnc,
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
@@ -1879,6 +1882,8 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         task_set_option("remove-dependent-index", value)
     elif key in ("-l", "--all-virtual",):
         task_set_option("all-virtual", True)
+    elif key in ("--index-children-records",):
+        task_set_option("index_children_records", True)
     else:
         return False
     return True
@@ -2232,22 +2237,23 @@ def task_run_core():
                                                        recIDs_range,
                                                        True)
 
-    data_paper_mapping = get_data_paper_mapping()
-
     # HACK: What follows is a total INSPIRE hack :-)
-    if [index_name for index_name in recIDs_for_index if 'author' in index_name]:
-        # author indexes are affected: we need to expand them with corresponding
-        # Data records.
-        affected_records = intbitset()
-        for recids in [recIDs_for_index[index_name] for index_name in recIDs_for_index if 'author' in index_name]:
-            affected_records |= intbitset(recids)
-        affected_data_records = intbitset()
-        for recid in affected_records:
-            affected_data_records |= data_paper_mapping.get(recid, intbitset())
-        for index_name, recids in recIDs_for_index.iteritems():
-            if 'author' in index_name:
-                write_message("Adding %s Data records to be reindexed for the %s index" % (len(affected_data_records), index_name), verbose=2)
-                recIDs_for_index[index_name] = intbitset(recids) | affected_data_records
+    if task_get_option("index_children_records"):
+        data_paper_mapping = get_data_paper_mapping()
+
+        if [index_name for index_name in recIDs_for_index if 'author' in index_name]:
+            # author indexes are affected: we need to expand them with corresponding
+            # Data records.
+            affected_records = intbitset()
+            for recids in [recIDs_for_index[index_name] for index_name in recIDs_for_index if 'author' in index_name]:
+                affected_records |= intbitset(recids)
+            affected_data_records = intbitset()
+            for recid in affected_records:
+                affected_data_records |= data_paper_mapping.get(recid, intbitset())
+            for index_name, recids in recIDs_for_index.iteritems():
+                if 'author' in index_name:
+                    write_message("Adding %s Data records to be reindexed for the %s index" % (len(affected_data_records), index_name), verbose=2)
+                    recIDs_for_index[index_name] = intbitset(recids) | affected_data_records
     # End of the HACK
 
 
