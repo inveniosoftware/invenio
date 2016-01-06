@@ -2472,22 +2472,22 @@ msgid ""
 "your opinion and if we decide to buy the                   book, we will "
 "issue a loan for you as soon as it arrives and send it by internal mail."
 msgstr ""
-"Se penai che questo libro sia interessante, suggerirlo e dirci perché "
-"considera questo libro come importante. La biblioteca prenderà in "
-"considerazione la sua opinione e se decidiamo di comprare il libro, "
-"emetteremo un prestito per lei non appena arriva e lo invieremo per posta "
-"interna."
+"Se pensi che questo libro sia interessante, suggerisci l'acquisto e spiegaci"
+"perché lo consideri importante. La biblioteca prenderà in considerazione"
+"il suggerimento e se il libro verrá acquistato, emetteremo un prestito"
+"per te e te lo invieremo per posta interna appena disponibile."
+
 
 #: modules/bibcirculation/lib/bibcirculation.py:202
 msgid ""
 "In case we decide not to buy the book, we will offer you an interlibrary loan"
 msgstr ""
-"Nel caso in cui decidiamo di non comprare il libro, le offriremo un prestito "
+"Nel caso in cui decidessimo di non comprare il libro, le offriremo un prestito "
 "interbibliotecario"
 
 #: modules/bibcirculation/lib/bibcirculation.py:268
 msgid "This book was suggested for acquisition"
-msgstr "Questo libro è stato suggerito per acquisizione"
+msgstr "Questo libro è stato suggerito per l'acquisto"
 
 #: modules/bibcirculation/lib/bibcirculation.py:278
 msgid "This item already has copies."
