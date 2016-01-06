@@ -19,8 +19,8 @@ msgstr ""
 "Project-Id-Version: Invenio 1.2.1\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2015-05-21 17:22+0200\n"
-"PO-Revision-Date: 2015-08-27 14:06+0200\n"
-"Last-Translator: Charlotte Cattaneo <ciris.cattaneo@gmail.com>\n"
+"PO-Revision-Date: 2016-01-06 12:38+0200\n"
+"Last-Translator: Adrian Moennich <adrian.moennich@cern.ch>\n"
 "Language-Team: DE <info@invenio-software.org>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -13619,7 +13619,7 @@ msgstr "Verwaltung"
 
 #: modules/websession/lib/websession_templates.py:1556
 msgid "Statistics"
-msgstr "Statisken"
+msgstr "Statistiken"
 
 #: modules/websession/lib/websession_templates.py:1673
 msgid "You are an administrator of the following groups:"
