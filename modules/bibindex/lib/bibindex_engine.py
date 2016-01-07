@@ -2,7 +2,7 @@
 ##
 ## This file is part of Invenio.
 ## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009,
-##               2010, 2011, 2012, 2013 CERN.
+##               2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -232,70 +232,43 @@ def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
             (wash_table_column_name(reindex_prefix), index_id)
     run_sql_drop_silently(query) # kwalitee: disable=sql
 
-    run_sql("""CREATE TABLE %sidxWORD%02dF (
-                        id mediumint(9) unsigned NOT NULL auto_increment,
-                        term varchar(50) default NULL,
-                        hitlist longblob,
-                        PRIMARY KEY  (id),
-                        UNIQUE KEY term (term)
-                        ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
+    run_sql("""CREATE TABLE %sidxWORD%02dF LIKE idxWORD%02dF""" %
+            (reindex_prefix, index_id, index_id))
 
     query = """DROP TABLE IF EXISTS %sidxWORD%02dR""" % \
             (wash_table_column_name(reindex_prefix), index_id)
     run_sql_drop_silently(query) # kwalitee: disable=sql
 
-    run_sql("""CREATE TABLE %sidxWORD%02dR (
-                        id_bibrec mediumint(9) unsigned NOT NULL,
-                        termlist longblob,
-                        type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
-                        PRIMARY KEY (id_bibrec,type)
-                        ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
+    run_sql("""CREATE TABLE %sidxWORD%02dR LIKE idxWORD%02dR""" %
+            (reindex_prefix, index_id, index_id))
 
     query = """DROP TABLE IF EXISTS %sidxPAIR%02dF""" % \
             (wash_table_column_name(reindex_prefix), index_id)
     run_sql_drop_silently(query) # kwalitee: disable=sql
 
-    run_sql("""CREATE TABLE %sidxPAIR%02dF (
-                        id mediumint(9) unsigned NOT NULL auto_increment,
-                        term varchar(100) default NULL,
-                        hitlist longblob,
-                        PRIMARY KEY  (id),
-                        UNIQUE KEY term (term)
-                        ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
+    run_sql("""CREATE TABLE %sidxPAIR%02dF LIKE idxPAIR%02dF""" %
+            (reindex_prefix, index_id, index_id))
 
     query = """DROP TABLE IF EXISTS %sidxPAIR%02dR""" % \
             (wash_table_column_name(reindex_prefix), index_id)
     run_sql_drop_silently(query) # kwalitee: disable=sql
 
-    run_sql("""CREATE TABLE %sidxPAIR%02dR (
-                        id_bibrec mediumint(9) unsigned NOT NULL,
-                        termlist longblob,
-                        type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
-                        PRIMARY KEY (id_bibrec,type)
-                        ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
+    run_sql("""CREATE TABLE %sidxPAIR%02dR LIKE idxPAIR%02dR""" %
+            (reindex_prefix, index_id, index_id))
 
     query = """DROP TABLE IF EXISTS %sidxPHRASE%02dF""" % \
             (wash_table_column_name(reindex_prefix), index_id)
     run_sql_drop_silently(query) # kwalitee: disable=sql
 
-    run_sql("""CREATE TABLE %sidxPHRASE%02dF (
-                        id mediumint(9) unsigned NOT NULL auto_increment,
-                        term text default NULL,
-                        hitlist longblob,
-                        PRIMARY KEY  (id),
-                        KEY term (term(50))
-                        ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
+    run_sql("""CREATE TABLE %sidxPHRASE%02dF LIKE idxPHRASE%02dF""" %
+            (reindex_prefix, index_id, index_id))
 
     query = """DROP TABLE IF EXISTS %sidxPHRASE%02dR""" %  \
             (wash_table_column_name(reindex_prefix), index_id)
     run_sql_drop_silently(query) # kwalitee: disable=sql
 
-    run_sql("""CREATE TABLE %sidxPHRASE%02dR (
-                        id_bibrec mediumint(9) unsigned NOT NULL default '0',
-                        termlist longblob,
-                        type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
-                        PRIMARY KEY  (id_bibrec,type)
-                        ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
+    run_sql("""CREATE TABLE %sidxPHRASE%02dR LIKE idxPHRASE%02dR""" %
+            (reindex_prefix, index_id, index_id))
 
 
 def remove_subfields(s):
