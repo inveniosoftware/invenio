@@ -2,7 +2,7 @@
 ##
 ## This file is part of Invenio.
 ## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013,
-##               2014, 2015 CERN.
+##               2014, 2015, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -892,13 +892,13 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
             if len(recids) > 1:
                 store_citation_warning('multiple-matches', refnumber)
                 msg = "Whoops: record '%d' report number value '%s' " \
-                      "matches many records; taking only the first one. %s" % \
+                      "matches many records: %s." % \
                       (thisrecid, refnumber, repr(recids[:50]))
                 # record_duplicates_in_asana(p, recids)
                 write_message(msg, stream=sys.stderr)
-
-            for recid in list(recids)[:1]:  # take only the first one
-                add_to_refs(thisrecid, recid)
+            else:
+                for recid in list(recids)[:1]:  # take only the first one
+                    add_to_refs(thisrecid, recid)
 
     mesg = "done fully"
     write_message(mesg)
@@ -941,13 +941,13 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
             if len(recids) > 1:
                 store_citation_warning('multiple-matches', p)
                 msg = "Whoops: record '%d' reference value '%s' " \
-                      "matches many records; taking only the first one. %s" % \
+                      "matches many records: %s." % \
                       (thisrecid, p, repr(recids[:50]))
                 record_duplicates_in_asana(p, recids)
                 write_message(msg, stream=sys.stderr)
-
-            for recid in list(recids)[:1]:  # take only the first one
-                add_to_refs(thisrecid, recid)
+            else:
+                for recid in list(recids)[:1]:  # take only the first one
+                    add_to_refs(thisrecid, recid)
 
     mesg = "done fully"
     write_message(mesg)
@@ -981,13 +981,13 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
             if len(recids) > 1:
                 store_citation_warning('multiple-matches', p)
                 msg = "Whoops: record '%d' DOI value '%s' " \
-                      "matches many records; taking only the first one. %s" % \
+                      "matches many records: %s." % \
                       (thisrecid, p, repr(recids[:50]))
                 record_duplicates_in_asana(p, recids)
                 write_message(msg, stream=sys.stderr)
-
-            for recid in list(recids)[:1]:  # take only the first one
-                add_to_refs(thisrecid, recid)
+            else:
+                for recid in list(recids)[:1]:  # take only the first one
+                    add_to_refs(thisrecid, recid)
 
     mesg = "done fully"
     write_message(mesg)
@@ -1021,13 +1021,13 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
             if len(recids) > 1:
                 store_citation_warning('multiple-matches', p)
                 msg = "Whoops: record '%d' HDL value '%s' " \
-                      "matches many records; taking only the first one. %s" % \
+                      "matches many records: %s." % \
                       (thisrecid, p, repr(recids[:50]))
                 record_duplicates_in_asana(p, recids)
                 write_message(msg, stream=sys.stderr)
-
-            for recid in list(recids)[:1]:  # take only the first one
-                add_to_refs(thisrecid, recid)
+            else:
+                for recid in list(recids)[:1]:  # take only the first one
+                    add_to_refs(thisrecid, recid)
 
     mesg = "done fully"
     write_message(mesg)
