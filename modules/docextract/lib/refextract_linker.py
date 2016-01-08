@@ -61,17 +61,20 @@ def find_journal(citation_element):
     }
     journal_string \
                = format_journal(CFG_JOURNAL_PUBINFO_STANDARD_FORM, tags_values)
-    return get_recids_matching_query(journal_string, 'journal')
+    recids = get_recids_matching_query(journal_string, 'journal')
+    return recids if len(recids) == 1 else []
 
 
 def find_reportnumber(citation_element):
     reportnumber = standardize_report_number(citation_element['report_num'])
-    return get_recids_matching_query(reportnumber, 'reportnumber')
+    recids = get_recids_matching_query(reportnumber, 'reportnumber')
+    return recids if len(recids) == 1 else []
 
 
 def find_doi(citation_element):
     doi_string = citation_element['doi_string']
-    return get_recids_matching_query(doi_string, 'doi')
+    recids = get_recids_matching_query(doi_string, 'doi')
+    return recids if len(recids) == 1 else []
 
 
 def find_referenced_recid(citation_element):
@@ -101,7 +104,8 @@ def find_book(citation_element):
 def find_isbn(citation_element):
     books_recids = get_collection_reclist('Books')
     recids = intbitset(get_recids_matching_query(citation_element['ISBN'], 'isbn'))
-    return list(recids & books_recids)
+    recids = list(recids & books_recids)
+    return recids if len(recids) == 1 else []
 
 
 FINDERS = {
