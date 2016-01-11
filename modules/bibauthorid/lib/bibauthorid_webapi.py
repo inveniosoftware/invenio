@@ -1271,7 +1271,7 @@ def institution_history(record):
     field_instances = record_get_field_instances(record, '371', '', '')
     institutions = [extract_institution(x[0]) for x in field_instances if extract_institution(x[0]) is not None]
 
-    institutions.sort(key=lambda x: (x.get('current'), x.get('start'), x.get('end')))
+    institutions.sort(key=lambda x: (x.get('current'), x.get('start'), x.get('end')), reverse=True)
 
     return institutions
 
