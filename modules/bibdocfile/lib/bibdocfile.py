@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -123,6 +123,7 @@ from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
     CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 from invenio.pluginutils import PluginContainer
+from invenio.redisutils import get_redis
 
 import invenio.template
 
@@ -3834,6 +3835,8 @@ def download_external_url(url, docformat=None):
     @rtype: string
     @raise StandardError: if the download failed
     """
+    r = get_redis()
+    hostname = urllib2.urlparse.urlsplit(urllib.unquote(url)).hostname
     tmppath = None
 
     # Make sure the format is OK.
@@ -3851,43 +3854,52 @@ def download_external_url(url, docformat=None):
     from_file, to_file, tmppath = None, None, ''
 
     try:
+        while r.get('hostname_cache.%s' % hostname):
+            # We have accessed this host within the last 2 seconds
+            time.sleep(2)
         from_file = open_url(url)
     except InvenioBibdocfileUnauthorizedURL, e:
         raise StandardError, str(e)
     except urllib2.URLError, e:
         raise StandardError, 'URL could not be opened: %s' % str(e)
 
-    if not docformat:
-        # We could not determine the format from the URL, so let's try
-        # to read it from the HTTP headers.
-        docformat = get_format_from_http_response(from_file)
-
+    # We use redis as a semaphore.
+    r.set('hostname_cache.%s' % hostname, True)
     try:
-        tmppath = safe_mkstemp(docformat)
+        if not docformat:
+            # We could not determine the format from the URL, so let's try
+            # to read it from the HTTP headers.
+            docformat = get_format_from_http_response(from_file)
 
-        to_file = open(tmppath, 'w')
-        while True:
-            block = from_file.read(CFG_BIBDOCFILE_BLOCK_SIZE)
-            if not block:
-                break
-            to_file.write(block)
-        to_file.close()
-        from_file.close()
-
-        if os.path.getsize(tmppath) == 0:
-            raise StandardError, "%s seems to be empty" % url
-    except Exception, e:
-        # Try to close and remove the temporary file.
         try:
+            tmppath = safe_mkstemp(docformat)
+
+            to_file = open(tmppath, 'w')
+            while True:
+                block = from_file.read(CFG_BIBDOCFILE_BLOCK_SIZE)
+                if not block:
+                    break
+                to_file.write(block)
             to_file.close()
-        except Exception:
-            pass
-        try:
-            os.remove(tmppath)
-        except Exception:
-            pass
-        raise StandardError, "Error when downloading %s into %s: %s" % \
-                (url, tmppath, e)
+            from_file.close()
+
+            if os.path.getsize(tmppath) == 0:
+                raise StandardError, "%s seems to be empty" % url
+        except Exception, e:
+            # Try to close and remove the temporary file.
+            try:
+                to_file.close()
+            except Exception:
+                pass
+            try:
+                os.remove(tmppath)
+            except Exception:
+                pass
+            raise StandardError, "Error when downloading %s into %s: %s" % \
+                    (url, tmppath, e)
+    finally:
+        # We automatically expire the semaphore after 2 seconds.
+        r.setex('hostname_cache.%s' % hostname, True, 2)
 
     return tmppath
 
