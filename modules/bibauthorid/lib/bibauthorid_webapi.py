@@ -1420,7 +1420,7 @@ def hepnames_context(record):
 
     }
     for institution in context['institution_history']:
-        if institution.get('current', '') == 'Current':
+        if institution.get('current', '').lower() == 'current':
             context['current_institution'] = institution.get('name', '')
 
     return context

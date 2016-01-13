@@ -100,7 +100,7 @@
 			{% if record.current_institution %}
 			<td>{{ record.current_institution }}</td>
 			{% else %}
-			<td>{{ (record.institution_history|last).name }}</td>
+			<td>{{ (record.institution_history|first).name }}</td>
 			{% endif %}
 		</tr>
 		{% endif %}
