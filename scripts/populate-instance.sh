@@ -106,7 +106,7 @@ ${INVENIO_WEB_INSTANCE} db create
 
 # sphinxdoc-create-user-account-begin
 ${INVENIO_WEB_INSTANCE} users create \
-       --email ${INVENIO_USER_EMAIL} \
+       ${INVENIO_USER_EMAIL} \
        --password ${INVENIO_USER_PASS} \
        --active
 # sphinxdoc-create-user-account-end
