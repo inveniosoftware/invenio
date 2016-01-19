@@ -214,14 +214,30 @@ associated CSS/JS filter tools. Let's do it globally:
    :end-before: # sphinxdoc-install-npm-and-css-js-filters-end
    :literal:
 
-Finally, we'll install Python virtual environment wrapper tools and activate
-them in the current user shell process:
+Sixth, we'll install Python virtual environment wrapper tools and activate them
+in the current user shell process:
 
 * on either of the operating systems:
 
 .. include:: ../../scripts/provision-web.sh
    :start-after: # sphinxdoc-install-virtualenvwrapper-begin
    :end-before: # sphinxdoc-install-virtualenvwrapper-end
+   :literal:
+
+Finally, let's clean after ourselves:
+
+* on Ubuntu 14.04 LTS (Trusty Tahr):
+
+.. include:: ../../scripts/provision-web.sh
+   :start-after: # sphinxdoc-install-web-cleanup-trusty-begin
+   :end-before: # sphinxdoc-install-web-cleanup-trusty-end
+   :literal:
+
+* on CentOS7:
+
+.. include:: ../../scripts/provision-web.sh
+   :start-after: # sphinxdoc-install-web-cleanup-centos7-begin
+   :end-before: # sphinxdoc-install-web-cleanup-centos7-end
    :literal:
 
 Database
@@ -268,6 +284,22 @@ the new database:
    :end-before: # sphinxdoc-setup-postgresql-access-end
    :literal:
 
+Finally, let's clean after ourselves:
+
+* on Ubuntu 14.04 LTS (Trusty Tahr):
+
+.. include:: ../../scripts/provision-postgresql.sh
+   :start-after: # sphinxdoc-install-postgresql-cleanup-trusty-begin
+   :end-before: # sphinxdoc-install-postgresql-cleanup-trusty-end
+   :literal:
+
+* on CentOS7:
+
+.. include:: ../../scripts/provision-postgresql.sh
+   :start-after: # sphinxdoc-install-postgresql-cleanup-centos7-begin
+   :end-before: # sphinxdoc-install-postgresql-cleanup-centos7-end
+   :literal:
+
 Redis
 -----
 
@@ -295,6 +327,22 @@ Let's see in detail what the Redis provisioning script does.
 .. include:: ../../scripts/provision-redis.sh
    :start-after: # sphinxdoc-install-redis-centos7-begin
    :end-before: # sphinxdoc-install-redis-centos7-end
+   :literal:
+
+Finally, let's clean after ourselves:
+
+* on Ubuntu 14.04 LTS (Trusty Tahr):
+
+.. include:: ../../scripts/provision-redis.sh
+   :start-after: # sphinxdoc-install-redis-cleanup-trusty-begin
+   :end-before: # sphinxdoc-install-redis-cleanup-trusty-end
+   :literal:
+
+* on CentOS7:
+
+.. include:: ../../scripts/provision-redis.sh
+   :start-after: # sphinxdoc-install-redis-cleanup-centos7-begin
+   :end-before: # sphinxdoc-install-redis-cleanup-centos7-end
    :literal:
 
 Elasticsearch
@@ -328,6 +376,22 @@ Let's see in detail what the Elasticsearch provisioning script does.
    :end-before: # sphinxdoc-install-elasticsearch-centos7-end
    :literal:
 
+Finally, let's clean after ourselves:
+
+* on Ubuntu 14.04 LTS (Trusty Tahr):
+
+.. include:: ../../scripts/provision-elasticsearch.sh
+   :start-after: # sphinxdoc-install-elasticsearch-cleanup-trusty-begin
+   :end-before: # sphinxdoc-install-elasticsearch-cleanup-trusty-end
+   :literal:
+
+* on CentOS7:
+
+.. include:: ../../scripts/provision-elasticsearch.sh
+   :start-after: # sphinxdoc-install-elasticsearch-cleanup-centos7-begin
+   :end-before: # sphinxdoc-install-elasticsearch-cleanup-centos7-end
+   :literal:
+
 RabbitMQ
 --------
 
@@ -355,6 +419,22 @@ Let's see in detail what the RabbitMQ provisioning script does.
 .. include:: ../../scripts/provision-rabbitmq.sh
    :start-after: # sphinxdoc-install-rabbitmq-centos7-begin
    :end-before: # sphinxdoc-install-rabbitmq-centos7-end
+   :literal:
+
+Finally, let's clean after ourselves:
+
+* on Ubuntu 14.04 LTS (Trusty Tahr):
+
+.. include:: ../../scripts/provision-rabbitmq.sh
+   :start-after: # sphinxdoc-install-rabbitmq-cleanup-trusty-begin
+   :end-before: # sphinxdoc-install-rabbitmq-cleanup-trusty-end
+   :literal:
+
+* on CentOS7:
+
+.. include:: ../../scripts/provision-rabbitmq.sh
+   :start-after: # sphinxdoc-install-rabbitmq-cleanup-centos7-begin
+   :end-before: # sphinxdoc-install-rabbitmq-cleanup-centos7-end
    :literal:
 
 Worker
@@ -385,6 +465,22 @@ Let's see in detail what the worker provisioning script does.
 .. include:: ../../scripts/provision-worker.sh
    :start-after: # sphinxdoc-install-worker-centos7-begin
    :end-before: # sphinxdoc-install-worker-centos7-end
+   :literal:
+
+Finally, let's clean after ourselves:
+
+* on Ubuntu 14.04 LTS (Trusty Tahr):
+
+.. include:: ../../scripts/provision-worker.sh
+   :start-after: # sphinxdoc-install-worker-cleanup-trusty-begin
+   :end-before: # sphinxdoc-install-worker-cleanup-trusty-end
+   :literal:
+
+* on CentOS7:
+
+.. include:: ../../scripts/provision-worker.sh
+   :start-after: # sphinxdoc-install-worker-cleanup-centos7-begin
+   :end-before: # sphinxdoc-install-worker-cleanup-centos7-end
    :literal:
 
 Invenio

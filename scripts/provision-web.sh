@@ -165,6 +165,18 @@ setup_virtualenvwrapper () {
 
 }
 
+cleanup_web_ubuntu_trusty () {
+    # sphinxdoc-install-web-cleanup-trusty-begin
+    $sudo apt-get -y autoremove && $sudo apt-get -y clean
+    # sphinxdoc-install-web-cleanup-trusty-end
+}
+
+cleanup_web_centos7 () {
+    # sphinxdoc-install-web-cleanup-centos7-begin
+    $sudo yum clean -y all
+    # sphinxdoc-install-web-cleanup-centos7-end
+}
+
 main () {
 
     # detect OS distribution and release version:
@@ -184,10 +196,16 @@ main () {
         # running inside Docker
         provision_web_common_ubuntu_trusty
         provision_web_libpostgresql_ubuntu_trusty
+        setup_npm_and_css_js_filters
+        setup_virtualenvwrapper
+        cleanup_web_ubuntu_trusty
     elif [ "$os_distribution" = "Ubuntu" ]; then
         if [ "$os_release" = "14.04" ]; then
             provision_web_common_ubuntu_trusty
             provision_web_libpostgresql_ubuntu_trusty
+            setup_npm_and_css_js_filters
+            setup_virtualenvwrapper
+            cleanup_web_ubuntu_trusty
         else
             echo "[ERROR] Sorry, unsupported release ${os_release}."
             exit 1
@@ -196,6 +214,9 @@ main () {
         if [ "$os_release" = "7" ]; then
             provision_web_common_centos7
             provision_web_libpostgresql_centos7
+            setup_npm_and_css_js_filters
+            setup_virtualenvwrapper
+            cleanup_web_centos7
         else
             echo "[ERROR] Sorry, unsupported release ${os_release}."
             exit 1
@@ -204,10 +225,6 @@ main () {
         echo "[ERROR] Sorry, unsupported distribution ${os_distribution}."
         exit 1
     fi
-
-    # finish with common setups:
-    setup_npm_and_css_js_filters
-    setup_virtualenvwrapper
 
 }
 

@@ -23,7 +23,7 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 # Use Python-2.7:
-FROM python:2.7
+FROM python:2.7-slim
 
 # Add Invenio sources to `code` and work there:
 WORKDIR /code

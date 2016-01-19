@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -79,6 +79,18 @@ setup_firewall_redis_centos7 () {
     # sphinxdoc-setup-firewall-redis-centos7-end
 }
 
+cleanup_rabbitmq_ubuntu_trusty () {
+    # sphinxdoc-install-rabbitmq-cleanup-trusty-begin
+    sudo apt-get -y autoremove && sudo apt-get -y clean
+    # sphinxdoc-install-rabbitmq-cleanup-trusty-end
+}
+
+cleanup_rabbitmq_centos7 () {
+    # sphinxdoc-install-rabbitmq-cleanup-centos7-begin
+    sudo yum clean -y all
+    # sphinxdoc-install-rabbitmq-cleanup-centos7-end
+}
+
 main () {
 
     # detect OS distribution and release version:
@@ -97,6 +109,7 @@ main () {
     if [ "$os_distribution" = "Ubuntu" ]; then
         if [ "$os_release" = "14.04" ]; then
             provision_rabbitmq_ubuntu_trusty
+            cleanup_rabbitmq_ubuntu_trusty
         else
             echo "[ERROR] Sorry, unsupported release ${os_release}."
             exit 1
@@ -104,6 +117,7 @@ main () {
     elif [ "$os_distribution" = "CentOS" ]; then
         if [ "$os_release" = "7" ]; then
             provision_rabbitmq_centos7
+            cleanup_rabbitmq_centos7
         else
             echo "[ERROR] Sorry, unsupported release ${os_release}."
             exit 1

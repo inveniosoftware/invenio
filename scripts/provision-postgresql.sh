@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -142,6 +142,18 @@ provision_postgresql_centos7 () {
 
 }
 
+cleanup_postgresql_ubuntu_trusty () {
+    # sphinxdoc-install-postgresql-cleanup-trusty-begin
+    sudo apt-get -y autoremove && sudo apt-get -y clean
+    # sphinxdoc-install-postgresql-cleanup-trusty-end
+}
+
+cleanup_postgresql_centos7 () {
+    # sphinxdoc-install-postgresql-cleanup-centos7-begin
+    sudo yum clean -y all
+    # sphinxdoc-install-postgresql-cleanup-centos7-end
+}
+
 setup_db () {
 
     # sphinxdoc-setup-postgresql-access-begin
@@ -181,6 +193,7 @@ main () {
     if [ "$os_distribution" = "Ubuntu" ]; then
         if [ "$os_release" = "14.04" ]; then
             provision_postgresql_ubuntu_trusty
+            cleanup_postgresql_ubuntu_trusty
         else
             echo "[ERROR] Sorry, unsupported release ${os_release}."
             exit 1
@@ -188,6 +201,7 @@ main () {
     elif [ "$os_distribution" = "CentOS" ]; then
         if [ "$os_release" = "7" ]; then
             provision_postgresql_centos7
+            cleanup_postgresql_centos7
         else
             echo "[ERROR] Sorry, unsupported release ${os_release}."
             exit 1
