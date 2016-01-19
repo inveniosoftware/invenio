@@ -57,7 +57,7 @@ ENV INVENIO_WORKER_HOST=127.0.0.1
 RUN /code/scripts/create-instance.sh --devel
 
 # Make given VENV default:
-ENV PATH=/home/invenio/.virtualenvs/invenio3/bin:$PATH
+ENV PATH=/home/invenio/.virtualenvs/invenio3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ENV VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python
 RUN echo "source /usr/local/bin/virtualenvwrapper.sh" >> ~/.bashrc
 RUN echo "workon invenio3" >> ~/.bashrc

@@ -26,7 +26,7 @@ web:
   build: .
   command: /bin/bash -c "invenio3 --debug run -h 0.0.0.0"
   environment:
-    - PATH=/home/invenio/.virtualenvs/invenio3/bin:$PATH
+    - PATH=/home/invenio/.virtualenvs/invenio3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     - VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python
     - INVENIO_WEB_HOST=127.0.0.1
     - INVENIO_WEB_INSTANCE=invenio3
