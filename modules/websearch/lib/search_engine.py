@@ -2,7 +2,7 @@
 
 ## This file is part of Invenio.
 ## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-##               2010, 2011, 2012, 2013, 2014, 2015 CERN.
+##               2010, 2011, 2012, 2013, 2014, 2015, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -2540,8 +2540,13 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress, wl=0):
                     res = excp.res
                     limit_reached = 1 # set the limit reached flag to true
         else:
+            washedword = ''
+            if f == 'journal':
+                washedword = wash_index_term(word, 255)
+            else:
+                washedword = wash_index_term(word)
             res = run_sql("SELECT term,hitlist FROM %s WHERE term=%%s" % bibwordsX,
-                          (wash_index_term(word),))
+                          (washedword,))
     # fill the result set:
     for word, hitlist in res:
         hitset_bibwrd = intbitset(hitlist)
