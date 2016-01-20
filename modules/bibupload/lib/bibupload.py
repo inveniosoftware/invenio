@@ -2019,7 +2019,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                             from PyPDF2 import PdfFileReader
                             from PyPDF2.utils import PdfReadError
                             try:
-                                PdfFileReader(open(download_url))
+                                PdfFileReader(open(downloaded_url))
                             except PdfReadError as err:
                                 raise RuntimeError("The provided PDF is corrupted: %s" % err)
                         write_message("%s saved into %s" % (url, downloaded_url), verbose=9)
