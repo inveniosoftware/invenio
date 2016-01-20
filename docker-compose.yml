@@ -49,7 +49,7 @@ web:
     - elasticsearch
     - rabbitmq
   ports:
-    - "5000:5000"
+    - "127.0.0.1:5000:5000"
 
 postgresql:
   image: postgres
@@ -68,10 +68,11 @@ redis:
 elasticsearch:
   image: elasticsearch
   ports:
-    - "29200:9200"
-    - "29300:9300"
+    - "127.0.0.1:29200:9200"
+    - "127.0.0.1:29300:9300"
 
 rabbitmq:
   image: rabbitmq
   ports:
-    - "25672:5672"
+    - "127.0.0.1:24369:4369"
+    - "127.0.0.1:45672:25672"
