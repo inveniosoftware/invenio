@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015,
+##               2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -2015,6 +2016,12 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                             guessed_format = guess_via_magic(downloaded_url)
                             if guessed_format != docformat:
                                 raise RuntimeError("Given URL %s was supposed to refer to format %s but was found to be of format %s. Is this document behind an authentication page?" % (url, docformat, guessed_format))
+                            from PyPDF2 import PdfFileReader
+                            from PyPDF2.utils import PdfReadError
+                            try:
+                                PdfFileReader(open(download_url))
+                            except PdfReadError as err:
+                                raise RuntimeError("The provided PDF is corrupted: %s" % err)
                         write_message("%s saved into %s" % (url, downloaded_url), verbose=9)
                     except Exception, err:
                         write_message("ERROR: in downloading '%s' because of: %s" % (url, err), stream=sys.stderr)
