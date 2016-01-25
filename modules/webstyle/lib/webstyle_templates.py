@@ -1,5 +1,6 @@
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013,
+# 2014, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -38,6 +39,7 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_VERSION, \
      CFG_WEBSTYLE_INSPECT_TEMPLATES, \
+     CFG_WEBSTYLE_SUPPORT_FONTAWESOME, \
      CFG_WEBSTYLE_TEMPLATE_SKIN, \
      CFG_INSPIRE_SITE, \
      CFG_WEBLINKBACK_TRACKBACK_ENABLED
@@ -374,6 +376,7 @@ template function generated it.
  %(metabase)s
  <link rev="made" href="mailto:%(sitesupportemail)s" />
  <link rel="stylesheet" href="%(cssurl)s/img/invenio%(cssskin)s.css" type="text/css" />
+ %(font_awesome)s
  <!--[if lt IE 8]>
     <link rel="stylesheet" type="text/css" href="%(cssurl)s/img/invenio%(cssskin)s-ie7.css" />
  <![endif]-->
@@ -460,6 +463,10 @@ template function generated it.
           'canonical_and_alternate_urls' : self.tmpl_canonical_and_alternate_urls(uri),
           'cssurl' : CFG_BASE_URL,
           'cssskin' : CFG_WEBSTYLE_TEMPLATE_SKIN != 'default' and '_' + CFG_WEBSTYLE_TEMPLATE_SKIN or '',
+          'font_awesome': (
+            '<link rel="stylesheet"'
+            'href="/static/css/font-awesome.min.css">') if (
+              CFG_WEBSTYLE_SUPPORT_FONTAWESOME) else '',
           'rssurl': rssurl,
           'ln' : ln,
           'ln_iso_639_a' : ln.split('_', 1)[0],
