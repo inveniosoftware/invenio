@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -81,6 +81,7 @@ from invenio.htmlutils import \
      HTMLWasher, \
      CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST, \
      CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST
+from invenio.textutils import escape_latex
 from invenio.webuser import collect_user_info
 from invenio.bibknowledge import get_kbr_values
 from HTMLParser import HTMLParseError
@@ -767,7 +768,7 @@ def eval_format_element(format_element, bfo, parameters=None, verbose=0):
                     output_text += '<b><span style="color: rgb(255, 0, 0);">'+ \
                                    str(exc.message) +'</span></b> '
         # (3)
-        if escape in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+        if escape in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']:
             escape_mode = int(escape)
 
         # If escape is equal to 1, then escape all
@@ -2129,6 +2130,7 @@ def escape_field(value, mode=0):
         then use mode 0. Else use mode 1.
       - mode 8: same as mode 1, but also escape double-quotes
       - mode 9: same as mode 4, but also escape double-quotes
+      - mode 10: escape for inclusion into TeX
 
     @param value: value to escape
     @param mode: escaping mode to use
@@ -2205,6 +2207,8 @@ def escape_field(value, mode=0):
             return value
         else:
             return cgi.escape(value)
+    elif mode == 10:
+        return escape_latex(value)
     else:
         return value
 

@@ -1,7 +1,7 @@
 ## -*- mode: html; coding: utf-8; -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -826,6 +826,7 @@ translated_welcome =  &#95;("Welcome")
 		then use mode mode 0. Else use mode 1.</li>
 	      <li>8 - same as mode 1, but also escape double-quotes</li>
               <li>9 - same as mode 4, but also escape double-quotes</li>
+              <li>10 - escape for inclusion into TeX</li>
            </ul>
      These modes are the same for <code>escape_values(bfo)</code> function.
      <p>
