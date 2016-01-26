@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014, 2015 CERN.
+# Copyright (C) 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -131,7 +131,7 @@ def _get_extids_from_orcid(orcid_id):
         return ext_ids_dict
 
     try:
-        for work in orcid_profile['works']['group']:
+        for work in orcid_profile.get('works', {}).get('group', []):
             try:
                 for identifier in work['identifiers']['identifier']:
                     identifier_type = identifier[
@@ -144,8 +144,9 @@ def _get_extids_from_orcid(orcid_id):
             except (KeyError, AttributeError, TypeError):
                 # No identifiers on this work.
                 pass
-    except KeyError:
-        register_exception(alert_admin=True)
+    except (KeyError, AttributeError):
+        # Very likely there are no works in this profile.
+        pass
 
     return ext_ids_dict
 
