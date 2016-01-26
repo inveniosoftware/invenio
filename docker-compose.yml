@@ -49,7 +49,7 @@ web:
     - elasticsearch
     - rabbitmq
   ports:
-    - "127.0.0.1:5000:5000"
+    - "5000:5000"
 
 postgresql:
   image: postgres
@@ -58,21 +58,21 @@ postgresql:
     - POSTGRES_DB=invenio3
     - POSTGRES_PASSWORD=dbpass123
   ports:
-    - "127.0.0.1:25432:5432"
+    - "25432:5432"
 
 redis:
   image: redis
   ports:
-    - "127.0.0.1:26379:6379"
+    - "26379:6379"
 
 elasticsearch:
   image: elasticsearch
   ports:
-    - "127.0.0.1:29200:9200"
-    - "127.0.0.1:29300:9300"
+    - "29200:9200"
+    - "29300:9300"
 
 rabbitmq:
   image: rabbitmq
   ports:
-    - "127.0.0.1:24369:4369"
-    - "127.0.0.1:45672:25672"
+    - "24369:4369"
+    - "45672:25672"
