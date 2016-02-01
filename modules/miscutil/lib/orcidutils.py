@@ -176,7 +176,7 @@ def get_dois_from_orcid(orcid_id, get_titles=False):
             register_exception(alert_admin=True)
 
     dois = list()
-    if orcid_profile is None:
+    if orcid_profile is None or orcid_profile['works'] is None:
         return dois
 
     try:
@@ -194,8 +194,9 @@ def get_dois_from_orcid(orcid_id, get_titles=False):
                                 if not get_titles:
                                     dois.append(current_dois[0])
                                 else:
-                                    title = work['work-summary'][0]['title'][
-                                        'title']['value']
+                                    title = work['work-summary'][0]['title']
+                                    if title:
+                                        title = title['title']['value']
                                     dois.append((doi, title))
             except KeyError:
                 # No identifiers on this work.
