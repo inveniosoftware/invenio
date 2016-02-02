@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014,
+##               2014, 2015, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -97,7 +98,7 @@ def load_kb(path, builder):
         if path.startswith(kb_start):
             return load_kb_from_db(path[len(kb_start):], builder)
         elif path.startswith(records_start):
-            return load_kb_from_records(path[len(kb_start):], builder)
+            return load_kb_from_records(path, builder)
         else:
             return load_kb_from_file(path, builder)
 
@@ -661,7 +662,7 @@ def load_kb_from_db(kb_name, builder):
 def load_kb_from_records(kb_name, builder):
     def get_tag_values(recid, tags):
         for tag in tags:
-            for value in get_fieldvalues(recid, tag):
+            for value in get_fieldvalues(recid, tag, sort=False):
                 yield value
 
     def lazy_parser(collection, left_tags, right_tags):
