@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014,
+##               2015, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -338,7 +339,10 @@ def record_can_extract_refs(recid):
 def record_can_overwrite_refs(recid):
     if get_fieldvalues(recid, '999C6v'):
         # References extracted by refextract
-        if get_fieldvalues(recid, '999C59'):
+        if 'curator' in  [value.lower().strip() for value in
+                          get_fieldvalues(recid, '999C59',
+                                          repetitive_values=False)
+                          if value.strip()]:
             # They have been curated
             # To put in the HP and create ticket in the future
             needs_submitting = False
