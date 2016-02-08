@@ -57,6 +57,36 @@ ORCID_SINGLE_REQUEST_WORKS = 1
 MAX_COAUTHORS = 25
 MAX_DESCRIPTION_LENGTH = 4500
 
+LANGUAGE_MAP = {
+    "bulgarian": "bg",
+    "chinese": "zh",
+    "czech": "cs",
+    "dutch": "nl",
+    "english": "en",
+    "esperanto": "eo",
+    "finnish": "fi",
+    "french": "fr",
+    "german": "de",
+    "greek": "el",
+    "hebrew": "he",
+    "hungarian": "hu",
+    "indonesian": "id",
+    "italian": "it",
+    "japanese": "ja",
+    "korean": "ko",
+    "latin": "la",
+    "norwegian": "no",
+    "persian": "fa",
+    "polish": "pl",
+    "portuguese": "pt",
+    "romanian": "ro",
+    "russian": "ru",
+    "slovak": "sk",
+    "spanish": "es",
+    "swedish": "sv",
+    "turkish": "tr",
+    "ukrainian": "uk",
+}
 # ############################# PULLING #######################################
 
 
@@ -445,8 +475,12 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids, orcid):
 
         language = record_get_field_value(recstruct, '041', '', '', 'a')
         if language:
-            work_dict['language_code'] = encode_for_jinja_and_xml(language)
-
+            # If we understand the language we map it to ISO 639-2
+            language = LANGUAGE_MAP.get(language.lower().strip())
+            if language:
+                work_dict['language_code'] = encode_for_jinja_and_xml(language)
+        else:
+            work_dict['language_code'] = 'en'
         work_dict['visibility'] = 'public'
         orcid_list.append(work_dict)
 
