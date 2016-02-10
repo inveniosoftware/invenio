@@ -118,15 +118,10 @@ import pkg_resources; \
 print(pkg_resources.resource_filename('invenio_records', \
   'data/marc21/bibliographic.xml'))" | python)
 
-# count the number of demo MARC21 records:
-demomarc21nbrecs=$(grep -c '</record>' $demomarc21pathname)
-
 # convert demo records from MARC21 to JSON and load them
 # using randomly generated UUIDs:
-demouuids=$(dojson do -i $demomarc21pathname -l marcxml marc21 | \
-             ${INVENIO_WEB_INSTANCE} records create \
-                $(for i in $(seq 1 $demomarc21nbrecs); \
-                   do echo "-i " $(uuid); done))
+demouuids=$(dojson -i $demomarc21pathname -l marcxml do marc21 | \
+             ${INVENIO_WEB_INSTANCE} records create)
 # sphinxdoc-populate-with-demo-records-end
 
 # sphinxdoc-register-pid-begin

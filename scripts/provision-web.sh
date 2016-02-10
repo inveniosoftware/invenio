@@ -53,10 +53,6 @@ provision_web_common_ubuntu_trusty () {
          rlwrap \
          screen \
          vim
-
-    # install uuid generator (useful for loading demo records):
-    $sudo apt-get -y install \
-         uuid
     # sphinxdoc-install-useful-system-tools-trusty-end
 
     # sphinxdoc-add-nodejs-external-repository-trusty-begin
