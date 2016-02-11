@@ -120,18 +120,18 @@ def task_run_core():
         except OSError:
             pass
         matching_order = CFG_BATCHUPLOADER_FILENAME_MATCHING_POLICY
-        for folder in ["append/", "revise/"]:
-            try:
-                os.mkdir(parent_dir + folder)
-            except:
-                pass
+        for base_folder in ["append", "revise"]:
+            folder = os.path.join(parent_dir, base_folder)
+            if not os.path.exists(folder):
+                os.makedirs(folder)
             for matching in matching_order:
-                errors = document_upload(folder=parent_dir + folder, matching=matching, mode=folder[:-1])[0]
+                errors, info = document_upload(folder=folder, matching=matching, mode=base_folder)
+                task_sleep_now_if_required(can_stop_too=True)
                 if not errors:
                     break  # All documents succedeed with that matching
                 for error in errors:
                     write_message("File: %s - %s with matching %s" % (error[0], error[1], matching), sys.stderr)
-            task_sleep_now_if_required(can_stop_too=True)
+                write_message("Uploaded %s files: %s", (info[0], ', '.join(info[1])))
     return 1
 
 
@@ -151,7 +151,7 @@ def main():
  -d, --documents\t Batch Uploader will look for documents in the corresponding folders
                                 """,
               version=__revision__,
-              specific_params=("md:", ["metadata", "documents"]),
+              specific_params=("md", ["metadata", "documents"]),
               task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
               task_run_fnc=task_run_core)
 

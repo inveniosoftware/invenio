@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2010, 2011, 2012, 2013, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -41,7 +41,7 @@ from invenio.config import CFG_BINDIR, CFG_TMPSHAREDDIR, CFG_LOGDIR, \
                             CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS, \
                             CFG_PREFIX, CFG_SITE_LANG
 from invenio.textutils import encode_for_xml
-from invenio.bibtask import task_low_level_submission
+from invenio.bibtask import task_low_level_submission, write_message
 from invenio.messages import gettext_set_language
 from invenio.textmarc2xmlmarc import transform_file
 from invenio.shellutils import run_shell_command
@@ -61,6 +61,66 @@ except ImportError:
 
 PERMITTED_MODES = ['-i', '-r', '-c', '-a', '-ir',
                    '--insert', '--replace', '--correct', '--append', '--holdingpen']
+
+FILE_SEARCH_PATTERN = [
+    # Example: 1234567.pdf
+        ('recid',
+        re.compile(r'(?i)(^\d+)\.pdfa?$'),
+        ('recid', )),
+    ## Example: Pages from C88-01-23_15-24.pdf
+        #('cnum and page range with prefix',
+        #re.compile(r'^Pages from (C\d\d-\d\d-\d\d)[-_](\d+\-\d+)\.pdfa?$'),
+        #('773__w', '773__c')),
+    ## Example: Pages from C88-01-23_15-24.pdf
+    ##PLEASE REMOVE WHITESPACE FROM FILENAMES FIRST! OR implement that in this script
+        ('cnum and page range with prefix but take only start page',
+        re.compile(r'^Pages_from_(C\d\d-\d\d-\d\d)[-_](\d+\-)\d+\.pdfa?$'),
+        ('773__w', '773__c')),
+    # Example: Pages from C75-03-02_101.pdf
+        ('cnum and page start with prefix with optional dot',
+        re.compile(r'^Pages_from_(C\d\d-\d\d-\d\d?.?\d)[-_](\d+)\.pdfa?$'),
+        ('773__w', '773__c')),
+    ## Example: 'Pages from C77-03-06.1_93.pdf'
+        #('cnum and page start with prefix with dot',
+        #re.compile(r'^Pages_from_(C\d\d-\d\d-\d\d\.\d)[-_](\d+)\.pdfa?$'),
+        #('773__w', '773__c')),
+    # Example: Pages from C88-03-06.1_79-89.pdf
+        ('cnum and page range with prefix but take only start page with optional dot',
+        re.compile(r'^Pages_from_(C\d\d-\d\d-\d\d?.?\d)[-_](\d+\-)\d+\.pdfa?$'),
+        ('773__w', '773__c')),
+    # Example: C73-03-04_Proceedings.pdf
+        ('cnum with Proceedings suffixed with optional dot',
+        re.compile(r'^(C\d\d-\d\d-\d\d?.?\d)[-_](Proceedings).pdfa?$'),
+        ('773__w', '980__a')),
+    # Example: c12-03-17.1-p578.pdf
+        ('cnum and page',
+        re.compile(r'(?i)(^C\d\d-\d\d-\d\d.?\d*)[-_]p0*(\d+)\.pdfa?$'),
+        ('773__w', '773__c')),
+    # Example: c12-03-17.1-p578_comment.pdf
+        ('cnum and page',
+        re.compile(r'(?i)(^C\d\d-\d\d-\d\d.?\d*)[-_]p0*(\d+)_(.*)\.pdfa?$'),
+        ('773__w', '773__c')),
+    # Example: c12-03-17.2-p578-582.pdf
+        ('cnum and page-range',
+        re.compile(r'(?i)(^C\d\d-\d\d-\d\d.?\d*)[-_]p0*(\d+)-0*\d+\.pdfa?$'),
+        ('773__w', '773__c')),
+    # Example: 1234567-p578.pdf
+        ('recid and page',
+        re.compile(r'(?i)(^\d+)[-_]p0*(\d+)\.pdfa?$'),
+        ('773__0', '773__c')),
+    # Example: 1234567-p578-591.pdf
+        ('recid and page-range',
+        re.compile(r'(?i)(^\d+)[-_]p0*(\d+)-0*d+\.pdfa?$'),
+        ('773__0', '773__c')),
+    # Example: RepNo_CMS-pas123.pdf
+        ('report-number',
+        re.compile(r'(?i)^RepNo[_-](.*)\.pdfa?$'),
+        ('reportnumber', )),
+    # Example: anything.pdf
+        ('garbage',
+        re.compile(r'(?i)^(.+)\.pdfa?$'),
+        ('rec_garbage', ))]
+
 
 _CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS_RE = re.compile(CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS)
 
@@ -287,7 +347,16 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
             extension = docfile[len(identifier):]
             rec_id = None
             if identifier:
-                rec_id = search_pattern(p=identifier, f=matching, m='e')
+                if matching == 'smart':
+                    for comment, pattern, fields in FILE_SEARCH_PATTERN:
+                        g = pattern.match(docfile)
+                        if g:
+                            query = ' '.join(map(lambda key, value: '%s:"%s"' % (key, value), fields, g.groups()))
+                            write_message("%s smart matched via %s: %s" % (docfile, comment, query))
+                            rec_id = search_pattern(p=query)
+                            break
+                else:
+                    rec_id = search_pattern(p=identifier, f=matching, m='e')
             if not rec_id:
                 errors.append((docfile, err_desc[2]))
                 continue
@@ -296,21 +365,8 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
                 continue
             else:
                 rec_id = str(list(rec_id)[0])
-            rec_info = BibRecDocs(rec_id)
-            if rec_info.bibdocs:
-                for bibdoc in rec_info.bibdocs:
-                    attached_files = bibdoc.list_all_files()
-                    file_md5 = md5(open(os.path.join(folder, docfile), "rb").read()).hexdigest()
-                    num_errors = len(errors)
-                    for attached_file in attached_files:
-                        if attached_file.checksum == file_md5:
-                            errors.append((docfile, err_desc[3]))
-                            break
-                        elif attached_file.get_full_name() == docfile:
-                            errors.append((docfile, err_desc[4]))
-                            break
-                if len(errors) > num_errors:
-                    continue
+            write_message("%s matches to record %s" % (docfile, rec_id))
+
             # Check if user has rights to upload file
             if req is not None:
                 file_collection = guess_collection_of_a_record(int(rec_id))
@@ -319,9 +375,11 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
                     error_msg = err_desc[5] % file_collection
                     errors.append((docfile, error_msg))
                     continue
+
             # Move document to be uploaded to temporary folder
             (fd, tmp_file) = tempfile.mkstemp(prefix=identifier + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_", suffix=extension, dir=CFG_TMPSHAREDDIR)
             shutil.copy(os.path.join(folder, docfile), tmp_file)
+
             # Create MARC temporary file with FFT tag and call bibupload
             (fd, filename) = tempfile.mkstemp(prefix=identifier + '_', dir=CFG_TMPSHAREDDIR)
             filedesc = os.fdopen(fd, 'w')
@@ -357,12 +415,12 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
             task_arguments += (filename, )
 
             jobid = task_low_level_submission(*task_arguments)
-
+            write_message("Scheduled Bibupload %s: %s" % (jobid, ' '.join(task_arguments)))
             # write batch upload history
             run_sql("""INSERT INTO hstBATCHUPLOAD (user, submitdate,
                     filename, execdate, id_schTASK, batch_mode)
                     VALUES (%s, NOW(), %s, %s, %s, "document")""",
-                    (user_info['nickname'], docfile,
+                    (user, docfile,
                     exec_date != "" and (exec_date + ' ' + exec_time)
                     or time.strftime("%Y-%m-%d %H:%M:%S"), str(jobid)))
 
