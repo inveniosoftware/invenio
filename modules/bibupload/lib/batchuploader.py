@@ -131,7 +131,7 @@ def task_run_core():
                     break  # All documents succedeed with that matching
                 for error in errors:
                     write_message("File: %s - %s with matching %s" % (error[0], error[1], matching), sys.stderr)
-                write_message("Uploaded %s files: %s", (info[0], ', '.join(info[1])))
+                write_message("Uploaded %s files: %s" % (info[0], ', '.join(info[1])))
     return 1
 
 
