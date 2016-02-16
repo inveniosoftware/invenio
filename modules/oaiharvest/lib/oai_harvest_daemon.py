@@ -1184,7 +1184,7 @@ def authorlist_extract(tarball_path, identifier, downloaded_files, stylesheet):
         match = REGEXP_AUTHLIST.findall(xml_content)
         if match != []:
             tempfile_fd, temp_authorlist_path = tempfile.mkstemp(suffix=".xml", prefix="authorlist_temp", dir=CFG_TMPDIR)
-            os.write(tempfile_fd, match[0])
+            os.write(tempfile_fd, match[0].replace('http://inspirehep.net/info/HepNames/tools/authors_xml/', 'http://www.slac.stanford.edu/spires/hepnames/authors_xml/'))
             os.close(tempfile_fd)
             # Generate file to store conversion results
             newfile_fd, authorlist_resultxml_path = tempfile.mkstemp(suffix=".xml", prefix="authorlist_MARCXML", \
