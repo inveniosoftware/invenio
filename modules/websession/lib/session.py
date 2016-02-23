@@ -620,8 +620,8 @@ class InvenioSessionRedis(InvenioSessionBase):
 
     def save_in_storage(self, sid, session_object, timeout, uid):  # pylint: disable=W0613
         return get_redis().setex(self.generate_key(sid),
-                                 session_object,
-                                 timeout)
+                                 timeout,
+                                 session_object)
 
 if CFG_WEBSESSION_STORAGE == 'mysql':
     InvenioSession = InvenioSessionMySQL
