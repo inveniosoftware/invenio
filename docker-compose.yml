@@ -23,8 +23,9 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 web:
+  restart: "always"
   build: .
-  command: /bin/bash -c "invenio3 --debug run -h 0.0.0.0"
+  command: /bin/bash -c "invenio3 run -h 0.0.0.0"
   environment:
     - PATH=/home/invenio/.virtualenvs/invenio3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     - VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python
@@ -41,8 +42,8 @@ web:
     - INVENIO_ELASTICSEARCH_HOST=elasticsearch
     - INVENIO_RABBITMQ_HOST=rabbitmq
     - INVENIO_WORKER_HOST=127.0.0.1
-  volumes:
-    - .:/code
+  volumes_from:
+    - static
   links:
     - postgresql
     - redis
@@ -52,6 +53,7 @@ web:
     - "5000:5000"
 
 postgresql:
+  restart: "always"
   image: postgres
   environment:
     - POSTGRES_USER=invenio3
@@ -61,18 +63,39 @@ postgresql:
     - "25432:5432"
 
 redis:
+  restart: "always"
   image: redis
   ports:
     - "26379:6379"
 
 elasticsearch:
+  restart: "always"
   image: elasticsearch
   ports:
     - "29200:9200"
     - "29300:9300"
 
 rabbitmq:
+  restart: "always"
   image: rabbitmq
   ports:
     - "24369:4369"
     - "45672:25672"
+
+nginx:
+  restart: "always"
+  build: ./nginx
+  ports:
+    - "80:80"
+  volumes_from:
+    - static
+  links:
+    - web
+
+static:
+  restart: "no"
+  build: .
+  volumes:
+    - /home/invenio/.virtualenvs/invenio3/var/invenio3-instance/static
+    - /home/invenio/.virtualenvs/invenio3/src/invenio-theme/invenio_theme/static
+  user: invenio

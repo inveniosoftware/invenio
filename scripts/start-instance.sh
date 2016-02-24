@@ -100,5 +100,5 @@ set -o errexit
 set -o nounset
 
 # sphinxdoc-start-application-begin
-${INVENIO_WEB_INSTANCE} --debug run -h 0.0.0.0 &
+${INVENIO_WEB_INSTANCE} run -h 0.0.0.0 &
 # sphinxdoc-start-application-end

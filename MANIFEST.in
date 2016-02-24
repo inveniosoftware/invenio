@@ -37,6 +37,7 @@ include .inveniorc
 include Vagrantfile
 include docker-compose.yml
 include Dockerfile
+include nginx/Dockerfile
 
 include *.rst
 include *.sh
@@ -62,3 +63,4 @@ recursive-include misc *.py
 recursive-include misc *.rst
 recursive-include scripts *.sh
 recursive-include tests *.py
+recursive-include nginx *.conf
