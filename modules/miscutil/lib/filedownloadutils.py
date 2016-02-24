@@ -60,7 +60,8 @@ class InvenioFileCopyError(Exception):
 
 
 def download_url(url, content_type=None, download_to_file=None,
-                 retry_count=10, timeout=10.0):
+                 retry_count=10, timeout=10.0, suffix=".tmp",
+                 prefix="filedownloadutils_"):
     """
     Will download a file from given URL (either local or external) to the
     desired path (or generate one if none is given). Local files are copied
@@ -100,8 +101,8 @@ def download_url(url, content_type=None, download_to_file=None,
     @raise InvenioFileDownloadError: raised upon URL/HTTP errors, file errors or wrong format
     """
     if not download_to_file:
-        download_to_file = safe_mkstemp(suffix=".tmp",
-                                        prefix="filedownloadutils_")
+        download_to_file = safe_mkstemp(suffix=suffix,
+                                        prefix=prefix)
 
     try:
         if is_url_a_local_file(url):
