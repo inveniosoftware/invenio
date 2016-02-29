@@ -38,8 +38,11 @@ from invenio.refextract_re import re_kb_line, \
                                   re_punctuation
 from invenio.docextract_utils import write_message
 from invenio.docextract_text import re_group_captured_multiple_space
-from invenio.search_engine import get_collection_reclist
+from invenio.search_engine import get_collection_reclist, get_record
 from invenio.search_engine_utils import get_fieldvalues
+from invenio.bibrecord import record_get_field_values, \
+                              record_get_field_instances, \
+                              field_get_subfield_instances
 
 
 def get_kbs(custom_kbs_files=None, cache={}):
@@ -659,6 +662,31 @@ def load_kb_from_db(kb_name, builder):
     return builder(lazy_parser(get_kbr_items(kb_name)))
 
 
+def load_journal_kb_from_records(kb_name, builder):
+    def lazy_parser(collection, left_tags, right_tags, volume_subfield):
+        for recid in get_collection_reclist(collection):
+            record = get_record(recid)
+            for right_tag in right_tags:
+                for right_value in record_get_field_values(record, right_tag[:3], right_tag[3], right_tag[4], right_tag[5]):
+                    if not right_value:
+                        continue # Empty metadata
+                    yield right_value, right_value
+                    for left_tag in left_tags:
+                        for left_field in record_get_field_instances(record, left_tag[:3], left_tag[3], left_tag[4]):
+                            left_subfields = dict(field_get_subfield_instances(left_field))
+                            if left_tag[5] not in left_subfields:
+                                continue # Empty field
+                            if volume_subfield in left_subfields:
+                                yield left_subfields[left_tag[5]], '%s;%s' % (right_value, left_subfields[volume_subfield])
+                            else:
+                                yield left_subfields[left_tag[5]], right_value
+
+    dummy, collection, left_str, right_str, volume_subfield = kb_name.split(':')
+    left_tags = left_str.split(',')
+    right_tags = right_str.split(',')
+    return builder(lazy_parser(collection, left_tags, right_tags, volume_subfield))
+
+
 def load_kb_from_records(kb_name, builder):
     def get_tag_values(recid, tags):
         for tag in tags:
@@ -669,13 +697,13 @@ def load_kb_from_records(kb_name, builder):
         for recid in get_collection_reclist(collection):
             try:
                 # Key tag
-                # e.g. for journals database: 711__a
+                # e.g. for journals database: 130__a, 730__a and 030__a
                 left_values = get_tag_values(recid, left_tags)
             except IndexError:
                 pass
             else:
                 # Value tags
-                # e.g. for journals database: 130__a, 730__a and 030__a
+                # e.g. for journals database: 711__a
                 right_values = get_tag_values(recid, right_tags)
 
                 for left_value in set(left_values):
