@@ -19,10 +19,9 @@
 
 """Utils for extracting notes from comments and manipulating them.
 
-.. py:data:: MARKERS
+The MARKERS variable defines the note markers.
 
-   the note markers; references have a special type of location, e.g.
-   "[Ellis98]"
+The references have a special type of location, e.g. "[Ellis98]".
 """
 
 import re
@@ -94,14 +93,14 @@ TEXT = r'(.+)'
 def extract_notes_from_comment(comment, bodyOnly=False):
     """Extracts notes from a comment.
 
-    Notes are one-line blocks of text preceded by :py:data:`MARKERS` and
+    Notes are one-line blocks of text preceded by `MARKERS` and
     locations (page numbers, figure names etc.).
 
     :param comment: the comment to parse
     :return: the list of parsed notes in the following JSON form below (
         if the ``body`` is a JSON, it means that the note has a child).
 
-        .. code-block:: json
+        .. code-block:: none
 
             {
                 "marker": String,

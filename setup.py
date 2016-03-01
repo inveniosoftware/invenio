@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014, 2015 CERN.
+# Copyright (C) 2013, 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -64,7 +64,7 @@ class _install_lib(install_lib):  # noqa
 
 install_requires = [
     "alembic>=0.6.6,<0.7",
-    "Babel>=1.3",
+    "Babel>=1.3,<2.0",
     "bagit>=1.5.1",
     "BeautifulSoup>=3.2.1",
     "BeautifulSoup4>=4.3.2",
@@ -72,12 +72,13 @@ install_requires = [
     # Cerberus>=0.7.1 api changes and is not yet supported
     "Cerberus>=0.7,<0.7.1",
     "chardet>=2.3.0",
-    "datacite>=0.1.0",
+    "click>=4.1,<7.0",
+    "datacite>=0.1.0,<0.2.0",
     "dictdiffer>=0.0.3",
     "feedparser>=5.1",
     "fixture>=1.5",
     "Flask>=0.10.1",
-    "Flask-Admin>=1.0.9",
+    "Flask-Admin>=1.0.9,<1.2",
     "Flask-Assets>=0.10",
     "Flask-Babel>=0.9",
     "Flask-Breadcrumbs>=0.2",
@@ -85,23 +86,22 @@ install_requires = [
     "Flask-Collect>=1.1.1",
     "Flask-Email>=1.4.4",
     "Flask-Gravatar>=0.4.2",
-    "Flask-Login>=0.2.7",
+    "Flask-Login>=0.2.7,<0.3.0",
     "Flask-Menu>=0.2",
     "Flask-OAuthlib>=0.6.0,<0.7",  # quick fix for issue #2158
     "Flask-Principal>=0.4",
     "Flask-Registry>=0.2",
-    "Flask-RESTful>=0.2.12",
+    "Flask-RESTful>=0.2.12,<0.3.0",
     "Flask-Script>=2.0.5",
-    # Development version is used, will switch to >=2.0 once released.
-    "Flask-SQLAlchemy>=2.0",
-    "Flask-WTF>=0.10.2",
+    "Flask-SQLAlchemy>=2.0,<2.2",
+    "Flask-WTF>=0.12,<0.13",
     "fs>=0.4",
     "intbitset>=2.0",
     "invenio-client>=0.1.0",
     "jellyfish>=0.3.2",
     "Jinja2>=2.7",
     "libmagic>=1.0",
-    "lxml>=3.3",
+    "lxml>=3.3,<3.5",
     "mechanize>=0.2.5",
     "mistune>=0.4.1",
     "msgpack-python>=0.3",
@@ -127,16 +127,17 @@ install_requires = [
     "redis>=2.8.0",
     "reportlab>=2.7,<3.2",
     "requests>=2.3,<2.4",
-    "setuptools>=2.2",
+    "setuptools>=12.0",
     "six>=1.7.2",
     "Sphinx>=1.3",
     "SQLAlchemy>=0.9.9,<1.0",
     "SQLAlchemy-Utils[encrypted]>=0.28.2,<0.30",
     "unidecode>=0.04.1",
     "workflow>=1.2.0,<2.0.0",
-    "WTForms>=2.0.1",
-    "WTForms-Alchemy>=0.12.6,<0.13.1",
-    "WTForms-SQLAlchemy>=0.1"
+    "WTForms>=2.0.2,<2.2",
+    "WTForms-Alchemy>=0.13.0,<0.13.1",
+    "WTForms-Components>=0.9.6,<0.10",
+    "WTForms-SQLAlchemy>=0.1,<0.2"
 ]
 
 
@@ -165,7 +166,7 @@ extras_require = {
     ],
     "img": [
         "qrcode>=5.1",
-        "Pillow>=2.7.0"
+        "Pillow>=2.7.0,<3.0.0"
     ],
     "mongo": [
         "pymongo>=3.0"
