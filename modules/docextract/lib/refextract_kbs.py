@@ -98,8 +98,11 @@ def load_kb(path, builder):
         write_message("Loading kb from %s" % path, verbose=3)
         kb_start = 'kb:'
         records_start = 'records:'
+        journal_records_starts = 'records:Journals:'
         if path.startswith(kb_start):
             return load_kb_from_db(path[len(kb_start):], builder)
+        elif path.startswith(journal_records_starts):
+            return load_journal_kb_from_records(path, builder)
         elif path.startswith(records_start):
             return load_kb_from_records(path, builder)
         else:
