@@ -64,7 +64,8 @@ from invenio.bibrecord import create_records, \
                               record_delete_fields, record_xml_output, \
                               record_get_field_instances, \
                               field_xml_output, \
-                              field_get_subfield_instances
+                              field_get_subfield_instances, \
+                              record_get_field_values
 from invenio import oai_harvest_getter
 from invenio.errorlib import register_exception
 from invenio.plotextractor_getter import harvest_single, make_single_directory
@@ -181,6 +182,10 @@ def task_run_core():
         if 'c' in repository["postprocess"]:
             post_process_functions.append(convert_step)
 
+        # Authorlist?
+        if 'a' in repository["postprocess"]:
+            post_process_functions.append(authorlist_step)
+
         # Filter?
         if 'f' in repository["postprocess"]:
             post_process_functions.append(filter_step)
@@ -196,10 +201,6 @@ def task_run_core():
         # Refextract?
         if 'r' in repository["postprocess"]:
             post_process_functions.append(refextract_step)
-
-        # Authorlist?
-        if 'a' in repository["postprocess"]:
-            post_process_functions.append(authorlist_step)
 
         # Upload?
         if 'u' in repository["postprocess"]:
@@ -560,11 +561,8 @@ def authorlist_step(repository, active_files_list, downloaded_material_dict, *ar
         task_sleep_now_if_required()
         task_update_progress("Extracting any authorlists from material harvested from %s (%i/%i)" %
                              (repository["name"], i, len(active_files_list)))
-        if 'f' in repository["postprocess"] and not ".insert." in active_file:
-            # Only process new records
-            updated_files_list.append(active_file)
-            continue
-        write_message("Insert detected (%s): extracting authors." % (active_file,))
+
+        write_message("Extracting authors...")
         updated_file = "%s.authextracted" % (os.path.splitext(active_file)[0],)
         updated_files_list.append(updated_file)
         (exitcode, err_msg) = call_authorlist_extract(active_file,
@@ -1036,28 +1034,31 @@ def call_authorlist_extract(active_file, extracted_file,
                         else:
                             all_err_msg.append("Error while submitting RT ticket for %s" % (identifier,))
                     # Replace 100,700 fields of original record with extracted fields
-                    record_delete_fields(existing_record, '100')
-                    record_delete_fields(existing_record, '700')
-                    first_author = record_get_field_instances(authorlist_record, '100')
-                    additional_authors = record_get_field_instances(authorlist_record, '700')
+                    if not (record_get_field_values(existing_record, '100', code="i") or \
+                       record_get_field_values(existing_record, '700', code="i")):
+                        # We did not found existing $i, so replace
+                        record_delete_fields(existing_record, '100')
+                        record_delete_fields(existing_record, '700')
+                        first_author = record_get_field_instances(authorlist_record, '100')
+                        additional_authors = record_get_field_instances(authorlist_record, '700')
 
-                    # Check if $$i is missing and report it
-                    missing_identifier_fields = []
-                    for field in first_author + additional_authors:
-                        subfields = dict(field_get_subfield_instances(field))
-                        if "i" not in subfields:
-                            missing_identifier_fields.append(field)
-                    if missing_identifier_fields:
-                        ticketid = create_authorlist_ticket(
-                            [("700", missing_identifier_fields)],
-                            identifier, "AUTHORS_long_list", missing_ids=True
-                        )
-                        if ticketid:
-                            write_message("authorlist RT ticket %d submitted for %s" % (ticketid, identifier))
-                        else:
-                            all_err_msg.append("Error while submitting RT ticket for %s" % (identifier,))
-                    record_add_fields(existing_record, '100', first_author)
-                    record_add_fields(existing_record, '700', additional_authors)
+                        # Check if $$i is missing and report it
+                        missing_identifier_fields = []
+                        for field in first_author + additional_authors:
+                            subfields = dict(field_get_subfield_instances(field))
+                            if "i" not in subfields:
+                                missing_identifier_fields.append(field)
+                        if missing_identifier_fields:
+                            ticketid = create_authorlist_ticket(
+                                [("700", missing_identifier_fields)],
+                                identifier, "AUTHORS_long_list", missing_ids=True
+                            )
+                            if ticketid:
+                                write_message("authorlist RT ticket %d submitted for %s" % (ticketid, identifier))
+                            else:
+                                all_err_msg.append("Error while submitting RT ticket for %s" % (identifier,))
+                        record_add_fields(existing_record, '100', first_author)
+                        record_add_fields(existing_record, '700', additional_authors)
 
         updated_xml.append(record_xml_output(existing_record))
     updated_xml.append('</collection>')
