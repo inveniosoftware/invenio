@@ -100,6 +100,8 @@ REGEXP_REFS = re.compile("<record.*?>.*?<controlfield .*?>.*?</controlfield>(.*?
 REGEXP_AUTHLIST = re.compile("<collaborationauthorlist.*?</collaborationauthorlist>", re.DOTALL)
 
 
+ALLOWED_AUTHOREXTRACT_CATEGORIES = ['hep-ex', 'nucl-ex', 'astro-ph', 'physics.ins-det']
+
 def task_run_core():
     """Run the harvesting task.  The row argument is the oaiharvest task
     queue row, containing if, arguments, etc.
@@ -966,21 +968,31 @@ def call_authorlist_extract(active_file, extracted_file,
     updated_xml.append('<collection>')
     for record_xml in record_xmls:
         current_exitcode = 0
-        if not oaiharvest_templates.tmpl_should_process_record_with_mode(record_xml, 'p', source_id):
-            # We skip this record
-            updated_xml.append("<record>")
-            updated_xml.append(record_xml)
-            updated_xml.append("</record>")
-            continue
 
-        id_list = record_collect_oai_identifiers("<record>" + record_xml + "</record>")
+        id_list, subjects = record_collect_oai_identifiers(
+            "<record>" + record_xml + "</record>",
+            subjects=True
+        )
         # We bet on the first one.
         identifier = None
         for oai_id in id_list:
             if "oai" in oai_id.lower():
                 identifier = oai_id
                 break
-        write_message("OAI identifier found in record: %s" % (identifier,), verbose=6)
+
+        allowed_subjects = []
+        for subj in subjects:
+            allowed_subjects.extend([subj for allowed_subject in ALLOWED_AUTHOREXTRACT_CATEGORIES
+                                     if allowed_subject in subj])
+
+
+        if not identifier or not allowed_subjects or not oaiharvest_templates.tmpl_should_process_record_with_mode(record_xml, 'p', source_id):
+            # We skip this record
+            updated_xml.append("<record>")
+            updated_xml.append(record_xml)
+            updated_xml.append("</record>")
+            continue
+
 
         # Grab BibRec instance of current record for later amending
         existing_record, status_code, dummy1 = create_record("<record>%s</record>" % (record_xml,))

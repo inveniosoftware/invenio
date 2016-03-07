@@ -82,7 +82,7 @@ def collect_identifiers(harvested_file_list):
     return result
 
 
-def record_collect_oai_identifiers(record_xml):
+def record_collect_oai_identifiers(record_xml, subjects=False):
     """
     Collects all OAI identifiers from given MARCXML.
 
@@ -109,6 +109,9 @@ def record_collect_oai_identifiers(record_xml):
         if not result:
             # No IDs found..
             write_message("No OAI IDs found in record")
+    if subjects:
+        subjects = record_get_field_values(record, tag="650", ind1="1", ind2="7", code="a")
+        return result, subjects
     return result
 
 
