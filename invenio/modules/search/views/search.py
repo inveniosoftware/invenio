@@ -462,7 +462,7 @@ def search(collection, p, of, ot, so, rm):
 
     ctx = dict(
         facets=facets.get_facets_config(collection, qid),
-        records=len(get_current_user_records_that_can_be_displayed(qid)),
+        records=len(recids),
         qid=qid, rg=rg,
         create_nearest_terms_box=lambda: _create_neareset_term_box(argd_orig),
         easy_search_form=EasySearchForm(csrf_enabled=False),
