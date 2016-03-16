@@ -1,7 +1,7 @@
 ## -*- mode: python; coding: utf-8; -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011, 2012 CERN.
+## Copyright (C) 2007, 2008, 2010, 2011, 2012, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -94,6 +94,8 @@ CFG_MAX_ATIME_RM_WEBSUBMIT_CKEDITOR_FILE = 28
 CFG_MAX_ATIME_BIBEDIT_TMP = 3
 # After how many days to remove submitted XML files related to BibEdit
 CFG_MAX_ATIME_BIBEDIT_XML = 3
+# After how many days any file in TMP folders is removed
+CFG_MAX_ATIME_TMPF = 90
 
 def gc_exec_command(command):
     """ Exec the command logging in appropriate way its output."""
@@ -143,6 +145,12 @@ def clean_tempfiles():
         ' -mtime +%s -exec rm %s -rf {} \;' \
             % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
                CFG_MAX_ATIME_RM_OAI, vstr))
+    # some basic precaution here:
+    if 'tmp' in CFG_TMPDIR and 'tmp' in CFG_TMPSHAREDDIR:
+        gc_exec_command('find %s %s -maxdepth 1 -type f'
+                        ' -mtime +%s -exec rm %s -f {} \;'
+                        % (CFG_TMPDIR, CFG_TMPSHAREDDIR,
+                           CFG_MAX_ATIME_TMPF, vstr))
 
     if not CFG_INSPIRE_SITE:
         write_message("- deleting/gzipping temporary old "
