@@ -25,12 +25,14 @@
 # Use Python-2.7:
 FROM python:2.7-slim
 
+COPY scripts/provision-web.sh /tmp/
+
+# Install Invenio web node pre-requisites:
+RUN /tmp/provision-web.sh
+
 # Add Invenio sources to `code` and work there:
 WORKDIR /code
 ADD . /code
-
-# Install Invenio web node pre-requisites:
-RUN /code/scripts/provision-web.sh
 
 # Run container as user `invenio` with UID `1000`, which should match
 # current host user in most situations:
