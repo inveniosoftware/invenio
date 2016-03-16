@@ -117,18 +117,19 @@ demomarc21pathname=$(echo "from __future__ import print_function; \
 import pkg_resources; \
 print(pkg_resources.resource_filename('invenio_records', \
   'data/marc21/bibliographic.xml'))" | python)
-
-# convert demo records from MARC21 to JSON and load them
-# using randomly generated UUIDs:
-demouuids=$(dojson -i $demomarc21pathname -l marcxml do marc21 | \
-             ${INVENIO_WEB_INSTANCE} records create)
+# define the schema for the records
+SCHEMA="http://${INVENIO_WEB_HOST}/schema/marc21/bibliographic/bd-v1.0.0.json"
+# convert demo records from MARC21 to JSON and load them:
+demouuids=$(dojson -i $demomarc21pathname -l marcxml do marc21 schema ${SCHEMA} | \
+            ${INVENIO_WEB_INSTANCE} records create --pid-minter recid)
 # sphinxdoc-populate-with-demo-records-end
 
-# sphinxdoc-register-pid-begin
-recid=1
-for demouuid in $demouuids; do
-    ${INVENIO_WEB_INSTANCE} pid create \
-         -t rec -i $demouuid -s REGISTERED recid $recid
-    let recid=recid+1
-done
-# sphinxdoc-register-pid-end
+# sphinxdoc-index-all-records-begin
+# indexing
+${INVENIO_WEB_INSTANCE} index init
+sleep 20
+${INVENIO_WEB_INSTANCE} index queue init
+${INVENIO_WEB_INSTANCE} index reindex --yes-i-know
+${INVENIO_WEB_INSTANCE} index run
+sleep 25
+# sphinxdoc-index-all-records-end

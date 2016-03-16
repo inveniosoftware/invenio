@@ -598,12 +598,11 @@ taken from the ``invenio-records`` package:
    :end-before: # sphinxdoc-populate-with-demo-records-end
    :literal:
 
-Let's register incremental numerical persistent identifiers for the uploaded
-demo records:
+Let's index all the uploaded records:
 
 .. include:: ../../scripts/populate-instance.sh
-   :start-after: # sphinxdoc-register-pid-begin
-   :end-before: # sphinxdoc-register-pid-end
+   :start-after: # sphinxdoc-index-all-records-begin
+   :end-before: # sphinxdoc-index-all-records-end
    :literal:
 
 Start instance

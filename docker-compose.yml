@@ -98,4 +98,5 @@ static:
   volumes:
     - /home/invenio/.virtualenvs/invenio3/var/invenio3-instance/static
     - /home/invenio/.virtualenvs/invenio3/src/invenio-theme/invenio_theme/static
+    - /home/invenio/.virtualenvs/invenio3/src/invenio-search-ui/invenio_search_ui/static
   user: invenio
