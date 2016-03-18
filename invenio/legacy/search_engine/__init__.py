@@ -5541,7 +5541,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=No
                         d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=CFG_SITE_LANG, ec=None, tab="",
                         wl=0, em=""):
     """Perform search or browse request, without checking for
-       authentication.  Return list of recIDs found, if of=id.
+       authentication.  Return list of recIDs found, if of=id or of=intbitset.
        Otherwise create web page.
 
        The arguments are as follows:
@@ -5561,7 +5561,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=No
 
           rg - records in groups of (e.g. "10").  Defines how many hits
                per collection in the search results page are
-               displayed.  (Note that `rg' is ignored in case of `of=id'.)
+               displayed.  (Note that `rg' is ignored in case of `of=intbitset'.)
 
           sf - sort field (e.g. "title").
 
@@ -5636,7 +5636,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=No
 
         jrec - jump to record (e.g. "234").  Used for navigation
                inside the search results.  (Note that `jrec' is ignored
-               in case of `of=id'.)
+               in case of `of=intbitset'.)
 
        recid - display record ID (e.g. "20000").  Do not
                search/browse but go straight away to the Detailed

@@ -444,6 +444,10 @@ def search(collection, p, of, ot, so, rm):
     qid = get_search_query_id(**argd)
     recids = perform_request_search(req=request.get_legacy_request(), **argd)
 
+    # second search to get the total number of results
+    argd['of'] = 'intbitset'
+    total_number_of_results = len(perform_request_search(req=request.get_legacy_request(), **argd))
+
     # back-to-search related code
     if request and not isinstance(request.get_legacy_request(),
                                   cStringIO.OutputType):
@@ -462,7 +466,7 @@ def search(collection, p, of, ot, so, rm):
 
     ctx = dict(
         facets=facets.get_facets_config(collection, qid),
-        records=len(recids),
+        records=total_number_of_results,
         qid=qid, rg=rg,
         create_nearest_terms_box=lambda: _create_neareset_term_box(argd_orig),
         easy_search_form=EasySearchForm(csrf_enabled=False),
