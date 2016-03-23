@@ -190,7 +190,8 @@ JSONSCHEMAS_HOST='http://${INVENIO_WEB_HOST}:5000'
 EOF
 `
 echo "${JSONSCHEMAS_CONF}" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
-
+echo "OAISERVER_RECORD_INDEX='marc21'" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
+echo "OAISERVER_ID_PREFIX='oai:${INVENIO_WEB_INSTANCE}:recid/'" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
 # sphinxdoc-customise-instance-end
 
 # sphinxdoc-run-npm-begin

@@ -121,7 +121,7 @@ print(pkg_resources.resource_filename('invenio_records', \
 SCHEMA="http://${INVENIO_WEB_HOST}/schema/marc21/bibliographic/bd-v1.0.0.json"
 # convert demo records from MARC21 to JSON and load them:
 demouuids=$(dojson -i $demomarc21pathname -l marcxml do marc21 schema ${SCHEMA} | \
-            ${INVENIO_WEB_INSTANCE} records create --pid-minter recid)
+            ${INVENIO_WEB_INSTANCE} records create --pid-minter recid --pid-minter oaiid)
 # sphinxdoc-populate-with-demo-records-end
 
 # sphinxdoc-index-all-records-begin
