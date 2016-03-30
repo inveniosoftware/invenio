@@ -3482,6 +3482,9 @@ def stream_restricted_icon(req):
 def _make_base_dir(docid):
     """Given a docid it returns the complete path that should host its files."""
     group = "g" + str(int(int(docid) / CFG_BIBDOCFILE_FILESYSTEM_BIBDOC_GROUP_LIMIT))
+    # FIXME: OPS this is just to workaround AFS being down
+    if group in ("g64", "g65"):
+        raise IOError("AFS g64 and g65 are currently down")
     return os.path.join(CFG_BIBDOCFILE_FILEDIR, group, str(docid))
 
 class Md5Folder(object):
