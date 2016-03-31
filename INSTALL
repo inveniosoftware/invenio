@@ -316,6 +316,7 @@ Contents
       $ make install
       $ make install-mathjax-plugin    ## optional
       $ make install-jquery-plugins    ## optional
+      $ make install-font-awesome      ## optional
       $ make install-ckeditor-plugin   ## optional
       $ make install-pdfa-helper-files ## optional
       $ make install-mediaelement      ## optional
@@ -524,6 +525,16 @@ Contents
           applications such as the record editor.
 
           Note that `unzip' is needed when installing jquery plugins.
+
+      $ make install-font-awesome  ## optional
+
+          This will automatically download and install Font Awesome,
+          the iconic font and CSS framework.
+
+          Note that in order to include Font Awesome in the HTML head
+          you have to set the CFG_WEBSTYLE_SUPPORT_FONTAWESOME to True
+
+          Note that `unzip' is needed when installing Font Awesome.
 
       $ make install-ckeditor-plugin  ## optional
 

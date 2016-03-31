@@ -1,5 +1,6 @@
 # This file is part of Invenio.
-# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+# 2011, 2012, 2013, 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -271,6 +272,38 @@ uninstall-jquery-plugins:
 	rm -f jquery.bookmark.css)
 	@echo "***********************************************************"
 	@echo "** The jquery plugins were successfully uninstalled.     **"
+	@echo "***********************************************************"
+
+install-font-awesome:
+	@echo "***********************************************************"
+	@echo "** Installing Font Awesome, please wait...               **"
+	@echo "***********************************************************"
+	rm -rf /tmp/font-awesome
+	mkdir /tmp/font-awesome
+	mkdir -p ${prefix}/var/www/static/css
+	mkdir -p ${prefix}/var/www/static/fonts
+	(cd /tmp/font-awesome && \
+	wget 'https://fortawesome.github.io/Font-Awesome/assets/font-awesome-4.5.0.zip' && \
+	unzip -u font-awesome-4.5.0.zip && \
+	mv font-awesome-4.5.0/css/font-awesome.min.css ${prefix}/var/www/static/css && \
+	mv font-awesome-4.5.0/fonts/* ${prefix}/var/www/static/fonts)
+	rm -rf /tmp/font-awesome
+	@echo "***********************************************************"
+	@echo "** Font Awesome was successfully installed.              **"
+	@echo "** It is disabled by default. To enable it, edit         **"
+	@echo "** CFG_WEBSTYLE_SUPPORT_FONTAWESOME in invenio.conf.     **"
+	@echo "***********************************************************"
+
+uninstall-font-awesome:
+	@rm -vf ${prefix}/var/www/static/css/font-awesome.min.css
+	@rm -vf ${prefix}/var/www/static/fonts/FontAwesome.otf
+	@rm -vf ${prefix}/var/www/static/fonts/fontawesome-webfont.eot
+	@rm -vf ${prefix}/var/www/static/fonts/fontawesome-webfont.svg
+	@rm -vf ${prefix}/var/www/static/fonts/fontawesome-webfont.ttf
+	@rm -vf ${prefix}/var/www/static/fonts/fontawesome-webfont.woff
+	@rm -vf ${prefix}/var/www/static/fonts/fontawesome-webfont.woff2
+	@echo "***********************************************************"
+	@echo "** Font Awesome was successfully uninstalled.            **"
 	@echo "***********************************************************"
 
 install-ckeditor-plugin:
