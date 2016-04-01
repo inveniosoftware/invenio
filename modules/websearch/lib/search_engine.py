@@ -57,6 +57,7 @@ from invenio.config import \
      CFG_SCOAP3_SITE, \
      CFG_OAI_ID_FIELD, \
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
+     CFG_WEBSEARCH_ADVANCED_SEARCH_EXACT_MATCH, \
      CFG_WEBSEARCH_CALL_BIBFORMAT, \
      CFG_WEBSEARCH_CREATE_SIMILARLY_NAMED_AUTHORS_LINK_BOX, \
      CFG_WEBSEARCH_FIELDS_CONVERT, \
@@ -6158,8 +6159,13 @@ def prs_advanced_search(results_in_any_collection, kwargs=None, req=None, of=Non
     len_results_p1 = 0
     len_results_p2 = 0
     len_results_p3 = 0
+    if CFG_WEBSEARCH_ADVANCED_SEARCH_EXACT_MATCH:
+        search_function = search_pattern
+    else:
+        search_function = search_pattern_parenthesised
+
     try:
-        results_in_any_collection.union_update(search_pattern_parenthesised(req, p1, f1, m1, ap=ap, of=of, verbose=verbose, ln=ln, wl=wl))
+        results_in_any_collection.union_update(search_function(req, p1, f1, m1, ap=ap, of=of, verbose=verbose, ln=ln, wl=wl))
         len_results_p1 = len(results_in_any_collection)
         if len_results_p1 == 0:
             if of.startswith("h"):
@@ -6171,7 +6177,7 @@ def prs_advanced_search(results_in_any_collection, kwargs=None, req=None, of=Non
                 print_records_epilogue(req, of)
             return page_end(req, of, ln, em)
         if p2:
-            results_tmp = search_pattern_parenthesised(req, p2, f2, m2, ap=ap, of=of, verbose=verbose, ln=ln, wl=wl)
+            results_tmp = search_function(req, p2, f2, m2, ap=ap, of=of, verbose=verbose, ln=ln, wl=wl)
             len_results_p2 = len(results_tmp)
             if op1 == "a": # add
                 results_in_any_collection.intersection_update(results_tmp)
@@ -6199,7 +6205,7 @@ def prs_advanced_search(results_in_any_collection, kwargs=None, req=None, of=Non
                     print_records_prologue(req, of)
                     print_records_epilogue(req, of)
         if p3:
-            results_tmp = search_pattern_parenthesised(req, p3, f3, m3, ap=ap, of=of, verbose=verbose, ln=ln, wl=wl)
+            results_tmp = search_function(req, p3, f3, m3, ap=ap, of=of, verbose=verbose, ln=ln, wl=wl)
             len_results_p3 = len(results_tmp)
             if op2 == "a": # add
                 results_in_any_collection.intersection_update(results_tmp)
