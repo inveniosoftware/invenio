@@ -57,7 +57,6 @@ from invenio.config import \
      CFG_SCOAP3_SITE, \
      CFG_OAI_ID_FIELD, \
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
-     CFG_WEBSEARCH_ADVANCED_SEARCH_EXACT_MATCH, \
      CFG_WEBSEARCH_CALL_BIBFORMAT, \
      CFG_WEBSEARCH_CREATE_SIMILARLY_NAMED_AUTHORS_LINK_BOX, \
      CFG_WEBSEARCH_FIELDS_CONVERT, \
@@ -91,6 +90,11 @@ from invenio.config import \
      CFG_BASE_URL, \
      CFG_WEBSEARCH_MAX_RECORDS_REFERSTO, \
      CFG_WEBSEARCH_MAX_RECORDS_CITEDBY
+
+try:
+    from invenio.config import CFG_WEBSEARCH_ADVANCED_SEARCH_PREFER_MATCHING_TYPE
+except ImportError:
+    CFG_WEBSEARCH_ADVANCED_SEARCH_PREFER_MATCHING_TYPE = False
 
 from invenio.search_engine_config import \
      InvenioWebSearchUnknownCollectionError, \
@@ -6159,7 +6163,7 @@ def prs_advanced_search(results_in_any_collection, kwargs=None, req=None, of=Non
     len_results_p1 = 0
     len_results_p2 = 0
     len_results_p3 = 0
-    if CFG_WEBSEARCH_ADVANCED_SEARCH_EXACT_MATCH:
+    if CFG_WEBSEARCH_ADVANCED_SEARCH_PREFER_MATCHING_TYPE:
         search_function = search_pattern
     else:
         search_function = search_pattern_parenthesised
