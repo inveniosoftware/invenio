@@ -24,10 +24,10 @@ We follow typical `GitHub flow
    say ``improve-fix-search-user-preferences``.
 3. Test your branch on a local site.  If everything works as expected,
    please `sign your commits
-   <http://invenio-software.org/wiki/Tools/Git/Workflow#R2.Remarksoncommitlogmessages>`_
+   <http://invenio.readthedocs.org/en/latest/technology/git.html#r2-remarks-on-commit-log-messages>`_
    to indicate its quality.
 4. Create `logically separate commits
-   <http://invenio-software.org/wiki/Tools/Git/Workflow#R1.Remarksoncommithistory>`_
+   <http://invenio.readthedocs.org/en/latest/technology/git.html#r1-remarks-on-commit-history>`_
    for logically separate things.
 5. Please add any ``(closes #123)`` or ``(addresses #123)`` directives
    in your commit log message if your pull request closes or addresses
@@ -140,7 +140,7 @@ to Invenio.
      completed.  Hence use of configurability upfront.
 
    * See `git workflow documentation on rebasing
-     <http://invenio-software.org/wiki/Tools/Git/Workflow#R1.Remarksoncommithistory>`_
+     <http://invenio.readthedocs.org/en/latest/technology/git.html#r1-remarks-on-commit-history>`_
      for more.
 
 6. **Use sensible commit messages and stamp them with QA and ticket
@@ -159,7 +159,7 @@ to Invenio.
      them onto fast integration track.
 
    * See `git workflow documentation on commit log messages
-     <http://invenio-software.org/wiki/Tools/Git/Workflow#R2.Remarksoncommitlogmessages>`_
+     <http://invenio.readthedocs.org/en/latest/technology/git.html#r2-remarks-on-commit-log-messages>`_
      for more.
 
 7. **Include test cases with the code.**
@@ -196,7 +196,7 @@ to Invenio.
      graph when there are no citations?
 
    * Are you changing DB schema?  Write an `upgrade recipe
-     <http://invenio-software.org/wiki/Development/Modules/InvenioUpgrader>`_.
+     <http://pythonhosted.org/invenio-upgrader/>`_.
 
    * Does your branch pass all our standard kwalitee tests?  Have you
      run `invenio-check-branch
@@ -214,9 +214,7 @@ to Invenio.
 
    * Respect minimal requirements, e.g. write for Python-2.4 for
      production ``maint-x.y`` branches that still require it.  Use
-     Vagrant `virtual development environment
-     <http://invenio-software.org/wiki/Development/VirtualEnvironments>`_
-     when necessary.
+     Vagrant `virtual development environment` when necessary.
 
    * Make conditional use of optional dependencies, e.g. test
      ``feedparser`` existence via ``try/except`` importing.  Check
@@ -255,17 +253,14 @@ to Invenio.
     with others.**
 
     * Check existing list of known bugs and known feature requests for
-      any given module.  Troubles with indexing?  Go to
-      `Development/Modules/BibIndex
-      <http://invenio-software.org/wiki/Development/Modules/BibIndex>`_.
+      any given module.  Troubles with collections?  Go to
+      `Modules/invenio-collections
+      <http://invenio.readthedocs.org/en/latest/modules/list.html#invenio-collections>`_.
 
     * Did you perform some service operation such as changing your
-      site URL?  Did you logged the several steps needed to achieve
-      this?  Document them.  `HowTo/HowToChangeSiteUrl
-      <http://invenio-software.org/wiki/HowTo/HowToChangeSiteUrl>`_.
+      site URL?  Did you log the several steps needed to achieve
+      this?  Document them.
 
     * Have you tried to improve performance of some tools Invenio
       relies on?  Have you run experiments and obtained observations
-      and tips on MySQL performance?  Document
-      them. `Tools/MySQL/Tuning
-      <http://invenio-software.org/wiki/Tools/MySQL/Tuning>`_.
+      and tips on MySQL performance?  Document them.
