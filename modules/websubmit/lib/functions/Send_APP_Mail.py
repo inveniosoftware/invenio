@@ -42,7 +42,7 @@ from invenio.access_control_admin import acc_get_role_users, acc_get_role_id
 from invenio.dbquery import run_sql
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.errorlib import register_exception
-from invenio.search_engine import print_record
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.mailutils import scheduled_send_email
 from invenio.bibtask import bibtask_allocate_sequenceid
 
@@ -240,10 +240,8 @@ def Send_APP_Mail (parameters, curdir, form, user_info=None):
     ## Add the record's submitter(s) into the list of recipients:
     ## Get the email address(es) of the record submitter(s)/owner(s) from
     ## the record itself:
-    record_owners = print_record(sysno, 'tm', \
-                                 [CFG_WEBSUBMIT_RECORD_OWNER_EMAIL]).strip()
+    record_owners = get_fieldvalues(sysno, CFG_WEBSUBMIT_RECORD_OWNER_EMAIL)
     if record_owners != "":
-        record_owners_list = record_owners.split("\n")
         record_owners_list = [email.lower().strip() \
                               for email in record_owners_list]
     else:
