@@ -579,7 +579,7 @@ def _get_work_type(recstruct):
     if 'conferencepaper' in [x.lower() for x in work_type]:
         return 'conference-paper'
     elif 'data' in [x.lower() for x in work_type]:
-        return 'dataset'
+        return 'data-set'
 
     published_flag = 'published' in [x.lower() for x in work_type]
     if (published_flag and
