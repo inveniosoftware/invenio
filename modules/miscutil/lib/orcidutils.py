@@ -212,7 +212,8 @@ def get_dois_from_orcid(orcid_id, get_titles=False):
     try:
         for work in orcid_profile['works']['group']:
             try:
-                if work['identifiers']:
+                if work['identifiers'] and \
+                   work['identifiers']['identifier'] is not None:
                     for identifier in work['identifiers']['identifier']:
                         identifier_type = \
                             identifier['external-identifier-type'].lower()
