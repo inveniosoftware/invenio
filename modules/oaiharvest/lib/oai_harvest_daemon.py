@@ -39,6 +39,7 @@ import urlparse
 import random
 import traceback
 
+from invenio.search_engine import get_record
 from invenio.config import \
      CFG_BINDIR, \
      CFG_INSPIRE_SITE, \
@@ -47,7 +48,8 @@ from invenio.config import \
      CFG_OAI_FAILED_HARVESTING_STOP_QUEUE, \
      CFG_OAI_FAILED_HARVESTING_EMAILS_ADMIN, \
      CFG_SITE_SUPPORT_EMAIL, \
-     CFG_TMPDIR
+     CFG_TMPDIR, \
+     CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
 from invenio.oai_harvest_config import InvenioOAIHarvestWarning
 from invenio.dbquery import deserialize_via_marshal
 from invenio.bibtask import \
@@ -86,7 +88,8 @@ from invenio.oai_harvest_utils import get_nb_records_in_file, \
                                       translate_fieldvalues_from_latex, \
                                       compare_timestamps_with_tolerance, \
                                       generate_harvest_report, \
-                                      record_collect_oai_identifiers
+                                      record_collect_oai_identifiers, \
+                                      record_collect_recid
 from invenio.webuser import email_valid_p
 from invenio.mailutils import send_email
 
@@ -481,11 +484,11 @@ def plotextract_step(repository, active_files_list, downloaded_material_dict, *a
         task_sleep_now_if_required()
         task_update_progress("Extracting plots from harvested material from %s (%i/%i)" %
                              (repository["name"], i, len(active_files_list)))
-        if 'f' in repository["postprocess"] and not ".insert." in active_file:
-            # Only process new records
+        if 'f' in repository["postprocess"] and ".append." in active_file:
+            # Only process insert or correct records
             updated_files_list.append(active_file)
             continue
-        write_message("Insert detected (%s): extracting plots." % (active_file,))
+        write_message("Insert/Correct detected (%s): extracting plots." % (active_file,))
         updated_file = "%s.plotextracted" % (os.path.splitext(active_file)[0],)
         updated_files_list.append(updated_file)
         (exitcode, err_msg) = call_plotextractor(active_file,
@@ -788,6 +791,8 @@ def call_plotextractor(active_file, extracted_file,
     records = recs_fd.read()
     recs_fd.close()
 
+    correct_mode = '.correct.' in active_file
+
     # Find all record
     record_xmls = REGEXP_RECORD.findall(records)
     updated_xml = ['<?xml version="1.0" encoding="UTF-8"?>']
@@ -795,19 +800,37 @@ def call_plotextractor(active_file, extracted_file,
     for record_xml in record_xmls:
         current_exitcode = 0
 
-        id_list = record_collect_oai_identifiers("<record>" + record_xml + "</record>")
-        # We bet on the first one.
+        updated_xml.append("<record>")
+        updated_xml.append(record_xml)
         identifier = None
-        for oai_id in id_list:
-            if "oai" in oai_id.lower():
-                identifier = oai_id
-                break
+        id_list = None
+
+        if not correct_mode:
+            id_list = record_collect_oai_identifiers("<record>" + record_xml + "</record>")
+        else:
+            recid = record_collect_recid("<record>" + record_xml + "</record>")
+            if recid:
+                record = get_record(recid)
+                id_list = record_get_field_values(record,
+                                                  CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:3],
+                                                  CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3],
+                                                  CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4],
+                                                  CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5])
+        if id_list:
+            # We bet on the first one.
+            for oai_id in id_list:
+                if "oai" in oai_id.lower():
+                    identifier = oai_id
+                    break
+        if identifier is None:
+            updated_xml.append("</record>")
+            continue
+
         write_message("OAI identifier found in record: %s" % (identifier,), verbose=6)
 
         if identifier not in downloaded_files:
             downloaded_files[identifier] = {}
-        updated_xml.append("<record>")
-        updated_xml.append(record_xml)
+
         if not oaiharvest_templates.tmpl_should_process_record_with_mode(record_xml, 'p', source_id):
             # We skip this record
             updated_xml.append("</record>")

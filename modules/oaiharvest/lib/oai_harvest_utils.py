@@ -82,6 +82,19 @@ def collect_identifiers(harvested_file_list):
     return result
 
 
+def record_collect_recid(record_xml):
+    """Return recid in MARCXML"""
+    result = None
+    (record, status_code, list_of_errors) = create_record(record_xml)
+    if not status_code:
+        # Error happened
+        write_message("Error collecting OAI identifier from record: %s" %
+                     ("\n".join(list_of_errors),))
+        return
+    if "001" in record:
+        return record['001'][0][3]
+
+
 def record_collect_oai_identifiers(record_xml, subjects=False):
     """
     Collects all OAI identifiers from given MARCXML.
