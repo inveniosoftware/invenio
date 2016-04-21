@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2013 CERN.
+## Copyright (C) 2010, 2011, 2013, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -105,7 +105,7 @@ def task_run_core():
                     shutil.copy(os.path.join(files_dir, metafile), filename)
                     # Send bibsched task
                     mode = "--" + folder
-                    jobid = str(task_low_level_submission('bibupload', 'batchupload', mode, filename))
+                    jobid = str(task_low_level_submission('bibupload', 'batchupload', mode, filename, '-N', 'daemon'))
                     # Move file to done folder
                     filename = metafile + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_" + jobid
                     os.rename(os.path.join(files_dir, metafile), os.path.join(files_done_dir, filename))
