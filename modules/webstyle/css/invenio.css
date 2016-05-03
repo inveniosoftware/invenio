@@ -2,7 +2,7 @@
 * -*- mode: text; coding: utf-8; -*-
 
 This file is part of Invenio.
-Copyright (C) 2009, 2010, 2011, 2012, 2013, 2015 CERN.
+Copyright (C) 2009, 2010, 2011, 2012, 2013, 2015, 2016 CERN.
 
 Invenio is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as
@@ -4046,6 +4046,33 @@ a.author_orcid_image_link {
   width:auto;
   height:20px;
   margin-right:10px;
+}
+
+/* Record Recommendation */
+.recommendations {
+    padding: 10px 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    width: 90%;
+    max-width: 1280px;
+    margin: 40px auto 0px;
+}
+
+.recommendations_contents {
+    width: 50%;
+    display: inline;
+}
+
+.recommendation_header {
+    display: block;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+}
+
+ul.record_recommendation li{
+  clear: both;
+  color: #444;
+  margin-top:5px;
 }
 
 /* end of invenio.css */

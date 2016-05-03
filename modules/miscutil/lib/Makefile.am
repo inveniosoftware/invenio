@@ -102,7 +102,9 @@ pylib_DATA = __init__.py \
              hepdatautils_unit_tests.py \
              filedownloadutils.py \
              filedownloadutils_unit_tests.py \
-	     viafutils.py
+             viafutils.py \
+             recommender_initializer.py \
+             recommender.py
 
 jsdir=$(localstatedir)/www/js
 

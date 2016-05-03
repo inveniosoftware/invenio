@@ -83,6 +83,7 @@ pylib_DATA = __init__.py \
 	bfe_record_id.py \
 	bfe_record_stats.py \
 	bfe_record_url.py \
+	bfe_record_recommendations.py \
 	bfe_references.py \
 	bfe_report_numbers.py \
 	bfe_reprints.py \
