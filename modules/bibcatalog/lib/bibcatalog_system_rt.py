@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
+# Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,6 +24,9 @@ This is a subclass of BibCatalogSystem
 
 import os
 import re
+
+from MySQLdb import escape_string
+
 import rt
 from rt import AuthorizationError, UnexpectedResponse, requests, \
     ConnectionError, NotAllowed, APISyntaxError, BadRequest
@@ -295,6 +298,13 @@ class BibCatalogSystemRT(BibCatalogSystem):
 
         if not search_atoms:
             return tickets
+
+        # rt modules does not escape search parameters
+        for k, val in search_atoms.items():
+            try:
+                search_atoms[k] = escape_string(val)
+            except TypeError:
+                pass
 
         rt_instance = self._get_instance()
         tickets = rt_instance.search(**search_atoms)
