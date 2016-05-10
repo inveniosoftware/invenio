@@ -24,7 +24,7 @@
 
 import re
 
-from invenio.config import CFG_RECOMMENDER_REDIS
+from invenio.config import CFG_RECOMMENDER_PREFIX
 from invenio.messages import gettext_set_language
 
 
@@ -93,7 +93,7 @@ $( document ).ready(function() {
 
 def format_element(bfo):
     """Create the HTML and JS code to display the recommended records."""
-    if CFG_RECOMMENDER_REDIS == "":
+    if CFG_RECOMMENDER_PREFIX == "":
         return ""
     try:
         re.search(r'/record/', bfo.user_info.get('uri')).group()
@@ -104,8 +104,9 @@ def format_element(bfo):
     _ = gettext_set_language(bfo.lang)
 
     url = "/record/" + str(bfo.recID) + "/recommendations"
+    title = _("People who viewed this record also viewed")
     html = html_script % {'recommendations_url': url,
-                          'text_title': _("You might also be interested in"),
+                          'text_title': title,
                           }
     return html
 

@@ -25,7 +25,7 @@ from invenio.bibfield import get_record
 from invenio.config import CFG_BASE_URL, \
     CFG_RECOMMENDER_PREFIX, \
     CFG_SITE_RECORD
-from invenio.recommender_initializer import get_redis_connection
+from invenio.redisutils import get_redis
 from invenio.webuser import collect_user_info
 
 
@@ -36,7 +36,7 @@ def get_recommended_records(recid):
     @param recid: Record id for the recommendation.
     @return: List of recommended records and a version ([234, 34, 2], 5)
     """
-    redis_connector = get_redis_connection()
+    redis_connector = get_redis('recommendations')
 
     if not redis_connector:
         return [], 0
