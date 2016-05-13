@@ -80,7 +80,7 @@ install_requires = [
     "Flask>=0.10.1",
     "Flask-Admin>=1.0.9,<1.2",
     "Flask-Assets>=0.10",
-    "Flask-Babel>=0.9",
+    "Flask-Babel>=0.9,<0.10",
     "Flask-Breadcrumbs>=0.2",
     "Flask-Cache>=0.12",
     "Flask-Collect>=1.1.1",
@@ -226,7 +226,7 @@ tests_require = [
 ]
 
 setup_requires = [
-    'Babel>=1.3',
+    'Babel>=1.3,<2.0',
 ]
 
 # Add `tests` dependencies to `extras_require` so that developers
