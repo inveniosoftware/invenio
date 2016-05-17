@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-##
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014, 2016 CERN.
+## Copyright (C) 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,32 +15,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-notifications:
-  email: false
-
-sudo: true
-
-python:
-  - "2.6"
-
-env:
-  global:
-    - INVENIO_SRCDIR=$(pwd)
-    - INVENIO_ADMIN_EMAIL=info@inveniosoftware.org
-    - INVENIO_WEB_DSTDIR=/opt/invenio
-    - INVENIO_WEB_HOST=127.0.0.1
-    - INVENIO_WEB_USER=www-data
-    - INVENIO_WEB_SMTP_PORT=0
-    - INVENIO_MYSQL_HOST=127.0.0.1
-    - INVENIO_MYSQL_DBNAME=invenio1
-    - INVENIO_MYSQL_DBUSER=invenio1
-    - INVENIO_MYSQL_DBPASS=dbpass123
-
-install:
-  - ./scripts/provision-mysql.sh
-  - ./scripts/provision-web.sh
-  - ./scripts/create-instance.sh
-  - ./scripts/populate-instance.sh
-
-script:
-  - sudo -u www-data nosetests /opt/invenio/lib/python/invenio/*_tests.py
+EXTRA_DIST = \
+    create-instance.sh \
+    drop-instance.sh \
+    make-install.sh \
+    populate-instance.sh \
+    provision-mysql.sh \
+    provision-web.sh

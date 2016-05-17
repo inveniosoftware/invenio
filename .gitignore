@@ -87,3 +87,5 @@ configure.lineno
 .pydevproject
 supervisord.log
 supervisord.pid
+.vagrant
+build

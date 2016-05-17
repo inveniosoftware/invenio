@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# Kickstart Invenio 1 demo instance.
+
+export INVENIO_SRCDIR=/vagrant
+export INVENIO_ADMIN_EMAIL=info@inveniosoftware.org
+export INVENIO_WEB_DSTDIR=/opt/invenio
+export INVENIO_WEB_HOST=192.168.50.10
+export INVENIO_WEB_USER=www-data
+export INVENIO_MYSQL_HOST=192.168.50.11
+export INVENIO_MYSQL_DBNAME=invenio1
+export INVENIO_MYSQL_DBUSER=invenio1
+export INVENIO_MYSQL_DBPASS=dbpass123
+
+# Now you can use kickstart scripts, for example:
+#
+# vagrant up --no-parallel
+# vagrant ssh web -c 'source .inveniorc && /vagrant/scripts/create-instance.sh'
+# vagrant ssh web -c 'source .inveniorc && /vagrant/scripts/populate-instance.sh'
+# firefox http://192.168.50.10/record/1
+# vagrant ssh web -c 'source .inveniorc && sudo -u www-data /opt/invenio/bin/inveniocfg --run-unit-tests'
+# vagrant ssh web -c 'source .inveniorc && sudo -u www-data /opt/invenio/bin/inveniocfg --run-regression-tests --yes-i-know'
