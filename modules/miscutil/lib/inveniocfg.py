@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2015 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2015, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1030,6 +1030,8 @@ def cli_cmd_create_apache_conf(conf):
         ssl_crt_path = '/etc/pki/tls/certs/localhost.crt'
         ssl_key_path = '/etc/pki/tls/private/localhost.key'
         vhost_ip_address_needed = True
+        if os.popen('grep -c "CentOS.*[67]\." /etc/redhat-release').read().strip() == '1':
+            vhost_ip_address_needed = False
         wsgi_socket_directive_needed = True
     # maybe we are using non-standard ports?
     vhost_site_url = conf.get('Invenio', 'CFG_SITE_URL').replace("http://", "")

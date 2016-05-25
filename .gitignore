@@ -94,3 +94,5 @@ configure.lineno
 org.eclipse.core.resources.prefs
 supervisord.log
 supervisord.pid
+.vagrant
+build
