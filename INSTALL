@@ -1,4 +1,4 @@
-Invenio INSTALLATION
+-Invenio INSTALLATION
 ====================
 
 About
@@ -11,11 +11,33 @@ from a previous Invenio release.
 Contents
 ========
 
-0. Prerequisites
-1. Quick instructions for the impatient Invenio admin
-2. Detailed instructions for the patient Invenio admin
+1. Using kickstart scripts
+2. Prerequisites
+3. Quick instructions for the impatient Invenio admin
+4. Detailed instructions for the patient Invenio admin
 
-0. Prerequisites
+1. Using kickstart scripts
+==========================
+
+   You can install Invenio on a Unix-based operating system in an unassisted
+   automated way by using kickstart scripts. Tested on Ubuntu 12.04, CentOS 6.
+   The other operating systems will work similarly. Please run:
+
+     $ $EDITOR .inveniorc # edit your options
+     $ source .inveniorc
+     $ ./scripts/provision-web.sh
+     $ ./scripts/provision-mysql.sh
+     $ ./scripts/create-instance.sh
+     $ ./scripts/populate-instance.sh
+     $ firefox http://192.168.50.10/record/1
+
+  Note that you can use Vagrant to run this in a virtual machine; please see the
+  .inveniorc file for more details.
+
+  You can also read the detailed installation instructions in the sections
+  below. They basically explain in detail what the kickstart scripts do.
+
+2. Prerequisites
 ================
 
    Here is the software you need to have around before you
@@ -63,7 +85,7 @@ Contents
 
         After running the above-quoted aptitude command(s), you can
         proceed to configuring your MySQL server instance
-        (max_allowed_packet in my.cnf, see item 0b below) and then to
+        (max_allowed_packet in my.cnf, see item b below) and then to
         installing the Invenio software package in the section 1
         below.
 
@@ -297,10 +319,10 @@ Contents
    some optional but recommended software.
 
 
-1. Quick instructions for the impatient Invenio admin
-=========================================================
+3. Quick instructions for the impatient Invenio admin
+=====================================================
 
-1a. Installation
+3a. Installation
 ----------------
 
       $ cd $HOME/src/
@@ -322,11 +344,11 @@ Contents
       $ make install-solrutils         ## optional
       $ make install-js-test-driver    ## optional
 
-1b. Configuration
+3b. Configuration
 -----------------
 
       $ sudo chown -R www-data.www-data /opt/invenio
-      $ sudo -u www-data emacs /opt/invenio/etc/invenio-local.conf
+      $ sudo -u www-data $EDITOR /opt/invenio/etc/invenio-local.conf
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --create-tables
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --load-bibfield-conf
@@ -343,10 +365,10 @@ Contents
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --drop-demo-site
       $ firefox http://your.site.com/help/admin/howto-run
 
-2. Detailed instructions for the patient Invenio admin
-==========================================================
+4. Detailed instructions for the patient Invenio admin
+======================================================
 
-2a. Installation
+4a. Installation
 ----------------
 
     The Invenio uses standard GNU autoconf method to build and
@@ -558,7 +580,7 @@ Contents
           This will automatically download and install JsTestDriver
           which is needed to run JS unit tests. Recommended for developers.
 
-2b. Configuration
+4b. Configuration
 -----------------
 
     Once the basic software installation is done, we proceed to
@@ -578,7 +600,7 @@ Contents
           place.  You could achieve this by configuring Unix directory
           group permissions, for example.
 
-      $ sudo -u www-data emacs /opt/invenio/etc/invenio-local.conf
+      $ sudo -u www-data $EDITOR /opt/invenio/etc/invenio-local.conf
 
           Customize your Invenio installation.  Please read the
           'invenio.conf' file located in the same directory that
