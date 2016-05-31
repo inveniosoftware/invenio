@@ -34,10 +34,6 @@ MATHJAX = http://invenio-software.org/download/mathjax/MathJax-v$(MJV).zip
 CKV = 3.6.6
 CKEDITOR = ckeditor_$(CKV).zip
 
-# current MediaElement.js version
-MEV = master
-MEDIAELEMENT = http://github.com/johndyer/mediaelement/zipball/$(MEV)
-
 #for solrutils
 INVENIO_JAVA_PATH = org/invenio_software/solr
 solrdirname = apache-solr-3.1.0
@@ -165,7 +161,7 @@ install-jquery-plugins:
 	mv uploadify/cancel.png uploadify/uploadify.css uploadify/uploadify.allglyphs.swf uploadify/uploadify.fla uploadify/uploadify.swf ../img/ && \
 	mv uploadify/jquery.uploadify.v2.1.4.min.js ./jquery.uploadify.min.js && \
 	rm uploadify.zip && rm -r uploadify && \
-	wget -N https://github.com/douglascrockford/JSON-js/raw/master/json2.js --no-check-certificate && \
+	wget -N http://invenio-software.org/download/jquery/json2.js --no-check-certificate && \
 	wget -O jquery.hotkeys.js http://invenio-software.org/download/jquery/jquery.hotkeys-0.8.js && \
 	wget -N http://invenio-software.org/download/jquery/jquery.treeview.zip && \
 	unzip -u jquery.treeview.zip -d jquery-treeview && \
@@ -266,7 +262,7 @@ install-mediaelement:
 	@echo "***********************************************************"
 	rm -rf /tmp/mediaelement
 	mkdir /tmp/mediaelement
-	wget 'http://github.com/johndyer/mediaelement/zipball/master' -O '/tmp/mediaelement/mediaelement.zip' --no-check-certificate
+	wget 'http://github.com/johndyer/mediaelement/zipball/2.18.1' -O '/tmp/mediaelement/mediaelement.zip' --no-check-certificate
 	unzip -u -d '/tmp/mediaelement' '/tmp/mediaelement/mediaelement.zip'
 	rm -rf ${prefix}/var/www/mediaelement
 	mkdir ${prefix}/var/www/mediaelement
