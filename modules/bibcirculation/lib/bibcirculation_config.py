@@ -388,7 +388,7 @@ ill_conf = ('Dear colleague,\n\n'
 CFG_BIBCIRCULATION_TEMPLATES['ILL_CONFIRMATION'] = ill_conf
 
 if CFG_CERN_SITE == 1:
-    CFG_BIBCIRCULATION_ILLS_EMAIL = 'CERN External loans<external.loans@cern.ch>'
+    CFG_BIBCIRCULATION_ILLS_EMAIL = 'CERN External loans<lib.acq@cern.ch>'
     CFG_BIBCIRCULATION_LIBRARIAN_EMAIL = 'CERN Library Desk<library.desk@cern.ch>'
     CFG_BIBCIRCULATION_LOANS_EMAIL = 'CERN Lib loans<lib.loans@cern.ch>'
 else:
