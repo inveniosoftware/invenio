@@ -143,7 +143,7 @@ install-jquery-plugins:
 	wget -N http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js && \
 	wget -N http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js && \
 	wget -N https://raw.githubusercontent.com/malsup/form/3.51/jquery.form.js --no-check-certificate && \
-	wget -N http://jquery-multifile-plugin.googlecode.com/svn-history/r54/trunk/jquery.MultiFile.js && \
+	wget -N http://invenio-software.org/download/jquery/jquery.MultiFile.pack.js && \
 	wget -O jquery.tablesorter.zip http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip && \
 	wget -O uploadify.zip http://invenio-software.org/download/jquery/uploadify-v2.1.4.zip && \
 	wget -N http://cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js && \
@@ -174,13 +174,13 @@ install-jquery-plugins:
 	rm -f jquery.bookmark.package-1.4.0.zip && \
 	mkdir -p ${prefix}/var/www/img && \
 	cd ${prefix}/var/www/img && \
-	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/base/ && \
-	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/smoothness/ && \
-	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/ && \
+	wget http://invenio-software.org/download/jquery/jquery-ui.tar.gz && \
+	tar xvfz jquery-ui.tar.gz && \
+	rm jquery-ui.tar.gz && \
 	wget -O datatables_jquery-ui.css https://raw.githubusercontent.com/DataTables/DataTables/1.10.0/media/css/demo_table_jui.css --no-check-certificate && \
-	wget -N http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/jquery-ui.css && \
-	wget -N http://jquery-ui.googlecode.com/svn/tags/1.8.17/demos/images/calendar.gif && \
-	wget -r -np -nH --cut-dirs=5 -A "png" http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/images/)
+	cp jquery-ui/themes/redmond/jquery-ui.css . && \
+	wget -N http://invenio-software.org/download/jquery/v1.5/img/calendar.gif && \
+	cp jquery-ui/themes/redmond/images/*.png .)
 	@echo "***********************************************************"
 	@echo "** The jQuery plugins were successfully installed.       **"
 	@echo "***********************************************************"

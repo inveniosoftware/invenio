@@ -156,7 +156,7 @@ install_sources () {
     make clean -s
     make -s
     sudo -u "${INVENIO_WEB_USER}" make -s install
-    #sudo -u "${INVENIO_WEB_USER}" make -s install-jquery-plugins
+    sudo -u "${INVENIO_WEB_USER}" make -s install-jquery-plugins
     sudo -u "${INVENIO_WEB_USER}" make -s install-mathjax-plugin
     sudo -u "${INVENIO_WEB_USER}" make -s install-ckeditor-plugin
     sudo -u "${INVENIO_WEB_USER}" make -s install-pdfa-helper-files
