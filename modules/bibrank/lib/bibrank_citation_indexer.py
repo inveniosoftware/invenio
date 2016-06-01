@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -994,11 +994,11 @@ def insert_into_cit_db(dic, name):
         testres = run_sql("select object_name from rnkCITATIONDATA where object_name = %s",
                        (name,))
         if testres:
-            run_sql("UPDATE rnkCITATIONDATA SET object_value = %s where object_name = %s",
+            run_sql("UPDATE rnkCITATIONDATA SET object_value = _binary %s where object_name = %s",
                     (s, name))
         else:
             #there was no entry for name, let's force..
-            run_sql("INSERT INTO rnkCITATIONDATA(object_name,object_value) values (%s,%s)",
+            run_sql("INSERT INTO rnkCITATIONDATA(object_name,object_value) values (%s,_binary %s)",
                      (name,s))
         run_sql("UPDATE rnkCITATIONDATA SET last_updated = %s where object_name = %s",
                (ndate,name))

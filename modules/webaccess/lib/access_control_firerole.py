@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2013 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2013, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -124,7 +124,11 @@ def repair_role_definitions():
     """
     definitions = run_sql("SELECT id, firerole_def_src FROM accROLE")
     for role_id, firerole_def_src in definitions:
-        run_sql("UPDATE accROLE SET firerole_def_ser=%s WHERE id=%s", (serialize(compile_role_definition(firerole_def_src)), role_id))
+        firerole_def_ser = serialize(compile_role_definition(firerole_def_src))
+        if firerole_def_ser:
+            run_sql("UPDATE accROLE SET firerole_def_ser=_binary %s WHERE id=%s", (firerole_def_ser, role_id))
+        else:
+            run_sql("UPDATE accROLE SET firerole_def_ser=%s WHERE id=%s", (firerole_def_ser, role_id))
 
 def store_role_definition(role_id, firerole_def_ser, firerole_def_src):
     """ Store a compiled serialized definition and its source in the database
@@ -133,7 +137,10 @@ def store_role_definition(role_id, firerole_def_ser, firerole_def_src):
     @param firerole_def_ser: the serialized compiled definition
     @param firerole_def_src: the sources from which the definition was taken
     """
-    run_sql("UPDATE accROLE SET firerole_def_ser=%s, firerole_def_src=%s WHERE id=%s", (firerole_def_ser, firerole_def_src, role_id))
+    if firerole_def_ser:
+        run_sql("UPDATE accROLE SET firerole_def_ser=_binary %s, firerole_def_src=%s WHERE id=%s", (firerole_def_ser, firerole_def_src, role_id))
+    else:
+        run_sql("UPDATE accROLE SET firerole_def_ser=%s, firerole_def_src=%s WHERE id=%s", (firerole_def_ser, firerole_def_src, role_id))
 
 def load_role_definition(role_id):
     """ Load the definition corresponding to a role. If the compiled definition

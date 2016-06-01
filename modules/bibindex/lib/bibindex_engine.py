@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -868,14 +868,14 @@ class WordTable:
             else:
                 # yes there were some new words:
                 write_message("......... updating hitlist for ``%s''" % word, verbose=9)
-                run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % self.tablename,
+                run_sql("UPDATE %s SET hitlist=_binary %%s WHERE term=%%s" % self.tablename,
                     (set.fastdump(), word))
 
         else: # the word is new, will create new set:
             write_message("......... inserting hitlist for ``%s''" % word, verbose=9)
             set = intbitset(self.value[word].keys())
             try:
-                run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % self.tablename,
+                run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, _binary %%s)" % self.tablename,
                         (word, set.fastdump()))
             except Exception, e:
                 ## We send this exception to the admin only when is not
@@ -1069,11 +1069,11 @@ class WordTable:
 
         # put words into reverse index table with FUTURE status:
         for recID in recIDs:
-            run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % self.tablename[:-1],
+            run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,_binary %%s,'FUTURE')" % self.tablename[:-1],
                     (recID, serialize_via_marshal(wlist[recID])))
             # ... and, for new records, enter the CURRENT status as empty:
             try:
-                run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % self.tablename[:-1],
+                run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,_binary %%s,'CURRENT')" % self.tablename[:-1],
                         (recID, serialize_via_marshal([])))
             except DatabaseError:
                 # okay, it's an already existing record, no problem

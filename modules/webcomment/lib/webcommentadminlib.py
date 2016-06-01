@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -650,12 +650,12 @@ def migrate_comments_populate_threads_index():
     res = run_sql("SELECT id FROM cmtRECORDCOMMENT WHERE reply_order_cached_data is NULL")
     for row in res:
         reply_order_cached_data = get_reply_order_cache_data(row[0])
-        run_sql("UPDATE cmtRECORDCOMMENT set reply_order_cached_data=%s WHERE id=%s",
+        run_sql("UPDATE cmtRECORDCOMMENT set reply_order_cached_data=_binary %s WHERE id=%s",
                 (reply_order_cached_data, row[0]))
 
     # Update WebBasket comments
     res = run_sql("SELECT id FROM bskRECORDCOMMENT WHERE reply_order_cached_data is NULL")
     for row in res:
         reply_order_cached_data = get_reply_order_cache_data(row[0])
-        run_sql("UPDATE cmtRECORDCOMMENT set reply_order_cached_data=%s WHERE id=%s",
+        run_sql("UPDATE cmtRECORDCOMMENT set reply_order_cached_data=_binary %s WHERE id=%s",
                 (reply_order_cached_data, row[0]))

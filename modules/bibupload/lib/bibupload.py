@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -809,7 +809,7 @@ def insert_bibfmt(id_bibrec, marc, format, modification_date='1970-01-01 00:00:0
         modification_date = '1970-01-01 00:00:00'
 
     query = """INSERT INTO  bibfmt (id_bibrec, format, last_updated, value)
-        VALUES (%s, %s, %s, %s)"""
+        VALUES (%s, %s, %s, _binary %s)"""
     try:
         if not pretend:
             row_id  = run_sql(query, (id_bibrec, format, modification_date, pickled_marc))
@@ -1495,7 +1495,7 @@ def update_bibfmt_format(id_bibrec, format_value, format_name, modification_date
         # compress the format_value value
         pickled_format_value =  compress(format_value)
         # update the format:
-        query = """UPDATE bibfmt SET last_updated=%s, value=%s WHERE id_bibrec=%s AND format=%s"""
+        query = """UPDATE bibfmt SET last_updated=%s, value=_binary %s WHERE id_bibrec=%s AND format=%s"""
         params = (modification_date, pickled_format_value, id_bibrec, format_name)
         try:
             if not pretend:
@@ -1534,7 +1534,7 @@ def archive_marcxml_for_history(recID, pretend=False):
                       (recID,))
         if res and not pretend:
             run_sql("""INSERT INTO hstRECORD (id_bibrec, marcxml, job_id, job_name, job_person, job_date, job_details)
-                                      VALUES (%s,%s,%s,%s,%s,%s,%s)""",
+                                      VALUES (%s,_binary %s,%s,%s,%s,%s,_binary %s)""",
                     (res[0][0], res[0][1], task_get_task_param('task_id', 0), 'bibupload', task_get_task_param('user','UNKNOWN'), res[0][2],
                      'mode: ' + task_get_option('mode','UNKNOWN') + '; file: ' + task_get_option('file_path','UNKNOWN') + '.'))
     except Error, error:
