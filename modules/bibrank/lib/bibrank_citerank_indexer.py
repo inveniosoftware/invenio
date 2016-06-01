@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -624,7 +624,7 @@ def into_db(dict_of_ranks, rank_method_code):
     serialized_data = serialize_via_marshal(dict_of_ranks)
     method_id_str = str(method_id[0][0])
     run_sql("INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) \
-        VALUES(%s, %s) ", (method_id_str, serialized_data, ))
+        VALUES(%s, _binary %s) ", (method_id_str, serialized_data, ))
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s", \
         (date, rank_method_code))

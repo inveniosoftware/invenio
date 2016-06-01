@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -860,7 +860,7 @@ class Collection:
         write_message("... updating reclist of %s (%s recs)" % (self.name, self.nbrecs), verbose=6)
         sys.stdout.flush()
         try:
-            run_sql("UPDATE collection SET nbrecs=%s, reclist=%s WHERE id=%s",
+            run_sql("UPDATE collection SET nbrecs=%s, reclist=_binary %s WHERE id=%s",
                     (self.nbrecs, self.reclist.fastdump(), self.id))
             self.reclist_updated_since_start = 1
         except Error, e:

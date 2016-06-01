@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -833,13 +833,13 @@ class WordTable:
             else:
                 # yes there were some new words:
                 write_message("......... updating hitlist for ``%s''" % word, verbose=9)
-                run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % wash_table_column_name(self.tablename), (set.fastdump(), word)) # kwalitee: disable=sql
+                run_sql("UPDATE %s SET hitlist=_binary %%s WHERE term=%%s" % wash_table_column_name(self.tablename), (set.fastdump(), word)) # kwalitee: disable=sql
 
         else: # the word is new, will create new set:
             write_message("......... inserting hitlist for ``%s''" % word, verbose=9)
             set = intbitset(self.value[word].keys())
             try:
-                run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % wash_table_column_name(self.tablename), (word, set.fastdump())) # kwalitee: disable=sql
+                run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, _binary %%s)" % wash_table_column_name(self.tablename), (word, set.fastdump())) # kwalitee: disable=sql
             except Exception, e:
                 ## We send this exception to the admin only when is not
                 ## already reparing the problem.
@@ -1079,10 +1079,10 @@ class WordTable:
 
         # put words into reverse index table with FUTURE status:
         for recID in recIDs:
-            run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % wash_table_column_name(self.tablename[:-1]), (recID, serialize_via_marshal(wlist[recID]))) # kwalitee: disable=sql
+            run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,_binary %%s,'FUTURE')" % wash_table_column_name(self.tablename[:-1]), (recID, serialize_via_marshal(wlist[recID]))) # kwalitee: disable=sql
             # ... and, for new records, enter the CURRENT status as empty:
             try:
-                run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(self.tablename[:-1]), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
+                run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,_binary %%s,'CURRENT')" % wash_table_column_name(self.tablename[:-1]), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
             except DatabaseError:
                 # okay, it's an already existing record, no problem
                 pass

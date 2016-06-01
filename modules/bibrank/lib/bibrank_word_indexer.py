@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2014 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2014, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -278,7 +278,7 @@ class WordTable:
             else:
                 # yes there were some new words:
                 write_message("......... updating hitlist for ``%s''" % word, verbose=9)
-                run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % self.tablename,
+                run_sql("UPDATE %s SET hitlist=_binary %%s WHERE term=%%s" % self.tablename,
                         (serialize_via_marshal(set), word))
         else: # the word is new, will create new set:
             write_message("......... inserting hitlist for ``%s''" % word, verbose=9)
@@ -287,7 +287,7 @@ class WordTable:
                 #new word, add to list
                 options["modified_words"][word] = 1
                 try:
-                    run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % self.tablename,
+                    run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, _binary %%s)" % self.tablename,
                             (word, serialize_via_marshal(set)))
                 except Exception, e:
                     ## FIXME: This is for debugging encoding errors
@@ -470,11 +470,11 @@ class WordTable:
 
         # put words into reverse index table with FUTURE status:
         for recID in recIDs:
-            run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % self.tablename[:-1],
+            run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,_binary %%s,'FUTURE')" % self.tablename[:-1],
                     (recID, serialize_via_marshal(wlist[recID])))
             # ... and, for new records, enter the CURRENT status as empty:
             try:
-                run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % self.tablename[:-1],
+                run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,_binary %%s,'CURRENT')" % self.tablename[:-1],
                         (recID, serialize_via_marshal([])))
             except DatabaseError:
                 # okay, it's an already existing record, no problem
@@ -1115,7 +1115,7 @@ as recommended in %s/help/admin/howto-run"""
                 Nj[j] = int(Nj[j] * 100)
                 if Nj[j] >= 0:
                     Nj[j] += 1
-                run_sql("UPDATE %sR SET termlist=%%s WHERE id_bibrec=%%s" % table[:-1],
+                run_sql("UPDATE %sR SET termlist=_binary %%s WHERE id_bibrec=%%s" % table[:-1],
                         (serialize_via_marshal(doc_terms), j))
             except (ZeroDivisionError, OverflowError), e:
                 ## This is to try to isolate division by zero errors.
@@ -1142,7 +1142,7 @@ as recommended in %s/help/admin/howto-run"""
                 if Git >= 0:
                     Git += 1
                 term_docs["Gi"] = (0, Git)
-                run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % table,
+                run_sql("UPDATE %s SET hitlist=_binary %%s WHERE term=%%s" % table,
                         (serialize_via_marshal(term_docs), t))
             except (ZeroDivisionError, OverflowError), e:
                 write_message(zero_division_msg % (e, CFG_SITE_URL), stream=sys.stderr)

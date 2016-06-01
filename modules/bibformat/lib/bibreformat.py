@@ -1,7 +1,7 @@
 ## -*- mode: python; coding: utf-8; -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011, 2012 CERN.
+## Copyright (C) 2007, 2008, 2010, 2011, 2012, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -277,7 +277,7 @@ def iterate_over_new(list, fmt):
         t1 = os.times()[4]
         start_date = time.strftime('%Y-%m-%d %H:%M:%S')
         formatted_record = zlib.compress(format_record(recID, fmt, on_the_fly=True))
-        run_sql('REPLACE LOW_PRIORITY INTO bibfmt (id_bibrec, format, last_updated, value) VALUES (%s, %s, %s, %s)',
+        run_sql('REPLACE LOW_PRIORITY INTO bibfmt (id_bibrec, format, last_updated, value) VALUES (%s, %s, %s, _binary %s)',
                 (recID, fmt, start_date, formatted_record))
         t2 = os.times()[4]
         tbibformat += (t2 - t1)

@@ -126,7 +126,8 @@ drop_symlinks () {
 
 drop_instance_folder () {
     $sudo rm -rf "${INVENIO_WEB_DSTDIR}/var/tmp/ooffice-tmp-files"
-    $sudo -u "${INVENIO_WEB_USER}" rm -rf "${INVENIO_WEB_DSTDIR}/*"
+    # shellcheck disable=SC2086
+    $sudo -u "${INVENIO_WEB_USER}" rm -rf ${INVENIO_WEB_DSTDIR}/*
 }
 
 drop_instance_tables () {

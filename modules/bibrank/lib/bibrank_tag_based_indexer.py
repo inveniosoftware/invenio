@@ -2,7 +2,7 @@
 ## Ranking of records using different parameters and methods.
 
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -230,7 +230,7 @@ def intoDB(dict, date, rank_method_code):
     del_rank_method_codeDATA(rank_method_code)
     serdata = serialize_via_marshal(dict);
     midstr = str(mid[0][0]);
-    run_sql("INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) VALUES (%s,%s)", (midstr, serdata,))
+    run_sql("INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) VALUES (%s,_binary %s)", (midstr, serdata,))
     if date:
         run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s", (date, rank_method_code))
 

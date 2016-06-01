@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1111,7 +1111,7 @@ class BibUploadFMTModeTest(GenericBibUploadTest):
         recs = bibupload.xml_marc_to_records(self.recid76_xm_before_all_the_tests)
         err, recid, msg = bibupload.bibupload(recs[0], opt_mode='replace')
         for (last_updated, value, format) in self.recid76_fmts:
-            run_sql("""UPDATE bibfmt SET last_updated=%s, value=%s WHERE id_bibrec=76 AND format=%s""", (last_updated, value, format))
+            run_sql("""UPDATE bibfmt SET last_updated=%s, value=_binary %s WHERE id_bibrec=76 AND format=%s""", (last_updated, value, format))
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
         self.assertEqual(compare_xmbuffers(inserted_xm, self.recid76_xm_before_all_the_tests), '')
