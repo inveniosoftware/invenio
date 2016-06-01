@@ -239,7 +239,7 @@ class InvenioSession(dict):
                     %s
                 ) ON DUPLICATE KEY UPDATE
                     session_expiry=%s,
-                    session_object=%s,
+                    session_object=_binary %s,
                     uid=%s
             """, (session_key, session_expiry, session_object, uid,
                 session_expiry, session_object, uid))
