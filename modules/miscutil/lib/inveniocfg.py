@@ -566,7 +566,7 @@ def cli_cmd_reset_recstruct_cache(conf):
                 value = serialize_via_marshal(get_record(recid))
 
             run_sql("DELETE FROM bibfmt WHERE id_bibrec=%s AND format='recstruct'", (recid, ))
-            run_sql("INSERT INTO bibfmt(id_bibrec, format, last_updated, value) VALUES(%s, 'recstruct', NOW(), %s)", (recid, value))
+            run_sql("INSERT INTO bibfmt(id_bibrec, format, last_updated, value) VALUES(%s, 'recstruct', NOW(), _binary %s)", (recid, value))
             count += 1
             if count % 1000 == 0:
                 print "    ... done records %s/%s" % (count, tot)

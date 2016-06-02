@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -2231,7 +2231,7 @@ def save_note(uid, bskid, recid, title, body, date_creation=None, reply_to=None)
             parent_reply_order = ''
         else:
             parent_reply_order = parent_reply_order[0][0]
-        run_sql("""UPDATE bskRECORDCOMMENT SET reply_order_cached_data=%s WHERE id=%s""",
+        run_sql("""UPDATE bskRECORDCOMMENT SET reply_order_cached_data=_binary %s WHERE id=%s""",
                 (parent_reply_order + get_reply_order_cache_data(new_comid), new_comid))
         return int(res)
     return 0
