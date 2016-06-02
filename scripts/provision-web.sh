@@ -89,6 +89,7 @@ provision_web_ubuntu_precise () {
           pylint \
           python-dev \
           python-gnuplot \
+          python-h5py \
           python-libxml2 \
           python-libxslt1 \
           python-nose \
@@ -130,6 +131,7 @@ provision_web_centos6 () {
          gettext-devel \
          git \
          gnuplot-py \
+         h5py \
          hdf5-devel \
          ipython \
          libffi-devel \
