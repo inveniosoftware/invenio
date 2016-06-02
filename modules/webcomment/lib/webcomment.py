@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of Invenio.
-# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -891,7 +891,7 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
             parent_reply_order = ''
         else:
             parent_reply_order = parent_reply_order[0][0]
-        run_sql("""UPDATE cmtRECORDCOMMENT SET reply_order_cached_data=%s WHERE id=%s""",
+        run_sql("""UPDATE cmtRECORDCOMMENT SET reply_order_cached_data=_binary %s WHERE id=%s""",
                 (parent_reply_order + get_reply_order_cache_data(new_comid), new_comid))
         action_code = CFG_WEBCOMMENT_ACTION_CODE[reviews and 'ADD_REVIEW' or 'ADD_COMMENT']
         action_time = convert_datestruct_to_datetext(time.localtime())

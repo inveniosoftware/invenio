@@ -1,7 +1,7 @@
 # -*- mode: python; coding: utf-8; -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2010, 2011, 2012 CERN.
+# Copyright (C) 2010, 2011, 2012, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -326,7 +326,7 @@ def write_to_methoddata_table(id_method, data_dict, data_dict_ordered, data_list
         write_message('Inserting new data..', verbose=5)
         run_sql("INSERT into bsrMETHODDATA \
             (id_bsrMETHOD, data_dict, data_dict_ordered, data_list_sorted, last_updated) \
-            VALUES (%s, %s, %s, %s, %s)", \
+            VALUES (%s, _binary %s, _binary %s, _binary %s, %s)", \
             (id_method, serialized_data_dict, serialized_data_dict_ordered, \
              serialized_data_list_sorted, date, ))
     except Error, err:
@@ -360,7 +360,7 @@ def write_to_buckets_table(id_method, bucket_no, bucket_data, bucket_last_value,
         write_message('Inserting new data.', verbose=5)
         run_sql("INSERT into bsrMETHODDATABUCKET \
             (id_bsrMETHOD, bucket_no, bucket_data, bucket_last_value, last_updated) \
-            VALUES (%s, %s, %s, %s, %s)", \
+            VALUES (%s, %s, _binary %s, %s, %s)", \
             (id_method, bucket_no, serialized_bucket_data, bucket_last_value, date, ))
     except Error, err:
         write_message("The error [%s] occured when inserting new bibsort data " \
@@ -716,12 +716,12 @@ def perform_update_buckets(recids_current_ordered, recids_to_insert, recids_old_
             if update_timestamp:
                 date = strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                 run_sql("UPDATE bsrMETHODDATABUCKET \
-                    SET bucket_data = %s, last_updated = %s \
+                    SET bucket_data = _binary %s, last_updated = %s \
                     WHERE id_bsrMETHOD = %s AND bucket_no = %s", \
                     (bucket_data.fastdump(), date, method_id, bucket_no, ))
             else:
                 run_sql("UPDATE bsrMETHODDATABUCKET \
-                    SET bucket_data = %s \
+                    SET bucket_data = _binary %s \
                     WHERE id_bsrMETHOD = %s AND bucket_no = %s", \
                     (bucket_data.fastdump(), method_id, bucket_no, ))
             write_message("Updating bucket %s for method %s." %(bucket_no, method_id), verbose=5)

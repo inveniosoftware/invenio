@@ -34,10 +34,6 @@ MATHJAX = http://invenio-software.org/download/mathjax/MathJax-v$(MJV).zip
 CKV = 3.6.6
 CKEDITOR = ckeditor_$(CKV).zip
 
-# current MediaElement.js version
-MEV = master
-MEDIAELEMENT = http://github.com/johndyer/mediaelement/zipball/$(MEV)
-
 #for solrutils
 INVENIO_JAVA_PATH = org/invenio_software/solr
 solrdirname = apache-solr-3.1.0
@@ -162,7 +158,7 @@ install-jquery-plugins:
 	wget -N http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js && \
 	wget -O jquery.jeditable.mini.js http://invenio-software.org/download/jquery/jquery.jeditable.custom.min.js && \
 	wget -N https://raw.githubusercontent.com/malsup/form/3.51/jquery.form.js --no-check-certificate && \
-	wget -N http://jquery-multifile-plugin.googlecode.com/svn-history/r54/trunk/jquery.MultiFile.pack.js && \
+	wget -N http://invenio-software.org/download/jquery/jquery.MultiFile.pack.js && \
 	wget -O jquery.tablesorter.zip http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip && \
 	wget -O uploadify.zip http://invenio-software.org/download/jquery/uploadify-v2.1.4.zip && \
 	wget -N http://cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js && \
@@ -190,7 +186,7 @@ install-jquery-plugins:
 	mv uploadify/cancel.png uploadify/uploadify.css uploadify/uploadify.allglyphs.swf uploadify/uploadify.fla uploadify/uploadify.swf ../img/ && \
 	mv uploadify/jquery.uploadify.v2.1.4.min.js ./jquery.uploadify.min.js && \
 	rm uploadify.zip && rm -r uploadify && \
-	wget -N https://github.com/douglascrockford/JSON-js/raw/master/json2.js --no-check-certificate && \
+	wget -N http://invenio-software.org/download/jquery/json2.js --no-check-certificate && \
 	wget -O jquery.hotkeys.js http://invenio-software.org/download/jquery/jquery.hotkeys-0.8.js && \
 	wget -N http://invenio-software.org/download/jquery/jquery.treeview.zip && \
 	unzip -u jquery.treeview.zip -d jquery-treeview && \
@@ -212,13 +208,13 @@ install-jquery-plugins:
 	wget https://raw.githubusercontent.com/es-shims/es5-shim/v4.0.3/es5-shim.map && \
 	mkdir -p ${prefix}/var/www/img && \
 	cd ${prefix}/var/www/img && \
-	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/base/ && \
-	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/smoothness/ && \
-	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/ && \
-	wget --no-check-certificate -O datatables_jquery-ui.css https://raw.githubusercontent.com/DataTables/DataTables/1.10.0/media/css/demo_table_jui.css && \
-	wget -N http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/jquery-ui.css && \
-	wget -N http://jquery-ui.googlecode.com/svn/tags/1.8.17/demos/images/calendar.gif && \
-	wget -r -np -nH --cut-dirs=5 -A "png" http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/images/)
+	wget http://invenio-software.org/download/jquery/jquery-ui.tar.gz && \
+	tar xvfz jquery-ui.tar.gz && \
+	rm jquery-ui.tar.gz && \
+	wget -O datatables_jquery-ui.css https://raw.githubusercontent.com/DataTables/DataTables/1.10.0/media/css/demo_table_jui.css --no-check-certificate && \
+	cp jquery-ui/themes/redmond/jquery-ui.css . && \
+	wget -N http://invenio-software.org/download/jquery/v1.5/img/calendar.gif && \
+	cp jquery-ui/themes/redmond/images/*.png .)
 	@echo "***********************************************************"
 	@echo "** The jQuery plugins were successfully installed.       **"
 	@echo "***********************************************************"
@@ -317,7 +313,7 @@ install-mediaelement:
 	@echo "***********************************************************"
 	rm -rf /tmp/mediaelement
 	mkdir /tmp/mediaelement
-	wget 'http://github.com/johndyer/mediaelement/zipball/master' -O '/tmp/mediaelement/mediaelement.zip' --no-check-certificate
+	wget 'http://github.com/johndyer/mediaelement/zipball/2.18.1' -O '/tmp/mediaelement/mediaelement.zip' --no-check-certificate
 	unzip -u -d '/tmp/mediaelement' '/tmp/mediaelement/mediaelement.zip'
 	rm -rf ${prefix}/var/www/mediaelement
 	mkdir ${prefix}/var/www/mediaelement
