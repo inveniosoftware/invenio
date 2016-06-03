@@ -78,7 +78,7 @@ else
     sudo=''
 fi
 
-create_apache_vhost_ubuntu_precise () {
+create_apache_vhost_ubuntu12 () {
     sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ssl-cert
     sudo mkdir -p /etc/apache2/ssl
     if [ ! -e /etc/apache2/ssl/apache.pem ]; then
@@ -113,6 +113,10 @@ create_apache_vhost_ubuntu_precise () {
     sudo /usr/sbin/a2enmod version || echo "[WARNING] Ignoring 'a2enmod version' command; hoping IfVersion is built-in."
     sudo /usr/sbin/a2enmod xsendfile
     sudo /usr/sbin/service apache2 restart
+}
+
+create_apache_vhost_ubuntu14 () {
+    create_apache_vhost_ubuntu12
 }
 
 create_apache_vhost_centos6 () {
@@ -201,8 +205,12 @@ create_apache_configuration () {
     sudo -u "${INVENIO_WEB_USER}" VIRTUAL_ENV="${VIRTUAL_ENV}" "${INVENIO_WEB_DSTDIR}/bin/inveniocfg" --create-apache-conf
 }
 
-restart_apache_ubuntu_precise () {
+restart_apache_ubuntu12 () {
     $sudo /usr/sbin/service apache2 restart
+}
+
+restart_apache_ubuntu14 () {
+    restart_apache_ubuntu12
 }
 
 restart_apache_centos6 () {
@@ -226,14 +234,23 @@ main () {
     # call appropriate provisioning functions:
     if [ "$os_distribution" = "Ubuntu" ]; then
         if [ "$os_release" = "12" ]; then
-            create_apache_vhost_ubuntu_precise
+            create_apache_vhost_ubuntu12
             create_symlinks
             install_sources
             create_openoffice_tmp_space
             configure_instance
             create_tables
             create_apache_configuration
-            restart_apache_ubuntu_precise
+            restart_apache_ubuntu12
+        elif [ "$os_release" = "14" ]; then
+            create_apache_vhost_ubuntu14
+            create_symlinks
+            install_sources
+            create_openoffice_tmp_space
+            configure_instance
+            create_tables
+            create_apache_configuration
+            restart_apache_ubuntu14
         else
             echo "[ERROR] Sorry, unsupported release ${os_release}."
             exit 1

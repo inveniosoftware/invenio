@@ -62,12 +62,20 @@ apache_wsgi_restart () {
     $sudo -u "${INVENIO_WEB_USER}" touch "${INVENIO_WEB_DSTDIR}/var/www-wsgi/invenio.wsgi"
 }
 
-start_apache_ubuntu_precise () {
+start_apache_ubuntu12 () {
     $sudo /usr/sbin/service apache2 start
 }
 
-stop_apache_ubuntu_precise () {
+stop_apache_ubuntu12 () {
     $sudo /usr/sbin/service apache2 stop
+}
+
+start_apache_ubuntu14 () {
+    start_apache_ubuntu12
+}
+
+stop_apache_ubuntu14 () {
+    stop_apache_ubuntu12
 }
 
 start_apache_centos6 () {
@@ -95,9 +103,15 @@ main () {
     # call appropriate provisioning functions:
     if [ "$os_distribution" = "Ubuntu" ]; then
         if [ "$os_release" = "12" ]; then
-            stop_apache_ubuntu_precise
+            stop_apache_ubuntu12
             create_demo_site
-            start_apache_ubuntu_precise
+            start_apache_ubuntu12
+            load_demo_records
+            apache_wsgi_restart
+        elif [ "$os_release" = "14" ]; then
+            stop_apache_ubuntu14
+            create_demo_site
+            start_apache_ubuntu14
             load_demo_records
             apache_wsgi_restart
         else

@@ -73,12 +73,20 @@ else
 fi
 
 
-start_apache_ubuntu_precise () {
+start_apache_ubuntu12 () {
     $sudo /usr/sbin/service apache2 start
 }
 
-stop_apache_ubuntu_precise () {
+stop_apache_ubuntu12 () {
     $sudo /usr/sbin/service apache2 stop
+}
+
+start_apache_ubuntu14 () {
+    start_apache_ubuntu12
+}
+
+stop_apache_ubuntu14 () {
+    stop_apache_ubuntu12
 }
 
 start_apache_centos6 () {
@@ -89,15 +97,19 @@ stop_apache_centos6 () {
     $sudo /sbin/service httpd stop
 }
 
-drop_apache_vhost_ubuntu_precise () {
-    stop_apache_ubuntu_precise
+drop_apache_vhost_ubuntu12 () {
+    stop_apache_ubuntu12
     if [ -e /etc/apache2/sites-available/default-ssl ]; then
         $sudo /usr/sbin/a2ensite "*default*"
     fi
     if [ -L /etc/apache2/sites-enabled/invenio.conf ]; then
         $sudo /usr/sbin/a2dissite "invenio*"
     fi
-    start_apache_ubuntu_precise
+    start_apache_ubuntu12
+}
+
+drop_apache_vhost_ubuntu14 () {
+    drop_apache_vhost_ubuntu12
 }
 
 drop_apache_vhost_centos6 () {
@@ -153,10 +165,17 @@ main () {
     # call appropriate provisioning functions:
     if [ "$os_distribution" = "Ubuntu" ]; then
         if [ "$os_release" = "12" ]; then
-            stop_apache_ubuntu_precise
+            stop_apache_ubuntu12
             drop_instance_tables
-            start_apache_ubuntu_precise
-            drop_apache_vhost_ubuntu_precise
+            start_apache_ubuntu12
+            drop_apache_vhost_ubuntu12
+            drop_instance_folder
+            drop_symlinks
+        elif [ "$os_release" = "14" ]; then
+            stop_apache_ubuntu14
+            drop_instance_tables
+            start_apache_ubuntu14
+            drop_apache_vhost_ubuntu14
             drop_instance_folder
             drop_symlinks
         else
