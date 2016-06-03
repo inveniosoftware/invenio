@@ -105,7 +105,7 @@ if CFG_MISCUTIL_SMTP_PORT:
                     "WHERE id=1")
 else:
     # SMTP server is not available. let's skip this test
-    class WebSessionLostYourPasswordTest(unittest.TestCase):
+    class WebSessionLostYourPasswordTest(InvenioTestCase):
         pass
 
 

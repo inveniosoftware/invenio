@@ -104,6 +104,12 @@ provision_web_ubuntu_precise () {
           unzip \
           vim
 
+    # make sure Apache is started:
+    sudo /usr/sbin/service apache2 restart
+
+    # make sure Redis is started:
+    sudo /usr/sbin/service redis-server restart
+
     # grant Apache user the nobody user rights for OpenOffice integration:
     echo "www-data  ALL=(nobody) NOPASSWD: ALL" | $sudo tee /etc/sudoers.d/www-data
     $sudo chmod o-r /etc/sudoers.d/www-data
@@ -182,11 +188,14 @@ provision_web_centos6 () {
     # enable Apache upon reboot:
     sudo /sbin/chkconfig httpd on
 
-    # start Redis:
-    sudo /etc/init.d/redis start
-
     # enable Redis upon reboot:
     sudo /sbin/chkconfig redis on
+
+    # make sure Apache is started:
+    sudo /etc/init.d/httpd restart
+
+    # make sure Redis is started:
+    sudo /etc/init.d/redis restart
 
     # grant Apache user the nobody user rights for OpenOffice integration:
     echo "apache  ALL=(nobody) NOPASSWD: ALL" | $sudo tee /etc/sudoers.d/apache
