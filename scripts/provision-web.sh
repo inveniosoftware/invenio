@@ -173,7 +173,7 @@ provision_web_centos6 () {
     fi
 
     # save new firewall rules to survive reboot:
-    sudo /etc/init.d/iptables save
+    sudo /sbin/service iptables save
 
     # enable Apache upon reboot:
     sudo /sbin/chkconfig httpd on

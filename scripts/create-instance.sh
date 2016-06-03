@@ -112,7 +112,7 @@ create_apache_vhost_ubuntu_precise () {
     sudo /usr/sbin/a2enmod ssl
     sudo /usr/sbin/a2enmod version || echo "[WARNING] Ignoring 'a2enmod version' command; hoping IfVersion is built-in."
     sudo /usr/sbin/a2enmod xsendfile
-    sudo /etc/init.d/apache2 restart
+    sudo /usr/sbin/service apache2 restart
 }
 
 create_apache_vhost_centos6 () {
@@ -202,11 +202,11 @@ create_apache_configuration () {
 }
 
 restart_apache_ubuntu_precise () {
-    $sudo /etc/init.d/apache2 restart
+    $sudo /usr/sbin/service apache2 restart
 }
 
 restart_apache_centos6 () {
-    $sudo /etc/init.d/httpd restart
+    $sudo /sbin/service httpd restart
 }
 
 main () {

@@ -63,19 +63,19 @@ apache_wsgi_restart () {
 }
 
 start_apache_ubuntu_precise () {
-    $sudo /etc/init.d/apache2 start
+    $sudo /usr/sbin/service apache2 start
 }
 
 stop_apache_ubuntu_precise () {
-    $sudo /etc/init.d/apache2 stop
+    $sudo /usr/sbin/service apache2 stop
 }
 
 start_apache_centos6 () {
-    $sudo /etc/init.d/httpd start
+    $sudo /sbin/service httpd start
 }
 
 stop_apache_centos6 () {
-    $sudo /etc/init.d/httpd stop
+    $sudo /sbin/service httpd stop
 }
 
 main () {

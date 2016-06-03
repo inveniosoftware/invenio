@@ -100,13 +100,13 @@ provision_mysql_centos6 () {
     fi
 
     # save new firewall rules to survive reboot:
-    sudo /etc/init.d/iptables save
+    sudo /sbin/service iptables save
 
     # enable MySQL upon reboot:
     sudo /sbin/chkconfig mysqld on
 
     # restart MySQL server:
-    sudo /etc/init.d/mysqld restart
+    sudo /sbin/service mysqld restart
 
 }
 
