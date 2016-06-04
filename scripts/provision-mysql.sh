@@ -55,7 +55,7 @@ fi
 # quit on unbound symbols:
 set -o nounset
 
-provision_mysql_ubuntu_precise () {
+provision_mysql_ubuntu12 () {
 
     # update list of available packages
     sudo DEBIAN_FRONTEND=noninteractive apt-get update
@@ -72,6 +72,10 @@ provision_mysql_ubuntu_precise () {
     # restart MySQL server:
     sudo /usr/sbin/service mysql restart
 
+}
+
+provision_mysql_ubuntu14 () {
+    provision_mysql_ubuntu12
 }
 
 provision_mysql_centos6 () {
@@ -100,13 +104,13 @@ provision_mysql_centos6 () {
     fi
 
     # save new firewall rules to survive reboot:
-    sudo /etc/init.d/iptables save
+    sudo /sbin/service iptables save
 
     # enable MySQL upon reboot:
     sudo /sbin/chkconfig mysqld on
 
     # restart MySQL server:
-    sudo /etc/init.d/mysqld restart
+    sudo /sbin/service mysqld restart
 
 }
 
@@ -138,7 +142,9 @@ main () {
     # call appropriate provisioning functions:
     if [ "$os_distribution" = "Ubuntu" ]; then
         if [ "$os_release" = "12" ]; then
-            provision_mysql_ubuntu_precise
+            provision_mysql_ubuntu12
+        elif [ "$os_release" = "14" ]; then
+            provision_mysql_ubuntu14
         else
             echo "[ERROR] Sorry, unsupported release ${os_release}."
             exit 1

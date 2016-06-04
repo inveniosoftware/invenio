@@ -333,7 +333,7 @@ Contents
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --create-tables
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --load-webstat-conf
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --create-apache-conf
-      $ sudo /etc/init.d/apache2 restart
+      $ sudo /usr/sbin/service apache2 restart
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --check-openoffice
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --create-demo-site
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --load-demo-records
@@ -755,7 +755,7 @@ Contents
           processes are not fully thread safe yet.  This may change in
           the future.
 
-      $ sudo /etc/init.d/apache2 restart
+      $ sudo /usr/sbin/service apache2 restart
 
           Please ask your webserver administrator to restart the
           Apache server after the above "httpd.conf" changes.
