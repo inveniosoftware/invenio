@@ -34,8 +34,11 @@
 # $ vagrant ssh web -c 'source .inveniorc && sudo -u www-data /opt/invenio/bin/inveniocfg --run-unit-tests'
 # $ vagrant ssh web -c 'source .inveniorc && sudo -u www-data /opt/invenio/bin/inveniocfg --run-regression-tests --yes-i-know'
 
-#OS = 'hfm4/centos6'
-OS = 'ubuntu/precise64'
+# Tested on:
+#
+# OS = 'hfm4/centos6' # CentOS 6
+# OS = 'ubuntu/precise64' # Ubuntu 12.04 LTS Precise Pangolin -- used by Travis CI
+OS = 'ubuntu/trusty64' # Ubuntu 14.04 LTS Trusty Tahr
 
 Vagrant.configure("2") do |config|
 
