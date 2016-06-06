@@ -48,7 +48,7 @@ fi
 # unattended installation:
 export DEBIAN_FRONTEND=noninteractive
 
-provision_web_ubuntu_precise () {
+provision_web_ubuntu12 () {
 
     # update list of available packages
     $sudo DEBIAN_FRONTEND=noninteractive apt-get update
@@ -63,7 +63,7 @@ provision_web_ubuntu_precise () {
           gettext \
           giflib-tools \
           git \
-          gnuplot poppler-utils \
+          gnuplot \
           html2text \
           ipython \
           libapache2-mod-wsgi \
@@ -79,16 +79,19 @@ provision_web_ubuntu_precise () {
           libxml2-dev \
           libxslt-dev \
           make \
+          mlocate \
           mysql-client \
           netpbm \
           openOffice.org \
           pdftk \
           pep8 \
+          poppler-utils \
           postfix \
           pstotext \
           pylint \
           python-dev \
           python-gnuplot \
+          python-h5py \
           python-libxml2 \
           python-libxslt1 \
           python-nose \
@@ -102,6 +105,88 @@ provision_web_ubuntu_precise () {
           texlive \
           unzip \
           vim
+
+    # make sure Apache is started:
+    sudo /usr/sbin/service apache2 restart
+
+    # make sure Redis is started:
+    sudo /usr/sbin/service redis-server restart
+
+    # update list of files e.g. useful for Apache version detection:
+    sudo updatedb
+
+    # grant Apache user the nobody user rights for OpenOffice integration:
+    echo "www-data  ALL=(nobody) NOPASSWD: ALL" | $sudo tee /etc/sudoers.d/www-data
+    $sudo chmod o-r /etc/sudoers.d/www-data
+
+}
+
+provision_web_ubuntu14 () {
+
+    # update list of available packages
+    $sudo DEBIAN_FRONTEND=noninteractive apt-get update
+
+    # install useful system packages
+    $sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+          apache2-mpm-worker \
+          automake \
+          clisp \
+          curl \
+          cython \
+          gettext \
+          giflib-tools \
+          git \
+          gnuplot \
+          html2text \
+          ipython \
+          libapache2-mod-wsgi \
+          libapache2-mod-xsendfile \
+          libffi-dev \
+          libfreetype6-dev \
+          libjpeg-dev \
+          libmsgpack-dev \
+          libmysqlclient-dev \
+          libpng-dev \
+          libssl-dev \
+          libtiff-dev \
+          libxml2-dev \
+          libxslt-dev \
+          make \
+          mlocate \
+          mysql-client \
+          netpbm \
+          libreoffice \
+          pdftk \
+          pep8 \
+          poppler-utils \
+          postfix \
+          pstotext \
+          pylint \
+          python-dev \
+          python-gnuplot \
+          python-h5py \
+          python-libxml2 \
+          python-libxslt1 \
+          python-nose \
+          python-nosexcover \
+          python-pip \
+          libreoffice-script-provider-python \
+          redis-server \
+          rlwrap \
+          sbcl \
+          screen \
+          texlive \
+          unzip \
+          vim
+
+    # make sure Apache is started:
+    sudo /usr/sbin/service apache2 restart
+
+    # make sure Redis is started:
+    sudo /usr/sbin/service redis-server restart
+
+    # update list of files e.g. useful for Apache version detection:
+    sudo updatedb
 
     # grant Apache user the nobody user rights for OpenOffice integration:
     echo "www-data  ALL=(nobody) NOPASSWD: ALL" | $sudo tee /etc/sudoers.d/www-data
@@ -130,6 +215,7 @@ provision_web_centos6 () {
          gettext-devel \
          git \
          gnuplot-py \
+         h5py \
          hdf5-devel \
          ipython \
          libffi-devel \
@@ -141,6 +227,7 @@ provision_web_centos6 () {
          libxml2-python \
          libxslt-devel \
          libxslt-python \
+         mlocate \
          mod_ssl \
          mod_wsgi \
          mysql-devel \
@@ -175,16 +262,22 @@ provision_web_centos6 () {
     fi
 
     # save new firewall rules to survive reboot:
-    sudo /etc/init.d/iptables save
+    sudo /sbin/service iptables save
 
     # enable Apache upon reboot:
     sudo /sbin/chkconfig httpd on
 
-    # start Redis:
-    sudo /etc/init.d/redis start
-
     # enable Redis upon reboot:
     sudo /sbin/chkconfig redis on
+
+    # make sure Apache is started:
+    sudo /sbin/service httpd restart
+
+    # make sure Redis is started:
+    sudo /sbin/service redis restart
+
+    # update list of files e.g. useful for Apache version detection:
+    sudo updatedb
 
     # grant Apache user the nobody user rights for OpenOffice integration:
     echo "apache  ALL=(nobody) NOPASSWD: ALL" | $sudo tee /etc/sudoers.d/apache
@@ -227,7 +320,10 @@ main () {
     # call appropriate provisioning functions:
     if [ "$os_distribution" = "Ubuntu" ]; then
         if [ "$os_release" = "12" ]; then
-            provision_web_ubuntu_precise
+            provision_web_ubuntu12
+            provision_web_pypi
+        elif [ "$os_release" = "14" ]; then
+            provision_web_ubuntu14
             provision_web_pypi
         else
             echo "[ERROR] Sorry, unsupported release ${os_release}."
