@@ -79,7 +79,7 @@ extras_require = {
         'invenio-db[postgresql]' + invenio_db_version,
     ],
     'docs': [
-        'Sphinx>=1.3',
+        'Sphinx>=1.4',
     ],
     'tests': tests_require,
 }
