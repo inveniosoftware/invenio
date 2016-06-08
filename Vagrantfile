@@ -31,20 +31,27 @@
 # order to better emulate production environment conditions. You can install an
 # Invenio demo site by running:
 #
-# laptop> vagrant up
-# laptop> vagrant ssh web -c 'source .inveniorc && /vagrant/scripts/install.sh'
-# vagrant> curl http://0.0.0.0:5000/records/1
+# $ vagrant up
+# $ vagrant ssh web -c 'source .inveniorc && /vagrant/scripts/create-instance.sh --devel'
+# $ vagrant ssh web -c 'source .inveniorc && nohup /vagrant/scripts/start-instance.sh'
+# $ vagrant ssh web -c 'source .inveniorc && /vagrant/scripts/populate-instance.sh'
+# $ firefox http://192.168.50.10/records/1
 
 #OS = 'hfm4/centos7'
 OS = 'ubuntu/trusty64'
 
 Vagrant.configure("2") do |config|
 
+  if Vagrant.has_plugin?("vagrant-cachier")
+    config.cache.scope = :box
+  end
+
   config.vm.define "web" do |web|
     web.vm.box = OS
     web.vm.hostname = 'web'
     web.vm.provision "file", source: ".inveniorc", destination: ".inveniorc"
     web.vm.provision "shell", inline: "source .inveniorc && /vagrant/scripts/provision-web.sh", privileged: false
+    web.vm.network "forwarded_port", guest: 80, host: 80
     web.vm.network "forwarded_port", guest: 5000, host: 5000
     web.vm.network "private_network", ip: ENV.fetch('INVENIO_WEB_HOST','192.168.50.10')
     web.vm.provider :virtualbox do |vb|

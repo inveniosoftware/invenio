@@ -26,7 +26,7 @@ You can get Invenio v3.0 demo site up and running using Docker::
   docker-compose build
   docker-compose up -d
   docker-compose run --rm web ./scripts/populate-instance.sh
-  firefox http://127.0.0.1:5000/records/1
+  firefox http://127.0.0.1/records/1
 
 Using Vagrant
 -------------
@@ -35,9 +35,9 @@ You can get Invenio v3.0 demo site up and running using Vagrant::
 
   vagrant up
   vagrant ssh web -c 'source .inveniorc && /vagrant/scripts/create-instance.sh --devel'
-  vagrant ssh web -c 'source .inveniorc && /vagrant/scripts/populate-instance.sh'
   vagrant ssh web -c 'source .inveniorc && nohup /vagrant/scripts/start-instance.sh'
-  firefox http://127.0.0.1:5000/records/1
+  vagrant ssh web -c 'source .inveniorc && /vagrant/scripts/populate-instance.sh'
+  firefox http://192.168.50.10/records/1
 
 Using kickstart scripts
 -----------------------
@@ -54,8 +54,8 @@ installation scripts manually::
   scripts/provision-rabbitmq.sh
   scripts/provision-worker.sh
   scripts/create-instance.sh --devel
-  scripts/populate-instance.sh
   scripts/start-instance.sh
-  firefox http://127.0.0.1:5000/records/1
+  scripts/populate-instance.sh
+  firefox http://192.168.50.10/records/1
 
 See :ref:`installation_detailed` for more information.

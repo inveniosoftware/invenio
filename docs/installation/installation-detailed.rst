@@ -141,8 +141,8 @@ Second, some useful system tools are installed:
 * on Ubuntu 14.04 LTS (Trusty Tahr):
 
 .. include:: ../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-useful-system-tools-trusty-begin
-   :end-before: # sphinxdoc-install-useful-system-tools-trusty-end
+   :start-after: # sphinxdoc-install-useful-system-tools-ubuntu14-begin
+   :end-before: # sphinxdoc-install-useful-system-tools-ubuntu14-end
    :literal:
 
 * on CentOS 7:
@@ -159,8 +159,8 @@ follows:
 * on Ubuntu 14.04 LTS (Trusty Tahr):
 
 .. include:: ../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-add-nodejs-external-repository-trusty-begin
-   :end-before: # sphinxdoc-add-nodejs-external-repository-trusty-end
+   :start-after: # sphinxdoc-add-nodejs-external-repository-ubuntu14-begin
+   :end-before: # sphinxdoc-add-nodejs-external-repository-ubuntu14-end
    :literal:
 
 * on CentOS 7:
@@ -176,8 +176,8 @@ needs are installed:
 * on Ubuntu 14.04 LTS (Trusty Tahr):
 
 .. include:: ../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-web-common-trusty-begin
-   :end-before: # sphinxdoc-install-web-common-trusty-end
+   :start-after: # sphinxdoc-install-web-common-ubuntu14-begin
+   :end-before: # sphinxdoc-install-web-common-ubuntu14-end
    :literal:
 
 * on CentOS7:
@@ -193,8 +193,8 @@ install corresponding libraries too:
 * on Ubuntu 14.04 LTS (Trusty Tahr):
 
 .. include:: ../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-web-libpostgresql-trusty-begin
-   :end-before: # sphinxdoc-install-web-libpostgresql-trusty-end
+   :start-after: # sphinxdoc-install-web-libpostgresql-ubuntu14-begin
+   :end-before: # sphinxdoc-install-web-libpostgresql-ubuntu14-end
    :literal:
 
 * on CentOS7:
@@ -224,13 +224,29 @@ in the current user shell process:
    :end-before: # sphinxdoc-install-virtualenvwrapper-end
    :literal:
 
+Seventh, we install Nginx web server and configure appropriate virtual host:
+
+* on Ubuntu 14.04 LTS (Trusty Tahr):
+
+.. include:: ../../scripts/provision-web.sh
+   :start-after: # sphinxdoc-install-web-nginx-ubuntu14-begin
+   :end-before: # sphinxdoc-install-web-nginx-ubuntu14-end
+   :literal:
+
+* on CentOS7:
+
+.. include:: ../../scripts/provision-web.sh
+   :start-after: # sphinxdoc-install-web-nginx-centos7-begin
+   :end-before: # sphinxdoc-install-web-nginx-centos7-end
+   :literal:
+
 Finally, let's clean after ourselves:
 
 * on Ubuntu 14.04 LTS (Trusty Tahr):
 
 .. include:: ../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-web-cleanup-trusty-begin
-   :end-before: # sphinxdoc-install-web-cleanup-trusty-end
+   :start-after: # sphinxdoc-install-web-cleanup-ubuntu14-begin
+   :end-before: # sphinxdoc-install-web-cleanup-ubuntu14-end
    :literal:
 
 * on CentOS7:
@@ -263,8 +279,8 @@ First, we install and configure the database software:
 * on Ubuntu 14.04 LTS (Trusty Tahr):
 
 .. include:: ../../scripts/provision-postgresql.sh
-   :start-after: # sphinxdoc-install-postgresql-trusty-begin
-   :end-before: # sphinxdoc-install-postgresql-trusty-end
+   :start-after: # sphinxdoc-install-postgresql-ubuntu14-begin
+   :end-before: # sphinxdoc-install-postgresql-ubuntu14-end
    :literal:
 
 * on CentOS 7:
@@ -289,8 +305,8 @@ Finally, let's clean after ourselves:
 * on Ubuntu 14.04 LTS (Trusty Tahr):
 
 .. include:: ../../scripts/provision-postgresql.sh
-   :start-after: # sphinxdoc-install-postgresql-cleanup-trusty-begin
-   :end-before: # sphinxdoc-install-postgresql-cleanup-trusty-end
+   :start-after: # sphinxdoc-install-postgresql-cleanup-ubuntu14-begin
+   :end-before: # sphinxdoc-install-postgresql-cleanup-ubuntu14-end
    :literal:
 
 * on CentOS7:
@@ -318,8 +334,8 @@ Let's see in detail what the Redis provisioning script does.
 * on Ubuntu 14.04 LTS (Trusty Tahr):
 
 .. include:: ../../scripts/provision-redis.sh
-   :start-after: # sphinxdoc-install-redis-trusty-begin
-   :end-before: # sphinxdoc-install-redis-trusty-end
+   :start-after: # sphinxdoc-install-redis-ubuntu14-begin
+   :end-before: # sphinxdoc-install-redis-ubuntu14-end
    :literal:
 
 * on CentOS 7:
@@ -334,8 +350,8 @@ Finally, let's clean after ourselves:
 * on Ubuntu 14.04 LTS (Trusty Tahr):
 
 .. include:: ../../scripts/provision-redis.sh
-   :start-after: # sphinxdoc-install-redis-cleanup-trusty-begin
-   :end-before: # sphinxdoc-install-redis-cleanup-trusty-end
+   :start-after: # sphinxdoc-install-redis-cleanup-ubuntu14-begin
+   :end-before: # sphinxdoc-install-redis-cleanup-ubuntu14-end
    :literal:
 
 * on CentOS7:
@@ -365,8 +381,8 @@ Let's see in detail what the Elasticsearch provisioning script does.
 * on Ubuntu 14.04 LTS (Trusty Tahr):
 
 .. include:: ../../scripts/provision-elasticsearch.sh
-   :start-after: # sphinxdoc-install-elasticsearch-trusty-begin
-   :end-before: # sphinxdoc-install-elasticsearch-trusty-end
+   :start-after: # sphinxdoc-install-elasticsearch-ubuntu14-begin
+   :end-before: # sphinxdoc-install-elasticsearch-ubuntu14-end
    :literal:
 
 * on CentOS 7:
@@ -381,8 +397,8 @@ Finally, let's clean after ourselves:
 * on Ubuntu 14.04 LTS (Trusty Tahr):
 
 .. include:: ../../scripts/provision-elasticsearch.sh
-   :start-after: # sphinxdoc-install-elasticsearch-cleanup-trusty-begin
-   :end-before: # sphinxdoc-install-elasticsearch-cleanup-trusty-end
+   :start-after: # sphinxdoc-install-elasticsearch-cleanup-ubuntu14-begin
+   :end-before: # sphinxdoc-install-elasticsearch-cleanup-ubuntu14-end
    :literal:
 
 * on CentOS7:
@@ -410,8 +426,8 @@ Let's see in detail what the RabbitMQ provisioning script does.
 * on Ubuntu 14.04 LTS (Trusty Tahr):
 
 .. include:: ../../scripts/provision-rabbitmq.sh
-   :start-after: # sphinxdoc-install-rabbitmq-trusty-begin
-   :end-before: # sphinxdoc-install-rabbitmq-trusty-end
+   :start-after: # sphinxdoc-install-rabbitmq-ubuntu14-begin
+   :end-before: # sphinxdoc-install-rabbitmq-ubuntu14-end
    :literal:
 
 * on CentOS 7:
@@ -426,8 +442,8 @@ Finally, let's clean after ourselves:
 * on Ubuntu 14.04 LTS (Trusty Tahr):
 
 .. include:: ../../scripts/provision-rabbitmq.sh
-   :start-after: # sphinxdoc-install-rabbitmq-cleanup-trusty-begin
-   :end-before: # sphinxdoc-install-rabbitmq-cleanup-trusty-end
+   :start-after: # sphinxdoc-install-rabbitmq-cleanup-ubuntu14-begin
+   :end-before: # sphinxdoc-install-rabbitmq-cleanup-ubuntu14-end
    :literal:
 
 * on CentOS7:
@@ -456,8 +472,8 @@ Let's see in detail what the worker provisioning script does.
 * on Ubuntu 14.04 LTS (Trusty Tahr):
 
 .. include:: ../../scripts/provision-worker.sh
-   :start-after: # sphinxdoc-install-worker-trusty-begin
-   :end-before: # sphinxdoc-install-worker-trusty-end
+   :start-after: # sphinxdoc-install-worker-ubuntu14-begin
+   :end-before: # sphinxdoc-install-worker-ubuntu14-end
    :literal:
 
 * on CentOS 7:
@@ -472,8 +488,8 @@ Finally, let's clean after ourselves:
 * on Ubuntu 14.04 LTS (Trusty Tahr):
 
 .. include:: ../../scripts/provision-worker.sh
-   :start-after: # sphinxdoc-install-worker-cleanup-trusty-begin
-   :end-before: # sphinxdoc-install-worker-cleanup-trusty-end
+   :start-after: # sphinxdoc-install-worker-cleanup-ubuntu14-begin
+   :end-before: # sphinxdoc-install-worker-cleanup-ubuntu14-end
    :literal:
 
 * on CentOS7:
@@ -571,6 +587,23 @@ We can now collect and build CSS/JS assets of our Invenio instance:
 Our first new Invenio instance is created and ready for loading some example
 records.
 
+Start instance
+~~~~~~~~~~~~~~
+
+Let's now start the web application:
+
+.. include:: ../../scripts/start-instance.sh
+   :start-after: # sphinxdoc-start-application-begin
+   :end-before: # sphinxdoc-start-application-end
+   :literal:
+
+and the web server:
+
+.. include:: ../../scripts/start-instance.sh
+   :start-after: # sphinxdoc-start-nginx-begin
+   :end-before: # sphinxdoc-start-nginx-end
+   :literal:
+
 Populate instance
 ~~~~~~~~~~~~~~~~~
 
@@ -605,27 +638,17 @@ Let's index all the uploaded records:
    :end-before: # sphinxdoc-index-all-records-end
    :literal:
 
-Start instance
-~~~~~~~~~~~~~~
-
-Finally, let's start the web application (in debugging mode):
-
-.. include:: ../../scripts/start-instance.sh
-   :start-after: # sphinxdoc-start-application-begin
-   :end-before: # sphinxdoc-start-application-end
-   :literal:
-
 We should now see our demo records on the web:
 
 .. code-block:: shell
 
-   firefox http://localhost:5000/records/1
+   firefox http://localhost/records/1
 
 and we can access them via REST API:
 
 .. code-block:: shell
 
    curl -i -H "Accept: application/json" \
-        http://localhost:5000/api/records/1
+        http://localhost/api/records/1
 
 We are done! Our first Invenio v3.0 demo instance is fully up and running.
