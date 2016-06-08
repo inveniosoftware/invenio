@@ -188,7 +188,7 @@ main () {
     fi
 
     # call appropriate provisioning functions:
-    if [ -f /.dockerinit ]; then
+    if [ -f /.dockerinit -o -f /.dockerenv ]; then
         # running inside Docker
         provision_web_common_ubuntu_trusty
         provision_web_libpostgresql_ubuntu_trusty
