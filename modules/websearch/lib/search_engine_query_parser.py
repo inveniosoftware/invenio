@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2008, 2010, 2011, 2012, 2013, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1270,15 +1270,26 @@ class SpiresToInvenioSyntaxConverter:
     def _normalise_journal_page_format(self, query):
         """Phys.Lett, 0903, 024 -> Phys.Lett,0903,024"""
 
-        def _is_triple(search):
-            return (len(re.findall('\s+', search)) + len(re.findall(':', search))) == 2
-
         def _normalise_spaces_and_colons_to_commas_in_triple(search):
-            if not _is_triple(search):
-                return search
-            search = re.sub(',\s+', ',', search)
-            search = re.sub('\s+', ',', search)
-            search = re.sub(':', ',', search)
+            """
+            There are many different ways in which the search term can deviate from the
+            standard form. This attempts to address some common patterns. Journal names
+            might contain spaces, so this applies only if exactly 2 substitutions are made
+            and additionally at least one digit is present.
+            'Phys.Lett,  0903, 024' -> 'Phys.Lett,0903,024'
+            'Phys.Lett,0903, 024' -> 'Phys.Lett,0903,024'
+            'Phys.Lett 0903 024' -> 'Phys.Lett,0903,024'
+            'Phys.Lett: 0903,024' -> 'Phys.Lett,0903,024'
+            'Phys.Lett 0903:024' -> 'Phys.Lett,0903,024'
+            'Rev Modern Physics' -> 'Rev Modern Physics'
+            'New J Phys' -> 'New J Phys'
+            'J.Fixed Point Theor.Appl.,5' -> 'J.Fixed Point Theor.Appl.,5'
+            """
+            if len(re.findall(r'(?<![,\d])\d', search)) > 0:
+                newsearch, count = re.subn(r'[,:\s]+', ',', search)
+                # require exactly 2 substitutions
+                if count == 2:
+                    return newsearch
             return search
 
         result = ""
