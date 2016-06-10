@@ -43,6 +43,7 @@ from invenio.bibindex_engine_utils import get_idx_indexer
 from invenio.bibtask import write_message
 from invenio.errorlib import register_exception
 from invenio.intbitset import intbitset
+from invenio.search_engine import search_pattern
 from invenio.bibindex_tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
 
 
@@ -131,16 +132,18 @@ class BibIndexFulltextTokenizer(BibIndexDefaultTokenizer):
                 for splash_re, url_re in CFG_BIBINDEX_SPLASH_PAGES.iteritems():
                     if re.match(splash_re, url_direct_or_indirect):
                         write_message("... %s is a splash page (%s)" % (url_direct_or_indirect, splash_re), verbose=2)
-                        html = urllib2.urlopen(url_direct_or_indirect).read()
-                        urls = get_links_in_html_page(html)
-                        write_message("... found these URLs in %s splash page: %s" % (url_direct_or_indirect, ", ".join(urls)), verbose=3)
-                        for url in urls:
-                            if re.match(url_re, url):
-                                write_message("... will index %s (matched by %s)" % (url, url_re), verbose=2)
-                                urls_to_index.add(url)
-                if not urls_to_index:
-                    urls_to_index.add(url_direct_or_indirect)
-                write_message("... will extract words from %s" % ', '.join(urls_to_index), verbose=2)
+                        if url_re is None:
+                            urls_to_index.add(url_direct_or_indirect)
+                            continue
+                        else:
+                            html = urllib2.urlopen(url_direct_or_indirect).read()
+                            urls = get_links_in_html_page(html)
+                            write_message("... found these URLs in %s splash page: %s" % (url_direct_or_indirect, ", ".join(urls)), verbose=3)
+                            for url in urls:
+                                if re.match(url_re, url):
+                                    write_message("... will index %s (matched by %s)" % (url, url_re), verbose=2)
+                                    urls_to_index.add(url)
+                write_message("... will extract words from {0}".format(urls_to_index), verbose=2)
                 words = {}
                 for url in urls_to_index:
                     tmpdoc = download_url(url)
@@ -156,11 +159,14 @@ class BibIndexFulltextTokenizer(BibIndexDefaultTokenizer):
 
                             indexer = get_idx_indexer('fulltext')
                             if indexer != 'native':
-                                if indexer == 'SOLR' and CFG_SOLR_URL:
-                                    solr_add_fulltext(None, text) # FIXME: use real record ID
-                                if indexer == 'XAPIAN' and CFG_XAPIAN_ENABLED:
-                                    #xapian_add(None, 'fulltext', text) # FIXME: use real record ID
-                                    pass
+                                recids = search_pattern(p='8567_u:{0}'.format(url))
+                                write_message('... will add words to record {0}'.format(recid), verbose=2)
+                                for recid in recids:
+                                    if indexer == 'SOLR' and CFG_SOLR_URL:
+                                        solr_add_fulltext(recid, text)
+                                    if indexer == 'XAPIAN' and CFG_XAPIAN_ENABLED:
+                                        #xapian_add(recid, 'fulltext', text)
+                                        pass
                                 # we are relying on an external information retrieval system
                                 # to provide full-text indexing, so dispatch text to it and
                                 # return nothing here:
