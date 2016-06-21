@@ -1390,6 +1390,8 @@ def collect_user_info(req, login_time=False, refresh=False):
                 user_info['precached_viewclaimlink'] = viewclaimlink
                 user_info['precached_usepaperclaim'] = usepaperclaim
                 user_info['precached_usepaperattribution'] = usepaperattribution
+        else: # guest user
+                user_info['precached_permitted_restricted_collections'] = get_permitted_restricted_collections(user_info)
 
     except Exception, e:
         register_exception()

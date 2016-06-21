@@ -3090,10 +3090,13 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, of="hb
         policy = CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY.strip().upper()
         # let's get the restricted collections the user has rights to view
         if user_info['guest'] == '1':
-            permitted_restricted_collections = []
-            ## For guest users that are actually authorized to some restricted
-            ## collection (by virtue of the IP address in a FireRole rule)
-            ## we explicitly build the list of permitted_restricted_collections
+            permitted_restricted_collections = user_info.get(
+                'precached_permitted_restricted_collections', [])
+            # For guest users that are actually authorized to some restricted
+            # collection (by virtue of the IP address in a FireRole rule) we
+            # explicitly build the list of permitted_restricted_collections and
+            # we make sure that these are used in the search engine`
+
             for coll in colls:
                 if collection_restricted_p(coll) and (acc_authorize_action(user_info, 'viewrestrcoll', collection=coll)[0] == 0):
                     permitted_restricted_collections.append(coll)
