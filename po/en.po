@@ -7445,7 +7445,7 @@ msgstr ""
 msgid ""
 "You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during "
 "the last 30 days or so."
-msgstr ""
+msgstr "You have performed %(x_nb1)s searches (%(x_nb2)s different questions)."
 
 #: modules/webalert/lib/webalert_templates.py:451
 #, python-format
