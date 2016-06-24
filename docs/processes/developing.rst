@@ -1,5 +1,5 @@
 .. This file is part of Invenio
-   Copyright (C) 2015 CERN.
+   Copyright (C) 2015, 2016 CERN.
 
    Invenio is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
@@ -18,6 +18,51 @@
 ============
  Developing
 ============
+
+::
+
+    Mutable defaults
+    The Master
+    Is full of regrets
+       —-after Yosa Buson (1716-1784)
+
+Developing principles
+=====================
+
+1. **Contributing documentation?** ReST and Sphinx. Contribute as code.
+
+2. **Contributing I18N translations?** GNU gettext. See :ref:`i18n`.
+
+3. **Contributing code?**
+
+   i. Read `The Zen of Python <https://en.wikipedia.org/wiki/Zen_of_Python>`_.
+
+   ii. Read `Python Anti-Patterns
+       <http://docs.quantifiedcode.com/python-anti-patterns/>`_.
+   iii. Code with style. Plug `pycodestyle
+        <https://pypi.python.org/pypi/pycodestyle>`_ (`PEP-8
+        <https://www.python.org/dev/peps/pep-0008/>`_), `pydocstyle
+        <https://pypi.python.org/pypi/pydocstyle>`_ (`PEP-257
+        <https://www.python.org/dev/peps/pep-0257/>`_), `Flake8
+        <https://pypi.python.org/pypi/flake8>`_, `ISort
+        <https://pypi.python.org/pypi/isort>`_ tools into your editor.
+
+
+   iv. Use sensible commit history. (See below.)
+
+   v. Run kwalitee checks locally.
+
+      - ``kwalitee check message master..my-feature-branch``
+      - ``kwalitee check files master..my-feature-branch``
+      - ``kwalitee check authors master..my-feature-branch``
+      - ``kwalitee prepare release master..my-feature-branch``
+
+   vi. Follow egoless programming principles. See :ref:`code-of-conduct`.
+
+   vii. Read the following contributing guide and developer guidelines.
+
+Contributing guide
+==================
 
 .. include:: ../../CONTRIBUTING.rst
    :start-after: and welcome!

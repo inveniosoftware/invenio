@@ -1,5 +1,5 @@
 .. This file is part of Invenio
-   Copyright (C) 2015 CERN.
+   Copyright (C) 2015, 2016 CERN.
 
    Invenio is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
@@ -15,8 +15,28 @@
    along with Invenio; if not, write to the Free Software Foundation, Inc.,
    59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-=========
- Merging
-=========
+===========
+ Reviewing
+===========
 
-FIXME
+::
+
+    Ecce pull request!
+    Undocumented features
+    Still shivering
+       —-after Akutagawa Ryunosuke (1892-1927)
+
+Reviewing principles
+====================
+
+1. **Every PR should preserve or increase code coverage.** If it ain’t green, it
+   ain’t finished.
+
+2. **Check it as a black box. Input, magic, output.** If it ain’t documented, it
+   ain’t finished.
+
+3. **Check it as a white box. Implementation details.** If it ain’t styled, it
+   ain’t finished.
+
+4. **Check it as a release news. Commit messages.** If it does not announce
+   anything, it may not be finished.

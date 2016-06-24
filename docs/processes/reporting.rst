@@ -1,5 +1,5 @@
 .. This file is part of Invenio
-   Copyright (C) 2015 CERN.
+   Copyright (C) 2015, 2016 CERN.
 
    Invenio is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
@@ -19,8 +19,42 @@
 Reporting
 =========
 
-Bug reports and feature requests
---------------------------------
+::
 
-If you find a bug or have a feature request, please search for already reported
-problems before submitting a new issue.
+    An issue in the morning
+    A feature request in the evening
+    What else?
+       --after Ekon
+
+Reporting principles
+====================
+
+Have you encountered a bug or do you have a new feature request? Here are a few
+tips on our issue reporting practices.
+
+1. **If it ain’t on GitHub, it does not exist.** Please document every bug or
+   every feature request on GitHub in respected repositories.
+
+2. **Found security issue? Alert us privately.** If you find a security issue
+   that has a possible dangerous exploit, please alert us privately at
+   ``<info@inveniosoftware.org>``. This will allow us to distribute a security
+   patch before potential attackers look at the issue.
+
+3. **Check existing issues before submitting.** Please check opened or closed
+   issued before submitting. Somebody else might have had the same issue as you.
+
+4. **Describe concrete steps how to reproduce a problem.** Which version you
+   used? What you did? What was the outcome? What you expected instead?
+
+5. **Submit a use case. Submit a test case code.** Please clarify the use case
+   in mind with as much explicit detail as necessary. Other Invenio instances
+   may have different implicit assumptions than you.
+
+6. **Get involved! Comment and advise on other issues.** Help the community and
+   see your responsibilites widen.
+
+7. **Join Invenio chat room.** Sometimes a quick chat may be better than long
+   GitHub issue.
+
+9. **Watch notifications in interested repositories.** Subscribe to GitHub
+   notifications to stay up-to-date on what is going on.

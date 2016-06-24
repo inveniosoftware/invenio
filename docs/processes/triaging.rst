@@ -1,5 +1,5 @@
 .. This file is part of Invenio
-   Copyright (C) 2015 CERN.
+   Copyright (C) 2015, 2016 CERN.
 
    Invenio is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
@@ -19,8 +19,15 @@
  Triaging
 ==========
 
-About
-=====
+::
+
+    No milestone
+    No assignee
+    A lonely feeling
+       —-after Yosa Buson (1716-1784)
+
+Triaging principles
+===================
 
 The purpose of `issue triage process
 <https://en.wikipedia.org/w/index.php?title=Software_bug&redirect=no#Bug_management>`_
@@ -31,6 +38,32 @@ the representatives of various Invenio distributed teams. The triage team
 members make sure of the big picture, cross-consider issues and tasks among
 interested services, help to note down, understand, prioritise, and follow-upon
 them.
+
+1. **Every issue should have an assignee.** Issues without assignees are sad and
+   likely to remain so. Each issue should have a driving force behind it.
+
+2. **Every issue should have a milestone.** Issues without milestones are sad
+   and likely to remain unaddressed.
+
+3. **Use additional type and priority labels.** Helps to find related issues out
+   quickly.
+
+4. **Use additional service labels to provide overview.** Helps to distinguish
+   which issues are of utmost importance to which services. Helps to keep a
+   service-oriented dashboard.
+
+5. **Silent since a month? Ping responsible.** An issue shouldn't be opened
+   without update for more than a month.
+
+6. **Nobody in sight to work on this? Discuss and triage.** The triage team
+   should take action if there is no natural candidate to work on an issue.
+
+7. **No time to realistically tackle this? “Someday” or close.** We don't want
+   to have thousands of open issues. Issues from the someday open or closed pool
+   can be revived later, should realistic manpower be found.
+
+8. **No reply? Ping @inveniosoftware/triagers** The triage team should take
+   action if there is no update on an issues for more than a month.
 
 Triaging team
 =============
