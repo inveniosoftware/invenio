@@ -24,7 +24,7 @@ order to see it in action:
 Demo Sites
 ----------
 
-`Atlantis Institute of Fictive Science <http://demo.invenio-software.org/>`_
+`Atlantis Institute of Fictive Science <http://demo.inveniosoftware.org/>`_
     *running Invenio 1.2.1, released 2015-05-21*
 
     Atlantis Institute of Fictive Science is an official demo site of

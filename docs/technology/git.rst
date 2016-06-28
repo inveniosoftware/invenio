@@ -72,7 +72,7 @@ This is how to set up your private repo (on your laptop).
 .. code-block:: console
 
     $ cd ~/src
-    $ git clone http://invenio-software.org/repo/invenio.git
+    $ git clone http://inveniosoftware.org/repo/invenio.git
 
 
 S3. Backuping your private repo (only developers at CERN)
@@ -159,7 +159,7 @@ S6. Making your public repo visible on the Web
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Please contact Joe Bloggs in order to make your public repo visible on
-Invenio's `repo web interface <http://invenio-software.org/repo/>`_.
+Invenio's `repo web interface <http://inveniosoftware.org/repo/>`_.
 
 S7. Using remote repository locally
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

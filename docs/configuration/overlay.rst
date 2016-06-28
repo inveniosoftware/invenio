@@ -127,9 +127,9 @@ it later on. Here is its minimal content.
     setup(
         name="My Overlay",
         version="0.1.dev0",
-        url="http://invenio-software.org/",
+        url="http://inveniosoftware.org/",
         author="Invenio Software",
-        author_email="invenio@invenio-software.org",
+        author_email="invenio@inveniosoftware.org",
         description="My first overlay",
         packages=packages,
         install_requires=[
