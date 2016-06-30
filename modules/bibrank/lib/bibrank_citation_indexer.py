@@ -263,12 +263,7 @@ def check_citations_losses(config, recids, refs, cites):
                 if recid not in records_to_ignore:
                     records_to_ignore.append(recid)
 
-    for recid in records_to_ignore:
-        try:
-            recids.pop(recids.index(recid))
-        except (ValueError, IndexError):
-            # recid not in list. ignore
-            pass
+    return records_to_ignore
 
 
 def report_loss(recid, prefix, is_refs):
@@ -334,10 +329,17 @@ def process_and_store(recids, config, chunk_size, loss_checks=True):
         if loss_checks:
             chunkset = intbitset(chunk)
             activerecs = chunkset - deleted_recids_cache() - superseeded_recids_cache()
-            check_citations_losses(config, activerecs, refs, cites)
+            records_to_ignore = check_citations_losses(config, activerecs, refs, cites)
             write_message("skipped %d deleted records and %d superseeded records in loss check"
                           % (len(chunkset & deleted_recids_cache()),
                              len(chunkset & superseeded_recids_cache())))
+            for recid in records_to_ignore:
+                try:
+                    chunk.pop(chunk.index(recid))
+                except (ValueError, IndexError):
+                    # recid not in list. ignore
+                    pass
+
         # Store processed citations/references
         store_dicts(chunk, refs, cites)
         modified = True
