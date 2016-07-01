@@ -152,27 +152,13 @@ echo "" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cf
 echo "# Elasticsearch" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
 echo "SEARCH_ELASTIC_HOSTS='${INVENIO_ELASTICSEARCH_HOST}'" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
 RECORDS_REST_CONF=`cat <<EOF
-RECORDS_REST_ENDPOINTS = dict(
-    recid=dict(
-        pid_type='recid',
-        pid_minter='recid',
-        pid_fetcher='recid',
-        search_index='marc21',
-        search_type=None,
-        record_serializers={
-        'application/json': ('invenio_records_rest.serializers'
-                             ':json_v1_response'),
-        },
-        search_serializers={
-        'application/json': ('invenio_records_rest.serializers'
-                             ':json_v1_search'),
-        },
-        list_route='/records/',
-        item_route='/records/<pid_value>',
-        default_media_type='application/json',
-        max_result_window=10000,
-    ),
-)
+try:
+    from invenio_marc21.config import MARC21_REST_ENDPOINTS as RECORDS_REST_ENDPOINTS
+except ImportError:
+    import copy
+    from invenio_records_rest.config import RECORDS_REST_ENDPOINTS as RRE
+    RECORDS_REST_ENDPOINTS = copy.deepcopy(RRE)
+    RECORDS_REST_ENDPOINTS['recid']['search_index'] = 'marc21'
 EOF
 `
 echo "${RECORDS_REST_CONF}" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
@@ -189,7 +175,7 @@ EOF
 echo "${RECORDS_UI_CONF}" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
 JSONSCHEMAS_CONF=`cat <<EOF
 JSONSCHEMAS_ENDPOINT='/schema'
-JSONSCHEMAS_HOST='http://${INVENIO_WEB_HOST}'
+JSONSCHEMAS_HOST='${INVENIO_WEB_HOST}'
 EOF
 `
 echo "${JSONSCHEMAS_CONF}" >> ../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg
