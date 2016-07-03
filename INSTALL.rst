@@ -1,20 +1,19 @@
 Installation
 ============
 
-The best way to get Invenio up running immediately is using our provided
-Docker image:
+The best way to get an Invenio demo instance up and running immediately is by
+using Docker or Vagrant, for example:
 
 .. code-block:: console
 
-   $ pip install invenio[minimal]
-   $ inveniomanage instance create mysite
-   $ cd mysite
    $ docker-compose build
-   $ docker-compose up
+   $ docker-compose up -d
+   $ docker-compose run --rm web ./scripts/populate-instance.sh
+   $ firefox http://127.0.0.1/records/1
 
-This will start an Invenio instance with all the related services you need such
-as PostgreSQL, ElasticSearch, Redis, RabbitMQ.
+This will start an Invenio demo instance containing several example records and
+all the needed services such as PostgreSQL, Elasticsearch, Redis, RabbitMQ.
 
-For a detailed walk-through on how to setup your instance on Invenio, see `our
-documentation
-<http://pythonhosted.org/invenio/installation/installation-detailed.html>`_.
+For a detailed walk-through on how to set up your Invenio instance, please see
+our `installation documentation
+<http://pythonhosted.org/invenio/installation/index.html>`_.

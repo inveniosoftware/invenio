@@ -56,7 +56,7 @@ ENV INVENIO_RABBITMQ_HOST=rabbitmq
 ENV INVENIO_WORKER_HOST=127.0.0.1
 
 # Create Invenio instance:
-RUN /code/scripts/create-instance.sh --devel
+RUN /code/scripts/create-instance.sh
 
 # Make given VENV default:
 ENV PATH=/home/invenio/.virtualenvs/invenio3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin

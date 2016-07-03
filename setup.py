@@ -44,33 +44,33 @@ tests_require = [
     'pytest>=2.8.0',
 ]
 
-invenio_db_version = '>=1.0.0a7,<1.1.0'
+invenio_db_version = '>=1.0.0a10,<1.1.0'
 
 extras_require = {
     'access': [
-        'invenio-access>=1.0.0a2,<1.1.0',
+        'invenio-access>=1.0.0a8,<1.1.0',
     ],
     'accounts': [
-        'invenio-accounts>=1.0.0a2,<1.1.0',
+        'invenio-accounts>=1.0.0a13,<1.1.0',
     ],
     'records': [
-        'dojson>=0.4.0',
-        'invenio-pidstore>=1.0.0a1,<1.1.0',
-        'invenio-records>=1.0.0a8,<1.1.0',
-        'invenio-records-ui>=1.0.0a4,<1.1.0',
-        'invenio-records-rest>=1.0.0a2,<1.1.0',
+        'dojson>=1.2.1',
+        'invenio-pidstore>=1.0.0a9,<1.1.0',
+        'invenio-records>=1.0.0a17,<1.1.0',
+        'invenio-records-ui>=1.0.0a7,<1.1.0',
+        'invenio-records-rest>=1.0.0a15,<1.1.0',
     ],
     'search': [
-        'invenio-search>=1.0.0a1,<1.1.0',
+        'invenio-search>=1.0.0a7,<1.1.0',
     ],
     'theme': [
-        'invenio-assets>=1.0.0a1,<1.1.0',
-        'invenio-theme>=1.0.0a6,<1.1.0',
+        'invenio-assets>=1.0.0a5,<1.1.0',
+        'invenio-theme>=1.0.0a13,<1.1.0',
     ],
     'utils': [
-        'invenio-mail>=1.0.0a1,<1.1.0',
-        'invenio-rest>=1.0.0a2,<1.1.0',
-        'invenio-logging>=1.0.0a1,<1.1.0',
+        'invenio-mail>=1.0.0a4,<1.1.0',
+        'invenio-rest>=1.0.0a9,<1.1.0',
+        'invenio-logging>=1.0.0a2,<1.1.0',
     ],
     'mysql': [
         'invenio-db[mysql]' + invenio_db_version,

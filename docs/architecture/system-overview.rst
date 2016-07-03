@@ -1,5 +1,5 @@
 .. This file is part of Invenio
-   Copyright (C) 2015 CERN.
+   Copyright (C) 2015, 2016 CERN.
 
    Invenio is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
@@ -25,7 +25,7 @@ Invenio v3.x
 .. admonition:: CAVEAT LECTOR
 
    Invenio v3.0 alpha is a bleeding-edge developer preview version that is
-   scheduled for public release in Q1/2016.
+   scheduled for public release in Q3/2016.
 
 Invenio v3.0 build on top of `Flask`_ web development framework, using `Jinja2`_
 template engine, `SQLAlchemy`_ Object Relational Mapper, `JSONSchema`_ data
@@ -35,9 +35,9 @@ information retrieval.
 .. _Flask: http://flask.pocoo.org/
 .. _Jinja2: http://jinja.pocoo.org/docs/
 .. _SQLAlchemy: http://www.sqlalchemy.org/
-.. _JSONSchema: http://json-schema.org/ 
+.. _JSONSchema: http://json-schema.org/
 .. _PostgreSQL: http://www.postgresql.org/
-.. _Elasticsearch: https://www.elastic.co/products/elasticsearch 
+.. _Elasticsearch: https://www.elastic.co/products/elasticsearch
 
 Invenio's architecture is modular. The code base is split into more than 50
 independent components that are `released independently on PyPI

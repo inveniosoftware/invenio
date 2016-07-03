@@ -23,7 +23,7 @@ Detailed installation guide
 .. admonition:: CAVEAT LECTOR
 
    Invenio v3.0 alpha is a bleeding-edge developer preview version that is
-   scheduled for public release in Q1/2016.
+   scheduled for public release in Q3/2016.
 
 Introduction
 ------------
@@ -515,8 +515,15 @@ following scripts:
 
    source .inveniorc
    ./scripts/create-instance.sh
-   ./scripts/populate-instance.sh
    ./scripts/start-instance.sh
+   ./scripts/populate-instance.sh
+
+.. note::
+
+   If you want to install the very-bleeding-edge Invenio packages from GitHub,
+   you can run the ``create-instance.sh`` script with the ``--devel`` argument::
+
+     ./scripts/create-instance.sh --devel
 
 Let’s see in detail about every Invenio installation step.
 
@@ -539,11 +546,6 @@ PyPI:
    :start-after: # sphinxdoc-install-invenio-full-begin
    :end-before: # sphinxdoc-install-invenio-full-end
    :literal:
-
-Alternatively, if you want to install the very-bleeding-edge Invenio packages
-from GitHub, you can run the following in the Invenio source code directory::
-
-  pip install -r requirements-devel.txt
 
 We can now create a new Invenio instance:
 

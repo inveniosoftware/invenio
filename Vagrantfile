@@ -32,7 +32,7 @@
 # Invenio demo site by running:
 #
 # $ vagrant up
-# $ vagrant ssh web -c 'source .inveniorc && /vagrant/scripts/create-instance.sh --devel'
+# $ vagrant ssh web -c 'source .inveniorc && /vagrant/scripts/create-instance.sh'
 # $ vagrant ssh web -c 'source .inveniorc && nohup /vagrant/scripts/start-instance.sh'
 # $ vagrant ssh web -c 'source .inveniorc && /vagrant/scripts/populate-instance.sh'
 # $ firefox http://192.168.50.10/records/1

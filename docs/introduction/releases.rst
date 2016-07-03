@@ -1,5 +1,5 @@
 ..  This file is part of Invenio
-    Copyright (C) 2015 CERN.
+    Copyright (C) 2015, 2016 CERN.
 
     Invenio is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -79,7 +79,7 @@ Invenio v3.x
 *Not released yet; however a developer preview is available on GitHub.*
 
 Invenio v3.0 will be released when the Invenio code base is fully split into a
-set of standalone independent Python packages. *(ETA: Q1/2016)*
+set of standalone independent Python packages. *(ETA: Q3/2016)*
 
 Invenio v2.x
 ------------
@@ -183,4 +183,3 @@ Released versions include:
 * `v0.1.1 <https://github.com/inveniosoftware/invenio/releases/tag/v0.1.1>`_ - released 2003-12-19
 * `v0.1.0 <https://github.com/inveniosoftware/invenio/releases/tag/v0.1.0>`_ - released 2003-12-04
 * `v0.0.9 <https://github.com/inveniosoftware/invenio/releases/tag/v0.0.9>`_ - released 2002-08-01
-

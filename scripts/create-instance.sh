@@ -124,11 +124,14 @@ fi
 inveniomanage instance create ${INVENIO_WEB_INSTANCE}
 # sphinxdoc-create-instance-end
 
+if [[ "$@" != *"--devel"* ]]; then
 # sphinxdoc-install-instance-begin
 cd ${INVENIO_WEB_INSTANCE}
 pip install -e .
-pip install -r requirements-devel.txt
 # sphinxdoc-install-instance-end
+else
+    pip install -r requirements-devel.txt
+fi
 
 # sphinxdoc-customise-instance-begin
 mkdir -p ../../var/${INVENIO_WEB_INSTANCE}-instance/
