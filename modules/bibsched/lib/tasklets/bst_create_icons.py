@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """Invenio Bibliographic Tasklet for generating subformats.
-   Usange:
+   Usage:
    $bibtasklet -N createicons -T bst_create_icons -a recid=123 -a icon_sizes=180,640,1440
    $bibtasklet -N createicons -T bst_create_icons -a "collection=ABC Photos" -a icon_sizes=180,640,1440"""
 
@@ -146,7 +146,7 @@ def create_icons_for_record(recid, icon_sizes, icon_format_mappings=None,
     return done, exceptions
 
 
-def bst_create_icons(recid, icon_sizes, icon_format_mappings=None,
+def bst_create_icons(recid=None, icon_sizes=None, icon_format_mappings=None,
                      collection=None, docnames=None, add_default_icon=0, inherit_moreinfo=0):
     """BibTasklet for generating missing icons.
        @param recid: the record on which the action is being performed
@@ -191,6 +191,7 @@ def bst_create_icons(recid, icon_sizes, icon_format_mappings=None,
                                 (1) or not (0)
        @type inherit_moreinfo: int
     """
+    assert icon_sizes is not None
     if recid:
         recids = [int(recid)]
     elif collection:
