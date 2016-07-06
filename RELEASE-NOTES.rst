@@ -1,8 +1,8 @@
-================
- Invenio v3.0.0
-================
+==================
+ Invenio v3.0.0a3
+==================
 
-Invenio v3.0.0 was released on November 9, 2015.
+Invenio v3.0.0a3 was released on July 6, 2016.
 
 About
 -----
@@ -16,7 +16,7 @@ What's new
 Installation
 ------------
 
-   $ pip install invenio==3.0.0
+   $ pip install invenio==3.0.0a3
 
 Documentation
 -------------
