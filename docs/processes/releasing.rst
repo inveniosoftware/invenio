@@ -29,30 +29,67 @@
 Releasing principles
 ====================
 
+.. _cross-check-ci-green-lights:
+
 1. **Cross-check CI green lights.** Are all Travis builds green? Is nightly
    Jenkins build green?
 
+.. _cross-check-read-the-docs-documentation-builds:
+
 2. **Cross-check Read The Docs documentation builds.** Are docs building fine?
+   Is this check done as part of the continuous integration? If not, add it.
+
+.. _cross-check-demo-site-builds:
 
 3. **Cross-check demo site builds.** Is demo site working?
 
-4. **check-manifest** Are all files included in the release?
+.. _check-manifest:
+
+4. **check-manifest** Are all files included in the release? Is this check done
+   as part of the continuous integration? If not, add it.
+
+.. _check-author-list:
 
 5. **Check author list.** Are all committers listed in AUTHORS file? Use
-   ``kwalitee check authors``. Add newcomers.
+   ``kwalitee check authors``. Add newcomers. Is this check done as part of the
+   continuous integration? If not, add it.
+
+.. _update-i18n-message-catalogs:
 
 6. **Update I18N message catalogs.**
 
-7. **Update version number. Generate release notes.** Use `kwalitee prepare
-   release v1.1.0..` to generate release notes.
+.. _update_version_number:
 
-8. **Push a pre-release to testpypi.** Try a test install from there.
+7. **Update version number.** Stick to `semantic versioning
+   <http://semver.org/>`_.
 
-9. **Tag it. Push it. Bump it.** Sign the tag with your GnuPG key. Don't forget
-   the post-release version bump.
+.. _generate-release-notes:
 
-10. **Add release notes on GitHub. Tweet it. Post it.** Make publicity for
+8. **Generate release notes.** Use `kwalitee prepare release v1.1.0..` to
+   generate release notes. Use empty commits with "AMENDS" to amend wrong past
+   messages before releasing.
+
+.. _push-pre-release-to-testpypi:
+
+9. **Push a pre-release to testpypi.** Try a test install from there.
+
+.. _tag-it-push-it-:
+
+10. **Tag it. Push it.** Sign the tag with your GnuPG key. Push it to PyPI. Is
+    the PyPI deployment done automatically as part of the continuous
+    integration? If not, add it.
+
+.. _bump-it:
+
+11. **Bump it.** Don't forget the issue the pull request with a post-release
+    version bump. Use ``.devYYYYMMDD`` suffix.
+
+.. _add-release-notes-on-github-tweet-it-post-it:
+
+12. **Add release notes on GitHub. Tweet it. Post it.** Make publicity for
     production-ready releases. This is not automated yet.
+
+.. _structured-release-notes:
 
 Structured release notes
 ========================
@@ -80,4 +117,4 @@ the following labels:
 | (missing)    | (developers only)        |
 +--------------+--------------------------+
 
-For more, see kwalitee.
+For more, see `kwalitee <http://kwalitee.readthedocs.io/>`_.

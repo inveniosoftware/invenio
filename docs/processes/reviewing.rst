@@ -29,14 +29,24 @@
 Reviewing principles
 ====================
 
+.. _every-pr-should-preserve-or-increase-code-coverage:
+
 1. **Every PR should preserve or increase code coverage.** If it ain’t green, it
    ain’t finished.
 
-2. **Check it as a black box. Input, magic, output.** If it ain’t documented, it
-   ain’t finished.
+.. _check-it-as-a-black-box:
 
-3. **Check it as a white box. Implementation details.** If it ain’t styled, it
-   ain’t finished.
+2. **Check it as a black box.** Check the overall picture of input, "something
+   happens", output chain. If it ain’t documented, it ain’t finished.
 
-4. **Check it as a release news. Commit messages.** If it does not announce
-   anything, it may not be finished.
+.. _check-it-as-a-white-box:
+
+3. **Check it as a white box.** Check implementation details of
+   "something-happens". If it ain’t styled, it ain’t finished.
+
+.. _check-it-as-a-release-news:
+
+4. **Check it as a release news.** Check commit messages. Are they
+   understandable? Do they use FIX or BETTER labels? If a commit does not
+   announce anything, it may not be finished. See
+   :ref:`structured-release-notes`.

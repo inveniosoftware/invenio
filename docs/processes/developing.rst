@@ -29,9 +29,15 @@
 Developing principles
 =====================
 
+.. _contributing-documentation:
+
 1. **Contributing documentation?** ReST and Sphinx. Contribute as code.
 
+.. _contributing-i18n-translations:
+
 2. **Contributing I18N translations?** GNU gettext. See :ref:`i18n`.
+
+.. _contributing-code:
 
 3. **Contributing code?**
 
@@ -60,6 +66,8 @@ Developing principles
    vi. Follow egoless programming principles. See :ref:`code-of-conduct`.
 
    vii. Read the following contributing guide and developer guidelines.
+
+.. _contributing-guide:
 
 Contributing guide
 ==================

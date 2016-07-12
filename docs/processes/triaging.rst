@@ -39,28 +39,44 @@ members make sure of the big picture, cross-consider issues and tasks among
 interested services, help to note down, understand, prioritise, and follow-upon
 them.
 
+.. _every-issue-should-have-an-assignee:
+
 1. **Every issue should have an assignee.** Issues without assignees are sad and
    likely to remain so. Each issue should have a driving force behind it.
+
+.. _every-issue-should-have-a-milestone:
 
 2. **Every issue should have a milestone.** Issues without milestones are sad
    and likely to remain unaddressed.
 
+.. _use-additional-type-and-priority-labels:
+
 3. **Use additional type and priority labels.** Helps to find related issues out
    quickly.
 
-4. **Use additional service labels to provide overview.** Helps to distinguish
-   which issues are of utmost importance to which services. Helps to keep a
-   service-oriented dashboard.
+.. _use-additional-service-labels:
+
+4. **Use additional service labels.** Helps to distinguish which issues are of
+   utmost importance to which services. Helps to keep a service-oriented
+   dashboard overview.
+
+.. _silent-since-a-month-ping-responsible:
 
 5. **Silent since a month? Ping responsible.** An issue shouldn't be opened
    without update for more than a month.
 
+.. _nobody-in-sight-to-work-on-this-discuss-and-triage:
+
 6. **Nobody in sight to work on this? Discuss and triage.** The triage team
    should take action if there is no natural candidate to work on an issue.
 
-7. **No time to realistically tackle this? “Someday” or close.** We don't want
-   to have thousands of open issues. Issues from the someday open or closed pool
-   can be revived later, should realistic manpower be found.
+.. _no-time-to-realistically-tackle-this-use-someday-or-close:
+
+7. **No time to realistically tackle this? Use "Someday" or close.** We don't
+   want to have thousands of open issues. Issues from the someday open or closed
+   pool can be revived later, should realistic manpower be found.
+
+.. _no-reply-ping-inveniosoftware-triagers:
 
 8. **No reply? Ping @inveniosoftware/triagers** The triage team should take
    action if there is no update on an issues for more than a month.
