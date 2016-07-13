@@ -1212,27 +1212,33 @@ def check_record_doi_is_unique(rec_id, record):
     Return (boolean, msg) where 'boolean' would be True if the DOI is
     unique.
     """
-    record_dois = record_extract_dois(record)
-    if record_dois:
-        matching_recids = set()
-        for record_doi in record_dois:
-            possible_recid = find_record_from_doi(record_doi)
-            if possible_recid:
-                matching_recids.add(possible_recid)
-        if len(matching_recids) > 1:
-            # Oops, this record refers to DOI existing in multiple records.
-            msg = "   Failed: Multiple records found in the" \
+    try:
+        from invenio.config import CFG_BIBUPLOAD_DOI_CHECKING
+    except:
+        CFG_BIBUPLOAD_DOI_CHECKING = True
+
+    if CFG_BIBUPLOAD_DOI_CHECKING:
+        record_dois = record_extract_dois(record)
+        if record_dois:
+            matching_recids = set()
+            for record_doi in record_dois:
+                possible_recid = find_record_from_doi(record_doi)
+                if possible_recid:
+                    matching_recids.add(possible_recid)
+            if len(matching_recids) > 1:
+                # Oops, this record refers to DOI existing in multiple records.
+                msg = "   Failed: Multiple records found in the" \
                       " database %s that match the DOI(s) in the input" \
                       " MARCXML %s" % (repr(matching_recids), repr(record_dois))
-            return (False, msg)
-        elif len(matching_recids) == 1:
-            matching_recid = matching_recids.pop()
-            if str(matching_recid) != str(rec_id):
-                # Oops, this record refers to DOI existing in a different record.
-                msg = "   Failed: DOI(s) %s found in this record (#%s)" \
+                return (False, msg)
+            elif len(matching_recids) == 1:
+                matching_recid = matching_recids.pop()
+                if str(matching_recid) != str(rec_id):
+                    # Oops, this record refers to DOI existing in a different record.
+                    msg = "   Failed: DOI(s) %s found in this record (#%s)" \
                       " already exist(s) in another other record (#%s)" % \
                       (repr(record_dois), rec_id, matching_recid)
-                return (False, msg)
+                    return (False, msg)
     return (True, "")
 
 ### Insert functions
