@@ -26,7 +26,7 @@
 set -o errexit
 
 # check environment variables:
-if [ -v ${INVENIO_REDIS_HOST} ]; then
+if [[ -v INVENIO_REDIS_HOST ]]; then
     echo "[ERROR] Please set environment variable INVENIO_REDIS_HOST before runnning this script."
     echo "[ERROR] Example: export INVENIO_REDIS_HOST=192.168.50.12"
     exit 1
@@ -109,7 +109,7 @@ main () {
     if hash lsb_release 2> /dev/null; then
         os_distribution=$(lsb_release -i | cut -f 2)
         os_release=$(lsb_release -r | cut -f 2 | grep -oE '[0-9]+\.' | cut -d. -f1 | head -1)
-    elif [ -e /etc/redhat-release ]; then
+    elif [[ -e /etc/redhat-release ]]; then
         os_distribution=$(cut -d ' ' -f 1 /etc/redhat-release)
         os_release=$(grep -oE '[0-9]+\.' /etc/redhat-release | cut -d. -f1 | head -1)
     else
@@ -118,22 +118,12 @@ main () {
     fi
 
     # call appropriate provisioning functions:
-    if [ "$os_distribution" = "Ubuntu" ]; then
-        if [ "$os_release" = "14" ]; then
-            provision_redis_ubuntu14
-        else
-            echo "[ERROR] Sorry, unsupported release ${os_release}."
-            exit 1
-        fi
-    elif [ "$os_distribution" = "CentOS" ]; then
-        if [ "$os_release" = "7" ]; then
-            provision_redis_centos7
-        else
-            echo "[ERROR] Sorry, unsupported release ${os_release}."
-            exit 1
-        fi
+    if [[ "$os_distribution-$os_release" = "Ubuntu-14" ]]; then
+        provision_redis_ubuntu14
+    elif [[ "$os_distribution-$os_release" = "CentOS-7" ]]; then
+        provision_redis_centos7
     else
-        echo "[ERROR] Sorry, unsupported distribution ${os_distribution}."
+        echo "[ERROR] Sorry, unsupported distribution ${os_distribution}-${os_release}."
         exit 1
     fi
 

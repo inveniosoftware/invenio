@@ -26,7 +26,7 @@
 set -o errexit
 
 # check environment variables:
-if [ -v ${INVENIO_ELASTICSEARCH_HOST} ]; then
+if [[ -v INVENIO_ELASTICSEARCH_HOST ]]; then
     echo "[ERROR] Please set environment variable INVENIO_ELASTICSEARCH_HOST before runnning this script."
     echo "[ERROR] Example: export INVENIO_ELASTICSEARCH_HOST=192.168.50.12"
     exit 1
