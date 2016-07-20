@@ -3075,6 +3075,82 @@ def update_item_info_step6(req, tup_infos, ln=CFG_SITE_LANG):
         return redirect_to_url(req, CFG_SITE_SECURE_URL +
                                     "/record/edit/#state=edit&recid=" + str(recid))
 
+def loan_period_calculate(req, ln=CFG_SITE_LANG):
+    """
+    Display a form where is possible to calculate the loan period.
+    """
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a> &gt; <a class="navtrail" ' \
+                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    infos = []
+
+    body = bc_templates.tmpl_loan_period_calculate(infos=infos, ln=ln)
+
+    return page(title="Loan Period Calculate",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def loan_period_result(req, s, e, n, ln=CFG_SITE_LANG):
+    """
+    Calculate the laon period and return a list with desired top results.
+
+    @type s:   string
+    @param s:  start date
+
+    @type e:   string
+    @param e:  end date
+
+    @type n:   string
+    @param n:  top results
+
+    @return:   list of recids
+    """
+
+    if s and e and n:
+        infos = []
+        res = db.calculate(s, e, n)
+	
+        if res is None:
+            infos.append('Does not exist on BibCirculation database.')
+            body = bc_templates.tmpl_loan_period_calculate(infos=infos, ln=ln)
+        else:
+            body = bc_templates.tmpl_loan_period_result(result=res, ln=ln)
+    
+    else:
+        infos = []
+        infos.append("Input missing")
+        body = bc_templates.tmpl_loan_period_calculate(infos=infos, ln=ln)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a> &gt; <a class="navtrail" ' \
+                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    return page(title="Loan period result",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+
 def item_search(req, infos=[], ln=CFG_SITE_LANG):
     """
     Display a form where is possible to searh for an item.
