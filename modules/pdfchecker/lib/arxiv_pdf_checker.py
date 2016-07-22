@@ -183,6 +183,14 @@ def download_one(recid, version):
 
         docs = BibRecDocs(recid)
         bibdocfiles = docs.list_latest_files(doctype="arXiv")
+        if not bibdocfiles:
+            # Maybe that this is one of those INSPIRE-PUBLIC with
+            # still an arXiv file in it
+            for name, bibdoc in docs.list_bibdocs_by_names().items():
+                if name.startswith('arXiv:'):
+                    bibdocfiles = bibdoc.list_latest_files()
+
+        bibdocfiles = [bibdocfile for bibdocfile in bibdocfiles if bibdocfile.get_superformat() == '.pdf']
 
         needs_update = False
         try:
