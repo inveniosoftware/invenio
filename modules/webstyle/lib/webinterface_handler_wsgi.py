@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011, 2012 CERN.
+# Copyright (C) 2009, 2010, 2011, 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,40 +16,51 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""mod_python->WSGI Framework"""
+"""mod_python->WSGI Framework."""
 
-import sys
-import os
-import re
 import cgi
 import gc
 import inspect
-import socket
 import logging
+import os
+import re
+import socket
+import sys
+
 from fnmatch import fnmatch
 from urlparse import urlparse, urlunparse
-
-from wsgiref.validate import validator
 from wsgiref.util import FileWrapper
+from wsgiref.validate import validator
 
 if __name__ != "__main__":
     # Chances are that we are inside mod_wsgi.
-    ## You can't write to stdout in mod_wsgi, but some of our
-    ## dependecies do this! (e.g. 4Suite)
+    # You can't write to stdout in mod_wsgi, but some of our
+    # dependecies do this! (e.g. 4Suite)
     sys.stdout = sys.stderr
 
-from invenio.urlutils import redirect_to_url
+from invenio.config import (
+    CFG_DEVEL_SITE,
+    CFG_SITE_LANG,
+    CFG_SITE_SECURE_URL,
+    CFG_SITE_URL,
+    CFG_WEBDIR,
+    CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST,
+    CFG_WEBSTYLE_REVERSE_PROXY_IPS
+)
+from invenio.errorlib import get_pretty_traceback, register_exception
 from invenio.session import get_session
-from invenio.webinterface_handler import CFG_HAS_HTTPS_SUPPORT, CFG_FULL_HTTPS
+from invenio.urlutils import redirect_to_url
+from invenio.webinterface_handler import CFG_FULL_HTTPS, CFG_HAS_HTTPS_SUPPORT
+from invenio.webinterface_handler_config import (
+    DONE,
+    HTTP_INTERNAL_SERVER_ERROR,
+    HTTP_NOT_FOUND,
+    HTTP_STATUS_MAP,
+    OK,
+    SERVER_RETURN
+)
+from invenio.webinterface_handler_wsgi_utils import FieldStorage, table
 from invenio.webinterface_layout import invenio_handler
-from invenio.webinterface_handler_wsgi_utils import table, FieldStorage
-from invenio.webinterface_handler_config import \
-    HTTP_STATUS_MAP, SERVER_RETURN, OK, DONE, \
-    HTTP_NOT_FOUND, HTTP_INTERNAL_SERVER_ERROR
-from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
-    CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST, CFG_DEVEL_SITE, CFG_SITE_URL, \
-    CFG_SITE_SECURE_URL, CFG_WEBSTYLE_REVERSE_PROXY_IPS
-from invenio.errorlib import register_exception, get_pretty_traceback
 
 # Static files are usually handled directly by the webserver (e.g. Apache)
 # However in case WSGI is required to handle static files too (such
@@ -62,41 +73,50 @@ CFG_WSGI_SERVE_STATIC_FILES = False
 # any src usage of an external website
 _RE_HTTPS_REPLACES = re.compile(r"\b((?:src\s*=|url\s*\()\s*[\"']?)http\://", re.I)
 
-# Regexp to verify that the IP starts with a number (filter cases where 'unknown')
-# It is faster to verify only the start (585 ns) compared with verifying
-# the whole ip address - re.compile('^\d+\.\d+\.\d+\.\d+$') (1.01 µs)
-_RE_IPADDRESS_START = re.compile(r"^\d+\.")
+# Regexp to verify the IP (filter cases where 'unknown').
+_RE_IPADDRESS = re.compile(r"^\d+(\.\d+){3}$")
+_RE_IPADDRESS_WITH_PORT = re.compile(r"^\d+(\.\d+){3}:\d+$")
 
 # Regexp to match IE User-Agent
 _RE_BAD_MSIE = re.compile(r"MSIE\s+(\d+\.\d+)")
 
 
 def _http_replace_func(match):
-    ## src external_site -> CFG_SITE_SECURE_URL/sslredirect/external_site
+    # src external_site -> CFG_SITE_SECURE_URL/sslredirect/external_site
     return match.group(1) + CFG_SITE_SECURE_URL + '/sslredirect/'
 
 _ESCAPED_CFG_SITE_URL = cgi.escape(CFG_SITE_URL, True)
 _ESCAPED_CFG_SITE_SECURE_URL = cgi.escape(CFG_SITE_SECURE_URL, True)
+
+
 def https_replace(html):
     html = html.replace(_ESCAPED_CFG_SITE_URL, _ESCAPED_CFG_SITE_SECURE_URL)
     return _RE_HTTPS_REPLACES.sub(_http_replace_func, html)
 
+
 class InputProcessed(object):
+
     """
     Auxiliary class used when reading input.
+
     @see: <http://www.wsgi.org/wsgi/Specifications/handling_post_forms>.
     """
+
     def read(self, *args):
         raise EOFError('The wsgi.input stream has already been consumed')
     readline = readlines = __iter__ = read
 
+
 class SimulatedModPythonRequest(object):
+
     """
     mod_python like request object.
+
     Minimum and cleaned implementation to make moving out of mod_python
     easy.
     @see: <http://www.modpython.org/live/current/doc-html/pyapi-mprequest.html>
     """
+
     def __init__(self, environ, start_response):
         self.__environ = environ
         self.__start_response = start_response
@@ -112,7 +132,7 @@ class SimulatedModPythonRequest(object):
         self.__allowed_methods = []
         self.__cleanups = []
         self.headers_out = self.__headers
-        ## See: <http://www.python.org/dev/peps/pep-0333/#the-write-callable>
+        # See: <http://www.python.org/dev/peps/pep-0333/#the-write-callable>
         self.__write = None
         self.__write_error = False
         self.__errors = environ['wsgi.errors']
@@ -123,7 +143,7 @@ class SimulatedModPythonRequest(object):
         self.track_writings = False
         self.__what_was_written = ""
         self.__cookies_out = {}
-        self.g = {} ## global dictionary in case it's needed
+        self.g = {}  # global dictionary in case it's needed
         for key, value in environ.iteritems():
             if key.startswith('HTTP_'):
                 self.__headers_in[key[len('HTTP_'):].replace('_', '-')] = value
@@ -133,14 +153,12 @@ class SimulatedModPythonRequest(object):
             self.__headers_in['content-type'] = environ['CONTENT_TYPE']
 
     def set_cookie(self, cookie):
-        """
-        This function is used to cumulate identical cookies.
-        """
+        """This function is used to cumulate identical cookies."""
         self.__cookies_out[cookie.name] = cookie
 
     def _write_cookies(self):
         if self.__cookies_out:
-            if not self.headers_out.has_key("Set-Cookie"):
+            if "Set-Cookie" not in self.headers_out:
                 g = _RE_BAD_MSIE.search(self.headers_in.get('User-Agent', "MSIE 6.0"))
                 bad_msie = g and float(g.group(1)) < 9.0
                 if not (bad_msie and self.is_https()):
@@ -155,13 +173,13 @@ class SimulatedModPythonRequest(object):
         self.__tainted = True
         post_form = self.__environ.get('wsgi.post_form')
         input = self.__environ['wsgi.input']
-        if (post_form is not None
-            and post_form[0] is input):
+        if (post_form is not None and
+                post_form[0] is input):
             return post_form[2]
         # This must be done to avoid a bug in cgi.FieldStorage
         self.__environ.setdefault('QUERY_STRING', '')
 
-        ## Video handler hack:
+        # Video handler hack:
         uri = self.__environ['PATH_INFO']
         if uri.endswith("upload_video"):
             tmp_shared = True
@@ -212,11 +230,11 @@ class SimulatedModPythonRequest(object):
                             self.__what_was_written += self.__buffer
             except IOError, err:
                 if "failed to write data" in str(err) or "client connection closed" in str(err):
-                    ## Let's just log this exception without alerting the admin:
                     err.level=logging.INFO
                     register_exception(req=self)
-                    self.__write_error = True ## This flag is there just
-                        ## to not report later other errors to the admin.
+                    self.__write_error = True
+                    # This flag is there just
+                    # to not report later other errors to the admin.
                 else:
                     raise
             self.__buffer = ''
@@ -237,7 +255,7 @@ class SimulatedModPythonRequest(object):
             if self.__allowed_methods and self.__status.startswith('405 ') or self.__status.startswith('501 '):
                 self.__headers['Allow'] = ', '.join(self.__allowed_methods)
 
-            ## See: <http://www.python.org/dev/peps/pep-0333/#the-write-callable>
+            # See: <http://www.python.org/dev/peps/pep-0333/#the-write-callable>
             #print self.__low_level_headers
             self.__write = self.__start_response(self.__status, self.__low_level_headers)
             self.__response_sent_p = True
@@ -269,25 +287,29 @@ class SimulatedModPythonRequest(object):
 
     def get_remote_ip(self):
         if 'X-FORWARDED-FOR' in self.__headers_in and \
-               self.__headers_in.get('X-FORWARDED-SERVER', '') == \
-               self.__headers_in.get('X-FORWARDED-HOST', '') == \
-               urlparse(CFG_SITE_URL)[1]:
+                self.__headers_in.get('X-FORWARDED-SERVER', '') == \
+                self.__headers_in.get('X-FORWARDED-HOST', '') == \
+                urlparse(CFG_SITE_URL)[1]:
             # we are using proxy setup
             if self.__environ.get('REMOTE_ADDR') in CFG_WEBSTYLE_REVERSE_PROXY_IPS:
                 # we trust this proxy
                 ip_list = self.__headers_in['X-FORWARDED-FOR'].split(',')
                 for ip in ip_list:
-                    if _RE_IPADDRESS_START.match(ip):
+                    if _RE_IPADDRESS.match(ip):
                         return ip
+                    # Probably because behind a proxy
+                    elif _RE_IPADDRESS_WITH_PORT.match(ip):
+                        return ip[:ip.index(':')]
                 # no IP has the correct format, return a default IP
                 return '10.0.0.10'
             else:
                 # we don't trust this proxy
-                register_exception(prefix="You are running in a proxy configuration, but the " + \
-                                   "CFG_WEBSTYLE_REVERSE_PROXY_IPS variable does not contain " + \
-                                   "the IP of your proxy, thus the remote IP addresses of your " + \
-                                   "clients are not trusted.  Please configure this variable.",
-                                   alert_admin=True)
+                register_exception(
+                    prefix="You are running in a proxy configuration, but the "
+                           "CFG_WEBSTYLE_REVERSE_PROXY_IPS variable does not contain "
+                           "the IP of your proxy, thus the remote IP addresses of your "
+                           "clients are not trusted.  Please configure this variable.",
+                    alert_admin=True)
                 return '10.0.0.11'
         return self.__environ.get('REMOTE_ADDR')
 
@@ -338,7 +360,7 @@ class SimulatedModPythonRequest(object):
                 raise
         except IOError, err:
             if "failed to write data" in str(err) or "client connection closed" in str(err):
-                ## Let's just log this exception without alerting the admin:
+                # Let's just log this exception without alerting the admin:
                 register_exception(req=self)
             else:
                 raise
@@ -392,10 +414,10 @@ class SimulatedModPythonRequest(object):
         try:
             return self.__environ['wsgi.input'].readline(hint)
         except TypeError:
-            ## the hint param is not part of wsgi pep, although
-            ## it's great to exploit it in when reading FORM
-            ## with large files, in order to avoid filling up the memory
-            ## Too bad it's not there :-(
+            # the hint param is not part of wsgi pep, although
+            # it's great to exploit it in when reading FORM
+            # with large files, in order to avoid filling up the memory
+            # Too bad it's not there :-(
             return self.__environ['wsgi.input'].readline()
 
     def readlines(self, hint=None):
@@ -428,9 +450,8 @@ class SimulatedModPythonRequest(object):
         return out
 
     def get_original_wsgi_environment(self):
-        """
-        Return the original WSGI environment used to initialize this request
-        object.
+        """Return the original WSGI environment used to initialize this object.
+
         @return: environ, start_response
         @raise AssertionError: in case the environment has been altered, i.e.
             either the input has been consumed or something has already been
@@ -466,9 +487,10 @@ class SimulatedModPythonRequest(object):
     referer = property(get_referer)
     what_was_written = property(get_what_was_written)
 
+
 def alert_admin_for_server_status_p(status, referer):
-    """
-    Check the configuration variable
+    """Check the configuration variable.
+
     CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST to see if the exception should
     be registered and the admin should be alerted.
     """
@@ -477,20 +499,19 @@ def alert_admin_for_server_status_p(status, referer):
         pattern = pattern.lower()
         must_have_referer = False
         if pattern.endswith('r'):
-            ## e.g. "404 r"
+            # e.g. "404 r"
             must_have_referer = True
-            pattern = pattern[:-1].strip() ## -> "404"
+            pattern = pattern[:-1].strip()  # -> "404"
         if fnmatch(status, pattern) and (not must_have_referer or referer):
             return True
     return False
 
+
 def application(environ, start_response):
-    """
-    Entry point for wsgi.
-    """
-    ## Needed for mod_wsgi, see: <http://code.google.com/p/modwsgi/wiki/ApplicationIssues>
+    """Entry point for wsgi."""
+    # Needed for mod_wsgi, see: <http://code.google.com/p/modwsgi/wiki/ApplicationIssues>
     req = SimulatedModPythonRequest(environ, start_response)
-    #print 'Starting mod_python simulation'
+    # print 'Starting mod_python simulation'
     try:
         try:
             if (CFG_FULL_HTTPS or (CFG_HAS_HTTPS_SUPPORT and get_session(req).need_https)) and not req.is_https():
@@ -503,7 +524,7 @@ def application(environ, start_response):
                 # Compute the new path
                 plain_path = original_parts[2]
                 plain_path = secure_prefix_parts[2] + \
-                            plain_path[len(plain_prefix_parts[2]):]
+                    plain_path[len(plain_prefix_parts[2]):]
 
                 # ...and recompose the complete URL
                 final_parts = list(secure_prefix_parts)
@@ -531,8 +552,8 @@ def application(environ, start_response):
             if status not in (OK, DONE):
                 req.status = status
                 req.headers_out['content-type'] = 'text/html'
-                admin_to_be_alerted = alert_admin_for_server_status_p(status,
-                                                  req.headers_in.get('referer'))
+                admin_to_be_alerted = alert_admin_for_server_status_p(
+                    status, req.headers_in.get('referer'))
                 if admin_to_be_alerted:
                     register_exception(req=req, alert_admin=True)
                 if not req.response_sent_p:
@@ -555,12 +576,12 @@ def application(environ, start_response):
                 return generate_error_page(req, page_already_started=True)
     finally:
         try:
-            ## Let's save the session.
+            # Let's save the session.
             session = get_session(req)
             try:
                 if req.is_https() or not session.need_https:
-                    ## We save the session only if it's safe to do it, i.e.
-                    ## if we well had a valid session.
+                    # We save the session only if it's safe to do it, i.e.
+                    # if we well had a valid session.
                     session.dirty = True
                     session.save()
                 if 'user_info' in req._session:
@@ -568,35 +589,31 @@ def application(environ, start_response):
             finally:
                 del session
         except Exception:
-            ## What could have gone wrong?
+            # What could have gone wrong?
             register_exception(req=req, alert_admin=True)
         if hasattr(req, '_session'):
-            ## The session handler saves for caching a request_wrapper
-            ## in req.
-            ## This saves req as an attribute, creating a circular
-            ## reference.
-            ## Since we have have reached the end of the request handler
-            ## we can safely drop the request_wrapper so to avoid
-            ## memory leaks.
+            # The session handler saves for caching a request_wrapper in req.
+            # This saves req as an attribute, creating a circular reference.
+            # Since we have have reached the end of the request handler
+            # we can safely drop the request_wrapper so to avoid memory leaks.
             delattr(req, '_session')
         if hasattr(req, '_user_info'):
-            ## For the same reason we can delete the user_info.
+            # For the same reason we can delete the user_info.
             delattr(req, '_user_info')
 
         for (callback, data) in req.get_cleanups():
             callback(data)
 
-        ## as suggested in
-        ## <http://www.python.org/doc/2.3.5/lib/module-gc.html>
+        # as suggested in
+        # <http://www.python.org/doc/2.3.5/lib/module-gc.html>
         gc.enable()
         gc.collect()
         del gc.garbage[:]
     return []
 
+
 def generate_error_page(req, admin_was_alerted=True, page_already_started=False):
-    """
-    Returns an iterable with the error page to be sent to the user browser.
-    """
+    """Return an iterable with the error page to be sent to the browser."""
     from invenio.webpage import page
     from invenio import template
     webstyle_templates = template.load('webstyle')
@@ -606,9 +623,11 @@ def generate_error_page(req, admin_was_alerted=True, page_already_started=False)
     else:
         return [page(title=req.get_wsgi_status(), body=webstyle_templates.tmpl_error_page(status=req.get_wsgi_status(), ln=ln, admin_was_alerted=admin_was_alerted), language=ln, req=req)]
 
+
 def is_static_path(path):
     """
-    Returns True if path corresponds to an exsting file under CFG_WEBDIR.
+    Return True if path corresponds to an exsting file under CFG_WEBDIR.
+
     @param path: the path.
     @type path: string
     @return: True if path corresponds to an exsting file under CFG_WEBDIR.
@@ -619,9 +638,10 @@ def is_static_path(path):
         return path
     return None
 
+
 def is_mp_legacy_publisher_path(path):
-    """
-    Checks path corresponds to an exsting Python file under CFG_WEBDIR.
+    """Check path corresponds to an exsting Python file under CFG_WEBDIR.
+
     @param path: the path.
     @type path: string
     @return: the path of the module to load and the function to call there.
@@ -641,36 +661,35 @@ def is_mp_legacy_publisher_path(path):
     else:
         return None, None
 
+
 def mp_legacy_publisher(req, possible_module, possible_handler):
-    """
-    mod_python legacy publisher minimum implementation.
-    """
+    """mod_python legacy publisher minimum implementation."""
     the_module = open(possible_module).read()
     module_globals = {}
     exec(the_module, module_globals)
     if possible_handler in module_globals and callable(module_globals[possible_handler]):
         from invenio.webinterface_handler import _check_result
-        ## req is the required first parameter of any handler
+        # req is the required first parameter of any handler
         expected_args = list(inspect.getargspec(module_globals[possible_handler])[0])
         if not expected_args or 'req' != expected_args[0]:
-            ## req was not the first argument. Too bad!
+            # req was not the first argument. Too bad!
             raise SERVER_RETURN, HTTP_NOT_FOUND
-        ## the req.form must be casted to dict because of Python 2.4 and earlier
-        ## otherwise any object exposing the mapping interface can be
-        ## used with the magic **
+        # the req.form must be casted to dict because of Python 2.4 and earlier
+        # otherwise any object exposing the mapping interface can be
+        # used with the magic **
         form = dict(req.form)
         for key, value in form.items():
-            ## FIXME: this is a backward compatibility workaround
-            ## because most of the old administration web handler
-            ## expect parameters to be of type str.
-            ## When legacy publisher will be removed all this
-            ## pain will go away anyway :-)
+            # FIXME: this is a backward compatibility workaround
+            # because most of the old administration web handler
+            # expect parameters to be of type str.
+            # When legacy publisher will be removed all this
+            # pain will go away anyway :-)
             if isinstance(value, str):
                 form[key] = str(value)
             else:
-                ## NOTE: this is a workaround for e.g. legacy webupload
-                ## that is still using legacy publisher and expect to
-                ## have a file (Field) instance instead of a string.
+                # NOTE: this is a workaround for e.g. legacy webupload
+                # that is still using legacy publisher and expect to
+                # have a file (Field) instance instead of a string.
                 form[key] = value
 
         if (CFG_FULL_HTTPS or CFG_HAS_HTTPS_SUPPORT and get_session(req).need_https) and not req.is_https():
@@ -684,7 +703,7 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
             # Compute the new path
             plain_path = original_parts[2]
             plain_path = secure_prefix_parts[2] + \
-                         plain_path[len(plain_prefix_parts[2]):]
+                plain_path[len(plain_prefix_parts[2]):]
 
             # ...and recompose the complete URL
             final_parts = list(secure_prefix_parts)
@@ -718,6 +737,7 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
     else:
         raise SERVER_RETURN, HTTP_NOT_FOUND
 
+
 def check_wsgiref_testing_feasability():
     """
     In order to use wsgiref for running Invenio, CFG_SITE_URL and
@@ -736,10 +756,9 @@ Please set CFG_SITE_SECURE_URL not to start with "https".
 Currently CFG_SITE_SECURE_URL is set to: "%s".""" % CFG_SITE_SECURE_URL
         sys.exit(1)
 
+
 def wsgi_handler_test(port=80):
-    """
-    Simple WSGI testing environment based on wsgiref.
-    """
+    """Simple WSGI testing environment based on wsgiref."""
     from wsgiref.simple_server import make_server
     global CFG_WSGI_SERVE_STATIC_FILES
     CFG_WSGI_SERVE_STATIC_FILES = True
@@ -748,6 +767,7 @@ def wsgi_handler_test(port=80):
     httpd = make_server('', port, validator_app)
     print "Serving on port %s..." % port
     httpd.serve_forever()
+
 
 def main():
     from optparse import OptionParser
