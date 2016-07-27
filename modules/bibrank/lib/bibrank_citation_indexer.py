@@ -517,6 +517,14 @@ def get_tags_config(config):
             'volume': tagify(parse_tag(tag['volume'])),
         }
 
+    # alternate (hidden) form of pubinfo
+    try:
+        tag = config.get(function, "pubinfo_alternate")
+    except ConfigParser.NoOptionError:
+        tags['altpublication'] = None
+    else:
+        tags['altpublication'] = tagify(parse_tag(tag))
+
     # Fields needed to lookup the DOIs
     tags['doi'] = get_field_tags('doi')
 
@@ -542,6 +550,10 @@ def get_journal_info(record, tags):
     record_info = []
 
     journals_fields = record.find_fields(tags['publication']['journal'][:5])
+
+    if tags['altpublication']:
+        journals_fields += record.find_fields(tags['altpublication'][:5])
+
     for field in journals_fields:
         # we store the tags and their values here
         # like c->444 y->1999 p->"journal of foo",
