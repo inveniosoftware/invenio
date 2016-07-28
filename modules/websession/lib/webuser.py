@@ -43,6 +43,7 @@ from socket import gaierror
 import os
 import binascii
 import time
+import cStringIO
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
@@ -1267,6 +1268,14 @@ def collect_user_info(req, login_time=False, refresh=False):
                 user_info = req._user_info
                 if not refresh:
                     return req._user_info
+            elif type(req) is type(cStringIO.StringIO()):
+                raise Exception(
+                    'Strange request provided: %s\nreq.getvalue:%s' % (
+                        req,
+                        req.getvalue(),
+                    )
+                )
+
             req._user_info = user_info
             try:
                 user_info['remote_ip'] = req.remote_ip
