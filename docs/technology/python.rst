@@ -55,5 +55,5 @@ Entry points
 
 We use Python `entry_points`_ as a way to provide extensions for packages.
 
-.. _entry_points: https://pythonhosted.org/setuptools/pkg_resources.html#entry-points
+.. _entry_points: https://setuptools.readthedocs.io/en/latest/pkg_resources.html#entry-points
 

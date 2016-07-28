@@ -128,6 +128,7 @@ Past contributors:
 * Eduardo Benavidez <eduardo.benavidez@gmail.com>
 * Hector Sanchez <hector.sanchez@cern.ch>
 * Henning Weiler <henning.weiler@cern.ch>
+* Ivan Masár <helix84@centrum.sk>
 * Jaime Garcia Llopis <jaime.garcia.llopis@cern.ch>
 * Jake Cowton <jake.calum.cowton@cern.ch>
 * Jan Brice Krause <jan.brice.krause@cern.ch>
