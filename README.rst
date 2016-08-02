@@ -1,6 +1,6 @@
 ..
     This file is part of Invenio.
-    Copyright (C) 2015 CERN.
+    Copyright (C) 2015, 2016 CERN.
 
     Invenio is free software; you can redistribute it
     and/or modify it under the terms of the GNU General Public License as
@@ -37,11 +37,14 @@
 .. image:: https://img.shields.io/pypi/dm/invenio.svg
         :target: https://pypi.python.org/pypi/invenio
 
-.. image:: https://img.shields.io/github/license/inveniosoftware/invenio.svg
-        :target: https://github.com/inveniosoftware/invenio/blob/master/COPYING
+.. image:: https://badge.waffle.io/inveniosoftware/invenio.svg?label=Status%3A%20ready%20for%20work&title=Issues%20ready%20for%20work
+        :target: https://waffle.io/inveniosoftware/invenio
 
 .. image:: https://badges.gitter.im/Join%20Chat.svg
     :target: https://gitter.im/inveniosoftware/invenio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
+
+.. image:: https://img.shields.io/github/license/inveniosoftware/invenio.svg
+        :target: https://github.com/inveniosoftware/invenio/blob/master/COPYING
 
 Invenio is a free software suite enabling you to run your own digital
 library or document repository on the web.  The technology offered by
