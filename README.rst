@@ -38,7 +38,7 @@
         :target: https://pypi.python.org/pypi/invenio
 
 .. image:: https://img.shields.io/github/license/inveniosoftware/invenio.svg
-        :target: https://github.com/inveniosoftware/invenio/blob/master/LICENSE
+        :target: https://github.com/inveniosoftware/invenio/blob/master/COPYING
 
 .. image:: https://badges.gitter.im/Join%20Chat.svg
     :target: https://gitter.im/inveniosoftware/invenio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
