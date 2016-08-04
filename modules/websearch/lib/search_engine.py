@@ -6810,6 +6810,10 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
             prs_summarize_records(kwargs=kwargs, **kwargs)
         elif of in ['hcv', 'htcv', 'tlcv'] and CFG_INSPIRE_SITE:
             from invenio.search_engine_cvifier import cvify_records
+            if CFG_BIBSORT_ENABLED:
+                results_final_for_all_selected_colls = sort_records(
+                    req, results_final_for_all_selected_colls,
+                    sort_field=sf, sort_order='a', of=of, ln=ln)
             cvify_records(results_final_for_all_selected_colls, of, req, so)
         else:
             prs_print_records(kwargs=kwargs, **kwargs)
