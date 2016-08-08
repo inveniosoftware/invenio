@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -315,6 +315,9 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
         # first, treat everything before first comma as surname:
         if ',' in phrase:
             d_family_names[phrase.split(',', 1)[0]] = 1
+        # no comma, treat as distinguishing name which should be searchable
+        else:
+            d_family_names[phrase] = 1
         # second, try fuzzy author tokenizer to find surname variants:
         for name in self.tokenize_for_phrases(phrase):
             if ',' in name:
