@@ -506,6 +506,7 @@ def get_tags_config(config):
             'year': config.get(function, "pubinfo_journal_year"),
             'journal': config.get(function, "pubinfo_journal_title"),
             'volume': config.get(function, "pubinfo_journal_volume"),
+            'erratum': config.get(function, "pubinfo_journal_erratum"),
         }
     except ConfigParser.NoOptionError:
         tags['publication'] = None
@@ -515,6 +516,7 @@ def get_tags_config(config):
             'year': tagify(parse_tag(tag['year'])),
             'journal': tagify(parse_tag(tag['journal'])),
             'volume': tagify(parse_tag(tag['volume'])),
+            'erratum': tagify(parse_tag(tag['erratum'])),
         }
 
     # alternate (hidden) form of pubinfo
@@ -559,6 +561,15 @@ def get_journal_info(record, tags):
         # like c->444 y->1999 p->"journal of foo",
         # v->20
         tagsvalues = {}
+        try:
+            tmp = field.get_subfield_values(tags['publication']['erratum'][5])[0]
+        except IndexError:
+            pass
+        else:
+            if tmp.lower() in ('erratum', 'corrigendum'):
+                write_message("skipping erratum publication info")
+                continue
+
         try:
             tmp = field.get_subfield_values(tags['publication']['journal'][5])[0]
         except IndexError:
