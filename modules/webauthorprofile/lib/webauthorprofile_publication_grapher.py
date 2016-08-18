@@ -18,6 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import os
+import time
 import tempfile
 
 from invenio.config import CFG_SITE_URL, CFG_WEBDIR
@@ -108,9 +109,13 @@ def create_graph_image(graph_file_name, graph_data, image_size=None):
     def create_dir_if_not_exists(dir_path):
         if not os.path.exists(dir_path):
             os.mkdir(dir_path)
-
-    create_dir_if_not_exists("%s/img/tmp" % (CFG_WEBDIR))
-    create_dir_if_not_exists("%s/img/tmp/%s" % (CFG_WEBDIR, graph_file_name[0]))
+    try:
+        create_dir_if_not_exists("%s/img/tmp" % (CFG_WEBDIR))
+        create_dir_if_not_exists("%s/img/tmp/%s" % (CFG_WEBDIR, graph_file_name[0]))
+    except OSError:
+        # It could simply be due to AFS locking
+        time.sleep(1)
+        pass
 
     graph_coordinates_file, max_y = write_coordinates_in_tmp_file([graph_data])
     years = [tup[0] for tup in graph_data]
