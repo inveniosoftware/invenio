@@ -142,8 +142,8 @@ html_theme_options = {
     'github_banner': True,
     'show_powered_by': False,
     'extra_nav_links': {
-        'invenio@GitHub': 'http://github.com/inveniosoftware/invenio',
-        'invenio@PyPI': 'http://pypi.python.org/pypi/invenio/',
+        'invenio@GitHub': 'https://github.com/inveniosoftware/invenio',
+        'invenio@PyPI': 'https://pypi.python.org/pypi/invenio/',
     }
 }
 
@@ -335,13 +335,16 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     'python': ('https://docs.python.org/2.7/', None),
-    'flaskregistry': ('http://flask-registry.readthedocs.org/en/latest/',
+    'flaskregistry': ('https://flask-registry.readthedocs.org/en/latest/',
                       None),
     'werkzeug': ('http://werkzeug.pocoo.org/docs/', None),
     'flask': ('http://flask.pocoo.org/docs/', None),
-    'flaskassets': ('http://flask-assets.readthedocs.org/en/latest/', None),
-    'flaskscript': ('http://flask-script.readthedocs.org/en/latest/', None),
+    'flaskassets': ('https://flask-assets.readthedocs.org/en/latest/', None),
+    'flaskscript': ('https://flask-script.readthedocs.org/en/latest/', None),
     'sqlalchemy': ('http://docs.sqlalchemy.org/en/latest/', None),
     'jinja': ('http://jinja.pocoo.org/docs/', None),
-    'webassets': ('http://webassets.readthedocs.org/en/latest/', None),
+    'webassets': ('https://webassets.readthedocs.org/en/latest/', None),
 }
+
+# Autodoc configuraton.
+autoclass_content = 'both'
