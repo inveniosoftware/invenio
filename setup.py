@@ -115,6 +115,7 @@ setup_requires = [
 ]
 
 install_requires = [
+    'Flask>=0.11.1',
     'invenio-base>=1.0.0a6,<1.1.0',
     'invenio-celery>=1.0.0a2,<1.1.0',
     'invenio-config>=1.0.0a1,<1.1.0',
