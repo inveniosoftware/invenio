@@ -2,7 +2,7 @@
 ##
 ## This file is part of Invenio.
 ## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009,
-##               2010, 2011, 2012, 2013, 2014, 2015 CERN.
+##               2010, 2011, 2012, 2013, 2014, 2015, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1373,7 +1373,7 @@ class WordTable(AbstractIndexTable):
         self.recIDs_in_mem.append([recID1, recID2])
         # special case of author indexes where we also add author
         # canonical IDs:
-        if 'author' in self.index_name:
+        if 'author' in self.index_name and not 'authorcount' in self.index_name:
             for recID, term in get_author_canonical_ids_for_recid_range(recID1, recID2):
                 if not wlist.has_key(recID):
                     wlist[recID] = set()
@@ -1427,6 +1427,9 @@ class WordTable(AbstractIndexTable):
                             # Better remove it to be better safe than sorry.
                             del wlist[recids[0]]
                         write_message("... discovered this author information: %s" % wlist[i], verbose=2)
+                    if 'authorcount' in self.index_name:
+                        # don't add BAIs to authorcount
+                        continue
                     for term in get_author_canonical_ids_for_recid(recids[0]):
                         if not wlist.has_key(i):
                             wlist[i] = []
@@ -1917,7 +1920,7 @@ def get_recIDs_by_date_bibliographic(dates, index_name, force_all=False):
                                         (dates[0], dates[1],)))
     # special case of author indexes where we need to re-index
     # those records that were affected by changed BibAuthorID attributions:
-    if 'author' in index_name:
+    if 'author' in index_name and not 'authorcount' in index_name:
         from invenio.bibauthorid_personid_maintenance import get_recids_affected_since
         # dates[1] is ignored, since BibAuthorID API does not offer upper limit search
         rec_list_author = get_recids_affected_since(dates[0], dates[1])
