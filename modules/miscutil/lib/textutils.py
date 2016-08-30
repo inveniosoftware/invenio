@@ -354,6 +354,7 @@ def encode_for_xml(text, wash=False, xml_version='1.0', quote=False):
     @return: an encoded text"""
     text = text.replace('&', '&amp;')
     text = text.replace('<', '&lt;')
+    text = text.replace('>', '&gt;')
     if quote:
         text = text.replace('"', '&quot;')
     if wash:
