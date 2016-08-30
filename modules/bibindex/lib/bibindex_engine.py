@@ -1403,8 +1403,8 @@ class WordTable(AbstractIndexTable):
         if 'author' in self.index_name:
             for i in range(recID1, recID2 + 1):
                 if i not in wlist or ('authorcount' in self.index_name
-                                      and len(wlist[i] == 1
-                                              and wlist[i][0] == '0')):
+                                      and len(wlist[i]) == 1
+                                              and wlist[i][0] == '0'):
                     # Ha! this record has not author declared. Let's see if
                     # it has a corresponding paper.
                     recids = run_sql("""SELECT b.value FROM bib78x AS b, bibrec_bib78x AS bb
