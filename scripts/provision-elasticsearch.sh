@@ -44,7 +44,7 @@ check_environment_variables () {
 # quit on unbound symbols:
 set -o nounset
 
-provision_elasticsearch_ubuntu14 () {
+provision_elasticsearch_ubuntu () {
 
     # sphinxdoc-install-elasticsearch-ubuntu14-begin
     # install curl:
@@ -63,7 +63,7 @@ provision_elasticsearch_ubuntu14 () {
     # install Elasticsearch server:
     sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
          elasticsearch \
-         openjdk-7-jre
+         default-jre
 
     # allow network connections:
     if ! sudo grep -q "network.host: ${INVENIO_ELASTICSEARCH_HOST}" \
@@ -165,10 +165,8 @@ main () {
 
     # call appropriate provisioning functions:
     if [ "$os_distribution" = "Ubuntu" ]; then
-        if [ "$os_release" = "14" ]; then
-            check_environment_variables
-            provision_elasticsearch_ubuntu14
-            install_plugins
+        if [ "$os_release" = "14" -o "$os_release" = "16" ]; then
+            provision_elasticsearch_ubuntu
         else
             echo "[ERROR] Sorry, unsupported release ${os_release}."
             exit 1

@@ -55,7 +55,7 @@ fi
 # quit on unbound symbols:
 set -o nounset
 
-provision_postgresql_ubuntu14 () {
+provision_postgresql_ubuntu () {
 
     # sphinxdoc-install-postgresql-ubuntu14-begin
     # update list of available packages:
@@ -65,25 +65,28 @@ provision_postgresql_ubuntu14 () {
     sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
          postgresql
 
+    # detect PostgreSQL version:
+    postgresql_version=$(psql --version | cut -d" " -f3)
+
     # allow network connections:
-    if ! grep -q "listen_addresses.*${INVENIO_POSTGRESQL_HOST}" \
-         /etc/postgresql/9.3/main/postgresql.conf; then
+    if ! grep -q listen_addresses.*${INVENIO_POSTGRESQL_HOST} \
+         /etc/postgresql/${postgresql_version:0:3}/main/postgresql.conf; then
         echo "listen_addresses = '${INVENIO_POSTGRESQL_HOST}'" | \
-            sudo tee -a /etc/postgresql/9.3/main/postgresql.conf
+            sudo tee -a /etc/postgresql/${postgresql_version:0:3}/main/postgresql.conf
     fi
 
     # grant access rights:
-    if ! sudo grep -q "host.*${INVENIO_POSTGRESQL_DBNAME}.*${INVENIO_POSTGRESQL_DBUSER}" \
-         /etc/postgresql/9.3/main/pg_hba.conf; then
+    if ! sudo grep -q host.*${INVENIO_POSTGRESQL_DBNAME}.*${INVENIO_POSTGRESQL_DBUSER} \
+         /etc/postgresql/${postgresql_version:0:3}/main/pg_hba.conf; then
         echo "host ${INVENIO_POSTGRESQL_DBNAME} ${INVENIO_POSTGRESQL_DBUSER} ${INVENIO_WEB_HOST}/32 md5" | \
-            sudo tee -a /etc/postgresql/9.3/main/pg_hba.conf
+            sudo tee -a /etc/postgresql/${postgresql_version:0:3}/main/pg_hba.conf
     fi
 
     # grant database creation rights via SQLAlchemy-Utils:
-    if ! sudo grep -q "host.*template1.*${INVENIO_POSTGRESQL_DBUSER}" \
-         /etc/postgresql/9.3/main/pg_hba.conf; then
+    if ! sudo grep -q host.*template1.*${INVENIO_POSTGRESQL_DBUSER} \
+         /etc/postgresql/${postgresql_version:0:3}/main/pg_hba.conf; then
         echo "host template1 ${INVENIO_POSTGRESQL_DBUSER} ${INVENIO_WEB_HOST}/32 md5" | \
-            sudo tee -a /etc/postgresql/9.3/main/pg_hba.conf
+            sudo tee -a /etc/postgresql/${postgresql_version:0:3}/main/pg_hba.conf
     fi
 
     # restart PostgreSQL server:
@@ -191,8 +194,8 @@ main () {
 
     # call appropriate provisioning functions:
     if [ "$os_distribution" = "Ubuntu" ]; then
-        if [ "$os_release" = "14" ]; then
-            provision_postgresql_ubuntu14
+        if [ "$os_release" = "14" -o "$os_release" = "16" ]; then
+            provision_postgresql_ubuntu
         else
             echo "[ERROR] Sorry, unsupported release ${os_release}."
             exit 1

@@ -38,6 +38,7 @@
 # $ firefox http://192.168.50.10/records/1
 
 #OS = 'hfm4/centos7'
+#OS = 'ubuntu/xenial64'
 OS = 'ubuntu/trusty64'
 
 Vagrant.configure("2") do |config|
@@ -50,6 +51,8 @@ Vagrant.configure("2") do |config|
     web.vm.box = OS
     web.vm.hostname = 'web'
     web.vm.provision "file", source: ".inveniorc", destination: ".inveniorc"
+    # Note: if you use ubuntu/xenial64 and you are inside CERN, you may need to uncomment the following line:
+    # web.vm.provision "shell", inline: "echo 'nameserver 137.138.16.5' > /etc/resolv.conf"
     web.vm.provision "shell", inline: "source .inveniorc && /vagrant/scripts/provision-web.sh", privileged: false
     web.vm.network "forwarded_port", guest: 80, host: 80
     web.vm.network "forwarded_port", guest: 5000, host: 5000
@@ -64,6 +67,8 @@ Vagrant.configure("2") do |config|
     postgresql.vm.box = OS
     postgresql.vm.hostname = 'postgresql'
     postgresql.vm.provision "file", source: ".inveniorc", destination: ".inveniorc"
+    # Note: if you use ubuntu/xenial64 and you are inside CERN, you may need to uncomment the following line:
+    # postgresql.vm.provision "shell", inline: "echo 'nameserver 137.138.16.5' > /etc/resolv.conf"
     postgresql.vm.provision "shell", inline: "source .inveniorc && /vagrant/scripts/provision-postgresql.sh", privileged: false
     postgresql.vm.network "private_network", ip: ENV.fetch('INVENIO_POSTGRESQL_HOST','192.168.50.11')
   end
@@ -72,6 +77,8 @@ Vagrant.configure("2") do |config|
     redis.vm.box = OS
     redis.vm.hostname = 'redis'
     redis.vm.provision "file", source: ".inveniorc", destination: ".inveniorc"
+    # Note: if you use ubuntu/xenial64 and you are inside CERN, you may need to uncomment the following line:
+    #redis.vm.provision "shell", inline: "echo 'nameserver 137.138.16.5' > /etc/resolv.conf"
     redis.vm.provision "shell", inline: "source .inveniorc && /vagrant/scripts/provision-redis.sh", privileged: false
     redis.vm.network "private_network", ip: ENV.fetch('INVENIO_REDIS_HOST','192.168.50.12')
   end
@@ -80,6 +87,8 @@ Vagrant.configure("2") do |config|
     elasticsearch.vm.box = OS
     elasticsearch.vm.hostname = 'elasticsearch'
     elasticsearch.vm.provision "file", source: ".inveniorc", destination: ".inveniorc"
+    # Note: if you use ubuntu/xenial64 and you are inside CERN, you may need to uncomment the following line:
+    # elasticsearch.vm.provision "shell", inline: "echo 'nameserver 137.138.16.5' > /etc/resolv.conf"
     elasticsearch.vm.provision "shell", inline: "source .inveniorc && /vagrant/scripts/provision-elasticsearch.sh", privileged: false
     elasticsearch.vm.network "private_network", ip: ENV.fetch('INVENIO_ELASTICSEARCH_HOST','192.168.50.13')
   end
@@ -88,6 +97,8 @@ Vagrant.configure("2") do |config|
     rabbitmq.vm.box = OS
     rabbitmq.vm.hostname = 'rabbitmq'
     rabbitmq.vm.provision "file", source: ".inveniorc", destination: ".inveniorc"
+    # Note: if you use ubuntu/xenial64 and you are inside CERN, you may need to uncomment the following line:
+    # rabbitmq.vm.provision "shell", inline: "echo 'nameserver 137.138.16.5' > /etc/resolv.conf"
     rabbitmq.vm.provision "shell", inline: "source .inveniorc && /vagrant/scripts/provision-rabbitmq.sh", privileged: false
     rabbitmq.vm.network "private_network", ip: ENV.fetch('INVENIO_RABBITMQ_HOST','192.168.50.14')
   end
@@ -96,6 +107,8 @@ Vagrant.configure("2") do |config|
     worker.vm.box = OS
     worker.vm.hostname = 'worker'
     worker.vm.provision "file", source: ".inveniorc", destination: ".inveniorc"
+    # Note: if you use ubuntu/xenial64 and you are inside CERN, you may need to uncomment the following line:
+    # worker.vm.provision "shell", inline: "echo 'nameserver 137.138.16.5' > /etc/resolv.conf"
     worker.vm.provision "shell", inline: "source .inveniorc && /vagrant/scripts/provision-worker.sh", privileged: false
     worker.vm.network "private_network", ip: ENV.fetch('INVENIO_WORKER_HOST','192.168.50.15')
   end

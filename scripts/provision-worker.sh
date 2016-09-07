@@ -28,7 +28,7 @@ set -o errexit
 # quit on unbound symbols:
 set -o nounset
 
-provision_worker_ubuntu14 () {
+provision_worker_ubuntu () {
 
     # sphinxdoc-install-worker-ubuntu14-begin
     echo "FIXME worker is a copy of web node"
@@ -72,8 +72,8 @@ main () {
 
     # call appropriate provisioning functions:
     if [ "$os_distribution" = "Ubuntu" ]; then
-        if [ "$os_release" = "14" ]; then
-            provision_worker_ubuntu14
+        if [ "$os_release" = "14" -o "$os_release" = "16" ]; then
+            provision_worker_ubuntu
         else
             echo "[ERROR] Sorry, unsupported release ${os_release}."
             exit 1
