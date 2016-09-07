@@ -14,10 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """
 This is the Create_Modify_Interface function (along with its helpers).
 It is used by WebSubmit for the "Modify Bibliographic Information" action.
 """
+
 __revision__ = "$Id$"
 
 import os
@@ -305,9 +307,10 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
                     ## Note this exec is safe WRT global variable because the
                     ## Create_Modify_Interface has already been parsed by
                     ## execfile within a protected environment.
-                    the_globals['text'] = ''
+                    the_globals["text"] = ""
+                    the_globals["element"] = {"name": field, "value": value}
                     exec co in the_globals
-                    text = the_globals['text']
+                    text = the_globals["text"]
                 except:
                     msg = "Error in evaluating response element %s with globals %s" % (pprint.pformat(field), pprint.pformat(globals()))
                     register_exception(req=None, alert_admin=True, prefix=msg)

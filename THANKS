@@ -96,6 +96,9 @@ Several people contributed language translations:
   - Charlotte Iris Cattaneo <ciris.cattaneo@gmail.com>
     Contributions to the German, Italian, and Spanish translations.
 
+  - Adrian Moennich <adrian.moennich@cern.ch>
+    Contributions to the German translation.
+
 The URL handler was inspired by the Quixote Web Framework which is
 ``Copyright (c) 2004 Corporation for National Research Initiatives;
 All Rights Reserved''.

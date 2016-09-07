@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -29,6 +29,8 @@ import traceback
 import time
 import inspect
 import itertools
+import collections
+import functools
 
 from collections import namedtuple
 from ConfigParser import RawConfigParser
@@ -50,7 +52,8 @@ from invenio.config import \
     CFG_PYLIBDIR, \
     CFG_SITE_URL, \
     CFG_TMPSHAREDDIR, \
-    CFG_CERN_SITE
+    CFG_CERN_SITE, \
+    CFG_SITE_RECORD
 from invenio.search_engine import \
     perform_request_search, \
     search_unit_in_bibxxx, \
@@ -63,6 +66,7 @@ from invenio.dbquery import run_sql
 from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.shellutils import split_cli_ids_arg
 from invenio.jsonutils import json
+from invenio.websearch_webcoll import get_cache_last_updated_timestamp
 
 CFG_BATCH_SIZE = 1000
 
@@ -73,18 +77,168 @@ class RulesParseError(Exception):
             error))
 
 
+class Tickets(object):
+
+    """Handle ticket accumulation and dispatching."""
+
+    def __init__(self, records):
+        self.records = records
+        self.policy_method = None
+        self.ticket_creation_policy = \
+            task_get_option('ticket_creation_policy', 'per-record')
+
+    def resolve_ticket_creation_policy(self):
+        """Resolve the policy for creating tickets."""
+
+
+        known_policies = ('per-rule',
+                          'per-record',
+                          'per-rule-per-record',
+                          'no-tickets')
+        if self.ticket_creation_policy not in known_policies:
+            raise Exception("Invalid ticket_creation_policy in config '{0}'".
+                            format(self.ticket_creation_policy))
+
+        if task_get_option('no_tickets', False):
+            self.ticket_creation_policy = 'no-tickets'
+
+        policy_translator = {
+            'per-rule': self.tickets_per_rule,
+            'per-record': self.tickets_per_record,
+            'per-rule-per-record': self.tickets_per_rule_per_record
+        }
+        self.policy_method = policy_translator[self.ticket_creation_policy]
+
+    @staticmethod
+    def submit_ticket(msg_subject, msg, record_id):
+        """Submit a single ticket."""
+        if isinstance(msg, unicode):
+            msg = msg.encode("utf-8")
+
+        submit = functools.partial(BIBCATALOG_SYSTEM.ticket_submit,
+                                   subject=msg_subject, text=msg,
+                                   queue=task_get_option("queue", "Bibcheck"))
+        if record_id is not None:
+            submit = functools.partial(submit, recordid=record_id)
+        res = submit()
+        write_message("Bibcatalog returned %s" % res)
+        if res > 0:
+            BIBCATALOG_SYSTEM.ticket_comment(None, res, msg)
+
+    def submit(self):
+        """Generate and submit tickets for the bibcatalog system."""
+        self.resolve_ticket_creation_policy()
+        for ticket_information in self.policy_method():
+            self.submit_ticket(*ticket_information)
+
+    def _generate_subject(self, issue_type, record_id, rule_name):
+        """Generate a fitting subject based on what information is given."""
+        assert any((i is not None for i in (issue_type, record_id, rule_name)))
+        return "[BibCheck{issue_type}]{record_id}{rule_name}".format(
+            issue_type=":" + issue_type if issue_type else "",
+            record_id=" [ID:" + record_id + "]" if self.ticket_creation_policy
+            in ("per-record", "per-rule-per-record") else "",
+            rule_name=" [Rule:" + rule_name + "]" if self.ticket_creation_policy
+            in ("per-rule", "per-rule-per-record") else "")
+
+    @staticmethod
+    def _get_url(record):
+        """Resolve the URL required to edit a record."""
+        return "%s/%s/%s/edit" % (CFG_SITE_URL, CFG_SITE_RECORD,
+                                  record.record_id)
+
+    def tickets_per_rule(self):
+        """Generate with the `per-rule` policy."""
+        output = collections.defaultdict(list)
+        for record in self.records:
+            for issue in record.issues:
+                output[issue.rule].append((record, issue.nature, issue.msg))
+        for rule_name in output.iterkeys():
+            msg = []
+            for record, issue_nature, issue_msg in output[rule_name]:
+                msg.append("{issue_nature}: {issue_msg}".format(
+                    issue_nature=issue_nature, issue_msg=issue_msg))
+                msg.append("Edit record ({record_id}) {url}\n".format(
+                    record_id=record.record_id, url=self._get_url(record)))
+            msg_subject = self._generate_subject(None, None, rule_name)
+            yield (msg_subject, "\n".join(msg), None)
+
+    def tickets_per_record(self):
+        """Generate with the `per-record` policy."""
+        output = collections.defaultdict(list)
+        for record in self.records:
+            for issue in record.issues:
+                output[record].append((issue.nature, issue.msg))
+        for record in output.iterkeys():
+            msg = []
+            for issue in output[record]:
+                issue_nature, issue_msg = issue
+                msg.append("{issue_type}: {rule_messages}".
+                           format(record_id=record.record_id,
+                                  issue_type=issue_nature,
+                                  rule_messages=issue_msg))
+            msg.append("Edit record: {url}".format(url=self._get_url(record)))
+            msg_subject = self._generate_subject(None, record.record_id, None)
+            yield (msg_subject, "\n".join(msg), record.record_id)
+
+    def tickets_per_rule_per_record(self):
+        """Generate with the `per-rule-per-record` policy."""
+        output = collections.defaultdict(list)
+        for record in self.records:
+            for issue in record.issues:
+                output[(issue.rule, record)].append((issue.nature, issue.msg))
+        for issue_rule, record in output.iterkeys():
+            msg = []
+            for issue_nature, issue_msg in output[(issue_rule, record)]:
+                msg.append("{issue_message}".format(issue_message=issue_msg))
+            msg.append("Edit record ({record_id}): {url}".format(url=self._get_url(record),
+                                                                 record_id=record.record_id))
+            msg_subject = self._generate_subject(issue_nature, record.record_id,
+                                                 issue_rule)
+            yield (msg_subject, "\n".join(msg), record.record_id)
+
+
+class Issue(object):
+
+    """Holds information about a single record issue."""
+
+    def __init__(self, nature, rule, msg):
+        self._nature = None
+        self.nature = nature
+        self.rule = rule
+        self.msg = msg
+
+    @property
+    def nature(self):
+        return self._nature
+
+    @nature.setter
+    def nature(self, value):
+        assert value in ('error', 'amendment', 'warning')
+        self._nature = value
+
 class AmendableRecord(dict):
     """ Class that wraps a record (recstruct) to pass to a plugin """
     def __init__(self, record):
         dict.__init__(self, record)
-        self.errors = []
-        self.amendments = []
-        self.warnings = []
+        self.issues = []
         self.valid = True
         self.amended = False
         self.holdingpen = False
         self.rule = None
         self.record_id = self["001"][0][3]
+
+    @property
+    def _errors(self):
+        return [i for i in self.issues if i.nature == 'error']
+
+    @property
+    def _amendments(self):
+        return [i for i in self.issues if i.nature == 'amendment']
+
+    @property
+    def _warnings(self):
+        return [i for i in self.issues if i.nature == 'warning']
 
     def iterfields(self, fields, subfield_filter=(None, None)):
         """
@@ -190,17 +344,20 @@ class AmendableRecord(dict):
         tag, localpos, subfieldpos = position
         tag = tag.replace("_", " ")
 
-        old_value = self._queryval(position)
-        if new_value != old_value:
-            if position[2] is None:
-                fields = self[tag[0:3]]
-                fields[localpos] = fields[localpos][0:3] + (new_value,)
-            else:
-                self._query(position[:2] + (None,))[0][subfieldpos] = (tag[5], new_value)
-            if message == '':
-                message = u"Changed field %s from '%s' to '%s'" % (position[0],
-                        old_value.decode('utf-8'), new_value.decode('utf-8'))
-            self.set_amended(message)
+        try:
+            old_value = self._queryval(position)
+            if new_value != old_value:
+                if position[2] is None:
+                    fields = self[tag[0:3]]
+                    fields[localpos] = fields[localpos][0:3] + (new_value,)
+                else:
+                    self._query(position[:2] + (None,))[0][subfieldpos] = (tag[5], new_value)
+                if message == '':
+                    message = u"Changed field %s from '%s' to '%s'" % (position[0],
+                            old_value.decode('utf-8'), new_value.decode('utf-8'))
+                self.set_amended(message)
+        except Exception as err:
+            self.set_invalid("Error when trying to amend the record at position %s: %s. Maybe there is an empty subfield code?" % (position, err))
 
     def delete_field(self, position, message=""):
         """
@@ -230,21 +387,24 @@ class AmendableRecord(dict):
         """ Mark the record as amended """
         write_message("Amended record %s by rule %s: %s" %
                 (self.record_id, self.rule["name"], message))
-        self.amendments.append("Rule %s: %s" % (self.rule["name"], message))
+        self.issues.append(Issue('amendment', self.rule['name'], message))
         self.amended = True
         if self.rule["holdingpen"]:
             self.holdingpen = True
 
     def set_invalid(self, reason):
         """ Mark the record as invalid """
-        write_message("Record %s marked as invalid by rule %s: %s" %
-                (CFG_SITE_URL + "/record/%s" % self.record_id, self.rule["name"], reason))
-        self.errors.append("Rule %s: %s" % (self.rule["name"], reason))
+        url = "{site}/{record}/{record_id}".format(site=CFG_SITE_URL,
+                                                   record=CFG_SITE_RECORD,
+                                                   record_id=self.record_id)
+        write_message("Record {url} marked as invalid by rule {name}: {reason}".
+                      format(url=url, name=self.rule["name"], reason=reason))
+        self.issues.append(Issue('error', self.rule['name'], reason))
         self.valid = False
 
     def warn(self, msg):
         """ Add a warning to the record """
-        self.warnings.append("Rule %s: %s" % (self.rule["name"], msg))
+        self.issues.append(Issue('warning', self.rule['name'], msg))
         write_message("[WARN] record %s by rule %s: %s" %
                 (self.record_id, self.rule["name"], msg))
 
@@ -278,8 +438,7 @@ def task_parse_options(key, val, *_):
     """ Must be defined for bibtask to create a task """
 
     if key in ("--all", "-a"):
-        for rule_name in val.split(","):
-            reset_rule_last_run(rule_name)
+        task_set_option("reset_rules", set(val.split(",")))
     elif key in ("--enable-rules", "-e"):
         task_set_option("enabled_rules", set(val.split(",")))
     elif key in ("--id", "-i"):
@@ -288,6 +447,8 @@ def task_parse_options(key, val, *_):
         task_set_option("queue", val)
     elif key in ("--no-tickets", "-t"):
         task_set_option("no_tickets", True)
+    elif key in ("--ticket-creation-policy", "-p"):
+        task_set_option("ticket_creation_policy", val)
     elif key in ("--no-upload", "-b"):
         task_set_option("no_upload", True)
     elif key in ("--dry-run", "-n"):
@@ -295,6 +456,8 @@ def task_parse_options(key, val, *_):
         task_set_option("no_tickets", True)
     elif key in ("--config", "-c"):
         task_set_option("config", val)
+    elif key in ("--notimechange", ):
+        task_set_option("notimechange", True)
     else:
         raise StandardError("Error: Unrecognised argument '%s'." % key)
     return True
@@ -305,10 +468,26 @@ def task_run_core():
 
     Returns True when run successfully. False otherwise.
     """
+    rules_to_reset = task_get_option("reset_rules")
+    if rules_to_reset:
+        write_message("Resetting the following rules: %s" % rules_to_reset)
+        for rule in rules_to_reset:
+            reset_rule_last_run(rule)
     plugins = load_plugins()
     rules = load_rules(plugins)
+    write_message("Loaded rules: %s" % rules, verbose=9)
     task_set_option('plugins', plugins)
     recids_for_rules = get_recids_for_rules(rules)
+    write_message("recids for rules: %s" % recids_for_rules, verbose=9)
+
+    update_database = not (task_has_option('record_ids') or
+                           task_get_option('no_upload', False) or
+                           task_get_option('no_tickets', False))
+
+    if update_database:
+        next_starting_dates = {}
+        for rule_name, rule in rules.iteritems():
+            next_starting_dates[rule_name] = get_next_starting_date(rule)
 
     all_recids = intbitset([])
     single_rules = set()
@@ -322,6 +501,7 @@ def task_run_core():
 
     records_to_upload_holdingpen = []
     records_to_upload_replace = []
+    records_to_submit_tickets = []
     for batch in iter_batches(all_recids, CFG_BATCH_SIZE):
 
         for rule_name in batch_rules:
@@ -335,7 +515,7 @@ def task_run_core():
             if len(records):
                 check_records(rule, records)
 
-        # Then run them trught normal rules
+        # Then run them through normal rules
         for i, record_id, record in batch:
             progress_percent = int(float(i) / len(all_recids) * 100)
             task_update_progress("Processing record %s/%s (%i%%)." %
@@ -356,8 +536,11 @@ def task_run_core():
                     records_to_upload_replace.append(record)
 
             if not record.valid:
-                submit_ticket(record, record_id)
+                records_to_submit_tickets.append(record)
 
+        if len(records_to_submit_tickets) >= CFG_BATCH_SIZE:
+            Tickets(records_to_submit_tickets).submit()
+            records_to_submit_tickets = []
         if len(records_to_upload_holdingpen) >= CFG_BATCH_SIZE:
             upload_amendments(records_to_upload_holdingpen, True)
             records_to_upload_holdingpen = []
@@ -366,58 +549,20 @@ def task_run_core():
             records_to_upload_replace = []
 
     ## In case there are still some remaining amended records
+    if records_to_submit_tickets:
+        Tickets(records_to_submit_tickets).submit()
     if records_to_upload_holdingpen:
         upload_amendments(records_to_upload_holdingpen, True)
     if records_to_upload_replace:
         upload_amendments(records_to_upload_replace, False)
 
-    # Update the database with the last time the rules was ran
-    for rule in rules.keys():
-        update_rule_last_run(rule)
+
+    # Update the database with the last time each rule was ran
+    if update_database:
+        for rule_name, rule in rules.iteritems():
+            update_rule_last_run(rule_name, next_starting_dates[rule_name])
 
     return True
-
-def submit_ticket(record, record_id):
-    """ Submit the errors to bibcatalog """
-
-    if task_get_option("no_tickets", False):
-        return
-
-    msg = """
-Bibcheck found some problems with the record with id %s:
-
-Errors:
-%s
-
-Amendments:
-%s
-
-Warnings:
-%s
-
-Edit this record: %s
-"""
-    msg = msg % (
-        record_id,
-        "\n".join(record.errors),
-        "\n".join(record.amendments),
-        "\n".join(record.warnings),
-        "%s/record/%s/edit" % (CFG_SITE_URL, record_id),
-    )
-    if isinstance(msg, unicode):
-        msg = msg.encode("utf-8")
-
-    subject = "Bibcheck rule failed in record %s" % record_id
-
-    ticket_id = BIBCATALOG_SYSTEM.ticket_submit(
-        subject=subject,
-        recordid=record_id,
-        text=subject,
-        queue=task_get_option("queue", "Bibcheck")
-    )
-    write_message("Bibcatalog returned %s" % ticket_id)
-    if ticket_id:
-        BIBCATALOG_SYSTEM.ticket_comment(None, ticket_id, msg)
 
 
 def upload_amendments(records, holdingpen):
@@ -443,7 +588,12 @@ def upload_amendments(records, holdingpen):
         flag = "-o"
     else:
         flag = "-r"
-    task = task_low_level_submission('bibupload', 'bibcheck', flag, tmp_file)
+    if task_get_option("notimechange"):
+        task = task_low_level_submission('bibupload', 'bibcheck', flag,
+                                         tmp_file, "--notimechange")
+    else:
+        task = task_low_level_submission('bibupload', 'bibcheck', flag,
+                                         tmp_file)
     write_message("Submitted bibupload task %s" % task)
 
 def check_record(rule, record):
@@ -479,22 +629,45 @@ def get_rule_lastrun(rule_name):
         return res[0][0]
 
 
-def update_rule_last_run(rule_name):
+def get_next_starting_date(rule):
+    """Calculate the date the next bibcheck run should consider as initial.
+
+    If no filter has been specified then the time that is set is the time the
+    task was started. Otherwise, it is set to the earliest date among last time
+    webcoll was run and the last bibindex last_update as the last_run to prevent
+    records that have yet to be categorized from being perpetually ignored.
     """
-    Set the last time a rule was run to now. This function should be called
-    after a rule has been ran.
+    def dt(t):
+        return datetime.strptime(t, "%Y-%m-%d %H:%M:%S")
+
+    # Upper limit
+    task_starting_time = dt(task_get_task_param('task_starting_time'))
+
+    for key, val in rule.iteritems():
+        if key.startswith("filter_") and val:
+            break
+    else:
+        return task_starting_time
+
+    # Lower limit
+    min_last_updated = run_sql("select min(last_updated) from idxINDEX")[0][0]
+    cache_last_updated = dt(get_cache_last_updated_timestamp())
+
+    return min(min_last_updated, task_starting_time, cache_last_updated)
+
+
+def update_rule_last_run(rule_name, next_starting_date):
     """
+    Set the last time a rule was run.
 
-    if task_has_option('record_ids') or task_get_option('no_upload', False) \
-            or task_get_option('no_tickets', False):
-        return   # We don't want to update the database in this case
+    This function should be called after a rule has been ran.
+    """
+    next_starting_date_str = datetime.strftime(next_starting_date,
+                                               "%Y-%m-%d %H:%M:%S")
 
-    updated = run_sql("UPDATE bibcheck_rules SET last_run=%s WHERE name=%s;",
-                      (task_get_task_param('task_starting_time'), rule_name,))
-    if not updated: # rule not in the database, insert it
-        run_sql("INSERT INTO bibcheck_rules(name, last_run) VALUES (%s, %s)",
-                (rule_name, task_get_task_param('task_starting_time')))
-
+    run_sql("""INSERT INTO bibcheck_rules(name, last_run) VALUES (%s, %s)
+        ON DUPLICATE KEY UPDATE last_run=%s""",
+                (rule_name, next_starting_date_str, next_starting_date_str))
 
 def reset_rule_last_run(rule_name):
     """
@@ -779,6 +952,8 @@ def main():
   -n, --dry-run            Like --no-tickets and --no-upload
   -c, --config             By default bibcheck reads the file rules.cfg. This
                            allows to specify a different config file
+      --notimechange       schedules bibuploads with the option --notimechange
+                           (useful not to trigger reindexing)
 
   If any of the options --id, --no-tickets, --no-upload or --dry-run is enabled,
     bibcheck won't update the last-run-time of a task in the database.
@@ -816,9 +991,10 @@ def main():
               description="",
               help_specific_usage=usage,
               version="Invenio v%s" % CFG_VERSION,
-              specific_params=("hvtbnV:e:a:i:q:c:", ["help", "version",
+              specific_params=("hvtbnV:e:a:i:q:c:p:", ["help", "version",
                   "verbose=", "enable-rules=", "all=", "id=", "queue=",
-                  "no-tickets", "no-upload", "dry-run", "config"]),
+                  "no-tickets", "no-upload", "dry-run", "config",
+                  "notimechange", "ticket-creation-policy="]),
               task_submit_elaborate_specific_parameter_fnc=task_parse_options,
               task_run_fnc=task_run_core)
 

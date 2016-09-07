@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -4556,12 +4556,11 @@ class WebSearchSPIRESSyntaxTest(InvenioTestCase):
 
     if DATEUTIL_AVAILABLE:
         def test_dadd_search(self):
-            'websearch - find da > today - 3650'
-            # XXX: assumes we've reinstalled our site in the last 10 years
-            # should return every document in the system
+            'websearch - find da > today - 36500'
+            # finds all records that are declared with date added (see tag 005) in the past 100 years
             self.assertEqual([],
-                             test_web_page_content(CFG_SITE_URL +'/search?ln=en&p=find+da+%3E+today+-+3650&f=&of=id&so=a&rg=0',
-                                                  expected_text='[90, 92, 91, 97, 89, 107, 108, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 78, 79, 80, 81, 82, 83, 84, 85, 87, 88, 93, 94, 95, 96, 99, 100, 101, 102, 103, 104, 113, 127, 128]'))
+                             test_web_page_content(CFG_SITE_URL +'/search?ln=en&p=find+da+%3E+today+-+36500&f=&of=id&so=a&rg=0',
+                                                   expected_text='[86, 90, 92, 91, 97, 89, 107, 108, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 78, 79, 80, 81, 82, 83, 84, 85, 87, 88, 93, 94, 95, 96, 99, 100, 101, 102, 103, 104, 113, 127, 128]'))
 
 
 class WebSearchDateQueryTest(InvenioTestCase):

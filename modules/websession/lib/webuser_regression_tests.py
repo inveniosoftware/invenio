@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+# Copyright (C) 2007, 2008, 2009, 2010, 2011, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -29,7 +29,7 @@ from invenio.testutils import InvenioTestCase
 from mechanize import Browser
 
 from invenio.dbquery import run_sql
-from invenio.config import CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_SECURE_URL, CFG_MISCUTIL_SMTP_PORT
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio import webuser
 
@@ -131,59 +131,60 @@ class WebSessionYourSettingsTests(InvenioTestCase):
             self.fail("Expected to see %s, got %s." % \
                     (expected_response, change_password_body))
 
-    def test_email_caseless(self):
-        """webuser - check email caseless"""
-        browser = Browser()
-        browser.open(CFG_SITE_SECURE_URL + "/youraccount/register")
-        browser.select_form(nr=0)
-        browser['p_email'] = 'foo@cds.cern.ch'
-        browser['p_nickname'] = 'foobar'
-        browser['p_pw'] = ''
-        browser['p_pw2'] = ''
-        browser.submit()
+    if CFG_MISCUTIL_SMTP_PORT:
+        def test_email_caseless(self):
+            """webuser - check email caseless"""
+            browser = Browser()
+            browser.open(CFG_SITE_SECURE_URL + "/youraccount/register")
+            browser.select_form(nr=0)
+            browser['p_email'] = 'foo@cds.cern.ch'
+            browser['p_nickname'] = 'foobar'
+            browser['p_pw'] = ''
+            browser['p_pw2'] = ''
+            browser.submit()
 
-        expected_response = "Account created"
-        login_response_body = browser.response().read()
-        try:
-            login_response_body.index(expected_response)
-        except ValueError:
-            self.fail("Expected to see %s, got %s." % \
-                      (expected_response, login_response_body))
+            expected_response = "Account created"
+            login_response_body = browser.response().read()
+            try:
+                login_response_body.index(expected_response)
+            except ValueError:
+                self.fail("Expected to see %s, got %s." % \
+                        (expected_response, login_response_body))
 
 
-        browser = Browser()
-        browser.open(CFG_SITE_SECURE_URL + "/youraccount/register")
-        browser.select_form(nr=0)
-        browser['p_email'] = 'foo@cds.cern.ch'
-        browser['p_nickname'] = 'foobar2'
-        browser['p_pw'] = ''
-        browser['p_pw2'] = ''
-        browser.submit()
+            browser = Browser()
+            browser.open(CFG_SITE_SECURE_URL + "/youraccount/register")
+            browser.select_form(nr=0)
+            browser['p_email'] = 'foo@cds.cern.ch'
+            browser['p_nickname'] = 'foobar2'
+            browser['p_pw'] = ''
+            browser['p_pw2'] = ''
+            browser.submit()
 
-        expected_response = "Registration failure"
-        login_response_body = browser.response().read()
-        try:
-            login_response_body.index(expected_response)
-        except ValueError:
-            self.fail("Expected to see %s, got %s." % \
-                      (expected_response, login_response_body))
+            expected_response = "Registration failure"
+            login_response_body = browser.response().read()
+            try:
+                login_response_body.index(expected_response)
+            except ValueError:
+                self.fail("Expected to see %s, got %s." % \
+                        (expected_response, login_response_body))
 
-        browser = Browser()
-        browser.open(CFG_SITE_SECURE_URL + "/youraccount/register")
-        browser.select_form(nr=0)
-        browser['p_email'] = 'FOO@cds.cern.ch'
-        browser['p_nickname'] = 'foobar2'
-        browser['p_pw'] = ''
-        browser['p_pw2'] = ''
-        browser.submit()
+            browser = Browser()
+            browser.open(CFG_SITE_SECURE_URL + "/youraccount/register")
+            browser.select_form(nr=0)
+            browser['p_email'] = 'FOO@cds.cern.ch'
+            browser['p_nickname'] = 'foobar2'
+            browser['p_pw'] = ''
+            browser['p_pw2'] = ''
+            browser.submit()
 
-        expected_response = "Registration failure"
-        login_response_body = browser.response().read()
-        try:
-            login_response_body.index(expected_response)
-        except ValueError:
-            self.fail("Expected to see %s, got %s." % \
-                      (expected_response, login_response_body))
+            expected_response = "Registration failure"
+            login_response_body = browser.response().read()
+            try:
+                login_response_body.index(expected_response)
+            except ValueError:
+                self.fail("Expected to see %s, got %s." % \
+                        (expected_response, login_response_body))
 
     def test_select_records_per_group(self):
         """webuser - test of user preferences setting"""

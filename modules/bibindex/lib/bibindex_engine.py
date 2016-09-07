@@ -2,7 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009,
-#               2010, 2011, 2012, 2013, 2014, 2015 CERN.
+#               2010, 2011, 2012, 2013, 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -712,14 +712,14 @@ class AbstractIndexTable(object):
                 # yes there were some new words:
                 write_message("......... updating hitlist for ``%s''" %  \
                               word, verbose=9)
-                run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % wash_table_column_name(self.table_name), (set.fastdump(), word)) # kwalitee: disable=sql
+                run_sql("UPDATE %s SET hitlist=_binary %%s WHERE term=%%s" % wash_table_column_name(self.table_name), (set.fastdump(), word)) # kwalitee: disable=sql
 
         else: # the word is new, will create new set:
             write_message("......... inserting hitlist for ``%s''" % \
                           word, verbose=9)
             set = intbitset(self.value[word].keys())
             try:
-                run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % wash_table_column_name(self.table_name), (word, set.fastdump())) # kwalitee: disable=sql
+                run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, _binary %%s)" % wash_table_column_name(self.table_name), (word, set.fastdump())) # kwalitee: disable=sql
             except Exception, e:
                 ## We send this exception to the admin only when is not
                 ## already reparing the problem.
@@ -963,11 +963,11 @@ class VirtualIndexTable(AbstractIndexTable):
             if len(to_serialize) == 0:
                 continue
             run_sql("""INSERT INTO %s (id_bibrec,termlist,type)
-                       VALUES (%%s,%%s,'FUTURE')""" % \
+                       VALUES (%%s,_binary %%s,'FUTURE')""" % \
                        wash_table_column_name(virtual_tab_name),
                        (recID, serialize_via_marshal(to_serialize))) # kwalitee: disable=sql
             try:
-                run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
+                run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,_binary %%s,'CURRENT')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
             except DatabaseError:
                 pass
 
@@ -999,9 +999,9 @@ class VirtualIndexTable(AbstractIndexTable):
             to_serialize = insert_to_cache_for_record(index_name, recID, old_values, new_values)
             if len(to_serialize) == 0:
                 continue
-            run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal(to_serialize))) # kwalitee: disable=sql
+            run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,_binary %%s,'FUTURE')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal(to_serialize))) # kwalitee: disable=sql
             try:
-                run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
+                run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,_binary %%s,'CURRENT')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
             except DatabaseError:
                 pass
 
@@ -1030,9 +1030,9 @@ class VirtualIndexTable(AbstractIndexTable):
             to_serialize = remove_from_cache_for_record(index_name, recID, old_values)
             if len(to_serialize) == 0:
                 continue
-            run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal(to_serialize))) # kwalitee: disable=sql
+            run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,_binary %%s,'FUTURE')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal(to_serialize))) # kwalitee: disable=sql
             try:
-                run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
+                run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,_binary %%s,'CURRENT')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
             except DatabaseError:
                 pass
 
@@ -1468,10 +1468,10 @@ class WordTable(AbstractIndexTable):
         if len(wlist) == 0: return 0
         # put words into reverse index table with FUTURE status:
         for recID in recIDs:
-            run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % wash_table_column_name(self.table_name[:-1]), (recID, serialize_via_marshal(wlist[recID]))) # kwalitee: disable=sql
+            run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,_binary %%s,'FUTURE')" % wash_table_column_name(self.table_name[:-1]), (recID, serialize_via_marshal(wlist[recID]))) # kwalitee: disable=sql
             # ... and, for new records, enter the CURRENT status as empty:
             try:
-                run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(self.table_name[:-1]), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
+                run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,_binary %%s,'CURRENT')" % wash_table_column_name(self.table_name[:-1]), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
             except DatabaseError:
                 # okay, it's an already existing record, no problem
                 pass

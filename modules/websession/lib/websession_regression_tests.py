@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2010, 2011, 2014 CERN.
+# Copyright (C) 2006, 2007, 2008, 2010, 2011, 2014, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -27,7 +27,8 @@ __revision__ = \
 from invenio.testutils import InvenioTestCase
 
 from mechanize import Browser
-from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_ADMIN_EMAIL
+from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_ADMIN_EMAIL, \
+    CFG_MISCUTIL_SMTP_PORT
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 from invenio.dbquery import run_sql
@@ -67,47 +68,46 @@ class WebSessionWebPagesAvailabilityTest(InvenioTestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-class WebSessionLostYourPasswordTest(InvenioTestCase):
-    """Test Lost Your Passwords functionality."""
+if CFG_MISCUTIL_SMTP_PORT:
+    class WebSessionLostYourPasswordTest(InvenioTestCase):
+        """Test Lost Your Passwords functionality."""
 
-    def test_lost_your_password_for_internal_accounts(self):
-        """websession - sending lost password for internal admin account"""
+        def test_lost_your_password_for_internal_accounts(self):
+            """websession - sending lost password for internal admin account"""
 
-        try_with_account = CFG_SITE_ADMIN_EMAIL
+            try_with_account = CFG_SITE_ADMIN_EMAIL
 
-        # click on "send lost password" for CFG_SITE_ADMIN_EMAIL internal account
-        browser = Browser()
-        browser.open(CFG_SITE_SECURE_URL + "/youraccount/lost")
-        browser.select_form(nr=0)
-        browser['p_email'] = try_with_account
-        try:
-            browser.submit()
-        except Exception, e:
-            # Restore the admin password (send_email set it to random number)
-            run_sql("UPDATE user SET password=AES_ENCRYPT(email, '')"
-                "WHERE id=1")
-            self.fail("Obtained %s: probably the email server is not installed "
-                "correctly." % e)
+            # click on "send lost password" for CFG_SITE_ADMIN_EMAIL internal account
+            browser = Browser()
+            browser.open(CFG_SITE_SECURE_URL + "/youraccount/lost")
+            browser.select_form(nr=0)
+            browser['p_email'] = try_with_account
+            try:
+                browser.submit()
+            except Exception, e:
+                # Restore the admin password (send_email set it to random number)
+                run_sql("UPDATE user SET password=AES_ENCRYPT(email, '')"
+                    "WHERE id=1")
+                self.fail("Obtained %s: probably the email server is not installed "
+                    "correctly." % e)
 
 
 
-        # verify the response:
-        expected_response = "Okay, a password reset link has been emailed to " + \
-                            try_with_account
-        lost_password_response_body = browser.response().read()
-        try:
-            lost_password_response_body.index(expected_response)
-        except ValueError:
-            # Restore the admin password (send_email set it to random number)
-            run_sql("UPDATE user SET password=AES_ENCRYPT(email, '')"
-                "WHERE id=1")
-            self.fail("Expected to see %s, got %s." % \
-                      (expected_response, lost_password_response_body))
+            # verify the response:
+            expected_response = "Okay, a password reset link has been emailed to " + \
+                                try_with_account
+            lost_password_response_body = browser.response().read()
+            try:
+                lost_password_response_body.index(expected_response)
+            except ValueError:
+                # Restore the admin password (send_email set it to random number)
+                run_sql("UPDATE user SET password=AES_ENCRYPT(email, '')"
+                    "WHERE id=1")
+else:
+    # SMTP server is not available. let's skip this test
+    class WebSessionLostYourPasswordTest(InvenioTestCase):
+        pass
 
-    def tearDown(self):
-        # Restore the admin password (send_email set it to random number)
-        run_sql("UPDATE user SET password=AES_ENCRYPT(email, '')"
-            "WHERE id=1")
 
 class WebSessionExternalLoginTest(InvenioTestCase):
     """Test external login functionality."""

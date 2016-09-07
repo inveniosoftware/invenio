@@ -46,9 +46,11 @@ def format_element(bfo, category_prefix, category_suffix, separator=" | ",
     _ = gettext_set_language(ln)
 
     # Retrieve categories for this journal and issue
-    journal_categories = get_journal_categories(journal_name,
-                                                display_all_categories.lower() != 'yes' and \
-                                                this_issue_number or None)
+    journal_categories = get_journal_categories(
+        journal_name,
+        this_issue_number,
+        display_all_categories.lower() == 'yes' and True or False
+    )
 
     # Build the links to categories
     categories_links = []

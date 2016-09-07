@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2015 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -598,10 +598,10 @@ class InvenioSessionMySQL(InvenioSessionBase):
                                     session_expiry,
                                     session_object,
                                     uid
-                    ) VALUES (%s, %s, %s, %s)
+                    ) VALUES (%s, %s, _binary %s, %s)
                    ON DUPLICATE KEY UPDATE
                         session_expiry=%s,
-                        session_object=%s,
+                        session_object=_binary %s,
                         uid=%s
         """, (session_key, session_expiry, session_object, uid,
             session_expiry, session_object, uid))

@@ -1127,7 +1127,7 @@ II. Example - connecting role and user</a>
 
     Example of role definition:
         allow not email /.*@gmail.com/,/.*@hotmail.com/
-        deny group badguys
+        deny group "badguys"
         allow remote_ip "127.0.0.0/24"
         deny all
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
+# Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -566,7 +566,7 @@ def cli_cmd_reset_recstruct_cache(conf):
                 value = serialize_via_marshal(get_record(recid))
 
             run_sql("DELETE FROM bibfmt WHERE id_bibrec=%s AND format='recstruct'", (recid, ))
-            run_sql("INSERT INTO bibfmt(id_bibrec, format, last_updated, value) VALUES(%s, 'recstruct', NOW(), %s)", (recid, value))
+            run_sql("INSERT INTO bibfmt(id_bibrec, format, last_updated, value) VALUES(%s, 'recstruct', NOW(), _binary %s)", (recid, value))
             count += 1
             if count % 1000 == 0:
                 print "    ... done records %s/%s" % (count, tot)
@@ -1140,6 +1140,8 @@ def cli_cmd_create_apache_conf(conf):
         ssl_crt_path = '/etc/pki/tls/certs/localhost.crt'
         ssl_key_path = '/etc/pki/tls/private/localhost.key'
         vhost_ip_address_needed = True
+        if os.popen('grep -c "CentOS.*[67]\." /etc/redhat-release').read().strip() == '1':
+            vhost_ip_address_needed = False
         wsgi_socket_directive_needed = True
     # maybe we are using non-standard ports?
     vhost_site_url = conf.get('Invenio', 'CFG_SITE_URL').replace("http://", "")

@@ -2,7 +2,7 @@
 # Ranking of records using different parameters and methods.
 
 # This file is part of Invenio.
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -194,7 +194,8 @@ def get_lastupdated(rank_method_code):
     if res:
         return res[0][0]
     else:
-        raise Exception("Is this the first run? Please do a complete update.")
+        # raise Exception("Is this the first run? Please do a complete update.")
+        return "1970-01-01 00:00:00"
 
 def intoDB(dic, date, rank_method_code):
     """Insert the rank method data into the database"""
@@ -202,13 +203,15 @@ def intoDB(dic, date, rank_method_code):
     del_rank_method_codeDATA(rank_method_code)
     serdata = serialize_via_marshal(dic)
     midstr = str(mid[0][0])
-    run_sql("INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) VALUES (%s,%s)", (midstr, serdata,))
+    run_sql("INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) VALUES (%s,_binary %s)", (midstr, serdata,))
     if date:
         run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s", (date, rank_method_code))
 
 def fromDB(rank_method_code):
     """Get the data for a rank method"""
     id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
+    if not id:
+        return {}
     res = run_sql("SELECT relevance_data FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (id[0][0], ))
     if res:
         return deserialize_via_marshal(res[0][0])
@@ -394,10 +397,7 @@ def add_recIDs_by_date(rank_method_code, dates=""):
        the ranking method RANK_METHOD_CODE.
     """
     if not dates:
-        try:
-            dates = (get_lastupdated(rank_method_code), '')
-        except Exception:
-            dates = ("0000-00-00 00:00:00", '')
+        dates = (get_lastupdated(rank_method_code), '')
     if dates[0] is None:
         dates = ("0000-00-00 00:00:00", '')
     query = """SELECT b.id FROM bibrec AS b WHERE b.modification_date >= %s"""

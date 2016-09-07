@@ -224,6 +224,16 @@ class WebLinkbackDatabaseTest(InvenioTestCase):
         """weblinkback - get all linkbacks with a certain status"""
         self.assertEqual(9, len(get_all_linkbacks(status=CFG_WEBLINKBACK_STATUS['PENDING'])))
         self.assertEqual(0, len(get_all_linkbacks(status=CFG_WEBLINKBACK_STATUS['APPROVED'])))
+        self.assertEqual(9, get_all_linkbacks(status=CFG_WEBLINKBACK_STATUS['PENDING'], full_count_only=True))
+        self.assertEqual(0, get_all_linkbacks(status=CFG_WEBLINKBACK_STATUS['APPROVED'], full_count_only=True))
+
+    def test_get_limited_count_of_linkbacks(self):
+        """weblinkback - get limited count of linkbacks"""
+        self.assertEqual(5, len(get_all_linkbacks(status=CFG_WEBLINKBACK_STATUS['PENDING'], limit=5)))
+        self.assertEqual(2, len(get_all_linkbacks(recid=42, status=CFG_WEBLINKBACK_STATUS['PENDING'], limit=2)))
+        # Ignores limit
+        self.assertEqual(9, get_all_linkbacks(status=CFG_WEBLINKBACK_STATUS['PENDING'], limit=5, full_count_only=True))
+        self.assertEqual(5, get_all_linkbacks(recid=42, status=CFG_WEBLINKBACK_STATUS['PENDING'], limit=2, full_count_only=True))
 
     def test_approve_linkback(self):
         """weblinkback - approve linkback"""

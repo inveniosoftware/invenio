@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of Invenio.
-# Copyright (C) 2010, 2011 CERN.
+# Copyright (C) 2010, 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+import logging
 
 """
 WebInterface (WSGI) related constants and Exceptions
@@ -121,7 +123,16 @@ HTTP_STATUS_MAP = {
 
 
 class SERVER_RETURN(Exception):
-    pass
+
+    def __init__(self, code=-1):
+        super(SERVER_RETURN, self).__init__(code)
+        if code < 400:
+            self.level = logging.INFO
+        elif code >= 400 and code < 500:
+            self.level = logging.WARN
+        else:
+            self.level = logging.ERROR
+
 
 class CookieError(Exception):
     pass

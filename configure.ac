@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2015 CERN.
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -923,6 +923,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/websubmit/etc/Makefile \
      modules/websubmit/lib/Makefile \
      modules/websubmit/lib/functions/Makefile \
+     modules/websubmit/lib/author_sources/Makefile \
      modules/websubmit/web/Makefile \
      modules/websubmit/web/admin/Makefile \
      modules/docextract/Makefile \
@@ -935,6 +936,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/docextract/etc/Makefile \
      modules/docextract/doc/admin/Makefile \
      modules/docextract/doc/hacking/Makefile \
+     scripts/Makefile \
      ])
 
 # Finally, write output files:
