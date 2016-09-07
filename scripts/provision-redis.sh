@@ -35,7 +35,7 @@ fi
 # quit on unbound symbols:
 set -o nounset
 
-provision_redis_ubuntu14 () {
+provision_redis_ubuntu () {
 
     # sphinxdoc-install-redis-ubuntu14-begin
     # update list of available packages:
@@ -119,8 +119,8 @@ main () {
 
     # call appropriate provisioning functions:
     if [ "$os_distribution" = "Ubuntu" ]; then
-        if [ "$os_release" = "14" ]; then
-            provision_redis_ubuntu14
+        if [ "$os_release" = "14" -o "$os_release" = "16" ]; then
+            provision_redis_ubuntu
         else
             echo "[ERROR] Sorry, unsupported release ${os_release}."
             exit 1

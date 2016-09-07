@@ -43,7 +43,7 @@ fi
 # unattended installation:
 export DEBIAN_FRONTEND=noninteractive
 
-provision_web_common_ubuntu14 () {
+provision_web_common_ubuntu () {
 
     # sphinxdoc-install-useful-system-tools-ubuntu14-begin
     # update list of available packages:
@@ -80,7 +80,7 @@ provision_web_common_ubuntu14 () {
     # sphinxdoc-install-web-common-ubuntu14-end
 }
 
-provision_web_libpostgresql_ubuntu14 () {
+provision_web_libpostgresql_ubuntu () {
 
     # sphinxdoc-install-web-libpostgresql-ubuntu14-begin
     $sudo apt-get -y install \
@@ -165,7 +165,7 @@ setup_virtualenvwrapper () {
 
 }
 
-setup_nginx_ubuntu14 () {
+setup_nginx_ubuntu () {
     # sphinxdoc-install-web-nginx-ubuntu14-begin
     # install Nginx web server:
     $sudo apt-get install -y nginx
@@ -227,18 +227,18 @@ main () {
     # call appropriate provisioning functions:
     if [ -f /.dockerinit ] || [ -f /.dockerenv ]; then
         # running inside Docker
-        provision_web_common_ubuntu14
-        provision_web_libpostgresql_ubuntu14
+        provision_web_common_ubuntu
+        provision_web_libpostgresql_ubuntu
         setup_npm_and_css_js_filters
         setup_virtualenvwrapper
         cleanup_web_ubuntu14
     elif [ "$os_distribution" = "Ubuntu" ]; then
-        if [ "$os_release" = "14" ]; then
-            provision_web_common_ubuntu14
-            provision_web_libpostgresql_ubuntu14
+        if [ "$os_release" = "14" -o "$os_release" = "16" ]; then
+            provision_web_common_ubuntu
+            provision_web_libpostgresql_ubuntu
             setup_npm_and_css_js_filters
             setup_virtualenvwrapper
-            setup_nginx_ubuntu14
+            setup_nginx_ubuntu
         else
             echo "[ERROR] Sorry, unsupported release ${os_release}."
             exit 1

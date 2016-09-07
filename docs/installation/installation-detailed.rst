@@ -137,7 +137,7 @@ First, let's see if using ``sudo`` will be required:
 
 Second, some useful system tools are installed:
 
-* on Ubuntu 14.04 LTS (Trusty Tahr):
+* on Ubuntu 14.04 LTS (Trusty Tahr) and Ubuntu 16.04 LTS (Xenial Xerus):
 
 .. include:: ../../scripts/provision-web.sh
    :start-after: # sphinxdoc-install-useful-system-tools-ubuntu14-begin
@@ -155,7 +155,7 @@ Third, an external Node.js package repository is enabled. We'll be needing to
 install and run Npm on the web node later. The Node.js repository is enabled as
 follows:
 
-* on Ubuntu 14.04 LTS (Trusty Tahr):
+* on Ubuntu 14.04 LTS (Trusty Tahr) and Ubuntu 16.04 LTS (Xenial Xerus):
 
 .. include:: ../../scripts/provision-web.sh
    :start-after: # sphinxdoc-add-nodejs-external-repository-ubuntu14-begin
@@ -172,7 +172,7 @@ follows:
 Fourth, all the common prerequisite software libraries and packages that Invenio
 needs are installed:
 
-* on Ubuntu 14.04 LTS (Trusty Tahr):
+* on Ubuntu 14.04 LTS (Trusty Tahr) and Ubuntu 16.04 LTS (Xenial Xerus):
 
 .. include:: ../../scripts/provision-web.sh
    :start-after: # sphinxdoc-install-web-common-ubuntu14-begin
@@ -189,7 +189,7 @@ needs are installed:
 We want to use PostgreSQL database in this installation example, so we need to
 install corresponding libraries too:
 
-* on Ubuntu 14.04 LTS (Trusty Tahr):
+* on Ubuntu 14.04 LTS (Trusty Tahr) and Ubuntu 16.04 LTS (Xenial Xerus):
 
 .. include:: ../../scripts/provision-web.sh
    :start-after: # sphinxdoc-install-web-libpostgresql-ubuntu14-begin
@@ -225,7 +225,7 @@ in the current user shell process:
 
 Seventh, we install Nginx web server and configure appropriate virtual host:
 
-* on Ubuntu 14.04 LTS (Trusty Tahr):
+* on Ubuntu 14.04 LTS (Trusty Tahr) and Ubuntu 16.04 LTS (Xenial Xerus):
 
 .. include:: ../../scripts/provision-web.sh
    :start-after: # sphinxdoc-install-web-nginx-ubuntu14-begin
@@ -241,7 +241,7 @@ Seventh, we install Nginx web server and configure appropriate virtual host:
 
 Finally, let's clean after ourselves:
 
-* on Ubuntu 14.04 LTS (Trusty Tahr):
+* on Ubuntu 14.04 LTS (Trusty Tahr) and Ubuntu 16.04 LTS (Xenial Xerus):
 
 .. include:: ../../scripts/provision-web.sh
    :start-after: # sphinxdoc-install-web-cleanup-ubuntu14-begin
@@ -275,7 +275,7 @@ Let's see in detail what the database provisioning script does.
 
 First, we install and configure the database software:
 
-* on Ubuntu 14.04 LTS (Trusty Tahr):
+* on Ubuntu 14.04 LTS (Trusty Tahr) and Ubuntu 16.04 LTS (Xenial Xerus):
 
 .. include:: ../../scripts/provision-postgresql.sh
    :start-after: # sphinxdoc-install-postgresql-ubuntu14-begin
@@ -301,7 +301,7 @@ the new database:
 
 Finally, let's clean after ourselves:
 
-* on Ubuntu 14.04 LTS (Trusty Tahr):
+* on Ubuntu 14.04 LTS (Trusty Tahr) and Ubuntu 16.04 LTS (Xenial Xerus):
 
 .. include:: ../../scripts/provision-postgresql.sh
    :start-after: # sphinxdoc-install-postgresql-cleanup-ubuntu14-begin
@@ -330,7 +330,7 @@ following script:
 
 Let's see in detail what the Redis provisioning script does.
 
-* on Ubuntu 14.04 LTS (Trusty Tahr):
+* on Ubuntu 14.04 LTS (Trusty Tahr) and Ubuntu 16.04 LTS (Xenial Xerus):
 
 .. include:: ../../scripts/provision-redis.sh
    :start-after: # sphinxdoc-install-redis-ubuntu14-begin
@@ -346,7 +346,7 @@ Let's see in detail what the Redis provisioning script does.
 
 Finally, let's clean after ourselves:
 
-* on Ubuntu 14.04 LTS (Trusty Tahr):
+* on Ubuntu 14.04 LTS (Trusty Tahr) and Ubuntu 16.04 LTS (Xenial Xerus):
 
 .. include:: ../../scripts/provision-redis.sh
    :start-after: # sphinxdoc-install-redis-cleanup-ubuntu14-begin
@@ -377,7 +377,7 @@ the following script:
 
 Let's see in detail what the Elasticsearch provisioning script does.
 
-* on Ubuntu 14.04 LTS (Trusty Tahr):
+* on Ubuntu 14.04 LTS (Trusty Tahr) and Ubuntu 16.04 LTS (Xenial Xerus):
 
 .. include:: ../../scripts/provision-elasticsearch.sh
    :start-after: # sphinxdoc-install-elasticsearch-ubuntu14-begin
@@ -400,7 +400,7 @@ Some packages require extra plugins to be installed.
 
 Finally, let's clean after ourselves:
 
-* on Ubuntu 14.04 LTS (Trusty Tahr):
+* on Ubuntu 14.04 LTS (Trusty Tahr) and Ubuntu 16.04 LTS (Xenial Xerus):
 
 .. include:: ../../scripts/provision-elasticsearch.sh
    :start-after: # sphinxdoc-install-elasticsearch-cleanup-ubuntu14-begin
@@ -429,7 +429,7 @@ following script:
 
 Let's see in detail what the RabbitMQ provisioning script does.
 
-* on Ubuntu 14.04 LTS (Trusty Tahr):
+* on Ubuntu 14.04 LTS (Trusty Tahr) and Ubuntu 16.04 LTS (Xenial Xerus):
 
 .. include:: ../../scripts/provision-rabbitmq.sh
    :start-after: # sphinxdoc-install-rabbitmq-ubuntu14-begin
@@ -445,7 +445,7 @@ Let's see in detail what the RabbitMQ provisioning script does.
 
 Finally, let's clean after ourselves:
 
-* on Ubuntu 14.04 LTS (Trusty Tahr):
+* on Ubuntu 14.04 LTS (Trusty Tahr) and Ubuntu 16.04 LTS (Xenial Xerus):
 
 .. include:: ../../scripts/provision-rabbitmq.sh
    :start-after: # sphinxdoc-install-rabbitmq-cleanup-ubuntu14-begin
@@ -475,7 +475,7 @@ following script:
 
 Let's see in detail what the worker provisioning script does.
 
-* on Ubuntu 14.04 LTS (Trusty Tahr):
+* on Ubuntu 14.04 LTS (Trusty Tahr) and Ubuntu 16.04 LTS (Xenial Xerus):
 
 .. include:: ../../scripts/provision-worker.sh
    :start-after: # sphinxdoc-install-worker-ubuntu14-begin
@@ -491,7 +491,7 @@ Let's see in detail what the worker provisioning script does.
 
 Finally, let's clean after ourselves:
 
-* on Ubuntu 14.04 LTS (Trusty Tahr):
+* on Ubuntu 14.04 LTS (Trusty Tahr) and Ubuntu 16.04 LTS (Xenial Xerus):
 
 .. include:: ../../scripts/provision-worker.sh
    :start-after: # sphinxdoc-install-worker-cleanup-ubuntu14-begin
