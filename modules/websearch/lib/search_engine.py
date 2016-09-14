@@ -957,6 +957,8 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
         else:
             # we are doing XML output:
             req.content_type = get_output_format_content_type(of, 'text/xml')
+            if 'Origin' in req.headers_in:
+                req.headers_out["Access-Control-Allow-Origin"] = '*'
             req.send_http_header()
             req.write("""<?xml version="1.0" encoding="UTF-8"?>\n""")
     elif of.startswith('t') or str(of[0:3]).isdigit():
@@ -968,6 +970,8 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
         req.send_http_header()
     elif of == "recjson":
         req.content_type = "application/json"
+        if 'Origin' in req.headers_in:
+            req.headers_out["Access-Control-Allow-Origin"] = '*'
         req.send_http_header()
     elif of == "id":
         pass # nothing to do, we shall only return list of recIDs
