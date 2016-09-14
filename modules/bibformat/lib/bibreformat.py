@@ -270,8 +270,7 @@ def outdated_caches(fmt, last_updated, chunk_size=5000):
     sql = """SELECT br.id
              FROM bibrec AS br
              INNER JOIN bibfmt AS bf ON bf.id_bibrec = br.id
-             WHERE br.modification_date >= %s
-             AND bf.format = %s
+             WHERE bf.format = %s
              AND bf.last_updated < br.modification_date
              AND br.id BETWEEN %s AND %s"""
 
@@ -280,7 +279,7 @@ def outdated_caches(fmt, last_updated, chunk_size=5000):
     max_id = run_sql("SELECT max(id) FROM bibrec")[0][0] or 0
     for start in xrange(1, max_id + 1, chunk_size):
         end = start + chunk_size
-        recids += intbitset(run_sql(sql, (last_updated_str, fmt, start, end)))
+        recids += intbitset(run_sql(sql, (fmt, start, end)))
 
     return recids
 
