@@ -242,8 +242,9 @@ PROFILE_IDENTIFIER_WHITELIST = {
     "bai": 1,
     "inspire": 2,
     "orcid": 3,
-    "googlescholar": 4,
-    "arxiv": 5
+    "kaken": 4,
+    "googlescholar": 5,
+    "arxiv": 6
 }
 
 # Used to define URL mappings for identifiers in lowercase
@@ -251,7 +252,8 @@ PROFILE_IDENTIFIER_WHITELIST = {
 # e.g. { "orcid": "https://orcid.org/{0}"}
 PROFILE_IDENTIFIER_URL_MAPPING = {
     "bai": "%s/author/profile/{0}" % CFG_SITE_URL,
-    "orcid": "https://orcid.org/{0}"
+    "orcid": "https://orcid.org/{0}",
+    "kaken": "https://kaken.nii.ac.jp/search/?qm={0}",
 }
 
 NON_EMPTY_PERSON_TAGS = ['canonical_name', 'user-created']
