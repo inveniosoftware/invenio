@@ -4469,6 +4469,30 @@ def get_orcid_id_of_signature(sig):
             except AttributeError:
                 pass
 
+def get_kaken_id_of_signature(sig):
+    """
+    Gets the external identifier of KAKEN system for the given signature.
+    The field to check is either '100__j' or '700__j'
+    and the prefix is 'KAKEN-'
+
+    @param sig: signature (bibref_table, bibref_value, bibrec)
+    type sig: tuple (int, int, int)
+
+    @return KAKEN external identifier
+    @rtype: str
+    """
+    table, ref, rec = sig
+    ext_ids_field = (str(table), ref, rec), str(table) + '__j'
+
+    ext_ids = get_grouped_records(*ext_ids_field).values()[0]
+    for ext_id in ext_ids:
+        if ext_id.startswith('KAKEN-'):
+            try:
+                return [re.search(r"\d{8}", ext_id).group()]
+            except AttributeError:
+                pass
+
+
 def get_author_names_from_db(pid):  # get_person_db_names_set
     '''
     Gets the set of names associated to the given author.

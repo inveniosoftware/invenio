@@ -34,6 +34,9 @@ if USE_EXT_IDS:
     if 'OrcidID' in EXT_IDS_TO_USE:
         from invenio.bibauthorid_backinterface import get_orcid_id_of_signature
         external_id_getters.append(get_orcid_id_of_signature)
+    if 'KAKEN' in EXT_IDS_TO_USE:
+        from invenio.bibauthorid_backinterface import get_kaken_id_of_signature
+        external_id_getters.append(get_kaken_id_of_signature)
 
 
 M_NAME_PIDS_CACHE = None

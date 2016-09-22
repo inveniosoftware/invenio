@@ -156,7 +156,7 @@ RABBIT_USE_EXTERNAL_IDS = True
 # Collect and use in rabbit external ids INSPIREID
 COLLECT_EXTERNAL_ID_INSPIREID = CFG_INSPIRE_SITE
 if CFG_INSPIRE_SITE:
-    RABBIT_EXTERNAL_IDS_TO_USE = ['InspireID', 'OrcidID']
+    RABBIT_EXTERNAL_IDS_TO_USE = ['InspireID', 'OrcidID', 'KAKEN']
 else:
     RABBIT_EXTERNAL_IDS_TO_USE = list()
 
@@ -231,7 +231,7 @@ CREATE_NEW_PERSON = -3
 
 # Dict which lists which external identifiers  can be stored on a person profile page, and maps them
 # with their representation in aidPERSONIDDATA
-PERSONID_EXTERNAL_IDENTIFIER_MAP = {'Inspire': 'INSPIREID', 'Orcid': 'ORCID'}
+PERSONID_EXTERNAL_IDENTIFIER_MAP = {'Inspire': 'INSPIREID', 'Orcid': 'ORCID', 'KAKEN': 'KAKEN'}
 
 # HepNames whitelist of identifiers displayed on user profiles.
 # Identifiers should be in lowercase and the value represents the priority.
