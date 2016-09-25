@@ -16,4 +16,4 @@ all the needed services such as PostgreSQL, Elasticsearch, Redis, RabbitMQ.
 
 For a detailed walk-through on how to set up your Invenio instance, please see
 our `installation documentation
-<http://pythonhosted.org/invenio/installation/index.html>`_.
+<http://invenio/installation.readthedocs.io/index.html>`_.

@@ -117,4 +117,4 @@ Here's the contents of the most important files:
             ...
 
 
-.. _Flask Login: https://flask-login.readthedocs.org/en/latest/
+.. _Flask Login: https://flask-login.readthedocs.io/en/latest/

@@ -25,7 +25,7 @@
 # This Vagrant configuration is suitable for testing detailed Invenio
 # installation instructions as they are described in:
 #
-# http://pythonhosted.org/invenio/installation/installation-detailed.html
+# http://invenio/installation.readthedocs.io/installation-detailed.html
 #
 # This Vagrant configuration uses separate dedicated VMs for various services in
 # order to better emulate production environment conditions. You can install an

@@ -44,6 +44,7 @@ include *.sh
 include *.txt
 include ABOUT-NLS
 include babel.ini
+include docs/requirements.txt
 include COPYING
 include LICENSE
 include pytest.ini

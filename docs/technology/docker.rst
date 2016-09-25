@@ -278,7 +278,7 @@ Done.  Your Invenio overlay installation is now up and running.
 .. _boot2docker: http://boot2docker.io/
 .. _Docker: https://www.docker.com/
 .. _Docker Compose: https://docs.docker.com/compose/
-.. _flower: https://flower.readthedocs.org/
+.. _flower: https://flower.readthedocs.io/
 .. _sysdig: http://www.sysdig.org/
 .. _Werkzeug: http://werkzeug.pocoo.org/
 .. _Wireshark: https://www.wireshark.org/

@@ -189,7 +189,7 @@ Some examples follow::
 
 .. _SQLAlchemy: http://www.sqlalchemy.org/
 .. _SQLAlchemy Relationships: http://docs.sqlalchemy.org/en/latest/orm/extensions/declarative.html#configuring-relationships
-.. _Flask-SQLAlchemy: http://pythonhosted.org/Flask-SQLAlchemy/
+.. _Flask-SQLAlchemy: http://Flask-SQLAlchemy.readthedocs.io/
 .. _Official Tutorial: http://docs.sqlalchemy.org/en/latest/orm/tutorial.html
 .. _Other Tutorial: http://www.rmunn.com/sqlalchemy-tutorial/tutorial.html
 
