@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -180,9 +180,9 @@ def gc_tasks(verbose=False, statuses=None, since=None, tasks=None): # pylint: di
                        runtime,sleeptime,arguments,status,progress)
                        SELECT id,proc,host,user,
                        runtime,sleeptime,arguments,status,progress
-                       FROM schTASK WHERE proc=%%s AND %s AND
+                       FROM schTASK WHERE proc like %%s AND %s AND
                        runtime<%%s""" % status_query, (task, date))
-            res = run_sql("""DELETE FROM schTASK WHERE proc=%%s AND %s AND
+            res = run_sql("""DELETE FROM schTASK WHERE proc like %%s AND %s AND
                              runtime<%%s""" % status_query, (task, date))
             write_message('Archived %s %s tasks (created before %s) with %s'
                                             % (res, task, date, status_query))
