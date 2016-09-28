@@ -1478,7 +1478,7 @@ class Template:
                 if show_status:
                     if not result["status"] and action_button_to_disable:
                         disabled = "disabled"
-                h('<form action="%s" method="get">%s%s<input type="submit" name="%s" class="%s aid_btn_blue" value="%s" %s/></form>' %
+                h('<form action="%s" method="post">%s%s<input type="submit" name="%s" class="%s aid_btn_blue" value="%s" %s/></form>' %
                     (action_button_link, parameters_sublink, hidden_status, canonical_id, action_button_class, action_button_text, disabled))  # confirmlink check if canonical id
                 h('</td>')
             h('</tr>')
