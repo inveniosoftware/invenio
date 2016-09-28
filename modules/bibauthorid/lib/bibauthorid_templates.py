@@ -168,20 +168,20 @@ class WebProfilePage():
             "spin.min.js",
             "sly.min.js",
             "parsley.js",
-            "bootstrap.min.js?g=c29c5bc",
+            "bootstrap.min.js?g=fbe082d",
             "underscore-min.js",
             "backbone.js",
             "handlebars.js",
             "author-handlebars-templates.js",
-            "bibauthorid.js?g=c29c5bc"
+            "bibauthorid.js?g=fbe082d"
         ]
 
         self.legacy_stylesheets = ["jquery-ui/themes/smoothness/jquery-ui.css",
                                    "datatables_jquery-ui.css"]
 
         self.stylesheets = [
-            "bootstrap.min.css?g=c29c5bc",
-            "bibauthorid.css?g=c29c5bc"
+            "bootstrap.min.css?g=fbe082d",
+            "bibauthorid.css?g=fbe082d"
         ]
         self.stylesheets = ["%s/%s" % (self.css_dir, item) for item in self.stylesheets]
         self.stylesheets = self.stylesheets + \

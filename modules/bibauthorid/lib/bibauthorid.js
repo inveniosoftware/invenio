@@ -1858,7 +1858,7 @@ jQuery(function($) {
                         $form.toggleClass("hidden", true);
                         $.ajax({
                             url: "/author/claim/action",
-                            action: "POST",
+                            type: "POST",
                             data: formSerialised,
                             success: function() {
                                 $successMsg.toggleClass("hidden", false);
@@ -2464,6 +2464,7 @@ $(document).ready(function() {
                             $modal.find(".modal-header>.modal-title").text("Please wait");
                             $.ajax({
                                 url: "/author/claim/action",
+                                type: "POST",
                                 // adding email manually
                                 data: $form.serialize() + email,
                                 success: function (data, status, jqXHR) {
