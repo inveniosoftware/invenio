@@ -131,7 +131,7 @@ from invenio.intbitset import intbitset
 from invenio.dbquery import DatabaseError, deserialize_via_marshal, InvenioDbQueryWildcardLimitError
 from invenio.access_control_engine import acc_authorize_action
 from invenio.errorlib import register_exception
-from invenio.textutils import encode_for_xml, wash_for_utf8, strip_accents
+from invenio.textutils import encode_for_xml, wash_for_utf8, strip_accents, translate_to_ascii
 from invenio.htmlutils import get_mathjax_header
 from invenio.htmlutils import nmtoken_from_string
 from invenio import bibrecord
@@ -4417,7 +4417,8 @@ def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_p
             else:
                 # no sort pattern defined, so join them all together
                 val = ''.join(vals)
-            val = strip_accents(val.lower()) # sort values regardless of accents and case
+            # sort values regardless of accents and case
+            val = translate_to_ascii(val).pop().lower()
             if val in recIDs_dict:
                 recIDs_dict[val].append(recID)
             else:
