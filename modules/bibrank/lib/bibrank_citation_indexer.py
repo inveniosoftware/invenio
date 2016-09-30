@@ -118,6 +118,12 @@ def deleted_recids_cache(cache={}):
     return cache['deleted_records']
 
 
+def withdrawn_recids_cache(cache={}):
+    if 'withdrawn_records' not in cache:
+        cache['withdrawn_records'] = search_unit(p='Withdrawn', f='980', m='a')
+    return cache['withdrawn_records']
+
+
 def superseeded_recids_cache(cache={}):
     if 'superseeded_records' not in cache:
         cache['superseeded_records'] = intbitset(
@@ -328,11 +334,14 @@ def process_and_store(recids, config, chunk_size, loss_checks=True):
         # (raises an exception if needed)
         if loss_checks:
             chunkset = intbitset(chunk)
-            activerecs = chunkset - deleted_recids_cache() - superseeded_recids_cache()
+            activerecs = chunkset - deleted_recids_cache() \
+                         - superseeded_recids_cache() \
+                         - withdrawn_recids_cache()
             records_to_ignore = check_citations_losses(config, activerecs, refs, cites)
-            write_message("skipped %d deleted records and %d superseeded records in loss check"
+            write_message("skipped %d deleted, %d superseeded, and %d withdrawn records in loss check"
                           % (len(chunkset & deleted_recids_cache()),
-                             len(chunkset & superseeded_recids_cache())))
+                             len(chunkset & superseeded_recids_cache()),
+                             len(chunkset & withdrawn_recids_cache())))
             for recid in records_to_ignore:
                 try:
                     chunk.pop(chunk.index(recid))
