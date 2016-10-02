@@ -46,7 +46,9 @@ include ABOUT-NLS
 include babel.ini
 include docs/requirements.txt
 include COPYING
+include .lgtm
 include LICENSE
+include MAINTAINERS
 include pytest.ini
 include THANKS
 recursive-include docs *.bat
