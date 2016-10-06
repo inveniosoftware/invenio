@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014, 2015 CERN.
+## Copyright (C) 2013, 2014, 2015, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -838,11 +838,11 @@ def load_rule(config, plugins, rule_name):
     return rule
 
 
-def load_rules(plugins):
+def load_rules(plugins,cfg=None):
     """
     Load the rules and return a dict with the rules
     """
-    config = task_get_option("config", "rules.cfg")
+    config = cfg or task_get_option("config", "rules.cfg")
     filename = os.path.join(CFG_ETCDIR, "bibcheck/", config)
     config = RawConfigParser()
     config.readfp(open(filename))
@@ -981,10 +981,10 @@ def _bibcheck_plugin_builder(plugin_name, plugin_code):
     return plugin
 
 
-def print_rules():
+def print_rules(cfg=None):
     """Prints the valid rules to stdout"""
     plugins  = load_plugins()
-    for rule_name, rule in load_rules(plugins).items():
+    for rule_name, rule in load_rules(plugins, cfg).items():
         print "Rule %s:" % rule_name
         if "filter_pattern" in rule:
             print " - Filter: %s" % rule["filter_pattern"]
@@ -1053,8 +1053,8 @@ def main():
       bibcheck -e foo,bar
     """
     try:
-        opts = getopt.getopt(sys.argv[1:], "lr",
-                                   ["list-plugins", "list-rules"])[0]
+        opts = getopt.getopt(sys.argv[1:], "lrc:",
+                                   ["list-plugins", "list-rules", "config="])[0]
     except getopt.GetoptError:
         opts = []
 
@@ -1063,7 +1063,7 @@ def main():
             print_plugins()
             return
         elif opt in ["-r", "--list-rules"]:
-            print_rules()
+            print_rules(*[c[1] for c in opts if c[0] in ('-c', '--config')])
             return
 
     # Build and submit the task
