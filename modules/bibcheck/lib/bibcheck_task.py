@@ -441,11 +441,18 @@ class AmendableRecord(dict):
         """
         if message == "":
             message = u"Deleted field %s" % (position[0])
-        self.set_amended(message)
         if position[2] is None:
-            return self._query(position[:1] + (None, None)).pop(position[1])
+            value = self._query(position[:1] + (None, None)).pop(position[1])
         else:
-            return self._query(position[:2] + (None,))[0].pop(position[2])
+            field = self._query(position[:2] + (None,))[0]
+            value = field.pop(position[2])
+            if not field:
+                self._query(position[:1] + (None, None)).pop(position[1])
+        tag = position[0][:3]
+        if not self[tag]:
+            del self[tag]
+        self.set_amended(message)
+        return value
 
     def add_field(self, tag, value, subfields=None):
         """ Add a field """
