@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -30,13 +30,16 @@ from invenio.bibcheck_plugins import mandatory, \
     enum, \
     dates, \
     texkey, \
-    url
+    url, \
+    remove_empty_fields
 from invenio.bibcheck_task import AmendableRecord
 
 MOCK_RECORD = {
     '001': [([], ' ', ' ', '1', 7)],
     '005': [([], ' ', ' ', '20130621172205.0', 7)],
-    '100': [([('a', 'Photolab ')], ' ', ' ', '', 7)], # Trailing spaces
+    '100': [([('a', 'Photolab '),
+              ('c', '')], ' ', ' ', '', 7)],  # Trailing spaces
+    '245': [([('a', ''), ('b', '')], ' ', ' ', '', 7)],  # remove-empty-fields
     '260': [([('c', '2000-06-14')], ' ', ' ', '', 7)],
     '261': [([('c', '14 Jun 2000')], ' ', ' ', '', 7)],
     '262': [([('c', '14 06 00')], ' ', ' ', '', 7)],
@@ -46,20 +49,17 @@ MOCK_RECORD = {
     '340': [([('a', 'FI\xc3\x28LM')], ' ', ' ', '', 7)], # Invalid utf-8
     '595': [([('a', ' Press')], ' ', ' ', '', 7)], # Leading spaces
     '653': [([('a', 'LEP')], '1', ' ', '', 7)],
-    '695': [([('a', 'gravitation: nonlocal'), ('2', 'INSPIRE')], ' ', ' ', '', 7)],
-    '696': [([('2', 'INSPIRE'), ('a', 'gravitation: nonlocal')], ' ', ' ', '', 7)],
-    '697': [([('2', 'author'), ('a', 'gravitation')], ' ', ' ', '', 7)],
-    '698': [([('a', 'gravitation: nonlocal'), ('a', 'propagator'), ('2', 'INSPIRE'), ('a', 'singularity')], ' ', ' ', '', 7)],
-    '699': [([('2', 'INSPIRE'), ('a', 'gravitation')], ' ', ' ', '', 7),
-            ([('2', 'INSPIRE'), ('a', 'antigravitation')], ' ', ' ', '', 7)
-            ],
+    '700': [([('a', 'Bella, Ludovica Aperio'),
+              ('c', '')], ' ', ' ', '', 7),
+            ([('a', 'Galtieri, Angela Barbaro')], ' ', ' ', '', 8)],  # remove-empty-fields
     '856': [([('f', 'neil.calder@cern.ch')], '0', ' ', '', 7)],
     '994': [([('u', 'http://httpstat.us/200')], '4', ' ', '', 7)], # Url that works
     '995': [([('u', 'www.google.com/favicon.ico')], '4', ' ', '', 7)],  # url without protocol
     '996': [([('u', 'httpstat.us/301')], '4', ' ', '', 7)],   # redirection without protocol
     '997': [([('u', 'http://httpstat.us/404')], '4', ' ', '', 7)], # Error 404
     '998': [([('u', 'http://httpstat.us/500')], '4', ' ', '', 7)], # Error 500
-    '999': [([('u', 'http://httpstat.us/301')], '4', ' ', '', 7)], # Permanent redirect
+    '999': [([('u', 'http://httpstat.us/301')], '4', ' ', '', 7), # Permanent redirect
+            ([], 'C', '5', '', 8)] # remove-empty-tag
 }
 
 RULE_MOCK = {
@@ -67,8 +67,26 @@ RULE_MOCK = {
     "holdingpen": True
 }
 
+
 class BibCheckPluginsTest(InvenioTestCase):
     """ Bibcheck default plugins test """
+
+    def assertDeletions(self, test, deletions, **kwargs):
+        """
+        Assert that the plugin "test" deletes from the mock record
+        the fields in the list 'deletions' and makes the record amended
+        when called with params kwargs.
+        """
+        record = AmendableRecord(MOCK_RECORD)
+        record.set_rule(RULE_MOCK)
+        test.check_record(record)
+        self.assertTrue(record.amended)
+        self.assertEqual(len(record._amendments), len(deletions))
+        for field in deletions:
+            self.assertEqual(0, len(list(record.iterfield(field))))
+        if kwargs.get('tagremoved'):
+            self.assertFalse(record.get(kwargs.get('tagremoved')))
+
 
     def assertAmends(self, test, changes, **kwargs):
         """
@@ -83,8 +101,8 @@ class BibCheckPluginsTest(InvenioTestCase):
         for field, val in changes.iteritems():
             if val is not None:
                 self.assertEqual(
-                    [((field, 0, 0), val)],
-                    list(record.iterfield(field))
+                    ((field, 0, 0), val),
+                    list(record.iterfield(field))[0]
                 )
             else:
                 self.assertEqual(len(list(record.iterfield(field))), 1)
@@ -159,8 +177,13 @@ class BibCheckPluginsTest(InvenioTestCase):
         """ TexKey plugin test """
         self.assertAmends(texkey, {"035__a": None})
 
+    def test_remove_empty_subfields(self):
+        """ remove_empty_fields plugin test """
+        self.assertDeletions(remove_empty_fields, ["700__c", '245__a', '245__b', "100__c", '999C5%'],
+                             tagremoved='245')
+
     # Test skipped by default because it involved making slow http requests
-    #def test_url(self):
+    # def test_url(self):
     #    """ Url checker plugin test. This plugin is disabled by default """
     #    self.assertOk(url, fields=["994%%u"])
     #    self.assertAmends(url, {"9954_u": "http://www.google.com/favicon.ico"}, fields=["995%%u"])
@@ -174,4 +197,3 @@ TEST_SUITE = make_test_suite(BibCheckPluginsTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
-
