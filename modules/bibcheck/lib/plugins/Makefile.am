@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,6 +24,7 @@ pylib_DATA = __init__.py \
     regexp_replace.py \
     rename_tag.py \
     rename_subfield.py \
+    remove_empty_fields.py \
     utf8.py \
     files.py \
     enum.py \
