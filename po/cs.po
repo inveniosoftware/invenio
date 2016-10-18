@@ -1,35 +1,22 @@
-# # This file is part of Invenio.
-# # Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
-# #
-# # Invenio is free software; you can redistribute it and/or
-# # modify it under the terms of the GNU General Public License as
-# # published by the Free Software Foundation; either version 2 of the
-# # License, or (at your option) any later version.
-# #
-# # Invenio is distributed in the hope that it will be useful, but
-# # WITHOUT ANY WARRANTY; without even the implied warranty of
-# # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# # General Public License for more details.
-# #
-# # You should have received a copy of the GNU General Public License
-# # along with Invenio; if not, write to the Free Software Foundation, Inc.,
-# # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR CERN
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.0.9\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2014-08-31 21:44+0200\n"
-"PO-Revision-Date: 2012-02-16 18:24+0100\n"
-"Last-Translator: Jiří Kunčar <jiri.kuncar@cern.ch>\n"
-"Language-Team: CS <info@invenio-software.org>\n"
-"Language: \n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Tibor Simko <tibor.simko@cern.ch>, 2016\n"
+"Language-Team: Czech (https://www.transifex.com/inveniosoftware/teams/23537/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: pygettext.py 1.5\n"
-"Plural-Forms: nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2);\n"
-"X-Language: cs_CZ\n"
-"X-Source-Language: C\n"
+"Language: cs\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #: modules/websearch/doc/search-guide.webdoc:361
 #: modules/websearch/doc/search-guide.webdoc:396
@@ -2154,18 +2141,16 @@ msgid "Upload history"
 msgstr "Historie nahrávání"
 
 #: modules/bibupload/lib/batchuploader_templates.py:311
-#, fuzzy
 msgid "Daemon monitor"
-msgstr "Daemon monitor"
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:354
 msgid "Input directory"
 msgstr "Vstupní adresář"
 
 #: modules/bibupload/lib/batchuploader_templates.py:356
-#, fuzzy
 msgid "Filename matching"
-msgstr "avíza"
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:371
 #, python-format
@@ -2173,27 +2158,21 @@ msgid "<b>%s documents</b> have been found."
 msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:373
-#, fuzzy
 msgid "The following files have been successfully queued:"
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:378
-#, fuzzy
 msgid "The following errors have occurred:"
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:385
-#, fuzzy
 msgid ""
 "Some files could not be moved to DONE folder. Please remove them manually."
 msgstr ""
-"Některé soubory nemohly být přesunuty do složky HOTOVO. Prosím, odstraňte "
-"ručně. "
 
 #: modules/bibupload/lib/batchuploader_templates.py:387
-#, fuzzy
 msgid "All uploaded files were moved to DONE folder."
-msgstr "Všechny nahrané soubory byly přesunuty do složky HOTOVO."
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:397
 #, python-format
@@ -2210,9 +2189,8 @@ msgid ""
 msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:404
-#, fuzzy
 msgid "Metadata folders"
-msgstr "Metadata složky"
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:426
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2183
@@ -2230,14 +2208,12 @@ msgid "Progress"
 msgstr "Průběh"
 
 #: modules/bibupload/lib/batchuploader_templates.py:428
-#, fuzzy
 msgid "Last BibSched tasks:"
-msgstr "Poslední BibSched úkoly:"
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:437
-#, fuzzy
 msgid "Next scheduled BibSched run:"
-msgstr "Příští naplánovaná BibSched běh:"
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:98
 msgid "Guests are not authorized to run batchuploader"
@@ -2249,18 +2225,16 @@ msgid "The user '%s' is not authorized to run batchuploader"
 msgstr "Uživatel '%s' není oprávněn provozovat batchuploader"
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:216
-#, fuzzy
 msgid "Document batch upload result"
-msgstr "Dokument šarže nahrávání výsledek"
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:299
 msgid "Upload succesful"
 msgstr ""
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:349
-#, fuzzy
 msgid "Batch Uploader: Daemon monitor"
-msgstr "Batch Přidal: Daemon monitor"
+msgstr ""
 
 #: modules/miscutil/lib/dateutils.py:82 modules/miscutil/lib/dateutils.py:109
 #: modules/webbasket/lib/webbasket.py:181
@@ -2268,9 +2242,8 @@ msgstr "Batch Přidal: Daemon monitor"
 #: modules/webbasket/lib/webbasket.py:879
 #: modules/websession/lib/webuser.py:306
 #: modules/webstyle/lib/webstyle_templates.py:577
-#, fuzzy
 msgid "N/A"
-msgstr "N/A"
+msgstr ""
 
 #: modules/miscutil/lib/dateutils.py:172
 msgid "Sun"
@@ -2755,36 +2728,33 @@ msgid "You do not have rights for this operation."
 msgstr "Nemáte práva pro tuto operaci."
 
 #: modules/webalert/lib/webalert.py:198
-#, fuzzy
 msgid "You already have an alert defined for the specified query and basket."
-msgstr "Ty už mají záznam definované pro zadaný dotaz a koš."
+msgstr ""
 
 #: modules/webalert/lib/webalert.py:221 modules/webalert/lib/webalert.py:345
-#, fuzzy
 msgid "The alert name cannot be empty."
-msgstr "Záznam jméno nemůže být prázdné."
+msgstr ""
 
 #: modules/webalert/lib/webalert.py:226
-#, fuzzy
 msgid "You are not the owner of this basket."
-msgstr "Vy nejste vlastníkem tohoto koše."
+msgstr ""
 
 #: modules/webalert/lib/webalert.py:237
-#, fuzzy, python-format
+#, python-format
 msgid "The alert %s has been added to your profile."
-msgstr "Záznam%s byl přidán do vašeho profilu."
+msgstr ""
 
 #: modules/webalert/lib/webalert.py:376
-#, fuzzy, python-format
+#, python-format
 msgid "The alert %s has been successfully updated."
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/webalert/lib/webalert.py:428
 #, python-format
 msgid ""
-"You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s "
-"is available with a possibility to (a) view search results and (b) subscribe "
-"to an automatic email alerting service for these queries."
+"You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s"
+" is available with a possibility to (a) view search results and (b) "
+"subscribe to an automatic email alerting service for these queries."
 msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:74
@@ -2863,14 +2833,12 @@ msgid "QUERY"
 msgstr "DOTAZ"
 
 #: modules/webalert/lib/webalert_templates.py:210
-#, fuzzy
 msgid "Alert identification name:"
-msgstr "Výstraha identifikační název:"
+msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:212
-#, fuzzy
 msgid "Search-checking frequency:"
-msgstr "Hledat kontroly frekvence:"
+msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:216
 #: modules/webalert/lib/webalert_templates.py:336
@@ -2905,9 +2873,9 @@ msgid "no"
 msgstr "ne"
 
 #: modules/webalert/lib/webalert_templates.py:224
-#, fuzzy, python-format
+#, python-format
 msgid "if %(x_fmt_open)sno%(x_fmt_close)s you must specify a basket"
-msgstr "Pokud%(x_fmt_open) SNO%(x_fmt_close) je nutné zadat koš"
+msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:226
 msgid "Store results in basket?"
@@ -2941,9 +2909,8 @@ msgid "No"
 msgstr "Ne"
 
 #: modules/webalert/lib/webalert_templates.py:319
-#, fuzzy
 msgid "Search checking frequency"
-msgstr "Hledat kontrola frekvence"
+msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:320
 msgid "Notification by email"
@@ -2990,9 +2957,9 @@ msgid "Execute search"
 msgstr "Spustit vyhledávání"
 
 #: modules/webalert/lib/webalert_templates.py:398
-#, fuzzy, python-format
+#, python-format
 msgid "You have defined %s alerts."
-msgstr "Vy jste definován%s výstrahy."
+msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:436
 #, python-format
@@ -3004,14 +2971,14 @@ msgstr ""
 #: modules/webalert/lib/webalert_templates.py:445
 #, python-format
 msgid ""
-"You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during "
-"the last 30 days or so."
+"You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during"
+" the last 30 days or so."
 msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:450
-#, fuzzy, python-format
+#, python-format
 msgid "Here are the %s most popular searches."
-msgstr "Zkuste hledat na..."
+msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:461
 msgid "Question"
@@ -3146,23 +3113,22 @@ msgstr "Chyba"
 #: modules/webalert/lib/webalert_webinterface.py:371
 #: modules/webalert/lib/webalert_webinterface.py:448
 #: modules/webalert/lib/webalert_webinterface.py:522
-#, fuzzy, python-format
+#, python-format
 msgid "%s Personalize, Set a new alert"
-msgstr "%S Přizpůsobit, Nastavení nového záznamu"
+msgstr ""
 
 #: modules/webalert/lib/webalert_webinterface.py:178
 msgid "Set a new alert"
 msgstr "Nastavit nové upozornění"
 
 #: modules/webalert/lib/webalert_webinterface.py:263
-#, fuzzy
 msgid "Modify alert settings"
-msgstr "Změna nastavení upozornění"
+msgstr ""
 
 #: modules/webalert/lib/webalert_webinterface.py:270
-#, fuzzy, python-format
+#, python-format
 msgid "%s Personalize, Modify alert settings"
-msgstr "%S Přizpůsobit Změna nastavení upozornění"
+msgstr ""
 
 #: modules/webalert/lib/webalert_webinterface.py:314
 #: modules/websession/lib/websession_templates.py:488
@@ -3173,9 +3139,9 @@ msgstr "Vaše upozornění"
 #: modules/webalert/lib/webalert_webinterface.py:397
 #: modules/webalert/lib/webalert_webinterface.py:474
 #: modules/webalert/lib/webalert_webinterface.py:550
-#, fuzzy, python-format
+#, python-format
 msgid "%s Personalize, Display alerts"
-msgstr "Zobrazit výsledky:"
+msgstr ""
 
 #: modules/webalert/lib/webalert_webinterface.py:390
 #: modules/webalert/lib/webalert_webinterface.py:467
@@ -3255,10 +3221,10 @@ msgid ""
 msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:87
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You may want to start by %(x_url_open)screating a new basket%(x_url_close)s."
-msgstr "Můžete začít tím,%(x_url_open) screating nový koš%(x_url_close) s."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:111
 #: modules/webbasket/lib/webbasket_templates.py:177
@@ -3357,17 +3323,17 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1043
 #: modules/webbasket/lib/webbasket_templates.py:1067
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_title)s, by %(x_name)s on %(x_date)s:"
-msgstr "Citováno: %s záznamy"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1046
 #: modules/webbasket/lib/webbasket_templates.py:1070
 #: modules/webcomment/lib/webcomment.py:1477
 #: modules/webcomment/lib/webcomment_templates.py:365
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_name)s wrote on %(x_date)s:"
-msgstr "Citováno: %s záznamy"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1126
 msgid "Select topic"
@@ -3433,24 +3399,24 @@ msgid "URL"
 msgstr "URL"
 
 #: modules/webbasket/lib/webbasket_templates.py:1279
-#, fuzzy, python-format
+#, python-format
 msgid "%i items have been successfully added to your basket"
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1280
-#, fuzzy, python-format
+#, python-format
 msgid "Proceed to the %(x_url_open)sbasket%(x_url_close)s"
-msgstr "Přejít k%(x_url_open) sbasket%(x_url_close) s"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1285
-#, fuzzy, python-format
+#, python-format
 msgid " or return to your %(x_url_open)sprevious basket%(x_url_close)s"
-msgstr "Nebo se vrátit ke svému%(x_url_open) sprevious košík%(x_url_close) s."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1289
-#, fuzzy, python-format
+#, python-format
 msgid " or return to your %(x_url_open)ssearch%(x_url_close)s"
-msgstr "Nebo se vrátit ke svému%(x_url_open) ssearch%(x_url_close) s"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1398
 #, python-format
@@ -3465,38 +3431,35 @@ msgid ""
 msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1405
-#, fuzzy
 msgid "Optionally, add a note to each one of these items"
-msgstr "Volitelně lze přidat poznámku ke každému z těchto položek"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1406
-#, fuzzy
 msgid "Optionally, add a note to this item"
-msgstr "Volitelně lze přidat poznámku k této položce"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1412
 msgid "Add items"
 msgstr "Přidat položky"
 
 #: modules/webbasket/lib/webbasket_templates.py:1436
-#, fuzzy
 msgid "Are you sure you want to delete this basket?"
-msgstr "Jste si jisti, že chcete smazat tento košík?"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1438
-#, fuzzy, python-format
+#, python-format
 msgid "%i users are subscribed to this basket."
-msgstr "Uživatelé%i se přihlásili k odběru tohoto koše."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1440
-#, fuzzy, python-format
+#, python-format
 msgid "%i user groups are subscribed to this basket."
-msgstr "%I skupiny uživatelů se k odběru tohoto koše."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1442
-#, fuzzy, python-format
+#, python-format
 msgid "You have set %i alerts on this basket."
-msgstr "Nastavili jste%i upozorní na koš."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1480
 #: modules/webcomment/lib/webcomment_templates.py:229
@@ -3537,9 +3500,9 @@ msgid "Delete basket"
 msgstr "Smazat košík"
 
 #: modules/webbasket/lib/webbasket_templates.py:1578
-#, fuzzy, python-format
+#, python-format
 msgid "Editing basket %(x_basket_name)s"
-msgstr "košíky"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1587
 #: modules/webbasket/lib/webbasket_templates.py:1642
@@ -3551,9 +3514,9 @@ msgid "Topic name"
 msgstr "Jméno tématu"
 
 #: modules/webbasket/lib/webbasket_templates.py:1637
-#, fuzzy, python-format
+#, python-format
 msgid "Editing topic: %(x_topic_name)s"
-msgstr "Úpravy téma:%(x_topic_name) s"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1654
 #: modules/webbasket/lib/webbasket_templates.py:1669
@@ -3619,8 +3582,8 @@ msgstr "Sdílet košík s novou skupinou"
 #: modules/webbasket/lib/webbasket_templates.py:1756
 #: modules/websession/lib/websession_templates.py:522
 msgid ""
-"You are logged in as a guest user, so your baskets will disappear at the end "
-"of the current session."
+"You are logged in as a guest user, so your baskets will disappear at the end"
+" of the current session."
 msgstr ""
 "Jste přihlášeni jako uživatel host, takže vaše košíky zmizí na konci "
 "současné relace."
@@ -3628,11 +3591,10 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:1757
 #: modules/webbasket/lib/webbasket_templates.py:1772
 #: modules/websession/lib/websession_templates.py:525
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
 msgstr ""
-"Pokud chcete, můžete%(x_url_open) slogin či se registrovat%(x_url_close) s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1771
 #: modules/websession/lib/websession_webinterface.py:261
@@ -3652,9 +3614,9 @@ msgstr "%i položky"
 
 #: modules/webbasket/lib/webbasket_templates.py:1954
 #: modules/webbasket/lib/webbasket_templates.py:2988
-#, fuzzy, python-format
+#, python-format
 msgid "%i notes"
-msgstr "výsledky"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1954
 msgid "no notes yet"
@@ -3764,9 +3726,9 @@ msgstr "konto"
 
 #: modules/webbasket/lib/webbasket_templates.py:2442
 #: modules/webbasket/lib/webbasket_templates.py:3295
-#, fuzzy, python-format
+#, python-format
 msgid "Item %(x_item_index)i of %(x_item_total)i"
-msgstr "Položka%(x_item_index) I%(x_item_total) i"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:2455
 #: modules/webbasket/lib/webbasket_templates.py:2458
@@ -3799,20 +3761,17 @@ msgstr "Návrat do košíku"
 
 #: modules/webbasket/lib/webbasket_templates.py:2630
 #: modules/webbasket/lib/webbasket_templates.py:3456
-#, fuzzy
 msgid "The item you have selected does not exist."
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:2658
 #: modules/webbasket/lib/webbasket_templates.py:3480
-#, fuzzy
 msgid "You do not have sufficient rights to view this item's notes."
-msgstr "Tato kolekce ješte neobsahuje žádné záznamy."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:2699
-#, fuzzy
 msgid "You do not have sufficient rights to view this item."
-msgstr "Tato kolekce ješte neobsahuje žádné záznamy."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:2806
 #: modules/webbasket/lib/webbasket_templates.py:2816
@@ -3837,9 +3796,9 @@ msgstr "Odpovědět"
 
 #: modules/webbasket/lib/webbasket_templates.py:2883
 #: modules/webbasket/lib/webbasket_templates.py:3682
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_title)s, by %(x_name)s on %(x_date)s"
-msgstr "Citováno: %s záznamy"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:2885
 #: modules/webbasket/lib/webbasket_templates.py:3684
@@ -3953,9 +3912,9 @@ msgstr "%(report_number)s\"%(title)s\" byl okomentován"
 #: modules/webcomment/lib/webcomment_templates.py:241
 #: modules/webcomment/lib/webcomment_templates.py:671
 #: modules/webcomment/lib/webcomment_templates.py:681
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_nb)i comments for round \"%(x_name)s\""
-msgstr "Citováno: %s záznamy"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:112
 #: modules/webcomment/lib/webcomment_templates.py:798
@@ -3975,29 +3934,27 @@ msgstr "Diskutovat o tomto dokumentu"
 
 #: modules/webcomment/lib/webcomment_templates.py:162
 #: modules/webcomment/lib/webcomment_templates.py:808
-#, fuzzy
 msgid "Start a discussion about any aspect of this document."
-msgstr "Start se diskutuje o každém aspektu tohoto dokumentu."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:178
-#, fuzzy, python-format
+#, python-format
 msgid "Sorry, the record %s does not seem to exist."
-msgstr "Promiň, záznam%s nevypadá, že neexistuje."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:180
-#, fuzzy, python-format
+#, python-format
 msgid "Sorry, %s is not a valid ID value."
-msgstr "Je mi líto,%s není platný občanský hodnotu."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:182
-#, fuzzy
 msgid "Sorry, no record ID was provided."
-msgstr "Omlouvám se, nebyla ID záznamu poskytovány."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:186
-#, fuzzy, python-format
+#, python-format
 msgid "You may want to start browsing from %s"
-msgstr "Můžete začít prohledávat%s"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:264
 #: modules/webcomment/lib/webcomment_templates.py:722
@@ -4013,16 +3970,14 @@ msgstr "Napsat recenzi"
 #: modules/webcomment/lib/webcomment_templates.py:282
 #: modules/webcomment/lib/webcomment_templates.py:786
 #: modules/webcomment/lib/webcomment_templates.py:1975
-#, fuzzy, python-format
+#, python-format
 msgid "Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews"
 msgstr ""
-"Průměrné skóre v recenzi:%(x_nb_score) je založena na%(x_nb_reviews) S "
-"hodnocení"
 
 #: modules/webcomment/lib/webcomment_templates.py:285
-#, fuzzy, python-format
+#, python-format
 msgid "Readers found the following %s reviews to be most helpful."
-msgstr "Čtenáři nalezeny následující%s recenzí být velmi užitečné."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:288
 #: modules/webcomment/lib/webcomment_templates.py:311
@@ -4068,9 +4023,9 @@ msgid "Attached files"
 msgstr "Přiložené soubory"
 
 #: modules/webcomment/lib/webcomment_templates.py:473
-#, fuzzy, python-format
+#, python-format
 msgid "Reviewed by %(x_nickname)s on %(x_date)s"
-msgstr "Citováno: %s záznamy"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:474
 #, python-format
@@ -4181,9 +4136,9 @@ msgid "You are not authorized to comment or review."
 msgstr "Nemáte oprávnění komentovat nebo hodnotit."
 
 #: modules/webcomment/lib/webcomment_templates.py:1078
-#, fuzzy, python-format
+#, python-format
 msgid "Note: Your nickname, %s, will be displayed as author of this comment."
-msgstr "Poznámka: Vaše přezdívka,%s, zobrazí se jako autor tohoto komentáře."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1082
 #: modules/webcomment/lib/webcomment_templates.py:1195
@@ -4194,19 +4149,16 @@ msgid ""
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1099
-#, fuzzy
 msgid "Once logged in, authorized users can also attach files."
-msgstr "Jakmile se přihlásíte, můžete oprávnění uživatelé připojit soubory."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1114
-#, fuzzy
 msgid "Optionally, attach a file to this comment"
-msgstr "V případě potřeby připojit soubor na názor"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1115
-#, fuzzy
 msgid "Optionally, attach files to this comment"
-msgstr "V případě potřeby připojovat soubory k tomuto komentáři"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1116
 msgid "Max one file"
@@ -4236,10 +4188,10 @@ msgid "Add comment"
 msgstr "Přidat komentář"
 
 #: modules/webcomment/lib/webcomment_templates.py:1190
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Note: Your nickname, %s, will be displayed as the author of this review."
-msgstr "Poznámka: Vaše přezdívka,%s, zobrazí se jako autor tohoto přezkumu."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1266
 msgid "Rate this article"
@@ -4327,15 +4279,12 @@ msgid ""
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1456
-#, fuzzy
 msgid "Comment ID:"
-msgstr "Komentář ID:"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1457
-#, fuzzy
 msgid "Or enter a record ID to list all the associated comments/reviews:"
 msgstr ""
-"Nebo zadejte rekordní ID seznam veškerých souvisejících komentáře / recenze:"
 
 #: modules/webcomment/lib/webcomment_templates.py:1458
 msgid "Record ID:"
@@ -4346,9 +4295,8 @@ msgid "View Comment"
 msgstr "Zobrazit komentář"
 
 #: modules/webcomment/lib/webcomment_templates.py:1481
-#, fuzzy
 msgid "There have been no reports so far."
-msgstr "Tam byly žádné zprávy tak daleko."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1485
 #, python-format
@@ -4362,8 +4310,8 @@ msgstr "Zobrazit všechny nahlášené recenze %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1525
 msgid ""
-"Here is a list, sorted by total number of reports, of all users who have had "
-"a comment reported at least once."
+"Here is a list, sorted by total number of reports, of all users who have had"
+" a comment reported at least once."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1533
@@ -4418,9 +4366,8 @@ msgid "Number positive votes"
 msgstr "Počet pozitivních hlasů"
 
 #: modules/webcomment/lib/webcomment_templates.py:1538
-#, fuzzy
 msgid "Number negative votes"
-msgstr "Počet negativních hlasů"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1539
 msgid "Total number votes"
@@ -4431,19 +4378,18 @@ msgid "Total number of reports"
 msgstr "Celkový počet hlášení"
 
 #: modules/webcomment/lib/webcomment_templates.py:1541
-#, fuzzy
 msgid "View all user's reported comments/reviews"
-msgstr "Zobrazit všechny uživatele vykazované názory na hodnocení"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1574
-#, fuzzy, python-format
+#, python-format
 msgid "This review has been reported %i times"
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1576
-#, fuzzy, python-format
+#, python-format
 msgid "This comment has been reported %i times"
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1819
 msgid "Written by"
@@ -4507,41 +4453,36 @@ msgid "Here is comment %s"
 msgstr "Tady je komentář %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1868
-#, fuzzy, python-format
+#, python-format
 msgid "Here is review %(x_cmtID)s written by user %(x_user)s"
-msgstr "Zde je přehled%(x_cmtID) je napsán uživatelem%(x_user) s"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1870
-#, fuzzy, python-format
+#, python-format
 msgid "Here is comment %(x_cmtID)s written by user %(x_user)s"
-msgstr "Tady je komentář%(x_cmtID) je napsán uživatelem%(x_user) s"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1876
-#, fuzzy
 msgid "Here are all reported reviews sorted by the most reported"
-msgstr "Tady jsou všechny hlášené Recenze tříděné podle nejčastěji uváděným"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1878
-#, fuzzy
 msgid "Here are all reported comments sorted by the most reported"
 msgstr ""
-"Tady jsou všechny nahlášené připomínky tříděné podle nejčastěji hlášenou"
 
 #: modules/webcomment/lib/webcomment_templates.py:1883
-#, fuzzy, python-format
+#, python-format
 msgid "Here are all reviews for record %i, sorted by the most reported"
 msgstr ""
-"Tady jsou všechny názory na rekordních%i, tříděné podle nejčastěji uváděným"
 
 #: modules/webcomment/lib/webcomment_templates.py:1884
 msgid "Show comments"
 msgstr "Zobrazit komentáře"
 
 #: modules/webcomment/lib/webcomment_templates.py:1886
-#, fuzzy, python-format
+#, python-format
 msgid "Here are all comments for record %i, sorted by the most reported"
 msgstr ""
-"Tady jsou všechny komentáře k záznamu%i, tříděné podle nejčastěji uváděným"
 
 #: modules/webcomment/lib/webcomment_templates.py:1887
 msgid "Show reviews"
@@ -4562,9 +4503,8 @@ msgid "successfully undeleted"
 msgstr "úspěšně obnoveno"
 
 #: modules/webcomment/lib/webcomment_templates.py:1962
-#, fuzzy
 msgid "successfully suppressed abuse report"
-msgstr "Úspěšně potlačil hlášení o zneužití"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1979
 msgid "Not yet reviewed"
@@ -4622,9 +4562,8 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_webinterface.py:344
 #: modules/webcomment/lib/webcomment_webinterface.py:579
 #: modules/webcomment/lib/webcomment_webinterface.py:656
-#, fuzzy
 msgid "You do not have access to the specified comment"
-msgstr "Tato kolekce ješte neobsahuje žádné záznamy."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_webinterface.py:491
 #: modules/websubmit/lib/websubmit_templates.py:2659
@@ -4982,22 +4921,18 @@ msgid "No values found."
 msgstr "Nebyly nalezeny žádné hodnoty."
 
 #: modules/websearch/lib/search_engine.py:1825
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Warning: full-text search is only available for a subset of papers mostly "
 "from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
-"Varování: full-textové vyhledávání je k dispozici pouze pro určitou "
-"podmnožinu příspěvků."
 
 #: modules/websearch/lib/search_engine.py:1829
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Warning: figure caption search is only available for a subset of papers "
 "mostly from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
-"Varování: hodnota titulku hledání je k dispozici pouze pro určitou "
-"podmnožinu papírů."
 
 #: modules/websearch/lib/search_engine.py:1838
 msgid ""
@@ -5028,14 +4963,14 @@ msgid ""
 "Search syntax misunderstood. Ignoring all parentheses in the query. If this "
 "doesn't help, please check your search and try again."
 msgstr ""
-"Syntaxe dotazu nepochopena. Ignorování všech závorek v dotazu. Pokud je toto "
-"nepomůže, zkontrolujte Váš dotaz a zkuste to znova."
+"Syntaxe dotazu nepochopena. Ignorování všech závorek v dotazu. Pokud je toto"
+" nepomůže, zkontrolujte Váš dotaz a zkuste to znova."
 
 #: modules/websearch/lib/search_engine.py:2341
 #, python-format
 msgid ""
-"No match found in collection %(x_collection)s. Other public collections gave "
-"%(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
+"No match found in collection %(x_collection)s. Other public collections gave"
+" %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
 msgstr ""
 "Žádný záznam nebyl nalezen v kolekci %(x_collection)s. Ostatní veřejně "
 "dostupné kolekce dali %(x_url_open)s%(x_nb_hits)d výsledků%(x_url_close)s."
@@ -5081,7 +5016,8 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:2534
 #, python-format
 msgid ""
-"Search term %s did not match any record. Nearest terms in any collection are:"
+"Search term %s did not match any record. Nearest terms in any collection "
+"are:"
 msgstr ""
 "Hledaný výraz %s neodpovídá žádnému záznamu. Nejbližší termíny v každé "
 "kolekci jsou:"
@@ -5428,7 +5364,8 @@ msgstr "Nenalezeny žádné výsledky ..."
 
 #: modules/websearch/lib/websearch_templates.py:3080
 msgid ""
-"Boolean query returned no hits. Please combine your search terms differently."
+"Boolean query returned no hits. Please combine your search terms "
+"differently."
 msgstr ""
 "Booleovský dotaz nevrátil žádný výsledek. Zkuste zkombinovat dané termíny "
 "jiným způsobem."
@@ -5481,19 +5418,17 @@ msgstr "Můžete začít prohledávat od %s."
 #, python-format
 msgid ""
 "Set up a personal %(x_url1_open)semail alert%(x_url1_close)s\n"
-"                                  or subscribe to the %(x_url2_open)sRSS feed"
-"%(x_url2_close)s."
+"                                  or subscribe to the %(x_url2_open)sRSS feed%(x_url2_close)s."
 msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3573
-#, fuzzy, python-format
+#, python-format
 msgid "Subscribe to the %(x_url2_open)sRSS feed%(x_url2_close)s."
-msgstr "Přihlásit se k%(x_url2_open) SRSS zdroj%(x_url2_close) s."
+msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3582
-#, fuzzy
 msgid "Interested in being notified about new results for this query?"
-msgstr "Zajímá se o oznámení o nových výsledků tohoto dotazu?"
+msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3701
 msgid "People who downloaded this document also downloaded:"
@@ -5519,9 +5454,8 @@ msgid ".. of which self-citations: %s records"
 msgstr ".. z toho vlastní citace v %s záznamech"
 
 #: modules/websearch/lib/websearch_templates.py:3925
-#, fuzzy
 msgid "Papers:"
-msgstr "avíza"
+msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3928
 msgid "downloaded"
@@ -5532,9 +5466,8 @@ msgid "times"
 msgstr "krát"
 
 #: modules/websearch/lib/websearch_templates.py:3962
-#, fuzzy
 msgid "Affiliations:"
-msgstr "Citační historie:"
+msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3981
 msgid "Frequent keywords:"
@@ -5627,17 +5560,17 @@ msgstr "stručný"
 #: modules/websession/lib/webaccount.py:115
 #, python-format
 msgid ""
-"You are logged in as guest. You may want to %(x_url_open)slogin"
-"%(x_url_close)s as a regular user."
+"You are logged in as guest. You may want to "
+"%(x_url_open)slogin%(x_url_close)s as a regular user."
 msgstr ""
-"Jste přihlášen jako host. Možná se budete chtít %(x_url_open)spřihlásit"
-"%(x_url_close)s jako bežný uživatel."
+"Jste přihlášen jako host. Možná se budete chtít "
+"%(x_url_open)spřihlásit%(x_url_close)s jako bežný uživatel."
 
 #: modules/websession/lib/webaccount.py:119
 #, python-format
 msgid ""
-"The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister"
-"%(x_url_close)s first"
+"The %(x_fmt_open)sguest%(x_fmt_close)s users need to "
+"%(x_url_open)sregister%(x_url_close)s first"
 msgstr ""
 
 #: modules/websession/lib/webaccount.py:124
@@ -5708,8 +5641,8 @@ msgid ""
 "If you want to change your password, please enter the old one and set the "
 "new value in the form below."
 msgstr ""
-"Pokud chcete změnit své heslo, zadejte staré a nastavte nové ve spodní části "
-"formuláře."
+"Pokud chcete změnit své heslo, zadejte staré a nastavte nové ve spodní části"
+" formuláře."
 
 #: modules/websession/lib/websession_templates.py:214
 msgid "Old password"
@@ -5827,8 +5760,8 @@ msgid ""
 "account%(x_fmt_close)s, then please enter your email address in the "
 "following form in order to have a password reset link emailed to you."
 msgstr ""
-"Pokud jste ztratili heslo pro %(sitename)s %(x_fmt_open)svnitří účet"
-"%(x_fmt_close)s, zadejte, prosím, Vaši emailovou adresu v následujícím "
+"Pokud jste ztratili heslo pro %(sitename)s %(x_fmt_open)svnitří "
+"účet%(x_fmt_close)s, zadejte, prosím, Vaši emailovou adresu v následujícím "
 "formuláři pro zaslání odkazu na změnu hesla."
 
 #: modules/websession/lib/websession_templates.py:417
@@ -5847,14 +5780,14 @@ msgid ""
 "then you can recover your password through the %(x_url_open)sCERN "
 "authentication system%(x_url_close)s."
 msgstr ""
-"Pokud jste používali %(x_fmt_open)spřihlašovací systém CERNu%(x_fmt_close)s, "
-"pak můžete obnovit Vaše heslo pomocí %(x_url_open)sauthentikačního systému "
+"Pokud jste používali %(x_fmt_open)spřihlašovací systém CERNu%(x_fmt_close)s,"
+" pak můžete obnovit Vaše heslo pomocí %(x_url_open)sauthentikačního systému "
 "CERNu%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:425
 msgid ""
-"Note that if you have been using an external login system, then we cannot do "
-"anything and you have to ask there."
+"Note that if you have been using an external login system, then we cannot do"
+" anything and you have to ask there."
 msgstr ""
 "Všimněte si, že pokud jste používali externí přihlašovací systém, pak "
 "nemůžeme nic dělat a musíte se zeptat zde."
@@ -5875,8 +5808,8 @@ msgid ""
 "own personal library of documents, or to set up an automatic alert query "
 "that would run periodically and would notify you of search results by email."
 msgstr ""
-"%s Vám nabízí možnost přizpůsobit rozhraní, nastavit vlastní osobní knihovnu "
-"dokumentů, nebo nastavit automatické zaslání upozornění při změně výsledků "
+"%s Vám nabízí možnost přizpůsobit rozhraní, nastavit vlastní osobní knihovnu"
+" dokumentů, nebo nastavit automatické zaslání upozornění při změně výsledků "
 "dotazu na email."
 
 #: modules/websession/lib/websession_templates.py:463
@@ -5896,8 +5829,8 @@ msgstr "Zobrazit všechny provedené vyhledávání během posledních 30 dnů."
 
 #: modules/websession/lib/websession_templates.py:480
 msgid ""
-"With baskets you can define specific collections of items, store interesting "
-"records you want to access later or share with others."
+"With baskets you can define specific collections of items, store interesting"
+" records you want to access later or share with others."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:489
@@ -5927,9 +5860,9 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:547
 #, python-format
 msgid ""
-"You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout"
-"%(x_url1_close)s; b) edit your %(x_url2_open)saccount settings"
-"%(x_url2_close)s."
+"You are logged in as %(x_user)s. You may want to a) "
+"%(x_url1_open)slogout%(x_url1_close)s; b) edit your %(x_url2_open)saccount "
+"settings%(x_url2_close)s."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:628
@@ -5939,8 +5872,8 @@ msgstr "Vaše upozornění na vyhledávání"
 #: modules/websession/lib/websession_templates.py:634
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are "
-"administering or are a member of."
+"You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are"
+" administering or are a member of."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:637
@@ -5964,8 +5897,8 @@ msgstr "Vaše podání"
 #: modules/websession/lib/websession_templates.py:646
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with "
-"the documents you approved or refereed."
+"You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with"
+" the documents you approved or refereed."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:649
@@ -6003,24 +5936,20 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:715
-#, fuzzy
 msgid "If you want to reset the password for this account, please go to:"
-msgstr "Pokud chcete vytvořit nové heslo pro tento účet, najdete na adrese:"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:721
 #: modules/websession/lib/websession_templates.py:758
-#, fuzzy
 msgid "in order to confirm the validity of this request."
-msgstr "S cílem potvrdit platnost této žádosti."
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:722
 #: modules/websession/lib/websession_templates.py:759
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Please note that this URL will remain valid for about %(days)s days only."
 msgstr ""
-"Upozorňujeme, že tato adresa URL zůstane v platnosti po dobu asi"
-"%(ve dnech) s dny."
 
 #: modules/websession/lib/websession_templates.py:744
 #, python-format
@@ -6031,23 +5960,21 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:752
-#, fuzzy
 msgid "If you want to complete this account registration, please go to:"
-msgstr "Chcete-li dokončit tento účet registraci naleznete na:"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:778
-#, fuzzy, python-format
+#, python-format
 msgid "Okay, a password reset link has been emailed to %s."
-msgstr "Dobře, je resetování hesla odkaz bylo zasláno na%s."
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:793
 msgid "Deleting your account"
 msgstr "Mazání Vašeho účtu"
 
 #: modules/websession/lib/websession_templates.py:807
-#, fuzzy
 msgid "You are no longer recognized by our system."
-msgstr "Ty se již uznává našeho systému."
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:809
 #, python-format
@@ -6058,15 +5985,13 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:816
-#, fuzzy, python-format
+#, python-format
 msgid "If you wish you can %(x_url_open)slogin here%(x_url_close)s."
-msgstr "Pokud chcete, můžete%(x_url_open) slogin zde%(x_url_close) s."
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:847
-#, fuzzy
 msgid "If you already have an account, please login using the form below."
 msgstr ""
-"Pokud již máte účet, přihlaste se prosím pomocí níže uvedeného formuláře."
 
 #: modules/websession/lib/websession_templates.py:851
 #, python-format
@@ -6078,14 +6003,14 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:854
 #, python-format
 msgid ""
-"If you don't own an account yet, please %(x_url_open)sregister"
-"%(x_url_close)s an internal account."
+"If you don't own an account yet, please "
+"%(x_url_open)sregister%(x_url_close)s an internal account."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:862
-#, fuzzy, python-format
+#, python-format
 msgid "If you don't own an account yet, please contact %s."
-msgstr "Pokud nemáte vlastní účet, prosím, kontaktujte%s."
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:885
 msgid "Login method:"
@@ -6182,30 +6107,27 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1091
-#, fuzzy
 msgid "You are not authorized to access administrative functions."
-msgstr "Nemáte oprávnění pro přístup k administrativní funkce."
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1094
-#, fuzzy, python-format
+#, python-format
 msgid "You are enabled to the following roles: %(x_role)s."
-msgstr "Ty jsou povoleny následující role:.%(X_role) s"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1110
-#, fuzzy
 msgid "Run BibSword Client"
-msgstr "Spustit BibSword klienta"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1136
-#, fuzzy
 msgid "Here are some interesting web admin links for you:"
-msgstr "Zde jsou některé zajímavé odkazy Web Admin pro vás:"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1138
 #, python-format
 msgid ""
-"For more admin-level activities, see the complete %(x_url_open)sAdmin Area"
-"%(x_url_close)s."
+"For more admin-level activities, see the complete %(x_url_open)sAdmin "
+"Area%(x_url_close)s."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1191
@@ -6410,9 +6332,9 @@ msgid "Invite new members"
 msgstr "Pozvat nové členy"
 
 #: modules/websession/lib/websession_templates.py:2080
-#, fuzzy, python-format
+#, python-format
 msgid "Invitation to join \"%s\" group"
-msgstr "Pozvánka k připojení se do skupiny \"%s\""
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2081
 #, python-format
@@ -6519,15 +6441,16 @@ msgstr "Skupina %s byla odstraněna jejím správcem."
 #: modules/websession/lib/websession_templates.py:2438
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)s%(x_nb_total)i groups"
-"%(x_url_close)s you are subscribed to (%(x_nb_member)i) or administering "
-"(%(x_nb_admin)i)."
+"You can consult the list of %(x_url_open)s%(x_nb_total)i "
+"groups%(x_url_close)s you are subscribed to (%(x_nb_member)i) or "
+"administering (%(x_nb_admin)i)."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2457
 msgid ""
 "Warning: The password set for MySQL root user is the same as the default "
-"Invenio password. For security purposes, you may want to change the password."
+"Invenio password. For security purposes, you may want to change the "
+"password."
 msgstr ""
 "Varování: heslo MySQL uživatele root je stejné jako výchozí. Pro vyšší "
 "bezpečnost můžete chtít změnit výchozí heslo."
@@ -6540,28 +6463,27 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2469
 msgid ""
-"Warning: The password set for the Invenio admin user is currently empty. For "
-"security purposes, it is strongly recommended that you add a password."
+"Warning: The password set for the Invenio admin user is currently empty. For"
+" security purposes, it is strongly recommended that you add a password."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2475
 msgid ""
-"Warning: The email address set for support email is currently set to "
-"info@invenio-software.org. It is recommended that you change this to your "
-"own address."
+"Warning: The email address set for support email is currently set to info"
+"@invenio-software.org. It is recommended that you change this to your own "
+"address."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2481
-#, fuzzy
 msgid ""
-"A newer version of Invenio is available for download. You may want to visit  "
+"A newer version of Invenio is available for download. You may want to visit"
+"  "
 msgstr ""
-"A nová verze Invenio je k dispozici ke stažení. Možná budete chtít navštívit "
 
 #: modules/websession/lib/websession_templates.py:2488
 msgid ""
-"Cannot download or parse release notes from http://invenio-software.org/repo/"
-"invenio/tree/RELEASE-NOTES"
+"Cannot download or parse release notes from http://invenio-"
+"software.org/repo/invenio/tree/RELEASE-NOTES"
 msgstr ""
 
 #: modules/websession/lib/webuser.py:156
@@ -6655,7 +6577,8 @@ msgstr "Již jste potvrdil platnost vaší e-mailové adresy!"
 
 #: modules/websession/lib/websession_webinterface.py:134
 msgid ""
-"This request for confirmation of an email address is not valid or is expired."
+"This request for confirmation of an email address is not valid or is "
+"expired."
 msgstr "Tato žádost o potvrzení e-mailové adresy není platná nebo vypršela."
 
 #: modules/websession/lib/websession_webinterface.py:139
@@ -6743,9 +6666,8 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:392
-#, fuzzy
 msgid "Login method successfully selected."
-msgstr "Přihlásit metodu úspěšně vybranou."
+msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:394
 #, python-format
@@ -6755,9 +6677,8 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:406
-#, fuzzy
 msgid "Your nickname has not been updated"
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:420
 msgid "Settings successfully edited."
@@ -6772,9 +6693,9 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:429
 #: modules/websession/lib/websession_webinterface.py:923
-#, fuzzy, python-format
+#, python-format
 msgid "Desired nickname %s is invalid."
-msgstr "Přezdívku%s je neplatný."
+msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:430
 #: modules/websession/lib/websession_webinterface.py:436
@@ -6877,8 +6798,8 @@ msgid ""
 "Cannot send password reset request since you are using external "
 "authentication system."
 msgstr ""
-"Nelze odeslat žádost o změnu hesla, protože používáte externí autentifikační "
-"systém."
+"Nelze odeslat žádost o změnu hesla, protože používáte externí autentifikační"
+" systém."
 
 #: modules/websession/lib/websession_webinterface.py:599
 msgid "The entered email address does not exist in the database."
@@ -6955,9 +6876,9 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:909
-#, fuzzy, python-format
+#, python-format
 msgid "You can now access your %(x_url_open)saccount%(x_url_close)s."
-msgstr "Nyní můžete přistupovat k%(x_url_open) saccount%(x_url_close) s."
+msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:916
 #: modules/websession/lib/websession_webinterface.py:921
@@ -6967,19 +6888,17 @@ msgstr "Nyní můžete přistupovat k%(x_url_open) saccount%(x_url_close) s."
 #: modules/websession/lib/websession_webinterface.py:941
 #: modules/websession/lib/websession_webinterface.py:945
 #: modules/websession/lib/websession_webinterface.py:950
-#, fuzzy
 msgid "Registration failure"
-msgstr "Registrace selhání"
+msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:934
-#, fuzzy, python-format
+#, python-format
 msgid "Desired nickname %s already exists in the database."
-msgstr "Přezdívku%s již existuje v databázi."
+msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:939
-#, fuzzy
 msgid "Users cannot register themselves, only admin can register them."
-msgstr "Uživatelé nemohou registrovat sami, může jen admin zaregistrovat."
+msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:943
 msgid ""
@@ -7067,9 +6986,8 @@ msgid "System Error"
 msgstr "Chyba systému"
 
 #: modules/webstyle/lib/webstyle_templates.py:622
-#, fuzzy
 msgid "Traceback"
-msgstr "Traceback"
+msgstr ""
 
 #: modules/webstyle/lib/webstyle_templates.py:669
 msgid "Client"
@@ -7089,30 +7007,28 @@ msgid "Please contact %s quoting the following information:"
 msgstr "Prosíme kontaktujte %s a uveďte následující informace:"
 
 #: modules/webstyle/lib/webstyle_templates.py:832
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Record created %(x_date_creation)s, last modified %(x_date_modification)s"
-msgstr "Záznam vytvořen %s, modifikován %s"
+msgstr ""
 
 #: modules/webstyle/lib/webstyle_templates.py:903
-#, fuzzy
 msgid "The server encountered an error while dealing with your request."
-msgstr "Na serveru došlo k chybě při vyřizování vašeho požadavku."
+msgstr ""
 
 #: modules/webstyle/lib/webstyle_templates.py:904
-#, fuzzy
 msgid "The system administrators have been alerted."
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/webstyle/lib/webstyle_templates.py:905
-#, fuzzy, python-format
+#, python-format
 msgid "In case of doubt, please contact %(x_admin_email)s."
-msgstr "V případě pochybností, kontaktujte%(x_admin_email) s."
+msgstr ""
 
 #: modules/webstyle/lib/webdoc.py:547
-#, fuzzy, python-format
+#, python-format
 msgid "%(category)s Pages"
-msgstr "%(Category) s Stránky"
+msgstr ""
 
 #: modules/webstyle/lib/webdoc_webinterface.py:144
 #: modules/webstyle/lib/webdoc_webinterface.py:149
@@ -7138,9 +7054,9 @@ msgid "Latest modifications:"
 msgstr "Posledně přidáno:"
 
 #: modules/webstyle/lib/webdoc_webinterface.py:162
-#, fuzzy, python-format
+#, python-format
 msgid "This is the table of contents of the %(x_category)s pages."
-msgstr "To je obsah těchto stránek%(x_category) s."
+msgstr ""
 
 #: modules/webstyle/lib/webdoc_webinterface.py:164
 msgid "See also"
@@ -7152,15 +7068,15 @@ msgid "Page %s Not Found"
 msgstr "Stránka %s nebyla nalezena"
 
 #: modules/webstyle/lib/webdoc_webinterface.py:187
-#, fuzzy, python-format
+#, python-format
 msgid "Sorry, page %s does not seem to exist."
-msgstr "Omlouváme se, stránka%s nevypadá, že neexistuje."
+msgstr ""
 
 #: modules/webstyle/lib/webdoc_webinterface.py:190
 #, python-format
 msgid ""
-"You may want to look at the %(x_url_open)s%(x_category)s pages"
-"%(x_url_close)s."
+"You may want to look at the %(x_url_open)s%(x_category)s "
+"pages%(x_url_close)s."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:368
@@ -7186,10 +7102,9 @@ msgid ""
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:548
-#, fuzzy
 msgid ""
 "The uploaded file name is too long and has therefore not been considered"
-msgstr "Nahraný soubor je název příliš dlouhý, a proto není považována za"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:560
 msgid ""
@@ -7200,14 +7115,14 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_managedocfiles.py:583
 #: modules/websubmit/lib/websubmit_managedocfiles.py:594
 #: modules/websubmit/lib/websubmit_managedocfiles.py:704
-#, fuzzy, python-format
+#, python-format
 msgid "A file named %s already exists. Please choose another name."
-msgstr "Soubor nazvaný %s již existuje.%s Prosím, vyberte jiné jméno. "
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:605
-#, fuzzy, python-format
+#, python-format
 msgid "A file with format '%s' already exists. Please upload another format."
-msgstr "Soubor ve formátu '%s' již existuje. Nahrajte prosím jiný formát. "
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:613
 msgid ""
@@ -7238,12 +7153,10 @@ msgid ""
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:844
-#, fuzzy
 msgid ""
-"Alternative formats uploaded for current version of this file will be removed"
+"Alternative formats uploaded for current version of this file will be "
+"removed"
 msgstr ""
-"Alternativní formáty nahrané pro aktuální verzi tohoto souboru budou "
-"odstraněny"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:845
 msgid "Keep previous versions"
@@ -7260,9 +7173,9 @@ msgid "Apply changes"
 msgstr "Použít změny"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:864
-#, fuzzy, python-format
+#, python-format
 msgid "Need help revising or adding files to record %(recid)s"
-msgstr "Potřebujete pomoc revize nebo přidávání souborů do nahrávat%(recid) s"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:866
 #, python-format
@@ -7312,16 +7225,15 @@ msgstr ""
 #: modules/websubmit/lib/functions/Shared_Functions.py:183
 msgid ""
 "Because of a human intervention or a temporary problem, the task queue is "
-"currently set to the manual mode. Your submission is well registered but may "
-"take longer than usual before it is fully integrated and searchable.\n"
+"currently set to the manual mode. Your submission is well registered but may"
+" take longer than usual before it is fully integrated and searchable.\n"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:177
 #: modules/websubmit/lib/websubmit_engine.py:790
 #: modules/websubmit/web/yoursubmissions.py:61
-#, fuzzy
 msgid "Sorry, you must log in to perform this action."
-msgstr "Je mi líto, musíte se přihlásit k provedení této akce."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:184
 #: modules/websubmit/lib/websubmit_engine.py:820
@@ -7342,16 +7254,15 @@ msgstr "Neplatné parametry"
 
 #: modules/websubmit/lib/websubmit_engine.py:196
 #: modules/websubmit/lib/websubmit_engine.py:826
-#, fuzzy
 msgid "Invalid doctype and act parameters"
-msgstr "Neplatný DOCTYPE a aktem parametry"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:227
 #: modules/websubmit/lib/websubmit_engine.py:799
 #: modules/websubmit/lib/websubmit_engine.py:861
-#, fuzzy, python-format
+#, python-format
 msgid "Unable to find the submission directory for the action: %s"
-msgstr "Nelze najít adresář pro podání žaloby:%s"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:236
 #: modules/websubmit/lib/websubmit_engine.py:1014
@@ -7365,22 +7276,21 @@ msgstr "Neznámá akce"
 
 #: modules/websubmit/lib/websubmit_engine.py:250
 #: modules/websubmit/lib/websubmit_engine.py:1027
-#, fuzzy
 msgid "Unable to determine the number of submission pages."
-msgstr "Nelze určit počet předkládání stránek."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:291
 #: modules/websubmit/lib/websubmit_engine.py:880
 msgid ""
-"Unable to create a directory for this submission. The administrator has been "
-"alerted."
+"Unable to create a directory for this submission. The administrator has been"
+" alerted."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:400
 #: modules/websubmit/lib/websubmit_engine.py:978
-#, fuzzy
-msgid "Cannot create submission directory. The administrator has been alerted."
-msgstr "Nelze vytvořit adresář podání. Administrátor byl upozorněn. "
+msgid ""
+"Cannot create submission directory. The administrator has been alerted."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:422
 #: modules/websubmit/lib/websubmit_engine.py:1000
@@ -7408,9 +7318,8 @@ msgid "Unable to find document type: %s"
 msgstr "Nelze najít typ dokumentu: %s"
 
 #: modules/websubmit/lib/websubmit_engine.py:1672
-#, fuzzy
 msgid "The chosen action is not supported by the document type."
-msgstr "Zvoleným opatřením je nepodporuje typ dokumentu."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:1749
 #: modules/websubmit/lib/websubmit_webinterface.py:1128
@@ -7419,19 +7328,16 @@ msgid "Warning"
 msgstr "Varování"
 
 #: modules/websubmit/lib/websubmit_templates.py:84
-#, fuzzy
 msgid "Document types available for submission"
-msgstr "Dokument typy jsou k dispozici pro podání"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:85
-#, fuzzy
 msgid "Please select the type of document you want to submit"
-msgstr "Prosím, vyberte druh dokumentu, který chcete, aby předložila"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:102
-#, fuzzy
 msgid "No document types available."
-msgstr "Žádné typy dokumentů k dispozici."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:268
 msgid "Please log in first."
@@ -7455,8 +7361,8 @@ msgstr "Vyberte kategorii a poté klikněte na tlačítko akce."
 
 #: modules/websubmit/lib/websubmit_templates.py:375
 msgid ""
-"To continue with a previously interrupted submission, enter an access number "
-"into the box below:"
+"To continue with a previously interrupted submission, enter an access number"
+" into the box below:"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:377
@@ -7502,9 +7408,8 @@ msgid ""
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:575
-#, fuzzy
 msgid "Mandatory fields appear in red in the SUMMARY window."
-msgstr "Povinná pole se objeví v červené barvě v okně shrnutí."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:721
 #, python-format
@@ -7632,43 +7537,35 @@ msgid "Reference not yet given"
 msgstr "Odkaz není ještě daný"
 
 #: modules/websubmit/lib/websubmit_templates.py:1595
-#, fuzzy
 msgid "Refereed Documents"
-msgstr "Dokumenty rozhodčího"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1605
-#, fuzzy
 msgid "You are a general referee"
-msgstr "Jste obecné rozhodčí"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1611
-#, fuzzy
 msgid "You are a referee for category:"
-msgstr "Jste rozhodčí pro kategorii"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1650
 #: modules/websubmit/lib/websubmit_templates.py:1695
-#, fuzzy
 msgid "List of refereed types of documents"
-msgstr "Seznam rozhodčího typů dokumentů"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1651
 #: modules/websubmit/lib/websubmit_templates.py:1696
-#, fuzzy
 msgid ""
 "Select one of the following types of documents to check the documents status"
 msgstr ""
-"Vyberte jednu z následujících typů dokumentů pro kontrolu dokumentů stav"
 
 #: modules/websubmit/lib/websubmit_templates.py:1664
-#, fuzzy
 msgid "Go to specific approval workflow"
-msgstr "Jdi do konkrétního postupu schvalování"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1752
-#, fuzzy
 msgid "List of refereed categories"
-msgstr "Seznam kategorií označovaných"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1753
 #: modules/websubmit/lib/websubmit_templates.py:1902
@@ -7711,9 +7608,8 @@ msgstr "Klíč"
 
 #: modules/websubmit/lib/websubmit_templates.py:1816
 #: modules/websubmit/lib/websubmit_templates.py:1985
-#, fuzzy
 msgid "Waiting for approval"
-msgstr "schválení"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1818
 #: modules/websubmit/lib/websubmit_templates.py:1987
@@ -7726,9 +7622,8 @@ msgid "Some documents are pending."
 msgstr "Některé dokumenty čekají na vyřízení."
 
 #: modules/websubmit/lib/websubmit_templates.py:1866
-#, fuzzy
 msgid "List of refereing categories"
-msgstr "Seznam refereing kategorií"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1946
 #: modules/websubmit/lib/websubmit_templates.py:1990
@@ -7739,15 +7634,13 @@ msgstr "Zrušeno"
 
 #: modules/websubmit/lib/websubmit_templates.py:2046
 #: modules/websubmit/lib/websubmit_templates.py:2134
-#, fuzzy
 msgid "List of refereed documents"
-msgstr "Seznam dokumentů označovaných"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2047
 #: modules/websubmit/lib/websubmit_templates.py:2171
-#, fuzzy
 msgid "Click on a report number for more information."
-msgstr "Klikněte na zprávu číslo pro více informací."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2048
 #: modules/websubmit/lib/websubmit_templates.py:2173
@@ -7755,14 +7648,12 @@ msgid "Report Number"
 msgstr "Číslo zprávy"
 
 #: modules/websubmit/lib/websubmit_templates.py:2136
-#, fuzzy
 msgid "List of publication documents"
-msgstr "košíky"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2138
-#, fuzzy
 msgid "List of direct approval documents"
-msgstr "Seznam přímých schvalovacích dokumentů"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2311
 msgid "Your request has been sent to the referee."
@@ -7801,19 +7692,16 @@ msgid "Approval note:"
 msgstr "Poznámka pro schválení:"
 
 #: modules/websubmit/lib/websubmit_templates.py:2355
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s."
 msgstr ""
-"Tento dokument je stále%(x_fmt_open) swaiting pro schvalování"
-"%(x_fmt_close) s."
 
 #: modules/websubmit/lib/websubmit_templates.py:2358
 #: modules/websubmit/lib/websubmit_templates.py:2378
 #: modules/websubmit/lib/websubmit_templates.py:2387
-#, fuzzy
 msgid "It was first sent for approval on:"
-msgstr "schválení"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2360
 #: modules/websubmit/lib/websubmit_templates.py:2362
@@ -7821,9 +7709,8 @@ msgstr "schválení"
 #: modules/websubmit/lib/websubmit_templates.py:2382
 #: modules/websubmit/lib/websubmit_templates.py:2389
 #: modules/websubmit/lib/websubmit_templates.py:2391
-#, fuzzy
 msgid "Last approval email was sent on:"
-msgstr "Poslední schválení e-mail byl odeslán"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2363
 msgid ""
@@ -7837,9 +7724,8 @@ msgid "Send Again"
 msgstr "Poslat znovu"
 
 #: modules/websubmit/lib/websubmit_templates.py:2366
-#, fuzzy
 msgid "WARNING! Upon confirmation, an email will be sent to the referee."
-msgstr "VAROVÁNÍ: Po potvrzení, bude e-mail zaslána k rozhodčímu. "
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2369
 msgid ""
@@ -7852,24 +7738,22 @@ msgid "Approve/Reject"
 msgstr "Schválit/Odmítnout"
 
 #: modules/websubmit/lib/websubmit_templates.py:2376
-#, fuzzy, python-format
+#, python-format
 msgid "This document has been %(x_fmt_open)sapproved%(x_fmt_close)s."
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2377
-#, fuzzy
 msgid "Its approved reference is:"
-msgstr "schválení"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2383
-#, fuzzy
 msgid "It was approved on:"
-msgstr "schválení"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2385
-#, fuzzy, python-format
+#, python-format
 msgid "This document has been %(x_fmt_open)srejected%(x_fmt_close)s."
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2392
 msgid "It was rejected on:"
@@ -7878,26 +7762,23 @@ msgstr "Byl zamítnut dne:"
 #: modules/websubmit/lib/websubmit_templates.py:2475
 #: modules/websubmit/lib/websubmit_templates.py:2530
 #: modules/websubmit/lib/websubmit_templates.py:2593
-#, fuzzy
 msgid "It has first been asked for refereing process on the "
-msgstr "To je poprvé požádal o refereing procesu o"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2478
 #: modules/websubmit/lib/websubmit_templates.py:2532
-#, fuzzy
-msgid "Last request e-mail was sent to the publication committee chair on the "
-msgstr "Poslední žádost e-mail byl odeslán na židli publikace výbor"
+msgid ""
+"Last request e-mail was sent to the publication committee chair on the "
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2482
-#, fuzzy
 msgid "A referee has been selected by the publication committee on the "
-msgstr "Rozhodčí byl vybrán z publikace výboru"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2485
 #: modules/websubmit/lib/websubmit_templates.py:2548
-#, fuzzy
 msgid "No referee has been selected yet."
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2487
 #: modules/websubmit/lib/websubmit_templates.py:2550
@@ -7932,30 +7813,26 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2505
 #: modules/websubmit/lib/websubmit_templates.py:2572
-#, fuzzy
 msgid "No recommendation from the publication committee yet."
-msgstr "Ne doporučení z publikace výboru dosud."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2512
 #: modules/websubmit/lib/websubmit_templates.py:2578
 #: modules/websubmit/lib/websubmit_templates.py:2598
-#, fuzzy
 msgid "It has been cancelled by the author on the "
-msgstr "To byl zrušen autora na"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2516
 #: modules/websubmit/lib/websubmit_templates.py:2581
 #: modules/websubmit/lib/websubmit_templates.py:2601
-#, fuzzy
 msgid "It has been approved by the project leader on the "
-msgstr "To byl schválen vedoucím projektu na"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2519
 #: modules/websubmit/lib/websubmit_templates.py:2583
 #: modules/websubmit/lib/websubmit_templates.py:2603
-#, fuzzy
 msgid "It has been rejected by the project leader on the "
-msgstr "To bylo odmítnuto vedoucího projektu na"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2522
 #: modules/websubmit/lib/websubmit_templates.py:2585
@@ -7972,20 +7849,17 @@ msgid "Take a decision"
 msgstr "Přijmout rozhodnutí"
 
 #: modules/websubmit/lib/websubmit_templates.py:2535
-#, fuzzy
 msgid ""
 "An editorial board has been selected by the publication committee on the "
-msgstr "Redakční rada byla vybrána publikace výboru"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2537
-#, fuzzy
 msgid "Add an author list"
-msgstr "Přidání autor seznam"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2540
-#, fuzzy
 msgid "No editorial board has been selected yet."
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2542
 msgid "Select an editorial board"
@@ -7997,7 +7871,8 @@ msgstr "Znalec byl vybrán redakční radou dne"
 
 #: modules/websubmit/lib/websubmit_templates.py:2554
 msgid ""
-"The referee has sent his final recommendations to the editorial board on the "
+"The referee has sent his final recommendations to the editorial board on the"
+" "
 msgstr "Znalec poslal své závěrečné doporučení redakční radě"
 
 #: modules/websubmit/lib/websubmit_templates.py:2562
@@ -8007,14 +7882,12 @@ msgid ""
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2564
-#, fuzzy
 msgid "No recommendation from the editorial board yet."
-msgstr "Ne doporučení z redakce ještě ne."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2595
-#, fuzzy
 msgid "Last request e-mail was sent to the project leader on the "
-msgstr "Poslední žádost e-mail byl odeslán na vedoucího projektu"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2689
 msgid "Comments overview"
@@ -8065,14 +7938,13 @@ msgid "reject"
 msgstr "odmítnout"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:114
-#, fuzzy
 msgid "Requested record does not seem to have been integrated."
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:140
 msgid ""
-"The system has encountered an error in retrieving the list of files for this "
-"document."
+"The system has encountered an error in retrieving the list of files for this"
+" document."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:196
@@ -8085,54 +7957,46 @@ msgid "This file is restricted: "
 msgstr "Tento soubor je omezen:"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:222
-#, fuzzy
 msgid "An error has happened in trying to stream the request file."
-msgstr "Chyba se stalo ve snaze přenášet soubor požadavku."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:225
-#, fuzzy
 msgid "The requested file is hidden and can not be accessed."
-msgstr "Požadovaný soubor je skrytý a není přístupný."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:232
-#, fuzzy
 msgid "Requested file does not seem to exist."
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:266
-#, fuzzy
 msgid "Access to Fulltext"
-msgstr "Přístup k Fulltext"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:315
-#, fuzzy
 msgid "An error has happened in trying to retrieve the requested file."
-msgstr "Chyba se stalo ve snaze získat požadovaný soubor."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:317
-#, fuzzy
 msgid "Not enough information to retrieve the document"
-msgstr "Tato kolekce ješte neobsahuje žádné záznamy."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:325
-#, fuzzy
 msgid "An error has happened in trying to retrieving the requested file."
-msgstr "Chyba se stalo ve snaze získávat požadovaný soubor."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:376
-#, fuzzy
 msgid "Manage Document Files"
-msgstr "Správa dokumentů soubory"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:394
-#, fuzzy, python-format
+#, python-format
 msgid "Your modifications to record #%i have been submitted"
-msgstr "Vaše změny k Record #%i byly předloženy"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:402
-#, fuzzy, python-format
+#, python-format
 msgid "Your modifications to record #%i have been cancelled"
-msgstr "Vaše změny k Record #%i byly zrušeny"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:411
 msgid "Edit"
@@ -8144,9 +8008,8 @@ msgstr "Upravit záznam"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:427
 #: modules/websubmit/lib/websubmit_webinterface.py:458
-#, fuzzy
 msgid "Document File Manager"
-msgstr "Document File Manager"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:428
 #: modules/websubmit/lib/websubmit_webinterface.py:458
@@ -8159,58 +8022,48 @@ msgid "Cancel all changes"
 msgstr "Zrušit všechny změny"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:922
-#, fuzzy
 msgid "Sorry, 'sub' parameter missing..."
-msgstr "Promiň, dílčí 'parametr chybí ... "
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:925
-#, fuzzy
 msgid "Sorry. Cannot analyse parameter"
-msgstr "Promiň. Nelze analyzovat parametr "
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:986
-#, fuzzy
 msgid "Sorry, invalid URL..."
-msgstr "Je mi líto, neplatné URL ..."
+msgstr ""
 
 #: modules/websubmit/web/approve.py:55
-#, fuzzy
 msgid "approve.py: cannot determine document reference"
-msgstr "Approve.py: nelze určit odkaz na dokument"
+msgstr ""
 
 #: modules/websubmit/web/approve.py:58
-#, fuzzy
 msgid "approve.py: cannot find document in database"
-msgstr "Approve.py: nelze najít dokument, v databázi"
+msgstr ""
 
 #: modules/websubmit/web/approve.py:72
-#, fuzzy
 msgid "Sorry parameter missing..."
-msgstr "Je mi líto parametr chybí ..."
+msgstr ""
 
 #: modules/websubmit/web/publiline.py:130
-#, fuzzy
 msgid "Document Approval Workflow"
-msgstr "Dokument schválení workflow"
+msgstr ""
 
 #: modules/websubmit/web/publiline.py:151
-#, fuzzy
 msgid "Approval and Refereeing Workflow"
-msgstr "Schválení a Rozhodčí Workflow"
+msgstr ""
 
 #: modules/websubmit/web/publiline.py:330
 #: modules/websubmit/web/publiline.py:431
 #: modules/websubmit/web/publiline.py:657
-#, fuzzy
 msgid "Approval has never been requested for this document."
-msgstr "Schválení nebyl nikdy požadován pro tohoto dokumentu."
+msgstr ""
 
 #: modules/websubmit/web/publiline.py:356
 #: modules/websubmit/web/publiline.py:457
 #: modules/websubmit/web/publiline.py:682
-#, fuzzy
 msgid "Unable to display document."
-msgstr "Nelze zobrazit dokument."
+msgstr ""
 
 #: modules/websubmit/web/publiline.py:686
 #: modules/websubmit/web/publiline.py:810
@@ -8220,9 +8073,8 @@ msgstr "Nelze zobrazit dokument."
 #: modules/websubmit/web/publiline.py:1086
 #: modules/websubmit/web/publiline.py:1149
 #: modules/websubmit/web/publiline.py:1199
-#, fuzzy
 msgid "Action unauthorized for this document."
-msgstr "Tato kolekce ješte neobsahuje žádné záznamy."
+msgstr ""
 
 #: modules/websubmit/web/publiline.py:689
 #: modules/websubmit/web/publiline.py:813
@@ -8232,62 +8084,52 @@ msgstr "Tato kolekce ješte neobsahuje žádné záznamy."
 #: modules/websubmit/web/publiline.py:1089
 #: modules/websubmit/web/publiline.py:1152
 #: modules/websubmit/web/publiline.py:1202
-#, fuzzy
 msgid "Action unavailable for this document."
-msgstr "Tato kolekce ješte neobsahuje žádné záznamy."
+msgstr ""
 
 #: modules/websubmit/web/publiline.py:699
-#, fuzzy
 msgid "Adding users to the editorial board"
-msgstr "Přidání uživatelů do redakční rady"
+msgstr ""
 
 #: modules/websubmit/web/publiline.py:727
 #: modules/websubmit/web/publiline.py:850
-#, fuzzy
 msgid "no qualified users, try new search."
-msgstr "Žádné kvalifikovaní uživatelé, zkuste nové hledání."
+msgstr ""
 
 #: modules/websubmit/web/publiline.py:729
 #: modules/websubmit/web/publiline.py:852
-#, fuzzy
 msgid "hits"
-msgstr "Hity"
+msgstr ""
 
 #: modules/websubmit/web/publiline.py:729
 #: modules/websubmit/web/publiline.py:852
-#, fuzzy
 msgid "too many qualified users, specify more narrow search."
-msgstr "Příliš mnoho kvalifikovaných uživatelů, určit užší vyhledávání."
+msgstr ""
 
 #: modules/websubmit/web/publiline.py:729
 #: modules/websubmit/web/publiline.py:852
-#, fuzzy
 msgid "limit"
-msgstr "Omezení"
+msgstr ""
 
 #: modules/websubmit/web/publiline.py:745
-#, fuzzy
 msgid "users in brackets are already attached to the role, try another one..."
-msgstr "Uživatelé v závorkách jsou již připojeny k roli, zkuste jiný ..."
+msgstr ""
 
 #: modules/websubmit/web/publiline.py:751
-#, fuzzy
 msgid "Removing users from the editorial board"
-msgstr "Odstranění uživatele z redakční rady"
+msgstr ""
 
 #: modules/websubmit/web/publiline.py:787
-#, fuzzy
 msgid "Validate the editorial board selection"
-msgstr "Ověřit redakční rady výběr"
+msgstr ""
 
 #: modules/websubmit/web/publiline.py:832
 msgid "Referee selection"
 msgstr "Výběr znalce"
 
 #: modules/websubmit/web/publiline.py:918
-#, fuzzy
 msgid "Come back to the document"
-msgstr "Vrať se k dokumentu"
+msgstr ""
 
 #: modules/websubmit/web/publiline.py:1103
 msgid "Back to the document"
@@ -8317,14 +8159,13 @@ msgstr "Dostupné časopisy"
 
 #: modules/webjournal/lib/webjournal_templates.py:58
 #: modules/webjournal/lib/webjournal_templates.py:97
-#, fuzzy, python-format
+#, python-format
 msgid "Contact %(x_url_open)sthe administrator%(x_url_close)s"
-msgstr "Kontakt%(x_url_open) sthe správce%(x_url_close) s"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_templates.py:142
-#, fuzzy
 msgid "Regeneration Error"
-msgstr "Vnitřní Chyba"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_templates.py:143
 msgid ""
@@ -8333,10 +8174,9 @@ msgid ""
 msgstr ""
 
 #: modules/webjournal/lib/webjournal_templates.py:268
-#, fuzzy, python-format
+#, python-format
 msgid "If you cannot read this email please go to %(x_journal_link)s"
 msgstr ""
-"Pokud nemůžete přečíst tento e-mail najdete na adrese%(x_journal_link) s"
 
 #: modules/webjournal/lib/webjournal_templates.py:415
 #: modules/webjournal/lib/webjournal_templates.py:664
@@ -8374,9 +8214,8 @@ msgid "Page not found"
 msgstr "Stránka nenalezena"
 
 #: modules/webjournal/lib/webjournal_config.py:64
-#, fuzzy
 msgid "The requested page does not exist"
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:94
 msgid "No journal articles"
@@ -8384,34 +8223,28 @@ msgstr "Žádné časopisové články"
 
 #: modules/webjournal/lib/webjournal_config.py:95
 #: modules/webjournal/lib/webjournal_config.py:135
-#, fuzzy
 msgid "Problem with the configuration of this journal"
-msgstr "Problém s nastavením tohoto časopisu"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:134
-#, fuzzy
 msgid "No journal issues"
-msgstr "Index slov není k dispozici pro"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:172
-#, fuzzy
 msgid "Journal article error"
-msgstr "Vnitřní Chyba"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:173
-#, fuzzy
 msgid "We could not know which article you were looking for"
-msgstr "Nemohli jsme vědět, který článek jste hledali"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:206
-#, fuzzy
 msgid "No journals available"
-msgstr "Index slov není k dispozici pro"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:207
-#, fuzzy
 msgid "We could not provide you any journals"
-msgstr "Nemohli jsme zajistit vám nějaké časopisy"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:208
 msgid ""
@@ -8420,14 +8253,12 @@ msgid ""
 msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:233
-#, fuzzy
 msgid "Select a journal on this server"
-msgstr "Vybrat deník na tomto serveru"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:234
-#, fuzzy
 msgid "We couldn't guess which journal you are looking for"
-msgstr "Nemohli jsme odhadnout, které časopis hledáte"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:235
 msgid ""
@@ -8436,14 +8267,12 @@ msgid ""
 msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:261
-#, fuzzy
 msgid "No current issue"
-msgstr "Žádný problém"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:262
-#, fuzzy
 msgid "We could not find any informtion on the current issue"
-msgstr "Nenašli jsme žádnou informtion o aktuálním vydání"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:263
 msgid ""
@@ -8452,70 +8281,57 @@ msgid ""
 msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:290
-#, fuzzy
 msgid "Issue number badly formed"
-msgstr "Problém číslo špatně se tvořil"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:291
-#, fuzzy
 msgid "We could not read the issue number you provided"
-msgstr "Nemohli jsme si číslo vydání, které jste poskytli"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:320
-#, fuzzy
 msgid "Archive date badly formed"
-msgstr "Archiv datum špatně se tvořil"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:321
-#, fuzzy
 msgid "We could not read the archive date you provided"
-msgstr "Nemohli jsme si archivní data, které jste poskytli"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:355
-#, fuzzy
 msgid "No popup record"
-msgstr "skoč na záznam:"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:356
-#, fuzzy
 msgid "We could not deduce the popup article you requested"
-msgstr "Nemohli jsme odvodit vyskakovací článek jste požadovaný"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:388
-#, fuzzy
 msgid "Update error"
-msgstr "Poslední aktualizace"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:389
 #: modules/webjournal/lib/webjournal_config.py:419
-#, fuzzy
 msgid "There was an internal error"
-msgstr "Došlo k vnitřní chybě"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:418
-#, fuzzy
 msgid "Journal publishing DB error"
-msgstr "Vnitřní Chyba"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:450
-#, fuzzy
 msgid "Journal issue error"
-msgstr "Vnitřní Chyba"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:451
-#, fuzzy
 msgid "Issue not found"
-msgstr "Kolekcia %s Nenalezena"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:480
-#, fuzzy
 msgid "Journal ID error"
-msgstr "Vnitřní Chyba"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:481
-#, fuzzy
 msgid "We could not find the id for this journal in the Database"
-msgstr "Nemohli jsme najít id tohoto časopisu v databázi"
+msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:512
 #: modules/webjournal/lib/webjournal_config.py:514
@@ -8524,34 +8340,29 @@ msgid "Category \"%(category_name)s\" not found"
 msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:516
-#, fuzzy
 msgid "Sorry, this category does not exist for this journal and issue."
 msgstr ""
-"Omlouváme se, tato kategorie neexistuje pro tohoto časopisu a vydávání."
 
 #: modules/webjournal/lib/webjournaladminlib.py:343
 msgid "Please select an issue"
 msgstr "Prosím, vyberte problém"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:77
-#, fuzzy
 msgid "WebJournal Admin"
-msgstr "WebJournal Admin"
+msgstr ""
 
 #: modules/webjournal/web/admin/webjournaladmin.py:119
-#, fuzzy, python-format
+#, python-format
 msgid "Administrate %(journal_name)s"
-msgstr "Administrace%(journal_name) s"
+msgstr ""
 
 #: modules/webjournal/web/admin/webjournaladmin.py:158
-#, fuzzy
 msgid "Feature a record"
-msgstr "skoč na záznam:"
+msgstr ""
 
 #: modules/webjournal/web/admin/webjournaladmin.py:220
-#, fuzzy
 msgid "Email Alert System"
-msgstr "Email Alert System"
+msgstr ""
 
 #: modules/webjournal/web/admin/webjournaladmin.py:273
 msgid "Issue regenerated"
@@ -8574,9 +8385,8 @@ msgid "You have "
 msgstr ""
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:43
-#, fuzzy
 msgid "tickets"
-msgstr "název"
+msgstr ""
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:62
 msgid "show"
@@ -8618,9 +8428,9 @@ msgid "Under the CERN sky"
 msgstr "Pod širým nebem v CERNu"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_article_author.py:48
-#, fuzzy, python-format
+#, python-format
 msgid "About your article at %(url)s"
-msgstr "O váš článek v%(url) s"
+msgstr ""
 
 #: modules/webjournal/lib/elements/bfe_webjournal_imprint.py:122
 msgid "Issue No."
@@ -8676,24 +8486,20 @@ msgid "Select Year:"
 msgstr "Vybrat rok:"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_archive.py:139
-#, fuzzy
 msgid "Select Issue:"
-msgstr "košíky"
+msgstr ""
 
 #: modules/webjournal/lib/elements/bfe_webjournal_archive.py:143
-#, fuzzy
 msgid "Select Date:"
-msgstr "Vybrat datum:"
+msgstr ""
 
 #: modules/bibedit/lib/bibedit_webinterface.py:183
-#, fuzzy
 msgid "Comparing two record revisions"
-msgstr "Porovnání dvou rekordních revize"
+msgstr ""
 
 #: modules/bibedit/lib/bibedit_webinterface.py:207
-#, fuzzy
 msgid "Failed to create a ticket"
-msgstr "Nepodařilo se vytvořit si jízdenku"
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:297
 msgid "Next Step"
@@ -8712,9 +8518,8 @@ msgid "Filter collection"
 msgstr "Filtr kolekce"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:301
-#, fuzzy
 msgid "1. Choose search criteria"
-msgstr "1. Vyberte kritéria vyhledávání "
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:302
 msgid ""
@@ -8728,9 +8533,8 @@ msgid "Preview results"
 msgstr "Náhled na výsledky"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:505
-#, fuzzy
 msgid "2. Define changes"
-msgstr "2. Definování změn "
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:506
 msgid ""
@@ -8793,9 +8597,8 @@ msgid "when field equals"
 msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:522
-#, fuzzy
 msgid "on subfield"
-msgstr "Úplný záznam"
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:523
 msgid "new value"
@@ -8806,14 +8609,12 @@ msgid "condition"
 msgstr "podmínka"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:525
-#, fuzzy
 msgid "Apply only to specific field instances"
-msgstr "Platí pouze pro konkrétní případy v terénu"
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:526
-#, fuzzy
 msgid "value"
-msgstr "hodnoty."
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:555
 msgid "Back to Results"
@@ -8827,27 +8628,23 @@ msgid "records found"
 msgstr "nalezené záznamy"
 
 #: modules/bibedit/lib/bibeditmulti_webinterface.py:114
-#, fuzzy
 msgid "Multi-Record Editor"
-msgstr "Multi-Record Editor"
+msgstr ""
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:116
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:132
-#, fuzzy
 msgid "Export Job Overview"
-msgstr "Export práce Přehled"
+msgstr ""
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:117
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:189
-#, fuzzy
 msgid "New Export Job"
-msgstr "Nový export práce"
+msgstr ""
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:118
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:443
-#, fuzzy
 msgid "Export Job History"
-msgstr "Export Job History"
+msgstr ""
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:174
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:195
@@ -8874,9 +8671,8 @@ msgid "Output Format"
 msgstr "Výstupní formát"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:258
-#, fuzzy
 msgid "Start"
-msgstr "Setřídit podle:"
+msgstr ""
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:259
 msgid "Output Directory"
@@ -8901,14 +8697,12 @@ msgid "Download"
 msgstr "Stáhnout"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:439
-#, fuzzy
 msgid "View as: "
-msgstr "více"
+msgstr ""
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:533
-#, fuzzy
 msgid "Job"
-msgstr "práce"
+msgstr ""
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:588
 msgid "Total"
@@ -8923,9 +8717,8 @@ msgid "None"
 msgstr "Žádný"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:672
-#, fuzzy
 msgid "Manualy"
-msgstr "leden"
+msgstr ""
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:674
 msgid "Daily"
@@ -8940,23 +8733,20 @@ msgid "Monthly"
 msgstr "Měsičně"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:192
-#, fuzzy
 msgid "Edit Export Job"
-msgstr "Upravit Export Job"
+msgstr ""
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:239
 msgid "Query Results"
 msgstr "Výsledky dotazu"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:246
-#, fuzzy
 msgid "Export Job Queries"
-msgstr "Export Job dotazy"
+msgstr ""
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:320
-#, fuzzy
 msgid "New Query"
-msgstr "Nový dotaz"
+msgstr ""
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:325
 msgid "Edit Query"
@@ -8975,9 +8765,8 @@ msgstr "Exportovat výsledek práce"
 #: modules/bibexport/lib/bibexport_method_fieldexporter.py:500
 #: modules/bibexport/lib/bibexport_method_fieldexporter.py:515
 #: modules/bibexport/lib/bibexport_method_fieldexporter.py:530
-#, fuzzy
 msgid "You are not authorised to access this resource."
-msgstr "Nemáte oprávnění k přístupu k tomuto zdroji."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:298
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7922
@@ -8986,9 +8775,8 @@ msgid "Loan information"
 msgstr "Informace o vypůjčce"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:300
-#, fuzzy
 msgid "This book is sent to you ..."
-msgstr "Tato kniha je odeslán na vás ..."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:320
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1624
@@ -9099,9 +8887,8 @@ msgid "Due date"
 msgstr "Termín dokončení"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:384
-#, fuzzy
 msgid "List of pending hold requests"
-msgstr "Seznam nevyřízených žádostí myslí si"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:401
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1622
@@ -9259,28 +9046,24 @@ msgstr "Datum žádosti"
 
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:108
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:152
-#, fuzzy
 msgid "You are not authorized to use loans."
-msgstr "Nemáte oprávnění k použití půjčky."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:157
 #: modules/bibcirculation/lib/bibcirculation_templates.py:489
-#, fuzzy
 msgid "Loans - historical overview"
-msgstr "Půjčky - historický přehled"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:208
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:264
-#, fuzzy
 msgid "You are not authorized to use ill."
-msgstr "Nejste oprávněni používat nemocní."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:212
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:282
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10732
-#, fuzzy
 msgid "Interlibrary loan request for books"
-msgstr "Meziknihovní žádost o knihy"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:290
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1511
@@ -9351,14 +9134,12 @@ msgid "Request"
 msgstr "Žádost"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:333
-#, fuzzy
 msgid "See this book on BibCirculation"
-msgstr "Podívejte se na tuto knihu BibCirculation"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:408
-#, fuzzy
 msgid "0 borrower(s) found."
-msgstr "Hledej v %s záznamech:"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:426
 msgid "Borrower(s)"
@@ -9460,14 +9241,12 @@ msgstr "Zpět"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:484
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4026
-#, fuzzy
 msgid "Renew all loans"
-msgstr "Obnovit všechny úvěry"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:503
-#, fuzzy
 msgid "You don't have any book on loan."
-msgstr "Nemáte žádnou knihu o půjčku."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:527
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3199
@@ -9491,14 +9270,12 @@ msgstr "Obnovit"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:597
 #: modules/bibcirculation/lib/bibcirculation_templates.py:627
-#, fuzzy
 msgid "Your Requests"
-msgstr "košíky"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:598
-#, fuzzy
 msgid "You don't have any request (waiting or pending)."
-msgstr "Nemáte žádný požadavek (čekání nebo jednání)."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:601
 #: modules/bibcirculation/lib/bibcirculation_templates.py:677
@@ -9532,15 +9309,13 @@ msgid "Returned"
 msgstr "Vráceno"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:717
-#, fuzzy
 msgid "Renewalls"
-msgstr "více"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:779
 #: modules/bibcirculation/lib/bibcirculation_templates.py:928
-#, fuzzy
 msgid "Enter your period of interest"
-msgstr "Zadejte období zájmu"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:930
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2555
@@ -9562,9 +9337,8 @@ msgstr "Potvrdit"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:959
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10852
-#, fuzzy
 msgid "You can see your loans "
-msgstr "Můžete vidět své úvěry"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:961
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10854
@@ -9573,21 +9347,18 @@ msgstr "zde"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:962
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10855
-#, fuzzy
 msgid "."
-msgstr "."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:993
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2475
-#, fuzzy
 msgid "A new loan has been registered."
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1050
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1236
-#, fuzzy
 msgid "No more requests are pending."
-msgstr "Žádné další žádosti jsou v řízení."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1079
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15362
@@ -9605,9 +9376,8 @@ msgid "Options"
 msgstr "Možnosti"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1398
-#, fuzzy
 msgid "No hold requests waiting."
-msgstr "Ne držet čekající žádosti."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1425
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1670
@@ -9621,9 +9391,8 @@ msgid "Request options"
 msgstr "Možnosti žádosti"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1457
-#, fuzzy
 msgid "Select hold request"
-msgstr "košíky"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1528
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4509
@@ -9638,9 +9407,8 @@ msgid ""
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1621
-#, fuzzy
 msgid "Loan informations"
-msgstr "Půjčka informace"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1626
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1925
@@ -9683,24 +9451,21 @@ msgstr "Vydavatelství"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11967
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12812
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12918
-#, fuzzy
 msgid "Return date"
-msgstr "Vraťte se datum"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1666
-#, fuzzy, python-format
+#, python-format
 msgid "There %s request(s) on the book who has been returned."
-msgstr "Existuje%s požadavek (y) na knize, která byla vrácena."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1667
-#, fuzzy
 msgid "Waiting requests"
-msgstr "košíky"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1711
-#, fuzzy
 msgid "Select request"
-msgstr "košíky"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1720
 #, python-format
@@ -9708,27 +9473,23 @@ msgid "There are no requests waiting on the item <strong>%s</strong>."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1754
-#, fuzzy
 msgid "Welcome to Invenio BibCirculation Admin"
-msgstr "Vítejte v Invenio BibCirculation Admin"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1818
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5527
-#, fuzzy
 msgid "Search borrower by"
-msgstr "Hledat dlužník o"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1899
-#, fuzzy
 msgid "0 item(s) found."
-msgstr "Kolekcia %s Nenalezena"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1926
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15578
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15740
-#, fuzzy
 msgid "No. Copies"
-msgstr "Ne Kopie"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2093
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8758
@@ -9835,18 +9596,16 @@ msgid "Continue"
 msgstr "Pokračovat"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2275
-#, fuzzy
 msgid "List of borrowed books"
-msgstr "Seznam vypůjčených knih"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2279
 msgid "Write note(s)"
 msgstr "Napsat poznámku(y)"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2397
-#, fuzzy
 msgid "Notification has been sent!"
-msgstr "Oznámení byla odeslána!"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2482
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2825
@@ -9883,23 +9642,20 @@ msgid "Author(s)"
 msgstr "Autoři"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2487
-#, fuzzy
 msgid "Print loan information"
-msgstr "Tisk úvěr informace"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2627
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2730
-#, fuzzy
 msgid "Cancel hold request"
-msgstr "Zrušit drží žádost"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2665
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3079
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3271
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3801
-#, fuzzy
 msgid "There are no requests."
-msgstr "košíky"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2823
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6315
@@ -9930,9 +9686,8 @@ msgstr "košíky"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15863
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16087
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16403
-#, fuzzy
 msgid "Item details"
-msgstr "Údaje o předmětu"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2830
 msgid "Edit this record"
@@ -9957,20 +9712,17 @@ msgid "Order new copy"
 msgstr "Objednat novou kopii"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3030
-#, fuzzy
 msgid "ILL request"
-msgstr "ILL žádost"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3031
-#, fuzzy
 msgid "Hold requests and loans overview on"
-msgstr "Držte požadavky a úvěry přehled o"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3032
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3035
-#, fuzzy
 msgid "Hold requests"
-msgstr "Hold žádostí"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3032
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3033
@@ -9982,9 +9734,8 @@ msgstr "Hold žádostí"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3776
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3777
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3778
-#, fuzzy
 msgid "More details"
-msgstr "Další podrobnosti"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3033
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3036
@@ -9995,22 +9746,19 @@ msgstr "Vypůjčky"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3034
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3775
-#, fuzzy
 msgid "Historical overview"
-msgstr "Historický přehled"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3167
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3907
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4645
-#, fuzzy
 msgid "There are no loans."
-msgstr "košíky"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3201
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3395
-#, fuzzy
 msgid "Returned on"
-msgstr "Vráceno na"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3202
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3396
@@ -10019,9 +9767,8 @@ msgstr "Vráceno na"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4307
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4558
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4685
-#, fuzzy
 msgid "Renewals"
-msgstr "více"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3203
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3397
@@ -10029,9 +9776,8 @@ msgstr "více"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4128
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4308
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4559
-#, fuzzy
 msgid "Overdue letters"
-msgstr "Zpožděné dopisy"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3462
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3566
@@ -10052,14 +9798,12 @@ msgid "Library details"
 msgstr "Detaily o knihovně"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3521
-#, fuzzy
 msgid "No of items"
-msgstr "Počet položek"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3571
-#, fuzzy
 msgid "Notes about this borrower"
-msgstr "Poznámky o tomto dlužník"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3644
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4830
@@ -10068,28 +9812,24 @@ msgid "Personal details"
 msgstr "Osobní údaje"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3767
-#, fuzzy
 msgid "New loan"
-msgstr "Nový úvěr"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3768
 msgid "New request"
 msgstr "Nová žádost"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3769
-#, fuzzy
 msgid "New ILL request"
-msgstr "Nový požadavek MVS"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3770
-#, fuzzy
 msgid "Notify this borrower"
-msgstr "Upozornit tohoto dlužníka"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3771
-#, fuzzy
 msgid "Requests, Loans and ILL overview on"
-msgstr "Žádosti, úvěry a špatné přehled o"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3772
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3776
@@ -10098,21 +9838,18 @@ msgstr "Žádosti"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3774
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3778
-#, fuzzy
 msgid "ILL"
-msgstr "ILL"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3839
-#, fuzzy
 msgid "Request option(s)"
-msgstr "Žádost o možnost (s)"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3946
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7925
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9433
-#, fuzzy
 msgid "Loan date"
-msgstr "Poslední aktualizace"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3950
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5843
@@ -10123,14 +9860,12 @@ msgstr "Typ"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3951
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4688
-#, fuzzy
 msgid "Loan notes"
-msgstr "Půjčka poznamenává"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3952
-#, fuzzy
 msgid "Loans status"
-msgstr "Půjčky stav"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3953
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4689
@@ -10145,16 +9880,14 @@ msgstr "Viz poznámky"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4099
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4279
-#, fuzzy
 msgid "No result for your search."
-msgstr "Kolekcia %s Nenalezena"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4129
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4309
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4560
-#, fuzzy
 msgid "Loan Notes"
-msgstr "Půjčka Poznámky"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4143
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4323
@@ -10165,16 +9898,14 @@ msgstr "viz poznámky"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4148
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4328
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4579
-#, fuzzy
 msgid "no notes"
-msgstr "Žádné poznámky"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4182
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4362
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4489
-#, fuzzy
 msgid "Send recall"
-msgstr "Odeslat stažení"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4436
 msgid "CERN Library"
@@ -10194,14 +9925,12 @@ msgstr "Šablony"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4486
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4686
-#, fuzzy
 msgid "Overdue letter"
-msgstr "Po splatnosti písmeno"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4487
-#, fuzzy
 msgid "Reminder"
-msgstr "Agenda"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4488
 msgid "Notification"
@@ -10217,9 +9946,8 @@ msgstr "Odeslat"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4687
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7927
-#, fuzzy
 msgid "Loan status"
-msgstr "Úvěr stav"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4874
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8115
@@ -10228,9 +9956,8 @@ msgid "Write notes"
 msgstr "Napsat poznámky"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4934
-#, fuzzy
 msgid "Notes about borrower"
-msgstr "Poznámky k dlužník"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4943
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5041
@@ -10245,27 +9972,24 @@ msgstr "Poznámky k dlužník"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12931
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13244
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15236
-#, fuzzy
 msgid "[delete]"
-msgstr "Smazat"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4986
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5085
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7849
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10055
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15279
-#, fuzzy
 msgid "Write new note"
-msgstr "košíky"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5032
 msgid "Notes about loan"
 msgstr "Poznámky o vypůjčce"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5225
-#, fuzzy
 msgid "Book Information"
-msgstr "O knize"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5229
 msgid "EAN"
@@ -10297,9 +10021,8 @@ msgid "Number of pages"
 msgstr "Počet stránek"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5236
-#, fuzzy
 msgid "Sub-library"
-msgstr "únor"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5237
 msgid "CERN Central Library"
@@ -10311,22 +10034,19 @@ msgstr "Nový vypůjčovatel byl zaregistrován."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5661
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5723
-#, fuzzy
 msgid "Borrower information"
-msgstr "Dlužník informace"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5763
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6241
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13994
-#, fuzzy
 msgid "The information has been updated."
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5842
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5903
-#, fuzzy
 msgid "New library information"
-msgstr "Nová knihovna informace"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5946
 msgid "A new library has been registered."
@@ -10380,29 +10100,25 @@ msgid "new copy"
 msgstr "nová kopie"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6819
-#, fuzzy, python-format
+#, python-format
 msgid "A %s has been added."
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7181
-#, fuzzy
 msgid "Update copy information"
-msgstr "Aktualizace kopírování informací"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7571
-#, fuzzy
 msgid "New copy information"
-msgstr "Nová kopie informace"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7615
-#, fuzzy
 msgid "This item has been updated."
-msgstr "Záznam byl vymazán."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7698
-#, fuzzy
 msgid "0 library(ies) found."
-msgstr "0 knihovna (y) nalézt."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7797
 msgid "Notes about library"
@@ -10606,7 +10322,8 @@ msgstr "Nová ILL žádost byla úspěšně zaregistrována."
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11027
 #, python-format
 msgid ""
-"I accept the %s of the service in particular the return of books in due time."
+"I accept the %s of the service in particular the return of books in due "
+"time."
 msgstr "Příjmám %s poskytující služby především pak návrat knih v termínu."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10821
@@ -10816,9 +10533,8 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14474
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15960
-#, fuzzy
 msgid "Borrower wants this edition only."
-msgstr "Dlužník chce toto vydání pouze."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14607
 msgid "Only this edition."
@@ -10839,7 +10555,8 @@ msgstr "Tisknutelný formát"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15526
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15684
 msgid ""
-"Check if the book already exists on Invenio, before to send your ILL request."
+"Check if the book already exists on Invenio, before to send your ILL "
+"request."
 msgstr ""
 "Zkontrolujte, zda kniha již existuje v Invenio, než odešlete ILL požadavek."
 
@@ -10963,41 +10680,36 @@ msgid "File"
 msgstr "Soubor"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:241
-#, fuzzy
 msgid "Edit BibCheck config file"
-msgstr "Úpravy BibCheck config file"
+msgstr ""
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:270
 msgid "already exists."
 msgstr ""
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:273
-#, fuzzy
 msgid "written OK."
-msgstr "Citováno"
+msgstr ""
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:279
 msgid "write failed."
 msgstr ""
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:281
-#, fuzzy
 msgid "Save BibCheck config file"
-msgstr "Uložit BibCheck konfigurační soubor"
+msgstr ""
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:315
 msgid "deleted"
 msgstr "chráněno"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:317
-#, fuzzy
 msgid "delete failed"
-msgstr "košíky"
+msgstr ""
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:319
-#, fuzzy
 msgid "Delete BibCheck config file"
-msgstr "Smazat BibCheck konfigurační soubor"
+msgstr ""
 
 #: modules/bibharvest/lib/oai_repository_admin.py:153
 #: modules/bibharvest/lib/oai_repository_admin.py:258
@@ -11006,39 +10718,33 @@ msgid "Return to main selection"
 msgstr "Návrat do hlavního výběru"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:118
-#, fuzzy
 msgid "Overview of sources"
-msgstr "Přehled zdrojů"
+msgstr ""
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:119
-#, fuzzy
 msgid "Harvesting status"
-msgstr "Sklizeň stav"
+msgstr ""
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:137
-#, fuzzy
 msgid "Not Set"
-msgstr "Ne Set"
+msgstr ""
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:138
 msgid "never"
 msgstr "nikdy"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:149
-#, fuzzy
 msgid "Never harvested"
-msgstr "Nikdy sklízí"
+msgstr ""
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:161
-#, fuzzy
 msgid "View Holding Pen"
-msgstr "Zobrazit Holding Pen"
+msgstr ""
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:186
 #: modules/bibharvest/lib/oai_harvest_admin.py:547
-#, fuzzy
 msgid "No OAI source ID selected."
-msgstr "Žádný zdroj OAI ID vybrán."
+msgstr ""
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:285
 #: modules/bibharvest/lib/oai_harvest_admin.py:422
@@ -11046,9 +10752,8 @@ msgstr "Žádný zdroj OAI ID vybrán."
 #: modules/bibharvest/lib/oai_harvest_admin.py:451
 #: modules/bibharvest/lib/oai_harvest_admin.py:488
 #: modules/bibharvest/lib/oai_harvest_admin.py:535
-#, fuzzy
 msgid "Go back to the OAI sources overview"
-msgstr "Vraťte se do OAI zdrojů přehled"
+msgstr ""
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:408
 msgid "Try again with another url"
@@ -11059,9 +10764,8 @@ msgid "Continue anyway"
 msgstr "Přesto pokračovat"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:818
-#, fuzzy
 msgid "Return to the month view"
-msgstr "Zpět na zobrazení měsíce"
+msgstr ""
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1092
 msgid "Compare with original"
@@ -11069,19 +10773,16 @@ msgstr "Srovnání s originálem"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1098
 #: modules/bibharvest/lib/oai_harvest_admin.py:1143
-#, fuzzy
 msgid "Delete from holding pen"
-msgstr "Odstranit z držení pera"
+msgstr ""
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1116
-#, fuzzy
 msgid "Error when retrieving the Holding Pen entry"
-msgstr "Chyba při načítání Holding pero vstup"
+msgstr ""
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1124
-#, fuzzy
 msgid "Error when retrieving the record"
-msgstr "Chyba při načítání záznam"
+msgstr ""
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1132
 msgid ""
@@ -11089,9 +10790,8 @@ msgid ""
 msgstr ""
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1137
-#, fuzzy
 msgid "Accept Holding Pen version"
-msgstr "seance"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:75
 msgid "Limit display to knowledge bases matching"
@@ -11106,24 +10806,20 @@ msgid "Add New Knowledge Base"
 msgstr "Přidat novou znalostní bázi"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:141
-#, fuzzy
 msgid "Configure a dynamic KB"
-msgstr "Konfigurace dynamické KB"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:142
-#, fuzzy
 msgid "Add New Taxonomy"
-msgstr "Přidat nový taxonomie"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:183
-#, fuzzy
 msgid "This knowledge base already has a taxonomy file."
-msgstr "Tato znalostní báze má již taxonomie soubor."
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:184
-#, fuzzy
 msgid "If you upload another file, the current version will be replaced."
-msgstr "Pokud nahrajete jiný soubor, bude aktuální verze nahradit."
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:186
 msgid "The current taxonomy can be accessed with this URL"
@@ -11155,8 +10851,8 @@ msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:234
 msgid ""
-"If the expression is empty, a list of all values                          in "
-"270__a will be created."
+"If the expression is empty, a list of all values                          in"
+" 270__a will be created."
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:236
@@ -11201,28 +10897,24 @@ msgid ""
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:333
-#, fuzzy
 msgid "Map From"
-msgstr "Mapa Z"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:396
 msgid "Search for a mapping"
 msgstr "Hledat mapování"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:514
-#, fuzzy
 msgid "You can get a these mappings in textual format by: "
-msgstr "Můžete si těchto mapování v textovém formátu:"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:516
-#, fuzzy
 msgid "And the KBA version by:"
-msgstr "A verze KBA tímto:"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:667
-#, fuzzy
 msgid "Your rule"
-msgstr "košíky"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:669
 msgid "The left side of the rule "
@@ -11241,19 +10933,16 @@ msgid "Please select action"
 msgstr "Prosím, vyberte akci"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:686
-#, fuzzy
 msgid "Replace the selected rules with this rule"
-msgstr "Nahradit vybrané předpisy s tímto pravidlem"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:687
-#, fuzzy
 msgid "Add this rule in the current knowledge base"
-msgstr "Přidat toto pravidlo v současné znalostní základny"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:688
-#, fuzzy
 msgid "Cancel: do not add this rule"
-msgstr "Zrušení: nepřidávejte toto pravidlo"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:719
 msgid ""
@@ -11262,23 +10951,20 @@ msgid ""
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:80
-#, fuzzy
 msgid "BibKnowledge Admin"
-msgstr "BibKnowledge Admin"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:100
-#, fuzzy
 msgid "Knowledge Bases"
-msgstr "košíky"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:118
 msgid "upload is a file"
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:130
-#, fuzzy
 msgid "Cannot create upload"
-msgstr "Výstupní formát:"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:144
 msgid "File uploaded"
@@ -11296,9 +10982,8 @@ msgstr "Soubor načten"
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:696
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:711
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:747
-#, fuzzy
 msgid "Manage Knowledge Bases"
-msgstr "Správa znalostní základnu"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:186
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:231
@@ -11307,9 +10992,8 @@ msgstr "Správa znalostní základnu"
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:479
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:544
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:723
-#, fuzzy
 msgid "Unknown Knowledge Base"
-msgstr "Neznámý znalostní báze"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:193
 #, python-format
@@ -11331,24 +11015,20 @@ msgid "Left side exists"
 msgstr "Levá strana existuje"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:416
-#, fuzzy
 msgid "Right side exists"
-msgstr "Pravá strana existuje"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:589
-#, fuzzy
 msgid "Knowledge base name missing"
-msgstr "Znalost základní název chybí"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:609
-#, fuzzy
 msgid "Unknown knowledge base"
-msgstr "košíky"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:610
-#, fuzzy
 msgid "There is no knowledge base with that name."
-msgstr "Není znalostní báze s tímto názvem."
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:629
 msgid "No such knowledge base"
@@ -11417,1292 +11097,3 @@ msgstr "Žádná práva k nahrání do kolekce '%s'"
 msgid ""
 "The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"
 msgstr "Uživatel '%(x_user)s' není oprávněn měnit collection '%(x_coll)s'"
-
-#~ msgid "Check if the book already exists on Invenio,"
-#~ msgstr "Zkontrolujte, zda kniha již existuje v Invenio,"
-
-#~ msgid "No fulltext"
-#~ msgstr "plný text"
-
-#~ msgid "period_of_interest_from"
-#~ msgstr "období_zájmu_od"
-
-#~ msgid "jsCal3"
-#~ msgstr "jsCal3"
-
-#~ msgid "period_of_interest_to"
-#~ msgstr "období_zájmu_do"
-
-#~ msgid "jsCal4"
-#~ msgstr "jsCal4"
-
-#~ msgid "jsCal1"
-#~ msgstr "jsCal1"
-
-#~ msgid "jsCal2"
-#~ msgstr "jsCal2"
-
-#~ msgid "the beginning"
-#~ msgstr "začátek"
-
-#~ msgid "now"
-#~ msgstr "nyní"
-
-#~ msgid "Upload priority"
-#~ msgstr "Priorita nahrávání"
-
-#~ msgid ""
-#~ "The MARCXML submitted is not valid. Please, review the file and "
-#~ "%(x_url2_open)sresubmit it%(x_url2_close)s"
-#~ msgstr ""
-#~ "Předložený MARCXML není platný. Prosím, přečtěte si soubor a "
-#~ "%(x_url2_open)s nahrajte jej znova %(x_url2_close)s"
-
-#, fuzzy
-#~ msgid "Invalid MARCXML"
-#~ msgstr "Neplatný MARCXML"
-
-#~ msgid "Upload successful"
-#~ msgstr "Úspěšně nahráno"
-
-#~ msgid "Run Person/Author Manager"
-#~ msgstr "Spustit správce osoby/autora"
-
-#, fuzzy
-#~ msgid ""
-#~ "The selected public basket does not exist or you do not have access to it."
-#~ msgstr "Vybraný veřejný košík neexistuje nebo nemáte přístup."
-
-#, fuzzy
-#~ msgid "Please select a valid public basket from the list of public baskets."
-#~ msgstr "Vyberte prosím platnou veřejnou koš ze seznamu veřejných košů."
-
-#, fuzzy
-#~ msgid "The selected item does not exist or you do not have access to it."
-#~ msgstr "Vybraná položka neexistuje nebo nemáte přístup."
-
-#~ msgid "Returning to the public basket view."
-#~ msgstr "Návrat k veřejnému pohledu košíku."
-
-#, fuzzy
-#~ msgid "You do not have permission to write notes to this item."
-#~ msgstr "Tato kolekce ješte neobsahuje žádné záznamy."
-
-#, fuzzy
-#~ msgid ""
-#~ "The note you are quoting does not exist or you do not have access to it."
-#~ msgstr "The poznámka se cituje neexistuje nebo nemáte přístup k němu."
-
-#, fuzzy
-#~ msgid "You must fill in both the subject and the body of the note."
-#~ msgstr "Musíte vyplnit i předmět a tělo poznámky."
-
-#, fuzzy
-#~ msgid "The selected topic does not exist or you do not have access to it."
-#~ msgstr "Vybrané téma neexistuje, nebo nemáte přístup."
-
-#, fuzzy
-#~ msgid "The selected basket does not exist or you do not have access to it."
-#~ msgstr "Vybrané košík neexistuje nebo nemáte přístup k němu."
-
-#, fuzzy
-#~ msgid "The selected basket is no longer public."
-#~ msgstr "Vybrané košík je již veřejnost."
-
-#, fuzzy
-#~ msgid ""
-#~ "The note you are deleting does not exist or you do not have access to it."
-#~ msgstr "Poznámka odstraňujete neexistuje nebo nemáte přístup."
-
-#, fuzzy
-#~ msgid "Sorry, you do not have sufficient rights to add record #%i."
-#~ msgstr "Tato kolekce ješte neobsahuje žádné záznamy."
-
-#, fuzzy
-#~ msgid "Some of the items were not added due to lack of sufficient rights."
-#~ msgstr "Některé z položek nebyla přidána kvůli nedostatku práv."
-
-#, fuzzy
-#~ msgid "Please provide a title for the external source."
-#~ msgstr "Zadejte prosím název pro externí zdroje."
-
-#, fuzzy
-#~ msgid "Please provide a description for the external source."
-#~ msgstr "Prosím, uveďte popis pro externí zdroje."
-
-#, fuzzy
-#~ msgid "Please provide a url for the external source."
-#~ msgstr "Uveďte prosím adresu URL pro externí zdroje."
-
-#, fuzzy
-#~ msgid "The url you have provided is not valid."
-#~ msgstr "Záznam byl vymazán."
-
-#, fuzzy
-#~ msgid "Sorry, you do not have sufficient rights on this basket."
-#~ msgstr "Tato kolekce ješte neobsahuje žádné záznamy."
-
-#~ msgid "No records to add."
-#~ msgstr "Žádné záznamy pro přidání."
-
-#, fuzzy
-#~ msgid "Cannot add items to the selected basket. Invalid parameters."
-#~ msgstr "Nelze přidávat položky do vybraného koše. Neplatné parametry. "
-
-#, fuzzy
-#~ msgid "Please provide a name for the new basket."
-#~ msgstr "Prosím zadejte název pro nový koše."
-
-#, fuzzy
-#~ msgid "Please select an existing topic or create a new one."
-#~ msgstr "Prosím, vyberte existující téma, nebo vytvořit novou."
-
-#, fuzzy
-#~ msgid ""
-#~ "The category you have selected does not exist. Please select a valid "
-#~ "category."
-#~ msgstr "Záznam byl vymazán."
-
-#, fuzzy
-#~ msgid "The selected group does not exist or you do not have access to it."
-#~ msgstr "Zvolená skupina neexistuje, nebo nemáte přístup."
-
-#, fuzzy
-#~ msgid "The selected output format is not available or is invalid."
-#~ msgstr "Zvolený výstupní formát není k dispozici nebo je neplatný."
-
-#~ msgid "This record does not seem to exist any more"
-#~ msgstr "Tento záznam již neexistuje"
-
-#~ msgid "Invalid comment ID."
-#~ msgstr "Neplatné ID komentáře."
-
-#~ msgid "Comment ID %s does not exist."
-#~ msgstr "ID %s komentáře neexistuje."
-
-#~ msgid "Record ID %s does not exist."
-#~ msgstr "ID %s záznamu neexistuje."
-
-#~ msgid "Bad page number --> showing first page."
-#~ msgstr "Špatné číslo stránky --> zobrazuji první stránku."
-
-#~ msgid "Bad number of results per page --> showing 10 results per page."
-#~ msgstr ""
-#~ "Špatný počet výsledků na stránku --> zobrazuji 10 výsledků na stránku"
-
-#~ msgid "Bad display order --> showing most helpful first."
-#~ msgstr "Špatné pořadí zobrazení --> zobrazuji velmi užitečné jako první."
-
-#~ msgid "Bad display order --> showing oldest first."
-#~ msgstr "Špatné pořadí zobrazení --> zobrazuji od nejstaršího."
-
-#, fuzzy
-#~ msgid "Comments on records have been disallowed by the administrator."
-#~ msgstr "Poznámky k záznamům byly zakázány administrátorem."
-
-#, fuzzy
-#~ msgid "Your feedback has been recorded, many thanks."
-#~ msgstr "Vaše připomínky byl zaznamenán velký dík."
-
-#, fuzzy
-#~ msgid "You have already reported an abuse for this comment."
-#~ msgstr "Ty už oznámily zneužití tohoto komentáře."
-
-#, fuzzy
-#~ msgid "The comment you have reported no longer exists."
-#~ msgstr "Záznam byl vymazán."
-
-#, fuzzy
-#~ msgid "Sorry, you have already voted. This vote has not been recorded."
-#~ msgstr "Promiňte, jste již hlasoval. Toto hlasování nebylo zaznamenáno. "
-
-#~ msgid "You have been unsubscribed from this discussion."
-#~ msgstr "Byl jste odhlášen z této diskuse."
-
-#~ msgid "%s is an invalid record ID"
-#~ msgstr "%s je neplatné ID záznamu"
-
-#, fuzzy
-#~ msgid "Your feedback could not be recorded, please try again."
-#~ msgstr "Vaše zpětná vazba nemůže být zaznamenán, zkuste to prosím znovu."
-
-#, fuzzy
-#~ msgid "%s is an invalid user ID."
-#~ msgstr "%S je neplatné uživatelské jméno."
-
-#~ msgid "Cannot reply to a review."
-#~ msgstr "Nelze odpovědět na recenzi."
-
-#~ msgid "You must enter a title."
-#~ msgstr "Musíte zadat název."
-
-#~ msgid "You must choose a score."
-#~ msgstr "Musíte vybrat skóre."
-
-#~ msgid "You must enter a text."
-#~ msgstr "Musíte zadat text."
-
-#~ msgid "You already wrote a review for this record."
-#~ msgstr "Ty už jste napsal recenzi tohoto záznamu."
-
-#~ msgid "You already posted a comment short ago. Please retry later."
-#~ msgstr ""
-#~ "Před chvílí jste zaslali krátký komentář. Zkuste to prosím později. "
-
-#~ msgid "Failed to insert your comment to the database. Please try again."
-#~ msgstr "Nepodařilo se vložit komentář do databáze. Prosím zkuste to znovu."
-
-#~ msgid "Unknown action --> showing you the default add comment form."
-#~ msgstr "Neznámá akce --> zobrazuji výchozí formulář pro přidání komentáře"
-
-#~ msgid "Record ID %s does not exist in the database."
-#~ msgstr "Záznam ID %s neexistuje v databázi."
-
-#, fuzzy
-#~ msgid "No record ID was given."
-#~ msgstr "Ne ID záznamu dostal."
-
-#, fuzzy
-#~ msgid "Record ID %s is an invalid ID."
-#~ msgstr "Záznam ID%s je neplatný číslo."
-
-#, fuzzy
-#~ msgid "Record ID %s is not a number."
-#~ msgstr "Záznam ID%s není číslo."
-
-#, fuzzy
-#~ msgid ""
-#~ "<div class=\"webcomment_comment_round_header\">%(x_nb)i Comments for "
-#~ "round \"%(x_name)s\""
-#~ msgstr "Citováno: %s záznamy"
-
-#, fuzzy
-#~ msgid "%(x_name)s"
-#~ msgstr "%(x_name)s"
-
-#, fuzzy
-#~ msgid ""
-#~ "%(x_nb_people)s out of %(x_nb_total)s people found this review useful"
-#~ msgstr ""
-#~ "%(X_nb_people) je mimo%(x_nb_total) s lidem se toto hodnocení užitečné"
-
-#~ msgid "Your comment will be lost."
-#~ msgstr "Váš komentář bude ztracen."
-
-#~ msgid ""
-#~ "The size of file \\\"%s\\\" (%s) is larger than maximum allowed file size "
-#~ "(%s). Select files again."
-#~ msgstr ""
-#~ "Velikost souboru \\\"%s\\\" (%s) je vetší než maximální povolená velikost "
-#~ "(%s). Vyberte soubor(y) znovu."
-
-#~ msgid "Sorry, this message in not in your mailbox."
-#~ msgstr "Omlouváme se, tato zpráva v není ve vaší schránce."
-
-#~ msgid "This message does not exist."
-#~ msgstr "Tato zpráva neexistuje."
-
-#~ msgid "There is no index %s.  Searching for %s in all fields."
-#~ msgstr "Neexistuje žádný index %s.  Hledání %s ve všech oblastech."
-
-#~ msgid "Instead searching %s."
-#~ msgstr "Namísto hledání %s."
-
-#~ msgid "Search term too generic, displaying only partial results..."
-#~ msgstr "Hledaný výraz příliš obecný, zobrazeny pouze dílčí výsledky ..."
-
-#~ msgid "No match found, please enter different search terms."
-#~ msgstr "Nenalezena shoda, zadejte prosím jiné vyhledávací podmínky."
-
-#~ msgid "Back to search"
-#~ msgstr "Zpět na vyhledávání"
-
-#~ msgid "%s of"
-#~ msgstr "%s z"
-
-#~ msgid "Name variants"
-#~ msgstr "Název variant"
-
-#, fuzzy
-#~ msgid "No Name Variants"
-#~ msgstr "Beze jména Varianty"
-
-#~ msgid "Papers"
-#~ msgstr "Příspěvky"
-
-#~ msgid "No Papers"
-#~ msgstr "Žádné příspěvky"
-
-#~ msgid "unknown affiliation"
-#~ msgstr "neznámá příslušnost"
-
-#~ msgid "No Affiliations"
-#~ msgstr "Žádná příslušnost"
-
-#, fuzzy
-#~ msgid "Affiliations"
-#~ msgstr "Citační historie:"
-
-#~ msgid "No Keywords"
-#~ msgstr "Žádná klíčová slova"
-
-#~ msgid "Frequent keywords"
-#~ msgstr "Častá klíčová slova"
-
-#~ msgid "Frequent co-authors"
-#~ msgstr "Častí spoluautoři"
-
-#~ msgid "No Frequent Co-authors"
-#~ msgstr "Občasní spoluautoři"
-
-#~ msgid "This is me.  Verify my publication list."
-#~ msgstr "To jsem já.  Ověřte si můj seznam publikací."
-
-#~ msgid "No Citation Information available"
-#~ msgstr "Žádné informace o citacích nejsou k dispozici"
-
-#~ msgid "Total number of citations excluding self-citations:"
-#~ msgstr "Celkový počet citací bez vlastních citací:"
-
-#~ msgid "Average citations per paper excluding self-citations:"
-#~ msgstr "Průměrný počet citací na jednu práci kromě vlastních citací:"
-
-#, fuzzy
-#~ msgid ""
-#~ "Please try the following link to start a broader search on the author: "
-#~ msgstr ""
-#~ "Prosím, zkuste následující odkaz k zahájení širší vyhledávání na autora:"
-
-#~ msgid "Please enter a group name."
-#~ msgstr "Prosím, zadejte název skupiny."
-
-#~ msgid "Please enter a valid group name."
-#~ msgstr "Zadejte prosím platný název skupiny."
-
-#~ msgid "Please choose a group join policy."
-#~ msgstr "Prosím, vyberte politiku pro připojení ke skupině."
-
-#~ msgid "Group name already exists. Please choose another group name."
-#~ msgstr "Název skupiny již existuje. Prosím zvolte jiný název skupiny. "
-
-#~ msgid "You are already member of the group."
-#~ msgstr "Vy jste již členem skupiny."
-
-#~ msgid "Please select only one group."
-#~ msgstr "Prosím, vyberte pouze jednu skupinu."
-
-#~ msgid "Please select one group."
-#~ msgstr "Prosím, vyberte jednu skupinu."
-
-#~ msgid "Sorry, there was an error with the database."
-#~ msgstr "Omlouváme se, došlo k chybě s databází."
-
-#~ msgid "Sorry, you do not have sufficient rights on this group."
-#~ msgstr "Omlouváme se, tato kolekce ješte neobsahuje žádné záznamy."
-
-#~ msgid "The group has already been deleted."
-#~ msgstr "Skupina již byla odstraněna."
-
-#~ msgid "Please choose a member if you want to remove him from the group."
-#~ msgstr "Prosím, vyberte člena, pokud jej chcete odstranit ze skupiny."
-
-#~ msgid ""
-#~ "Please choose a user from the list if you want him to be added to the "
-#~ "group."
-#~ msgstr ""
-#~ "Prosím, vyberte uživatele ze seznamu, pokud chcete, aby se přidal ke "
-#~ "skupině."
-
-#~ msgid "The user is already member of the group."
-#~ msgstr "Uživatel je již členem skupiny."
-
-#~ msgid "The user request for joining group has already been rejected."
-#~ msgstr "Uživatelova žádost o připojení do skupiny již byla zamítnuta."
-
-#~ msgid "Restricted"
-#~ msgstr "Omezené"
-
-#~ msgid ""
-#~ "The file you want to edit is protected against modifications. Your action "
-#~ "has not been applied"
-#~ msgstr ""
-#~ "Soubor, který chcete upravit je chráněn proti úpravám. Vaše akce nebyla "
-#~ "aplikovaná"
-
-#, fuzzy
-#~ msgid ""
-#~ "Moved field from position %s to position %s on page %s of submission '%s"
-#~ "%s'."
-#~ msgstr "Přesunuto pole z pozice na pozici%s%s na stránku%podání '%s%s'."
-
-#, fuzzy
-#~ msgid ""
-#~ "Unable to delete field at position %s from page %s of submission '%s'"
-#~ msgstr "Nelze smazat pole v pozici%s%z stránku podání '%s'"
-
-#, fuzzy
-#~ msgid ""
-#~ "Unable to delete field at position %s from page %s of submission '%s%s'"
-#~ msgstr "Nelze smazat pole v pozici%s%z stránku podání '%s%s'"
-
-#~ msgid "You have %i tickets."
-#~ msgstr "Máte %i lístků."
-
-#~ msgid "Announcements"
-#~ msgstr "Oznámení"
-
-#~ msgid "Training"
-#~ msgstr "Školení"
-
-#~ msgid "Events"
-#~ msgstr "Události"
-
-#, fuzzy
-#~ msgid "Staff Association"
-#~ msgstr "Zaměstnanci sdružení"
-
-#~ msgid "when subfield $$"
-#~ msgstr "když podpole $$"
-
-#~ msgid "is equal to"
-#~ msgstr "je rovno"
-
-#~ msgid "contains"
-#~ msgstr "obsahuje"
-
-#, fuzzy
-#~ msgid "when other subfield"
-#~ msgstr "Úplný záznam"
-
-#, fuzzy
-#~ msgid "when subfield"
-#~ msgstr "Úplný záznam"
-
-#~ msgid "Manually"
-#~ msgstr "Ručně"
-
-#~ msgid "ERROR: %s does not exist"
-#~ msgstr "Chyba: %s neexistuje"
-
-#~ msgid "ERROR: %s is not a directory"
-#~ msgstr "Chyba: %s není adresář"
-
-#~ msgid "ERROR: %s is not writable"
-#~ msgstr "Chyba: %s není zapisovatelný"
-
-#~ msgid "File %s already exists."
-#~ msgstr "Soubor %s již existuje."
-
-#~ msgid "File %s: written OK."
-#~ msgstr "Soubor %s: zapsán vpořádku."
-
-#~ msgid "File %s: write failed."
-#~ msgstr "Soubor %s: chyba při zápisu."
-
-#~ msgid "File %s deleted."
-#~ msgstr "Soubor %s odstraněn."
-
-#~ msgid "File %s: delete failed."
-#~ msgstr "Soubor %s: smazání nezdařilo."
-
-#, fuzzy
-#~ msgid ""
-#~ "Error when formatting the Holding Pen entry. Probably its content is "
-#~ "broken"
-#~ msgstr ""
-#~ "Chyba při formátování Holding Pen záznam. Pravděpodobně jeho obsah je "
-#~ "rozdělen "
-
-#, fuzzy
-#~ msgid "No Knowledge Base"
-#~ msgstr "košíky"
-
-#, fuzzy
-#~ msgid "The current taxonomy can be accessed with this URL: %s"
-#~ msgstr "Současná taxonomie se lze dostat s touto URL:%s"
-
-#, fuzzy
-#~ msgid "Please upload the RDF file for taxonomy %s"
-#~ msgstr "Prosím nahrajte soubor RDF pro taxonomie%s"
-
-#~ msgid "Any collection"
-#~ msgstr "Jakákoliv kolekce"
-
-#, fuzzy
-#~ msgid "Knowledge base is empty"
-#~ msgstr "košíky"
-
-#, fuzzy
-#~ msgid "Update Base Attributes"
-#~ msgstr "košíky"
-
-#, fuzzy
-#~ msgid "This knowledge base is not used in any format elements."
-#~ msgstr "Tato znalostní základny není používán v jakémkoli formátu prvků."
-
-#, fuzzy
-#~ msgid "Your rule: %s"
-#~ msgstr "košíky"
-
-#, fuzzy
-#~ msgid ""
-#~ "The left side of the rule (%s) already appears in these knowledge bases:"
-#~ msgstr ""
-#~ "Levá strana pravidla (%s) se již objevuje v těchto znalostních bází:"
-
-#, fuzzy
-#~ msgid ""
-#~ "The right side of the rule (%s) already appears in these knowledge bases:"
-#~ msgstr ""
-#~ "Pravá strana pravidla (%s) se již objevuje v těchto znalostních bází:"
-
-#~ msgid "Cannot upload file"
-#~ msgstr "Nelze nahrát soubor"
-
-#, fuzzy
-#~ msgid "You have not selected a file to upload"
-#~ msgstr "košíky"
-
-#, fuzzy
-#~ msgid "File %s uploaded."
-#~ msgstr "Soubor%s nahrál."
-
-#~ msgid "Fatal: Author ID capabilities are disabled on this system."
-#~ msgstr ""
-#~ "Kritická chyba: schopnosti rozeznání autor ID jsou vypnuté na tomto "
-#~ "systému."
-
-#~ msgid "Fatal: You are not allowed to access this functionality."
-#~ msgstr "Kritická chyba: Nemáte oprávnění pro přístup k této funkci."
-
-#, fuzzy
-#~ msgid "Papers removed from this profile"
-#~ msgstr "Papíry odstraněn z profilu"
-
-#, fuzzy
-#~ msgid "Papers in need of review"
-#~ msgstr "Papíry, které potřebují revizi"
-
-#, fuzzy
-#~ msgid "Open Tickets"
-#~ msgstr "košíky"
-
-#~ msgid "Data"
-#~ msgstr "Data"
-
-#, fuzzy
-#~ msgid "Papers of this Person"
-#~ msgstr "Papíry této osoby"
-
-#, fuzzy
-#~ msgid "Papers _not_ of this Person"
-#~ msgstr "Papíry _neinstalujete_ této osoby"
-
-#, fuzzy
-#~ msgid "Tickets for this Person"
-#~ msgstr "Vstupenky na tuto osobu"
-
-#~ msgid "Additional Data for this Person"
-#~ msgstr "Další údaje o této osobě"
-
-#, fuzzy
-#~ msgid ""
-#~ "Sorry, there are currently no documents to be found in this category."
-#~ msgstr ""
-#~ "Omlouváme se, v současné době žádné dokumenty, které se nacházejí v této "
-#~ "kategorii."
-
-#, fuzzy
-#~ msgid "Yes, those papers are by this person."
-#~ msgstr "Ano, tyto dokumenty jsou od této osoby."
-
-#, fuzzy
-#~ msgid "No, those papers are not by this person"
-#~ msgstr "Ne, tyto pokyny nejsou touto osobou"
-
-#, fuzzy
-#~ msgid "Assign to other person"
-#~ msgstr "Přiřadit jiné osobě"
-
-#~ msgid "Forget decision"
-#~ msgstr "Zapomeň na rozhodnutí."
-
-#~ msgid "Confirm!"
-#~ msgstr "Potvrďte!"
-
-#, fuzzy
-#~ msgid "Yes, this paper is by this person."
-#~ msgstr "Ano, tento článek je o této osobě."
-
-#~ msgid "Rejected!"
-#~ msgstr "Zamítnuto!"
-
-#~ msgid "Assign to another person"
-#~ msgstr "Přiřadit jiné osobě"
-
-#~ msgid "To other person!"
-#~ msgstr "Na jinou osobu!"
-
-#~ msgid "Confirmed."
-#~ msgstr "Potvrzeno."
-
-#~ msgid "Marked as this person's paper"
-#~ msgstr "Označeno jako esej této osoby"
-
-#~ msgid "Forget decision!"
-#~ msgstr "Zapomeň toto rozhodnutí!"
-
-#~ msgid "Forget decision."
-#~ msgstr "Zapomeň toto rozhodnutí."
-
-#~ msgid "Repeal!"
-#~ msgstr "Zrušení!"
-
-#~ msgid "Repealed"
-#~ msgstr "Zrušeno"
-
-#, fuzzy
-#~ msgid "Marked as not this person's paper"
-#~ msgstr "Označena jako této osoby papíru"
-
-#~ msgid "Your papers"
-#~ msgstr "Vaše eseje"
-
-#~ msgid "Not your papers"
-#~ msgstr "Cizí eseje"
-
-#~ msgid "These are mine!"
-#~ msgstr "Tyto jsou moje!"
-
-#~ msgid "These are not mine!"
-#~ msgstr "Tyto nejsou moje!"
-
-#~ msgid "It's not mine, but I know whose it is!"
-#~ msgstr "Toto není moje, ale já vím, čí je to!"
-
-#~ msgid "Mine!"
-#~ msgstr "Moje!"
-
-#, fuzzy
-#~ msgid "This is my paper!"
-#~ msgstr "To je moje práce!"
-
-#~ msgid "Not mine!"
-#~ msgstr "Není moje!"
-
-#~ msgid "This is not my paper!"
-#~ msgstr "To není moje práce!"
-
-#~ msgid "Not Mine."
-#~ msgstr "Není moje."
-
-#~ msgid "Marked as my paper!"
-#~ msgstr "Označen jako moje práce!"
-
-#~ msgid "Forget assignment decision"
-#~ msgstr "Zapomeň na přiřazení rozhodnutí"
-
-#~ msgid "Not Mine!"
-#~ msgstr "Není moje!"
-
-#~ msgid "But this is mine!"
-#~ msgstr "Ale toto je moje!"
-
-#, fuzzy
-#~ msgid "But this is my paper!"
-#~ msgstr "Ale tohle je moje práce!"
-
-#, fuzzy
-#~ msgid "Marked as not your paper."
-#~ msgstr "Označena jako papíru."
-
-#, fuzzy
-#~ msgid "Tickes you created about this person"
-#~ msgstr "Tickes jste vytvořili o této osobě"
-
-#, fuzzy
-#~ msgid "Tickets"
-#~ msgstr "název"
-
-#, fuzzy
-#~ msgid "Request Tickets"
-#~ msgstr "host"
-
-#, fuzzy
-#~ msgid "Submit Attribution Information"
-#~ msgstr "Odeslat Attribution informace"
-
-#, fuzzy
-#~ msgid "Please review your actions"
-#~ msgstr "košíky"
-
-#, fuzzy
-#~ msgid "Claim this paper"
-#~ msgstr "Reklamace tento papír"
-
-#, fuzzy
-#~ msgid "Person search for assignment in progress!"
-#~ msgstr "Osoba hledání přiřazení v pokrok!"
-
-#, fuzzy
-#~ msgid "You are searching for a person to assign the following papers:"
-#~ msgstr "Ty hledají pro osobu přiřadit následující dokumenty:"
-
-#, fuzzy
-#~ msgid "You are going to claim papers for: %s"
-#~ msgstr "Ty si vyžádá podklady pro:%s"
-
-#, fuzzy
-#~ msgid "This page in not accessible directly."
-#~ msgstr "Tato stránka v nepřístupné přímo."
-
-#~ msgid "Welcome!"
-#~ msgstr "Vítejte!"
-
-#~ msgid "Click here to review the transactions."
-#~ msgstr "Klikněte zde pro přehled transakcí."
-
-#~ msgid "Quit searching."
-#~ msgstr "Ukončete vyhledávání."
-
-#~ msgid "You are about to attribute the following paper"
-#~ msgstr "Chystáte se přispět následujícím článkem"
-
-#~ msgid "Info"
-#~ msgstr "Info"
-
-#~ msgid " Search for a person to attribute the paper to"
-#~ msgstr " Vyhledávání osob přispívající k práci"
-
-#~ msgid "Select All"
-#~ msgstr "Vybrat vše"
-
-#~ msgid "Select None"
-#~ msgstr "Nevybrat nic"
-
-#~ msgid "Invert Selection"
-#~ msgstr "Invertovat výběr"
-
-#~ msgid "Hide successful claims"
-#~ msgstr "Skrýt úspěšné nároky"
-
-#~ msgid "No status information found."
-#~ msgstr "Žádné informace o stavu nenalezeny."
-
-#, fuzzy
-#~ msgid "Operator review of user actions pending"
-#~ msgstr "Provozovatel přehled akcí uživatele čeká"
-
-#, fuzzy
-#~ msgid "Sorry, there are currently no records to be found in this category."
-#~ msgstr ""
-#~ "Omlouváme se, v současné době žádné záznamy, které se nacházejí v této "
-#~ "kategorii."
-
-#~ msgid "Review Transaction"
-#~ msgstr "Přehled transakce"
-
-#~ msgid " On all pages: "
-#~ msgstr "Na všech stranách:"
-
-#~ msgid "Names variants:"
-#~ msgstr "Varianty jména:"
-
-#~ msgid "These records have been marked as not being from this person."
-#~ msgstr "Tyto záznamy byly označeny jako nepatřící této osobě."
-
-#, fuzzy
-#~ msgid "They will be regarded in the next run of the author "
-#~ msgstr "Oni budou považovány v dalším běhu autora"
-
-#, fuzzy
-#~ msgid "disambiguation algorithm and might disappear from this listing."
-#~ msgstr "Disambiguation algoritmus a může zmizet z tohoto seznamu."
-
-#~ msgid "Not provided"
-#~ msgstr "Neposkytovány"
-
-#~ msgid "Not available"
-#~ msgstr "Není k dispozici"
-
-#~ msgid "No comments"
-#~ msgstr "Žádné komentáře"
-
-#~ msgid "Not Available"
-#~ msgstr "Není k dispozici"
-
-#~ msgid " Delete this ticket"
-#~ msgstr "Smazat tento lístek"
-
-#, fuzzy
-#~ msgid " Commit this entire ticket"
-#~ msgstr "Zavázat se celý tento lístek"
-
-#~ msgid "... This tab is currently under construction ... "
-#~ msgstr "... Tato karta je v současné době ve výstavbě ... "
-
-#, fuzzy
-#~ msgid "Please select an author for the records in question."
-#~ msgstr "Vyberte autora pro záznamy v pochybnost."
-
-#, fuzzy
-#~ msgid "Boxes not selected will be ignored in the process."
-#~ msgstr "Krabice, které nebyly vybrány, budou ignorovány v tomto procesu."
-
-#~ msgid "Select name for"
-#~ msgstr "Vyberte jméno pro"
-
-#~ msgid "Error retrieving record title"
-#~ msgstr "Chyba při načítání názvu záznamu"
-
-#, fuzzy
-#~ msgid "Paper title: "
-#~ msgstr "Název příspěvku:"
-
-#, fuzzy
-#~ msgid "The following names have been automatically chosen:"
-#~ msgstr "Záznam byl vymazán."
-
-#, fuzzy
-#~ msgid " --  With name: "
-#~ msgstr "- S názvem:"
-
-#~ msgid "Ignore"
-#~ msgstr "Ignorovat"
-
-#~ msgid "Navigation:"
-#~ msgstr "Navigace:"
-
-#, fuzzy
-#~ msgid "Run paper attribution for another author"
-#~ msgstr "Spustit papíru autorství jiného autora"
-
-#, fuzzy
-#~ msgid "Person Interface FAQ"
-#~ msgstr "Vnitřní Chyba"
-
-#~ msgid "Person Search"
-#~ msgstr "Hledání osoby"
-
-#, fuzzy
-#~ msgid "Open tickets"
-#~ msgstr "název"
-
-#, fuzzy
-#~ msgid "Symbols legend: "
-#~ msgstr "Symboly legenda:"
-
-#~ msgid "Everything is shiny, captain!"
-#~ msgstr "Všechno je lesklý, kapitáne!"
-
-#, fuzzy
-#~ msgid "The result of this request will be visible immediately"
-#~ msgstr "Výsledkem této žádosti budou vidět okamžitě"
-
-#~ msgid "Confirmation needed to continue"
-#~ msgstr "Je potřeba potvrzení pro pokračování"
-
-#, fuzzy
-#~ msgid "This will create a change request for the operators"
-#~ msgstr "Tím se vytvoří požadavek na změnu pro hospodářské subjekty"
-
-#, fuzzy
-#~ msgid "Selected name on paper"
-#~ msgstr "košíky"
-
-#~ msgid "Verification needed to continue"
-#~ msgstr "Před pokračováním je potřeba ověření"
-
-#, fuzzy
-#~ msgid "This will create a request for the operators"
-#~ msgstr "Tím se vytvoří žádost pro operátory"
-
-#~ msgid "Please Check your entries"
-#~ msgstr "Zkontrolujte si prosím vaše údaje"
-
-#, fuzzy
-#~ msgid "Sorry."
-#~ msgstr "Setřídit podle:"
-
-#~ msgid "Please provide at least one transaction."
-#~ msgstr "Prosím, uveďte alespoň jednu transakci."
-
-#~ msgid "Error:"
-#~ msgstr "Chyba:"
-
-#~ msgid "Please provide your information"
-#~ msgstr "Prosím, zadejte své údaje"
-
-#~ msgid "Please provide your first name"
-#~ msgstr "Prosím, zadejte své křestní jméno"
-
-#~ msgid "Your first name:"
-#~ msgstr "Vaše křestní jméno:"
-
-#~ msgid "Please provide your last name"
-#~ msgstr "Prosím, zadejte své příjmení"
-
-#, fuzzy
-#~ msgid "Your last name:"
-#~ msgstr "schválení"
-
-#~ msgid "Please provide your eMail address"
-#~ msgstr "Prosím, uveďte svou e-mailovou adresu"
-
-#, fuzzy
-#~ msgid "Your eMail:"
-#~ msgstr "košíky"
-
-#, fuzzy
-#~ msgid "You may leave a comment (optional)"
-#~ msgstr "Můžete zanechat komentář (nepovinný)"
-
-#, fuzzy
-#~ msgid "Continue claiming*"
-#~ msgstr "Pokračovat v nárokování *"
-
-#~ msgid "Confirm these changes**"
-#~ msgstr "Potvrďte tyto změny **"
-
-#~ msgid "!Delete the entire request!"
-#~ msgstr "!Odstranit celou žádost!"
-
-#~ msgid "Mark as your documents"
-#~ msgstr "Označit jako vlastní dokumenty"
-
-#~ msgid "Mark as _not_ your documents"
-#~ msgstr "Označit jako _ne_ vlastní dokumenty"
-
-#~ msgid "Nothing staged as not yours"
-#~ msgstr "Nic není představeno jako vaše"
-
-#~ msgid "Mark as their documents"
-#~ msgstr "Označit jako jejich dokumenty"
-
-#, fuzzy
-#~ msgid "Nothing staged in this category"
-#~ msgstr "Nic v této kategorii představil"
-
-#, fuzzy
-#~ msgid "Mark as _not_ their documents"
-#~ msgstr "košíky"
-
-#, fuzzy
-#~ msgid "We do not have a publication list for '%s'."
-#~ msgstr "Nemáme seznam publikací pro '%s'."
-
-#, fuzzy
-#~ msgid "Create a new Person for your search"
-#~ msgstr "Kolekcia %s Nenalezena"
-
-#~ msgid "Recent Papers"
-#~ msgstr "Nedávné práce"
-
-#~ msgid "YES!"
-#~ msgstr "ANO!"
-
-#, fuzzy
-#~ msgid " Attribute Papers To "
-#~ msgstr "Papíry do atributu"
-
-#~ msgid "Publication List "
-#~ msgstr "Seznam publikací"
-
-#~ msgid "Showing the"
-#~ msgstr "Zobrazuji"
-
-#~ msgid "most recent documents:"
-#~ msgstr "poslední dokumenty:"
-
-#, fuzzy
-#~ msgid "Sorry, there are no documents known for this person"
-#~ msgstr "Omlouvám se, nejsou tam žádné známé dokumenty pro tuto osobu"
-
-#, fuzzy
-#~ msgid ""
-#~ "Information not shown to increase performances. Please refine your search."
-#~ msgstr ""
-#~ "Informace nejsou zobrazeny pro zvýšení výkonu. Prosím upřesněte vaše "
-#~ "vyhledávání. "
-
-#, fuzzy
-#~ msgid "Correct my publication lists!"
-#~ msgstr "Opravit moje publikační seznamy!"
-
-#~ msgid "Time:"
-#~ msgstr "název"
-
-#~ msgid "are mandatory"
-#~ msgstr "jakýkoli den"
-
-#~ msgid "are mandatory."
-#~ msgstr "jakýkoli den"
-
-#~ msgid "Configure Bibknowledge"
-#~ msgstr "Hledej"
-
-#~ msgid "creating a new basket"
-#~ msgstr "košíky"
-
-#~ msgid "on"
-#~ msgstr "květen"
-
-#~ msgid "basket"
-#~ msgstr "košíky"
-
-#~ msgid "previous basket"
-#~ msgstr "košíky"
-
-#~ msgid "search"
-#~ msgstr "Hledej"
-
-#~ msgid "create a new one"
-#~ msgstr "košíky"
-
-#~ msgid "Adding"
-#~ msgstr "Agenda"
-
-#~ msgid "Please choose a basket"
-#~ msgstr "košíky"
-
-#~ msgid "Editing basket"
-#~ msgstr "košíky"
-
-#~ msgid "Editing topic"
-#~ msgstr "košíky"
-
-#~ msgid "Edit this item"
-#~ msgstr "košíky"
-
-#~ msgid "Submit and save record %s"
-#~ msgstr "Podobné záznamy"
-
-#~ msgid "updated on"
-#~ msgstr "Poslední aktualizace"
-
-#~ msgid "records"
-#~ msgstr "Podobné záznamy"
-
-#~ msgid "Non-shared basket"
-#~ msgstr "košíky"
-
-#~ msgid "Group-shared basket"
-#~ msgstr "košíky"
-
-#~ msgid "View comments"
-#~ msgstr "konto"
-
-#~ msgid "Select basket"
-#~ msgstr "košíky"
-
-#~ msgid "%i baskets"
-#~ msgstr "košíky"
-
-#~ msgid "Add to a group-shared basket"
-#~ msgstr "košíky"
-
-#~ msgid "Delete Comments"
-#~ msgstr "konto"
-
-#~ msgid "ADD TO BASKET"
-#~ msgstr "PŘIDAT DO KOŠÍKU"
-
-#~ msgid "Frequently publishes in:"
-#~ msgstr "přidání"
-
-#~ msgid "The collection to which this file belong is restricted: "
-#~ msgstr "Obsah této kolekce je chráněn."
-
-#~ msgid "This record does not exist. Please try another record ID."
-#~ msgstr "Záznam byl vymazán."
-
-#~ msgid "Move up"
-#~ msgstr "více"
-
-#~ msgid "Move down"
-#~ msgstr "více"
-
-#~ msgid "Verbose"
-#~ msgstr "Prolistuj"
-
-#~ msgid "Display"
-#~ msgstr "Zobrazit výsledky:"
-
-#~ msgid "Done"
-#~ msgstr "květen"
-
-#~ msgid "Edit current version"
-#~ msgstr "košíky"
-
-#~ msgid "View revision"
-#~ msgstr "oddělení"
-
-#~ msgid "Back to BibEdit"
-#~ msgstr "košíky"
-
-#~ msgid "select_from1"
-#~ msgstr "košíky"
-
-#~ msgid "select_to1"
-#~ msgstr "košíky"
-
-#~ msgid "last page >>|"
-#~ msgstr "Poslední aktualizace"
-
-#~ msgid "session"
-#~ msgstr "seance"
-
-#~ msgid "alerts"
-#~ msgstr "avíza"
-
-#~ msgid "account"
-#~ msgstr "konto"
-
-#~ msgid "submissions"
-#~ msgstr "přidání"
-
-#~ msgid "approvals"
-#~ msgstr "schválení"
-
-#~ msgid "List of publication categories"
-#~ msgstr "košíky"
-
-#~ msgid "Internal configuration error"
-#~ msgstr "Vnitřní Chyba"
-
-#~ msgid "link"
-#~ msgstr "v"
-
-#~ msgid "The contents of this collection is restricted."
-#~ msgstr "Obsah této kolekce je chráněn."
-
-#~ msgid "Alert sent successfully!"
-#~ msgstr "konto"
-
-#~ msgid "   Username/Email: %s\n"
-#~ msgstr "avíza"
-
-#~ msgid "Article Error"
-#~ msgstr "duben"
-
-#~ msgid "%s Personalize, Main page"
-#~ msgstr "Personalizace"
-
-#~ msgid "%s , personalize"
-#~ msgstr "Personalizace"
-
-#~ msgid "Agenda"
-#~ msgstr "Agenda"
-
-#~ msgid "Search Help"
-#~ msgstr "Nápověda pro vyhledávaní"
-
-#~ msgid "Format:"
-#~ msgstr "více"
-
-#~ msgid "username"
-#~ msgstr "avíza"
-
-#~ msgid "You seem to be %(x_role)s."
-#~ msgstr "Hledaný výraz <em>%s</em>"
-
-#~ msgid "Try your search on..."
-#~ msgstr "Zkuste hledat na..."
-
-#~ msgid "%(num)s results found"
-#~ msgstr "Hledej v %s záznamech:"
-
-#~ msgid "No result found"
-#~ msgstr "Kolekcia %s Nenalezena"
-
-#~ msgid "user #%i"
-#~ msgstr "avíza"
-
-#~ msgid "Sort by"
-#~ msgstr "Setřídit podle:"
-
-#~ msgid "Please Select:"
-#~ msgstr "košíky"
-
-#~ msgid "All of the words"
-#~ msgstr "Všechna tato slova:"
-
-#~ msgid "Any of the words"
-#~ msgstr "Jedno ze slov:"
-
-#~ msgid "Exact phrase"
-#~ msgstr "Přesná věta:"
-
-#~ msgid "Partial phrase"
-#~ msgstr "Částečná věta:"
-
-#~ msgid "Regular expression"
-#~ msgstr "Regulární výraz:"
-
-#~ msgid "Added since"
-#~ msgstr "Přidánо od:"
-
-#~ msgid "<strong>%s</strong> records found"
-#~ msgstr "<strong>%s</strong> záznamů nalezeno"
-
-#~ msgid ""
-#~ "<p>Sorry, collection <strong>%s</strong> does not seem to exist. <p>You "
-#~ "may want to start browsing from <a href=\"%s\">%s</a>."
-#~ msgstr ""
-#~ "<p>Litujeme, kolekce <strong>%s</strong> neexistuje. <p>Zkuste začít "
-#~ "hledat od <a href=\"%s\">%s</a>."
-
-#~ msgid "your submissions"
-#~ msgstr "přidání"
-
-#~ msgid "Create New Group"
-#~ msgstr "košíky"
-
-#~ msgid "Submission no(1)"
-#~ msgstr "přidání"
-
-#~ msgid "pending"
-#~ msgstr "Agenda"
-
-#~ msgid "Detailed record #%s"
-#~ msgstr "Úplný záznam"
-
-#~ msgid "Search term <em>%s</em>"
-#~ msgstr "Hledaný výraz <em>%s</em>"
-
-#~ msgid "inside <em>%s</em> index"
-#~ msgstr "v indexu <em>%s</em>"
-
-#~ msgid "Article:"
-#~ msgstr "duben"
-
-#~ msgid "email"
-#~ msgstr "podrobný"
-
-#~ msgid "(Report abuse)"
-#~ msgstr "září"
-
-#~ msgid "detailed list"
-#~ msgstr "podrobný"
-
-#~ msgid "your searches"
-#~ msgstr "Zkuste hledat na..."
-
-#~ msgid "%i others' baskets"
-#~ msgstr "košíky"
-
-#, fuzzy
-#~ msgid "There are %i baskets"
-#~ msgstr "košíky"
-
-#, fuzzy
-#~ msgid "Add another subfield"
-#~ msgstr "Úplný záznam"
-
-#, fuzzy
-#~ msgid "current version"
-#~ msgstr "košíky"
-
-#, fuzzy
-#~ msgid "your approvals"
-#~ msgstr "schválení"

@@ -1,34 +1,22 @@
-# # This file is part of Invenio.
-# # Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
-# #
-# # Invenio is free software; you can redistribute it and/or
-# # modify it under the terms of the GNU General Public License as
-# # published by the Free Software Foundation; either version 2 of the
-# # License, or (at your option) any later version.
-# #
-# # Invenio is distributed in the hope that it will be useful, but
-# # WITHOUT ANY WARRANTY; without even the implied warranty of
-# # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# # General Public License for more details.
-# #
-# # You should have received a copy of the GNU General Public License
-# # along with Invenio; if not, write to the Free Software Foundation, Inc.,
-# # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR CERN
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.0.9\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2014-08-31 21:44+0200\n"
-"PO-Revision-Date: 2012-02-17 11:55+0100\n"
-"Last-Translator: Flavio Costa <flavio.costa@cern.ch>\n"
-"Language-Team: IT <info@invenio-software.org>\n"
-"Language: \n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Tibor Simko <tibor.simko@cern.ch>, 2016\n"
+"Language-Team: Italian (https://www.transifex.com/inveniosoftware/teams/23537/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: pygettext.py 1.5\n"
-"X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"Language: it\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: modules/websearch/doc/search-guide.webdoc:361
 #: modules/websearch/doc/search-guide.webdoc:396
@@ -1818,7 +1806,6 @@ msgstr "Testo completo"
 msgid "Manage Files of This Record"
 msgstr "Gestione dei file di questo record"
 
-# # , fuzzy
 #: modules/bibformat/lib/elements/bfe_edit_record.py:51
 msgid "Edit This Record"
 msgstr "Modifica questo record"
@@ -2096,7 +2083,6 @@ msgstr "Ora"
 msgid "Example"
 msgstr "Esempio"
 
-# # , fuzzy, python-format
 #: modules/bibupload/lib/batchuploader_templates.py:174
 #: modules/bibupload/lib/batchuploader_templates.py:362
 #, python-format
@@ -2110,8 +2096,8 @@ msgid ""
 "%(x_url1_open)supload history%(x_url1_close)s or %(x_url2_open)ssubmit "
 "another file%(x_url2_close)s"
 msgstr ""
-"Il tuo file e' aggiunto alla lista di attesa. Puoi controllare la tua"
-"%(x_url1_open)scronologia dei caricamenti%(x_url1_close)s or "
+"Il tuo file e' aggiunto alla lista di attesa. Puoi controllare la "
+"tua%(x_url1_open)scronologia dei caricamenti%(x_url1_close)s or "
 "%(x_url2_open)ssottomettere un altro file%(x_url2_close)s."
 
 #: modules/bibupload/lib/batchuploader_templates.py:205
@@ -2190,7 +2176,6 @@ msgstr ""
 msgid "All uploaded files were moved to DONE folder."
 msgstr "Tutti i file caricati sono stati spostati nella cartella DONE."
 
-# # , python-format
 #: modules/bibupload/lib/batchuploader_templates.py:397
 #, python-format
 msgid ""
@@ -2200,15 +2185,14 @@ msgstr ""
 "Utilizzando %(x_fmt_open)sl'upload via interfaccia web%(x_fmt_close)s, le "
 "azioni sono eseguire una sola volta."
 
-# # , python-format
 #: modules/bibupload/lib/batchuploader_templates.py:399
 #, python-format
 msgid ""
 "Check the %(x_url_open)sBatch Uploader daemon help page%(x_url_close)s for "
 "executing these actions periodically."
 msgstr ""
-"Controlla la %(x_url_open)sguida al demone Batch Uploader%(x_url_close)s per "
-"eseguire queste azioni periodicamente."
+"Controlla la %(x_url_open)sguida al demone Batch Uploader%(x_url_close)s per"
+" eseguire queste azioni periodicamente."
 
 #: modules/bibupload/lib/batchuploader_templates.py:404
 msgid "Metadata folders"
@@ -2664,7 +2648,6 @@ msgstr "Esegui Batch Uploader"
 msgid "Your account on '%s' has been activated"
 msgstr "Il tuo account su %s è stato attivato"
 
-# # , python-format
 #: modules/webaccess/lib/webaccessadmin_lib.py:3705
 #, python-format
 msgid "Your account earlier created on '%s' has been activated:"
@@ -2737,7 +2720,6 @@ msgstr "Record simili"
 msgid "Cited by"
 msgstr "Citato da"
 
-# # , python-format
 #: modules/webalert/lib/webalert.py:54
 #, python-format
 msgid "You already have an alert named %s."
@@ -2778,14 +2760,14 @@ msgstr "L'avviso %s è stato aggiornato con successo."
 #: modules/webalert/lib/webalert.py:428
 #, python-format
 msgid ""
-"You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s "
-"is available with a possibility to (a) view search results and (b) subscribe "
-"to an automatic email alerting service for these queries."
+"You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s"
+" is available with a possibility to (a) view search results and (b) "
+"subscribe to an automatic email alerting service for these queries."
 msgstr ""
-"Hai effettuato %(x_nb)s ricerche. Una %(x_url_open)slista dettagliata"
-"%(x_url_close)s è disponibile con la possibilità di (a) visualizzare i "
-"risultati della ricerca e (b) iscriversi ad un servizio automatico di avvisi "
-"via email per gli stessi."
+"Hai effettuato %(x_nb)s ricerche. Una %(x_url_open)slista "
+"dettagliata%(x_url_close)s è disponibile con la possibilità di (a) "
+"visualizzare i risultati della ricerca e (b) iscriversi ad un servizio "
+"automatico di avvisi via email per gli stessi."
 
 #: modules/webalert/lib/webalert_templates.py:74
 msgid "Pattern"
@@ -2925,9 +2907,9 @@ msgid ""
 "Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the "
 "%(x_url2_open)spopular searches%(x_url2_close)s, or the input form."
 msgstr ""
-"Imposta un nuovo avviso a partire dalle %(x_url1_open)stue ricerche"
-"%(x_url1_close)s, dalle %(x_url2_open)sricerche comuni%(x_url2_close)s o dal "
-"modulo di inserimento."
+"Imposta un nuovo avviso a partire dalle %(x_url1_open)stue "
+"ricerche%(x_url1_close)s, dalle %(x_url2_open)sricerche "
+"comuni%(x_url2_close)s o dal modulo di inserimento."
 
 #: modules/webalert/lib/webalert_templates.py:317
 #: modules/webcomment/lib/webcomment_templates.py:230
@@ -3006,11 +2988,11 @@ msgstr ""
 #: modules/webalert/lib/webalert_templates.py:445
 #, python-format
 msgid ""
-"You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during "
-"the last 30 days or so."
+"You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during"
+" the last 30 days or so."
 msgstr ""
-"Hai eseguito %(x_nb1)s ricerche (%(x_nb2)s argomenti differenti) durante gli "
-"ultimi 30 giorni."
+"Hai eseguito %(x_nb1)s ricerche (%(x_nb2)s argomenti differenti) durante gli"
+" ultimi 30 giorni."
 
 #: modules/webalert/lib/webalert_templates.py:450
 #, python-format
@@ -3629,8 +3611,8 @@ msgstr "Condivisione cestino con un nuovo gruppo"
 #: modules/webbasket/lib/webbasket_templates.py:1756
 #: modules/websession/lib/websession_templates.py:522
 msgid ""
-"You are logged in as a guest user, so your baskets will disappear at the end "
-"of the current session."
+"You are logged in as a guest user, so your baskets will disappear at the end"
+" of the current session."
 msgstr ""
 "Sei autenticato come utente ospite, perciò i tuoi cestini scompariranno al "
 "termine della sessione corrente."
@@ -3642,8 +3624,8 @@ msgstr ""
 msgid ""
 "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
 msgstr ""
-"Se lo desideri puoi %(x_url_open)sautenticarti o registrarti qui"
-"%(x_url_close)s."
+"Se lo desideri puoi %(x_url_open)sautenticarti o registrarti "
+"qui%(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1771
 #: modules/websession/lib/websession_webinterface.py:261
@@ -4193,7 +4175,8 @@ msgstr "Non sei autorizzato a commentare o recensire."
 #, python-format
 msgid "Note: Your nickname, %s, will be displayed as author of this comment."
 msgstr ""
-"Nota: il tuo soprannome, %s, sarà visualizzato come autore di questo commento"
+"Nota: il tuo soprannome, %s, sarà visualizzato come autore di questo "
+"commento"
 
 #: modules/webcomment/lib/webcomment_templates.py:1082
 #: modules/webcomment/lib/webcomment_templates.py:1195
@@ -4373,8 +4356,8 @@ msgstr "Visualizza tutte le %s recensioni riportate"
 
 #: modules/webcomment/lib/webcomment_templates.py:1525
 msgid ""
-"Here is a list, sorted by total number of reports, of all users who have had "
-"a comment reported at least once."
+"Here is a list, sorted by total number of reports, of all users who have had"
+" a comment reported at least once."
 msgstr ""
 "Ecco una lista, ordinata secondo il numero totale di commenti, di tutti gli "
 "utenti che hanno riportato un commento almeno una volta."
@@ -4539,7 +4522,8 @@ msgstr "Ecco tutti i commenti valutati ordinate in base ai più valutati"
 #, python-format
 msgid "Here are all reviews for record %i, sorted by the most reported"
 msgstr ""
-"Ecco tutte le recensioni per il record %i, ordinate per numero di valutazioni"
+"Ecco tutte le recensioni per il record %i, ordinate per numero di "
+"valutazioni"
 
 #: modules/webcomment/lib/webcomment_templates.py:1884
 msgid "Show comments"
@@ -4596,7 +4580,8 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:2075
 msgid "This is an automatic message, please don't reply to it."
 msgstr ""
-"Questo e' un messaggio automatico, si prega di non rispondere a questo email."
+"Questo e' un messaggio automatico, si prega di non rispondere a questo "
+"email."
 
 #: modules/webcomment/lib/webcomment_templates.py:2077
 #, python-format
@@ -4632,10 +4617,8 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_webinterface.py:344
 #: modules/webcomment/lib/webcomment_webinterface.py:579
 #: modules/webcomment/lib/webcomment_webinterface.py:656
-#, fuzzy
 msgid "You do not have access to the specified comment"
 msgstr ""
-"Non possiedi diritti sufficienti a visualizzare il contenuto del cestino."
 
 #: modules/webcomment/lib/webcomment_webinterface.py:491
 #: modules/websubmit/lib/websubmit_templates.py:2659
@@ -4648,9 +4631,8 @@ msgid "You cannot vote for a deleted comment"
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_webinterface.py:661
-#, fuzzy
 msgid "You cannot report a deleted comment"
-msgstr "Visualizza tutti i commenti riportati"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_webinterface.py:788
 #: modules/webcomment/lib/webcomment_webinterface.py:828
@@ -4995,22 +4977,18 @@ msgid "No values found."
 msgstr "Nessun valore trovato."
 
 #: modules/websearch/lib/search_engine.py:1825
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Warning: full-text search is only available for a subset of papers mostly "
 "from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
-"Attenzione: la ricerca nel documento e' disponibile per un numero limitato "
-"di articoli, essenzialmente dal 2006 al 2010."
 
 #: modules/websearch/lib/search_engine.py:1829
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Warning: figure caption search is only available for a subset of papers "
 "mostly from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
-"Attenzione: la ricerca nella didascalia delle figure e' disponibile per un "
-"numero limitato di articoli, essenzialmente dal 2008 al 2010."
 
 #: modules/websearch/lib/search_engine.py:1838
 msgid ""
@@ -5049,12 +5027,12 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:2341
 #, python-format
 msgid ""
-"No match found in collection %(x_collection)s. Other public collections gave "
-"%(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
+"No match found in collection %(x_collection)s. Other public collections gave"
+" %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
 msgstr ""
 "Nessun risultato trovato nella collezione %(x_collection)s. Le altre "
-"collezioni pubbliche hanno dato %(x_url_open)s%(x_nb_hits)d risultati"
-"%(x_url_close)s."
+"collezioni pubbliche hanno dato %(x_url_open)s%(x_nb_hits)d "
+"risultati%(x_url_close)s."
 
 #: modules/websearch/lib/search_engine.py:2350
 msgid ""
@@ -5098,7 +5076,8 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:2534
 #, python-format
 msgid ""
-"Search term %s did not match any record. Nearest terms in any collection are:"
+"Search term %s did not match any record. Nearest terms in any collection "
+"are:"
 msgstr ""
 "Il termine di ricerca %s non corrisponde ad alcun record. I termini più "
 "vicini in tutte le collezioni sono:"
@@ -5118,8 +5097,8 @@ msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
 "instead."
 msgstr ""
-"Spiacente, %s non sembra essere un'opzione di ordinamento valida. Effettuato "
-"ordinamento in base al titolo."
+"Spiacente, %s non sembra essere un'opzione di ordinamento valida. Effettuato"
+" ordinamento in base al titolo."
 
 #: modules/websearch/lib/search_engine.py:3507
 #: modules/websearch/lib/search_engine.py:3836
@@ -5447,7 +5426,8 @@ msgstr "Nessun risultato trovato..."
 
 #: modules/websearch/lib/websearch_templates.py:3080
 msgid ""
-"Boolean query returned no hits. Please combine your search terms differently."
+"Boolean query returned no hits. Please combine your search terms "
+"differently."
 msgstr ""
 "La ricerca booleana non ha dato risultati. Vi preghiamo di combinare "
 "differentemente i termini."
@@ -5500,8 +5480,7 @@ msgstr "Potresti iniziare a sfogliare cominciando con %s."
 #, python-format
 msgid ""
 "Set up a personal %(x_url1_open)semail alert%(x_url1_close)s\n"
-"                                  or subscribe to the %(x_url2_open)sRSS feed"
-"%(x_url2_close)s."
+"                                  or subscribe to the %(x_url2_open)sRSS feed%(x_url2_close)s."
 msgstr ""
 "Imposta un %(x_url1_open)savviso via mail%(x_url1_close)s personale\n"
 "o iscriviti al %(x_url2_open)sfeed RSS%(x_url2_close)s."
@@ -5518,7 +5497,8 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3701
 msgid "People who downloaded this document also downloaded:"
-msgstr "Gli utenti che hanno scaricato questo documento hanno anche scaricato:"
+msgstr ""
+"Gli utenti che hanno scaricato questo documento hanno anche scaricato:"
 
 #: modules/websearch/lib/websearch_templates.py:3717
 msgid "People who viewed this page also viewed:"
@@ -5647,8 +5627,8 @@ msgstr "breve"
 #: modules/websession/lib/webaccount.py:115
 #, python-format
 msgid ""
-"You are logged in as guest. You may want to %(x_url_open)slogin"
-"%(x_url_close)s as a regular user."
+"You are logged in as guest. You may want to "
+"%(x_url_open)slogin%(x_url_close)s as a regular user."
 msgstr ""
 "Sei autenticato come ospite. Puoi %(x_url_open)sautenticarti%(x_url_close)s "
 "come utente regolare."
@@ -5656,8 +5636,8 @@ msgstr ""
 #: modules/websession/lib/webaccount.py:119
 #, python-format
 msgid ""
-"The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister"
-"%(x_url_close)s first"
+"The %(x_fmt_open)sguest%(x_fmt_close)s users need to "
+"%(x_url_open)sregister%(x_url_close)s first"
 msgstr ""
 "Gli utenti %(x_fmt_open)sospiti%(x_fmt_close)s devono prima "
 "%(x_url_open)sregistrarsi%(x_url_close)s"
@@ -5704,8 +5684,8 @@ msgid ""
 "If you want to change your email or set for the first time your nickname, "
 "please set new values in the form below."
 msgstr ""
-"Se desideri modificare il tuo indirizzo email o impostare per la prima volta "
-"il tuo soprannome, per favore, inserisci i nuovi valori nei campi "
+"Se desideri modificare il tuo indirizzo email o impostare per la prima volta"
+" il tuo soprannome, per favore, inserisci i nuovi valori nei campi "
 "sottostanti."
 
 #: modules/websession/lib/websession_templates.py:158
@@ -5845,8 +5825,8 @@ msgid ""
 "Please select which login method you would like to use to authenticate "
 "yourself"
 msgstr ""
-"Per favore, seleziona quale metodo di autenticazione desideri utilizzare per "
-"autenticarti"
+"Per favore, seleziona quale metodo di autenticazione desideri utilizzare per"
+" autenticarti"
 
 #: modules/websession/lib/websession_templates.py:361
 #: modules/websession/lib/websession_templates.py:376
@@ -5860,8 +5840,8 @@ msgid ""
 "account%(x_fmt_close)s, then please enter your email address in the "
 "following form in order to have a password reset link emailed to you."
 msgstr ""
-"Se hai dimenticato la password del tuo %(x_fmt_open)saccount interno"
-"%(x_fmt_close)s a %(sitename)s, allora inserisci, per favore, il tuo "
+"Se hai dimenticato la password del tuo %(x_fmt_open)saccount "
+"interno%(x_fmt_close)s a %(sitename)s, allora inserisci, per favore, il tuo "
 "indirizzo email nel campo sottostante così da ricevere un link per "
 "reimpostarla."
 
@@ -5881,14 +5861,14 @@ msgid ""
 "then you can recover your password through the %(x_url_open)sCERN "
 "authentication system%(x_url_close)s."
 msgstr ""
-"Se stai utilizzando il %(x_fmt_open)ssistema di login del CERN"
-"%(x_fmt_close)s, puoi ricuperare la tua password tramite il "
+"Se stai utilizzando il %(x_fmt_open)ssistema di login del "
+"CERN%(x_fmt_close)s, puoi ricuperare la tua password tramite il "
 "%(x_url_open)ssistema di autenticazione CERN%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:425
 msgid ""
-"Note that if you have been using an external login system, then we cannot do "
-"anything and you have to ask there."
+"Note that if you have been using an external login system, then we cannot do"
+" anything and you have to ask there."
 msgstr ""
 "Nota che se stavi utilizzando un sistema di autenticazione esterno, allora "
 "non c'è nulla che possiamo fare e devi fare riferimento al sistema esterno."
@@ -5909,8 +5889,8 @@ msgid ""
 "own personal library of documents, or to set up an automatic alert query "
 "that would run periodically and would notify you of search results by email."
 msgstr ""
-"%s ti offre la possibilità di personalizzare l'interfaccia, impostare la tua "
-"biblioteca di documenti personali o impostare una richiesta con avviso "
+"%s ti offre la possibilità di personalizzare l'interfaccia, impostare la tua"
+" biblioteca di documenti personali o impostare una richiesta con avviso "
 "automatico che verrebbe eseguita periodicamente per notificarti i risultati "
 "della ricerca via email."
 
@@ -5934,12 +5914,12 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:480
 msgid ""
-"With baskets you can define specific collections of items, store interesting "
-"records you want to access later or share with others."
+"With baskets you can define specific collections of items, store interesting"
+" records you want to access later or share with others."
 msgstr ""
 "Con i cestini puoi definire le tue collezioni personali di elementi, "
-"memorizzare record interessanti che vuoi ricuperare in seguito o condividere "
-"con altre persone."
+"memorizzare record interessanti che vuoi ricuperare in seguito o condividere"
+" con altre persone."
 
 #: modules/websession/lib/websession_templates.py:489
 msgid ""
@@ -5961,8 +5941,8 @@ msgid ""
 "Check out book you have on loan, submit borrowing requests, etc. Requires "
 "CERN ID."
 msgstr ""
-"Controlla i libri che hai in prestito, sottoponi richieste di prestito, ecc. "
-"Richiede un ID CERN."
+"Controlla i libri che hai in prestito, sottoponi richieste di prestito, ecc."
+" Richiede un ID CERN."
 
 #: modules/websession/lib/websession_templates.py:524
 msgid ""
@@ -5975,13 +5955,13 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:547
 #, python-format
 msgid ""
-"You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout"
-"%(x_url1_close)s; b) edit your %(x_url2_open)saccount settings"
-"%(x_url2_close)s."
+"You are logged in as %(x_user)s. You may want to a) "
+"%(x_url1_open)slogout%(x_url1_close)s; b) edit your %(x_url2_open)saccount "
+"settings%(x_url2_close)s."
 msgstr ""
-"Sei autenticato come %(x_user)s. Puoi a) %(x_url1_open)suscire"
-"%(x_url1_close)s; b) modificare le tue %(x_url2_open)simpostazioni "
-"dell'account%(x_url2_close)s."
+"Sei autenticato come %(x_user)s. Puoi a) "
+"%(x_url1_open)suscire%(x_url1_close)s; b) modificare le tue "
+"%(x_url2_open)simpostazioni dell'account%(x_url2_close)s."
 
 #: modules/websession/lib/websession_templates.py:628
 msgid "Your Alert Searches"
@@ -5990,11 +5970,11 @@ msgstr "Tuoi avvisi di ricerche"
 #: modules/websession/lib/websession_templates.py:634
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are "
-"administering or are a member of."
+"You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are"
+" administering or are a member of."
 msgstr ""
-"Puoi consultare la lista dei %(x_url_open)stuoi gruppi%(x_url_close)s di cui "
-"sei amministratore o membro."
+"Puoi consultare la lista dei %(x_url_open)stuoi gruppi%(x_url_close)s di cui"
+" sei amministratore o membro."
 
 #: modules/websession/lib/websession_templates.py:637
 #: modules/websession/lib/websession_templates.py:2347
@@ -6008,8 +5988,8 @@ msgid ""
 "You can consult the list of %(x_url_open)syour submissions%(x_url_close)s "
 "and inquire about their status."
 msgstr ""
-"Puoi consultare la lista delle %(x_url_open)stue sottomissioni"
-"%(x_url_close)s e controllarne lo stato."
+"Puoi consultare la lista delle %(x_url_open)stue "
+"sottomissioni%(x_url_close)s e controllarne lo stato."
 
 #: modules/websession/lib/websession_templates.py:643
 #: modules/websubmit/web/yoursubmissions.py:160
@@ -6019,11 +5999,11 @@ msgstr "Tue sottomissioni"
 #: modules/websession/lib/websession_templates.py:646
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with "
-"the documents you approved or refereed."
+"You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with"
+" the documents you approved or refereed."
 msgstr ""
-"Puoi consultare la lista delle %(x_url_open)stue approvazioni%(x_url_close)s "
-"con i documenti che hai approvato o di cui hai fatto da referee."
+"Puoi consultare la lista delle %(x_url_open)stue approvazioni%(x_url_close)s"
+" con i documenti che hai approvato o di cui hai fatto da referee."
 
 #: modules/websession/lib/websession_templates.py:649
 #: modules/websubmit/web/yourapprovals.py:88
@@ -6033,7 +6013,8 @@ msgstr "Tue approvazioni"
 #: modules/websession/lib/websession_templates.py:653
 #, python-format
 msgid "You can consult the list of %(x_url_open)syour tickets%(x_url_close)s."
-msgstr "Puoi consultare la lista dei %(x_url_open)stuoi ticket%(x_url_close)s."
+msgstr ""
+"Puoi consultare la lista dei %(x_url_open)stuoi ticket%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:656
 msgid "Your Tickets"
@@ -6142,11 +6123,11 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:854
 #, python-format
 msgid ""
-"If you don't own an account yet, please %(x_url_open)sregister"
-"%(x_url_close)s an internal account."
+"If you don't own an account yet, please "
+"%(x_url_open)sregister%(x_url_close)s an internal account."
 msgstr ""
-"Se non possiedi ancora un account, per favore %(x_url_open)sregistra"
-"%(x_url_close)s un account interno."
+"Se non possiedi ancora un account, per favore "
+"%(x_url_open)sregistra%(x_url_close)s un account interno."
 
 #: modules/websession/lib/websession_templates.py:862
 #, python-format
@@ -6237,11 +6218,11 @@ msgid ""
 "automatic alert search that will look for new preprints and will notify you "
 "daily of new arrivals by email."
 msgstr ""
-"Per favore non utilizzare una password di valore quale la tua password Unix, "
-"AFS o NICE con questo servizio. Il tuo indirizzo email resterà strettamente "
-"confidenziale e non verrà esposto a terze parti. Verrà utilizzato per "
-"identificarti per i vari servizi personalizzati di %s. Per esempio, potresti "
-"impostare una ricerca con avviso automatico che cercherà nuove prestampe e "
+"Per favore non utilizzare una password di valore quale la tua password Unix,"
+" AFS o NICE con questo servizio. Il tuo indirizzo email resterà strettamente"
+" confidenziale e non verrà esposto a terze parti. Verrà utilizzato per "
+"identificarti per i vari servizi personalizzati di %s. Per esempio, potresti"
+" impostare una ricerca con avviso automatico che cercherà nuove prestampe e "
 "ti notificherà giornalmente sui nuovi arrivi via email."
 
 #: modules/websession/lib/websession_templates.py:1059
@@ -6250,7 +6231,8 @@ msgid ""
 "It is not possible to create an account yourself. Contact %s if you want an "
 "account."
 msgstr ""
-"Non è possibile creare da soli un account.Contatta %s se desideri un account."
+"Non è possibile creare da soli un account.Contatta %s se desideri un "
+"account."
 
 #: modules/websession/lib/websession_templates.py:1085
 #, python-format
@@ -6258,8 +6240,8 @@ msgid ""
 "You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s "
 "first."
 msgstr ""
-"Sembri essere un utente ospite. Devi prima %(x_url_open)sautenticarti"
-"%(x_url_close)s."
+"Sembri essere un utente ospite. Devi prima "
+"%(x_url_open)sautenticarti%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:1091
 msgid "You are not authorized to access administrative functions."
@@ -6282,8 +6264,8 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:1138
 #, python-format
 msgid ""
-"For more admin-level activities, see the complete %(x_url_open)sAdmin Area"
-"%(x_url_close)s."
+"For more admin-level activities, see the complete %(x_url_open)sAdmin "
+"Area%(x_url_close)s."
 msgstr ""
 "Per ulteriori attività di amministrazione, vedi la completa "
 "%(x_url_open)sArea di amministrazione%(x_url_close)s."
@@ -6601,18 +6583,19 @@ msgstr "Il gruppo %s è stato cancellato dal suo amministratore."
 #: modules/websession/lib/websession_templates.py:2438
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)s%(x_nb_total)i groups"
-"%(x_url_close)s you are subscribed to (%(x_nb_member)i) or administering "
-"(%(x_nb_admin)i)."
+"You can consult the list of %(x_url_open)s%(x_nb_total)i "
+"groups%(x_url_close)s you are subscribed to (%(x_nb_member)i) or "
+"administering (%(x_nb_admin)i)."
 msgstr ""
-"Puoi consultare la lista dei %(x_url_open)s%(x_nb_total)i gruppi"
-"%(x_url_close)s di cui sei membro (%(x_nb_member)i) o amministratore "
+"Puoi consultare la lista dei %(x_url_open)s%(x_nb_total)i "
+"gruppi%(x_url_close)s di cui sei membro (%(x_nb_member)i) o amministratore "
 "(%(x_nb_admin)i)."
 
 #: modules/websession/lib/websession_templates.py:2457
 msgid ""
 "Warning: The password set for MySQL root user is the same as the default "
-"Invenio password. For security purposes, you may want to change the password."
+"Invenio password. For security purposes, you may want to change the "
+"password."
 msgstr ""
 "Attenzione: La password impostata per l'utente root di MySQL e' la stessa "
 "della password di default d'Invenio. Per ragioni di sicurezza, si consiglia "
@@ -6623,39 +6606,40 @@ msgid ""
 "Warning: The password set for the Invenio MySQL user is the same as the "
 "shipped default. For security purposes, you may want to change the password."
 msgstr ""
-"Attenzione: La password impostata per l'utente Invenio di MySQL e' la stessa "
-"della password di default dell'istallazione. Per ragioni di sicurezza, si "
+"Attenzione: La password impostata per l'utente Invenio di MySQL e' la stessa"
+" della password di default dell'istallazione. Per ragioni di sicurezza, si "
 "consiglia di cambiare la password."
 
 #: modules/websession/lib/websession_templates.py:2469
 msgid ""
-"Warning: The password set for the Invenio admin user is currently empty. For "
-"security purposes, it is strongly recommended that you add a password."
+"Warning: The password set for the Invenio admin user is currently empty. For"
+" security purposes, it is strongly recommended that you add a password."
 msgstr ""
 "Attenzione: L'utente admin di Invenio attualmente non ha password. Per "
 "ragioni di sicurezza, si consiglia di definire una password."
 
 #: modules/websession/lib/websession_templates.py:2475
 msgid ""
-"Warning: The email address set for support email is currently set to "
-"info@invenio-software.org. It is recommended that you change this to your "
-"own address."
+"Warning: The email address set for support email is currently set to info"
+"@invenio-software.org. It is recommended that you change this to your own "
+"address."
 msgstr ""
-"\"Attenzione: L'email impostato per l'assistenza attualmente e' info@invenio-"
-"software.org. Per ragioni di sicurezza, si consiglia di sostituirlo con il "
-"vostro apposito email."
+"\"Attenzione: L'email impostato per l'assistenza attualmente e' info"
+"@invenio-software.org. Per ragioni di sicurezza, si consiglia di sostituirlo"
+" con il vostro apposito email."
 
 #: modules/websession/lib/websession_templates.py:2481
 msgid ""
-"A newer version of Invenio is available for download. You may want to visit  "
+"A newer version of Invenio is available for download. You may want to visit"
+"  "
 msgstr ""
 "Una versione piu' recente di Invenio e' disponibile. Si consiglia di "
 "valutare  "
 
 #: modules/websession/lib/websession_templates.py:2488
 msgid ""
-"Cannot download or parse release notes from http://invenio-software.org/repo/"
-"invenio/tree/RELEASE-NOTES"
+"Cannot download or parse release notes from http://invenio-"
+"software.org/repo/invenio/tree/RELEASE-NOTES"
 msgstr ""
 "Non e' possibile scaricare o processare la documentazione sulla release da "
 "http://invenio-software.org/repo/invenio/tree/RELEASE-NOTES"
@@ -6752,9 +6736,11 @@ msgstr "Hai già confermato la validità del tuo indirizzo email!"
 
 #: modules/websession/lib/websession_webinterface.py:134
 msgid ""
-"This request for confirmation of an email address is not valid or is expired."
+"This request for confirmation of an email address is not valid or is "
+"expired."
 msgstr ""
-"Questa richiesta di conferma di un indirizzo email non è valida od è scaduta."
+"Questa richiesta di conferma di un indirizzo email non è valida od è "
+"scaduta."
 
 #: modules/websession/lib/websession_webinterface.py:139
 msgid "This request for an authorization is not valid or is expired."
@@ -6863,13 +6849,12 @@ msgid ""
 "The external login method %s does not support email address based logins.  "
 "Please contact the site administrators."
 msgstr ""
-"Il metodo di autenticazione esterno %s non supporta autenticazione basata su "
-"indirizzo email.  Per favore, contatta l'amministratore del sito."
+"Il metodo di autenticazione esterno %s non supporta autenticazione basata su"
+" indirizzo email.  Per favore, contatta l'amministratore del sito."
 
 #: modules/websession/lib/websession_webinterface.py:406
-#, fuzzy
 msgid "Your nickname has not been updated"
-msgstr "Il record è stato cancellato."
+msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:420
 msgid "Settings successfully edited."
@@ -7061,8 +7046,8 @@ msgid ""
 "Please follow instructions presented there in order to complete the account "
 "registration process."
 msgstr ""
-"Per favore, segui le istruzioni ivi contenute così da completare il processo "
-"di registrazione dell'account."
+"Per favore, segui le istruzioni ivi contenute così da completare il processo"
+" di registrazione dell'account."
 
 #: modules/websession/lib/websession_webinterface.py:906
 msgid ""
@@ -7104,8 +7089,8 @@ msgid ""
 "The site is having troubles in sending you an email for confirming your "
 "email address."
 msgstr ""
-"Il sito ha incontrato dei problemi nell'inviarti un email di conferma per il "
-"tuo indirizzo."
+"Il sito ha incontrato dei problemi nell'inviarti un email di conferma per il"
+" tuo indirizzo."
 
 #: modules/websession/lib/websession_webinterface.py:943
 #: modules/websubmit/lib/websubmit_webinterface.py:141
@@ -7281,8 +7266,8 @@ msgstr "Spiacente, la pagina %s non sembra esistere."
 #: modules/webstyle/lib/webdoc_webinterface.py:190
 #, python-format
 msgid ""
-"You may want to look at the %(x_url_open)s%(x_category)s pages"
-"%(x_url_close)s."
+"You may want to look at the %(x_url_open)s%(x_category)s "
+"pages%(x_url_close)s."
 msgstr ""
 "Potresti cominciare a consultare %(x_url_open)sl'indice delle pagine "
 "%(x_category)s%(x_url_close)s."
@@ -7301,7 +7286,8 @@ msgstr "Accesso"
 #, python-format
 msgid ""
 "The uploaded file is too small (<%i o) and has therefore not been considered"
-msgstr "Il file caricato e' troppo piccolo (<%i o) ed e' quindi stato ignorato"
+msgstr ""
+"Il file caricato e' troppo piccolo (<%i o) ed e' quindi stato ignorato"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:541
 #, python-format
@@ -7357,8 +7343,8 @@ msgstr "Aggiungi un nuovo file"
 #: modules/websubmit/lib/websubmit_managedocfiles.py:842
 msgid "You can decide to hide or not previous version(s) of this file."
 msgstr ""
-"Puoi scegliere se nascondere o no la(le) versione(i) precedente(i) di questo "
-"file."
+"Puoi scegliere se nascondere o no la(le) versione(i) precedente(i) di questo"
+" file."
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:843
 msgid ""
@@ -7372,7 +7358,8 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:844
 msgid ""
-"Alternative formats uploaded for current version of this file will be removed"
+"Alternative formats uploaded for current version of this file will be "
+"removed"
 msgstr ""
 "Saranno rimossi i formati alternativi caricati per la versione attuale di "
 "questo file"
@@ -7406,8 +7393,7 @@ msgid ""
 "Best regards"
 msgstr ""
 "Al Servizio Assistenza,\n"
-"Necessiterei di aiuto per rivedere o per aggiungere un file al record "
-"%(recid)s.\n"
+"Necessiterei di aiuto per rivedere o per aggiungere un file al record %(recid)s.\n"
 "Allego la nuova versione a questo email.\n"
 "Distinti saluti"
 
@@ -7438,13 +7424,10 @@ msgid "add format"
 msgstr "aggiungi formato"
 
 #: modules/websubmit/lib/functions/Shared_Functions.py:178
-#, fuzzy
 msgid ""
 "Note that your submission has been inserted into the bibliographic task "
 "queue and is waiting for execution.\n"
 msgstr ""
-"Nota che la tua sottomissione e' stata inserita nella lista d'attesa delle "
-"operazioni bibliografiche per la sua esecuzione.\n"
 
 #: modules/websubmit/lib/functions/Shared_Functions.py:181
 #, python-format
@@ -7461,8 +7444,8 @@ msgstr ""
 #: modules/websubmit/lib/functions/Shared_Functions.py:183
 msgid ""
 "Because of a human intervention or a temporary problem, the task queue is "
-"currently set to the manual mode. Your submission is well registered but may "
-"take longer than usual before it is fully integrated and searchable.\n"
+"currently set to the manual mode. Your submission is well registered but may"
+" take longer than usual before it is fully integrated and searchable.\n"
 msgstr ""
 "A causa di un intervento di manutenzione o un problema temporaneo, la lista "
 "d'attesa delle operazioni e' attualmente in modalita' manuale. La tua "
@@ -7525,18 +7508,19 @@ msgstr "Impossibile determinare il numero di pagine di sottomissione."
 #: modules/websubmit/lib/websubmit_engine.py:291
 #: modules/websubmit/lib/websubmit_engine.py:880
 msgid ""
-"Unable to create a directory for this submission. The administrator has been "
-"alerted."
+"Unable to create a directory for this submission. The administrator has been"
+" alerted."
 msgstr ""
 "Impossibile creare una directory per questa sottomissione. L'amministratore "
 "e' stato avvisato."
 
 #: modules/websubmit/lib/websubmit_engine.py:400
 #: modules/websubmit/lib/websubmit_engine.py:978
-msgid "Cannot create submission directory. The administrator has been alerted."
+msgid ""
+"Cannot create submission directory. The administrator has been alerted."
 msgstr ""
-"Impossibile creare una directory di sottomissione. L'amministratore e' stato "
-"avvisato."
+"Impossibile creare una directory di sottomissione. L'amministratore e' stato"
+" avvisato."
 
 #: modules/websubmit/lib/websubmit_engine.py:422
 #: modules/websubmit/lib/websubmit_engine.py:1000
@@ -7611,8 +7595,8 @@ msgstr "Seleziona una categoria e poi fai clic su un pulsante di azione."
 
 #: modules/websubmit/lib/websubmit_templates.py:375
 msgid ""
-"To continue with a previously interrupted submission, enter an access number "
-"into the box below:"
+"To continue with a previously interrupted submission, enter an access number"
+" into the box below:"
 msgstr ""
 "Per continuare con una sottomissione precedentemente interrotta, inserisci "
 "un numero di accesso nella casella sottostante:"
@@ -7658,8 +7642,8 @@ msgid ""
 "This is your submission access number. It can be used to continue with an "
 "interrupted submission in case of problems."
 msgstr ""
-"Questo è il numero di accesso della tua sottomissione. Può essere utilizzato "
-"per continuare una sottomissione interrotta in caso di problemi."
+"Questo è il numero di accesso della tua sottomissione. Può essere utilizzato"
+" per continuare una sottomissione interrotta in caso di problemi."
 
 #: modules/websubmit/lib/websubmit_templates.py:575
 msgid "Mandatory fields appear in red in the SUMMARY window."
@@ -7952,8 +7936,8 @@ msgstr "Nota di approvazione:"
 msgid ""
 "This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s."
 msgstr ""
-"Questo documento è ancora %(x_fmt_open)sin attesa di approvazione"
-"%(x_fmt_close)s."
+"Questo documento è ancora %(x_fmt_open)sin attesa di "
+"approvazione%(x_fmt_close)s."
 
 #: modules/websubmit/lib/websubmit_templates.py:2358
 #: modules/websubmit/lib/websubmit_templates.py:2378
@@ -8029,7 +8013,8 @@ msgstr "La richiesta di referee è stata fatta la prima volta il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2478
 #: modules/websubmit/lib/websubmit_templates.py:2532
-msgid "Last request e-mail was sent to the publication committee chair on the "
+msgid ""
+"Last request e-mail was sent to the publication committee chair on the "
 msgstr ""
 "L'ultima email di richiesta spedita alla rappresentanza della commissione "
 "per la pubblicazione è stata inviata il "
@@ -8140,7 +8125,8 @@ msgstr "L'editorial board ha selezionato un referee il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2554
 msgid ""
-"The referee has sent his final recommendations to the editorial board on the "
+"The referee has sent his final recommendations to the editorial board on the"
+" "
 msgstr ""
 "Il referee ha inviato le sue raccomandazioni finali alla editorial board il "
 
@@ -8158,7 +8144,8 @@ msgstr "Ancora nessuna raccomandazione dall'editorial board."
 
 #: modules/websubmit/lib/websubmit_templates.py:2595
 msgid "Last request e-mail was sent to the project leader on the "
-msgstr "L'ultima email di richiesta al leader del progetto è stata inviata il "
+msgstr ""
+"L'ultima email di richiesta al leader del progetto è stata inviata il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2689
 msgid "Comments overview"
@@ -8214,8 +8201,8 @@ msgstr "Il record richiesto sembra non essere ancora integrato."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:140
 msgid ""
-"The system has encountered an error in retrieving the list of files for this "
-"document."
+"The system has encountered an error in retrieving the list of files for this"
+" document."
 msgstr ""
 "Il sistema ha incontrato un errore nel ricuperare l'elenco dei file di "
 "questo documento."
@@ -8528,8 +8515,8 @@ msgid ""
 "It seems that there are no journals defined on this server. Please contact "
 "support if this is not right."
 msgstr ""
-"Non sembrano esserci giornale definiti su questo server. Se pensi che questo "
-"non è corretto contatta il servizio di supporto."
+"Non sembrano esserci giornale definiti su questo server. Se pensi che questo"
+" non è corretto contatta il servizio di supporto."
 
 #: modules/webjournal/lib/webjournal_config.py:233
 msgid "Select a journal on this server"
@@ -8829,8 +8816,8 @@ msgid ""
 "Specify fields and their subfields that should be changed in every record "
 "matching the search criteria."
 msgstr ""
-"Specifica campi e sottocampi che devono essere modificati in ogni record che "
-"soddisfa i criteri di ricerca."
+"Specifica campi e sottocampi che devono essere modificati in ogni record che"
+" soddisfa i criteri di ricerca."
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:507
 msgid "Define new field action"
@@ -9769,14 +9756,12 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1818
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5527
-#, fuzzy
 msgid "Search borrower by"
-msgstr "Cerca ovunque"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1899
-#, fuzzy
 msgid "0 item(s) found."
-msgstr "Nessun valore trovato."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1926
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15578
@@ -9790,15 +9775,13 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10263
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14727
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16534
-#, fuzzy
 msgid "Select user"
-msgstr "seleziona utente"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2182
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2268
-#, fuzzy
 msgid "User information"
-msgstr "Ulteriori informazioni:"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2186
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2272
@@ -9827,9 +9810,8 @@ msgstr "Ulteriori informazioni:"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14197
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14896
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16103
-#, fuzzy
 msgid "Phone"
-msgstr "Fatto"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2188
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2274
@@ -9892,19 +9874,16 @@ msgid "Continue"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2275
-#, fuzzy
 msgid "List of borrowed books"
-msgstr "Elenco dei documenti con referee"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2279
-#, fuzzy
 msgid "Write note(s)"
-msgstr "Scrivi un nuovo messaggio"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2397
-#, fuzzy
 msgid "Notification has been sent!"
-msgstr "Notifica via email"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2482
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2825
@@ -9937,14 +9916,12 @@ msgstr "Notifica via email"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16089
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16219
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16406
-#, fuzzy
 msgid "Author(s)"
-msgstr "Autore:"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2487
-#, fuzzy
 msgid "Print loan information"
-msgstr "Informazioni generali"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2627
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2730
@@ -9955,9 +9932,8 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3079
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3271
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3801
-#, fuzzy
 msgid "There are no requests."
-msgstr "Ci sono %i cestini"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2823
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6315
@@ -9992,30 +9968,26 @@ msgid "Item details"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2830
-#, fuzzy
 msgid "Edit this record"
-msgstr "Modifica un altro record"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2832
-#, fuzzy
 msgid "Additional details"
-msgstr "file aggiuntivi"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2866
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6578
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7032
-#, fuzzy
 msgid "No of loans"
-msgstr "Non trovata"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3028
 msgid "Add new copy"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3029
-#, fuzzy
 msgid "Order new copy"
-msgstr "Crea un nuovo argomento"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3030
 msgid "ILL request"
@@ -10047,9 +10019,8 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3036
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3773
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3777
-#, fuzzy
 msgid "Loans"
-msgstr "Tuoi prestiti"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3034
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3775
@@ -10059,15 +10030,13 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3167
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3907
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4645
-#, fuzzy
 msgid "There are no loans."
-msgstr "Ci sono %i cestini"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3201
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3395
-#, fuzzy
 msgid "Returned on"
-msgstr "Ricevuto il:"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3202
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3396
@@ -10076,9 +10045,8 @@ msgstr "Ricevuto il:"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4307
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4558
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4685
-#, fuzzy
 msgid "Renewals"
-msgstr "Recensioni"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3203
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3397
@@ -10096,9 +10064,8 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9922
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14145
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15138
-#, fuzzy
 msgid "No notes"
-msgstr "Nota"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3467
 msgid "Notes about this library"
@@ -10109,9 +10076,8 @@ msgid "Library details"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3521
-#, fuzzy
 msgid "No of items"
-msgstr "Numero di visualizzazioni"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3571
 msgid "Notes about this borrower"
@@ -10120,9 +10086,8 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3644
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4830
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8084
-#, fuzzy
 msgid "Personal details"
-msgstr "Cestini personali"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3767
 msgid "New loan"
@@ -10146,9 +10111,8 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3772
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3776
-#, fuzzy
 msgid "Requests"
-msgstr "Regole"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3774
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3778
@@ -10162,9 +10126,8 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3946
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7925
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9433
-#, fuzzy
 msgid "Loan date"
-msgstr "Ultimo aggiornamento"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3950
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5843
@@ -10184,9 +10147,8 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3953
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4689
-#, fuzzy
 msgid "Loan options"
-msgstr "Opzioni di ricerca:"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3971
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4709
@@ -10196,9 +10158,8 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4099
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4279
-#, fuzzy
 msgid "No result for your search."
-msgstr "Nessun risultato trovato."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4129
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4309
@@ -10229,19 +10190,16 @@ msgid "CERN Library"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4467
-#, fuzzy
 msgid "Message"
-msgstr "Messaggio:"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4468
-#, fuzzy
 msgid "Choose a template"
-msgstr "Scegli argomento"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4485
-#, fuzzy
 msgid "Templates"
-msgstr "Editor del modello"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4486
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4686
@@ -10249,36 +10207,31 @@ msgid "Overdue letter"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4487
-#, fuzzy
 msgid "Reminder"
-msgstr "Mittente"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4488
-#, fuzzy
 msgid "Notification"
-msgstr "Notifica via email"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4490
 msgid "Load"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4510
-#, fuzzy
 msgid "Send"
-msgstr "fine"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4687
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7927
-#, fuzzy
 msgid "Loan status"
-msgstr "stato corrente:"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4874
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8115
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9435
-#, fuzzy
 msgid "Write notes"
-msgstr "Scrivi un nuovo messaggio"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4934
 msgid "Notes about borrower"
@@ -10297,43 +10250,36 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12931
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13244
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15236
-#, fuzzy
 msgid "[delete]"
-msgstr "Cancella"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4986
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5085
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7849
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10055
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15279
-#, fuzzy
 msgid "Write new note"
-msgstr "Scrivi un nuovo messaggio"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5032
-#, fuzzy
 msgid "Notes about loan"
-msgstr "Nuovo account presso"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5225
-#, fuzzy
 msgid "Book Information"
-msgstr "Informazioni"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5229
-#, fuzzy
 msgid "EAN"
-msgstr "E"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5232
-#, fuzzy
 msgid "Publication date"
-msgstr "Data creazione"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5233
-#, fuzzy
 msgid "Publication place"
-msgstr "Cestino pubblico"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5234
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6321
@@ -10345,14 +10291,12 @@ msgstr "Cestino pubblico"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14850
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15869
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16093
-#, fuzzy
 msgid "Edition"
-msgstr "Modifica"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5235
-#, fuzzy
 msgid "Number of pages"
-msgstr "Numero di visualizzazioni"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5236
 msgid "Sub-library"
@@ -10363,33 +10307,28 @@ msgid "CERN Central Library"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5476
-#, fuzzy
 msgid "A new borrower has been registered."
-msgstr "Un nuovo account è stato creato presso"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5661
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5723
-#, fuzzy
 msgid "Borrower information"
-msgstr "Ulteriori informazioni:"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5763
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6241
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13994
-#, fuzzy
 msgid "The information has been updated."
-msgstr "Il record è stato cancellato."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5842
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5903
-#, fuzzy
 msgid "New library information"
-msgstr "Informazioni generali"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5946
-#, fuzzy
 msgid "A new library has been registered."
-msgstr "Un nuovo account è stato creato presso"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5999
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7671
@@ -10403,16 +10342,14 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6135
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6198
-#, fuzzy
 msgid "Library information"
-msgstr "Ulteriori informazioni:"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6316
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14380
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15864
-#, fuzzy
 msgid "Book title"
-msgstr "titolo"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6318
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10934
@@ -10424,9 +10361,8 @@ msgstr "titolo"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14847
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15866
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16090
-#, fuzzy
 msgid "Place"
-msgstr "Pagina:"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6555
 #, python-format
@@ -10442,24 +10378,21 @@ msgid "new copy"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6819
-#, fuzzy, python-format
+#, python-format
 msgid "A %s has been added."
-msgstr "Il gruppo %s è stato cancellato"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7181
-#, fuzzy
 msgid "Update copy information"
-msgstr "Ulteriori informazioni:"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7571
-#, fuzzy
 msgid "New copy information"
-msgstr "Ulteriori informazioni:"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7615
-#, fuzzy
 msgid "This item has been updated."
-msgstr "Il record è stato cancellato."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7698
 msgid "0 library(ies) found."
@@ -10470,18 +10403,16 @@ msgid "Notes about library"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7929
-#, fuzzy
 msgid "Requested ?"
-msgstr "Rifiutato"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7950
 msgid "New due date: "
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7975
-#, fuzzy
 msgid "Submit new due date"
-msgstr "Guida di Sottomissione"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8019
 #, python-format
@@ -10493,9 +10424,8 @@ msgid "Back borrower's loans"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8273
-#, fuzzy
 msgid "Select item"
-msgstr "Seleziona"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8312
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8907
@@ -10518,21 +10448,18 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8479
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8974
-#, fuzzy
 msgid "From:  "
-msgstr "Da:"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8480
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8975
-#, fuzzy
 msgid "To:  "
-msgstr "A:"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8538
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9007
-#, fuzzy
 msgid "A new request has been registered with success."
-msgstr "Un nuovo account è stato creato presso"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9562
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9805
@@ -10546,25 +10473,22 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9901
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13126
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13415
-#, fuzzy
 msgid "Vendor"
-msgstr "Mittente"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9625
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9808
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9903
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13416
-#, fuzzy
 msgid "Price"
-msgstr "Articolo"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9626
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9810
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13232
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13418
-#, fuzzy
 msgid "Order date"
-msgstr "Data creazione"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9627
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9811
@@ -10594,9 +10518,8 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9951
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11127
-#, fuzzy
 msgid "select"
-msgstr "Seleziona"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10003
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15227
@@ -10656,9 +10579,8 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16098
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16289
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16416
-#, fuzzy
 msgid "Additional comments"
-msgstr "Aggiungi commento"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10450
 msgid "Borrower wants only this edition?"
@@ -10678,7 +10600,8 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11027
 #, python-format
 msgid ""
-"I accept the %s of the service in particular the return of books in due time."
+"I accept the %s of the service in particular the return of books in due "
+"time."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10821
@@ -10696,14 +10619,12 @@ msgid "Interest from"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11421
-#, fuzzy
 msgid "Periodical Title"
-msgstr "Articolo"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11423
-#, fuzzy
 msgid "Article Title"
-msgstr "Articolo"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11427
 msgid "Volume, Issue, Page"
@@ -10734,9 +10655,8 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11493
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12385
-#, fuzzy
 msgid "Borrower comments"
-msgstr "Visualizza commenti"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11494
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12386
@@ -10773,9 +10693,8 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12921
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13234
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13420
-#, fuzzy
 msgid "Previous notes"
-msgstr "Pagina precedente"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11578
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11745
@@ -10826,9 +10745,8 @@ msgid "Arrival date"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11873
-#, fuzzy
 msgid "Barcoce"
-msgstr "Sfoglia"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13014
 msgid "An ILL request has been updated with success."
@@ -10840,20 +10758,17 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13576
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13641
-#, fuzzy
 msgid "New vendor information"
-msgstr "Ulteriori informazioni:"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13686
-#, fuzzy
 msgid "A new vendor has been registered."
-msgstr "Un nuovo account è stato creato presso"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13740
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14048
-#, fuzzy
 msgid "Search vendor by"
-msgstr "Cerca ovunque"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13777
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14085
@@ -10862,9 +10777,8 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13884
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13951
-#, fuzzy
 msgid "Vendor information"
-msgstr "Ulteriori informazioni:"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14150
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14240
@@ -10876,18 +10790,16 @@ msgid "Vendor details"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14279
-#, fuzzy
 msgid "Add notes"
-msgstr "Aggiungi agli utenti"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14377
 msgid "Book does not exists on Invenio."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14377
-#, fuzzy
 msgid "Please fill the following form."
-msgstr "Per favore, contatta %s riportando le seguenti informazioni:"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14473
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15959
@@ -10911,9 +10823,8 @@ msgid "Notes about this ILL"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15315
-#, fuzzy
 msgid "No more requests are pending or waiting."
-msgstr "Alcuni documenti in sospeso."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15466
 msgid "Printable format"
@@ -10922,14 +10833,14 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15526
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15684
 msgid ""
-"Check if the book already exists on Invenio, before to send your ILL request."
+"Check if the book already exists on Invenio, before to send your ILL "
+"request."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15550
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15713
-#, fuzzy
 msgid "0 items found."
-msgstr "Nessun valore trovato."
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15618
 msgid "Proceed anyway"
@@ -10940,9 +10851,8 @@ msgid "Book does not exists on Invenio. Please fill the following form."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16216
-#, fuzzy
 msgid "Article details"
-msgstr "Articolo"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16217
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16404
@@ -10951,21 +10861,18 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16218
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16405
-#, fuzzy
 msgid "Article title"
-msgstr "Articolo"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16220
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16407
-#, fuzzy
 msgid "Report number"
-msgstr "numero di rapporto"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16221
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16408
-#, fuzzy
 msgid "Volume"
-msgstr "Pagina principale"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16222
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16409
@@ -10974,9 +10881,8 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16223
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16410
-#, fuzzy
 msgid "Page"
-msgstr "Pagina:"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16225
 msgid "Budget code"
@@ -11013,7 +10919,8 @@ msgstr "non scrivibile"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:117
 msgid "Limit to knowledge bases containing string:"
-msgstr "Limita alle basi di conoscenza che contengono la stringa di caratteri:"
+msgstr ""
+"Limita alle basi di conoscenza che contengono la stringa di caratteri:"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:135
 msgid "Really delete"
@@ -11171,19 +11078,16 @@ msgid "Limit display to knowledge bases matching"
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:76
-#, fuzzy
 msgid "in their rules and descriptions"
-msgstr "Visualizza il riquadro degli ultimi arrivi"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:140
-#, fuzzy
 msgid "Add New Knowledge Base"
-msgstr "Cancella basi di conoscenza"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:141
-#, fuzzy
 msgid "Configure a dynamic KB"
-msgstr "Configura BibRank"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:142
 msgid "Add New Taxonomy"
@@ -11206,9 +11110,8 @@ msgid "Please upload the RDF file for taxonomy"
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:224
-#, fuzzy
 msgid "Please configure"
-msgstr "Per favore, autentificati."
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:225
 msgid ""
@@ -11228,8 +11131,8 @@ msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:234
 msgid ""
-"If the expression is empty, a list of all values                          in "
-"270__a will be created."
+"If the expression is empty, a list of all values                          in"
+" 270__a will be created."
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:236
@@ -11246,9 +11149,8 @@ msgid ""
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:255
-#, fuzzy
 msgid "Exporting: "
-msgstr "Esporta come"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:296
 #: modules/bibknowledge/lib/bibknowledge_templates.py:557
@@ -11275,14 +11177,12 @@ msgid ""
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:333
-#, fuzzy
 msgid "Map From"
-msgstr "Da:"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:396
-#, fuzzy
 msgid "Search for a mapping"
-msgstr "Opzioni di ricerca:"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:514
 msgid "You can get a these mappings in textual format by: "
@@ -11293,9 +11193,8 @@ msgid "And the KBA version by:"
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:667
-#, fuzzy
 msgid "Your rule"
-msgstr "I tuoi avvisi"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:669
 msgid "The left side of the rule "
@@ -11310,9 +11209,8 @@ msgid "already appears in these knowledge bases"
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:685
-#, fuzzy
 msgid "Please select action"
-msgstr "Per favore seleziona una categoria"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:686
 msgid "Replace the selected rules with this rule"
@@ -11333,23 +11231,20 @@ msgid ""
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:80
-#, fuzzy
 msgid "BibKnowledge Admin"
-msgstr "Amministrazione di BibFormat"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:100
-#, fuzzy
 msgid "Knowledge Bases"
-msgstr "Basi di conoscenza %s"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:118
 msgid "upload is a file"
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:130
-#, fuzzy
 msgid "Cannot create upload"
-msgstr "Impossibile creare il formato di output"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:144
 msgid "File uploaded"
@@ -11404,32 +11299,28 @@ msgid "Right side exists"
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:589
-#, fuzzy
 msgid "Knowledge base name missing"
-msgstr "Mappature della base di conoscenza"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:609
-#, fuzzy
 msgid "Unknown knowledge base"
-msgstr "Basi di conoscenza sconosciute"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:610
 msgid "There is no knowledge base with that name."
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:629
-#, fuzzy
 msgid "No such knowledge base"
-msgstr "Basi di conoscenza sconosciute"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:711
 msgid "Delete Knowledge Base"
 msgstr "Cancella basi di conoscenza"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:157
-#, fuzzy
 msgid "BibSword Admin Interface"
-msgstr "Interfaccia di amministrazione di BibEdit"
+msgstr ""
 
 #: modules/bibsword/lib/bibsword_webinterface.py:171
 #: modules/bibsword/lib/bibsword_webinterface.py:277
@@ -11486,958 +11377,3 @@ msgstr ""
 msgid ""
 "The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"
 msgstr ""
-
-#~ msgid "No fulltext"
-#~ msgstr "Nessun documento integrale"
-
-#, fuzzy
-#~ msgid "now"
-#~ msgstr "no"
-
-#, fuzzy
-#~ msgid "Upload priority"
-#~ msgstr "Cronologia dei download:"
-
-#, fuzzy
-#~ msgid "Returning to the public basket view."
-#~ msgstr "Aggiungi ad un cestino pubblico "
-
-#, fuzzy
-#~ msgid "You do not have permission to write notes to this item."
-#~ msgstr ""
-#~ "Non possiedi diritti sufficienti a visualizzare il contenuto del cestino."
-
-#, fuzzy
-#~ msgid "Sorry, you do not have sufficient rights to add record #%i."
-#~ msgstr ""
-#~ "Non possiedi diritti sufficienti a visualizzare il contenuto del cestino."
-
-#, fuzzy
-#~ msgid "The url you have provided is not valid."
-#~ msgstr "Questo record non esiste."
-
-#, fuzzy
-#~ msgid "Sorry, you do not have sufficient rights on this basket."
-#~ msgstr ""
-#~ "Non possiedi diritti sufficienti a visualizzare il contenuto del cestino."
-
-#, fuzzy
-#~ msgid "No records to add."
-#~ msgstr "Copia record nel cestino"
-
-#, fuzzy
-#~ msgid ""
-#~ "The category you have selected does not exist. Please select a valid "
-#~ "category."
-#~ msgstr "Questo record non esiste."
-
-#, fuzzy
-#~ msgid "This record does not seem to exist any more"
-#~ msgstr "Il record richiesto non sembra esistere."
-
-#, fuzzy
-#~ msgid "Invalid comment ID."
-#~ msgstr "ID commento"
-
-#, fuzzy
-#~ msgid "Comment ID %s does not exist."
-#~ msgstr "L'utente %s non esiste."
-
-#, fuzzy
-#~ msgid "Record ID %s does not exist."
-#~ msgstr "L'utente %s non esiste."
-
-#, fuzzy
-#~ msgid "Bad number of results per page --> showing 10 results per page."
-#~ msgstr "Numero di risultati della ricerca per pagina"
-
-#, fuzzy
-#~ msgid "Comments on records have been disallowed by the administrator."
-#~ msgstr "Il gruppo %s è stato cancellato dal suo amministratore."
-
-#, fuzzy
-#~ msgid "The comment you have reported no longer exists."
-#~ msgstr "Questo record non esiste."
-
-#, fuzzy
-#~ msgid "You have been unsubscribed from this discussion."
-#~ msgstr "Disiscriviti da questo cestino"
-
-#, fuzzy
-#~ msgid "Cannot reply to a review."
-#~ msgstr "Scrivi la tua recensione"
-
-#, fuzzy
-#~ msgid "You already wrote a review for this record."
-#~ msgstr "Non sei autorizzato a visualizzare quest'area."
-
-#, fuzzy
-#~ msgid "Record ID %s does not exist in the database."
-#~ msgstr "L'indirizzo email inserito non esiste nel database."
-
-#, fuzzy
-#~ msgid "No record ID was given."
-#~ msgstr "Spiacente, non è stato fornito nessun ID di record."
-
-#, fuzzy
-#~ msgid "Record ID %s is an invalid ID."
-#~ msgstr "Spiacente, %s non è un ID valido."
-
-#, fuzzy
-#~ msgid ""
-#~ "<div class=\"webcomment_comment_round_header\">%(x_nb)i Comments for "
-#~ "round \"%(x_name)s\""
-#~ msgstr "%(x_name)s ha scritto il %(x_date)s:"
-
-#, fuzzy
-#~ msgid "%(x_name)s"
-#~ msgstr "collegamento %(x_sitename)s"
-
-#, fuzzy
-#~ msgid ""
-#~ "%(x_nb_people)s out of %(x_nb_total)s people found this review useful"
-#~ msgstr ""
-#~ "%(x_nb_people)i persone su %(x_nb_total)i hanno trovato questa recensione "
-#~ "utile"
-
-#, fuzzy
-#~ msgid "Your comment will be lost."
-#~ msgstr "I tuoi commenti sono stati registrati con successo"
-
-#, fuzzy
-#~ msgid "This message does not exist."
-#~ msgstr "Questo record non esiste."
-
-#, fuzzy
-#~ msgid "No match found, please enter different search terms."
-#~ msgstr "Utilizza diversi termini di ricerca."
-
-#, fuzzy
-#~ msgid "Back to search"
-#~ msgstr "Torna ai risultati della ricerca"
-
-#, fuzzy
-#~ msgid "Papers"
-#~ msgstr "Articoli:"
-
-#, fuzzy
-#~ msgid "No Papers"
-#~ msgstr "Articoli:"
-
-#, fuzzy
-#~ msgid "unknown affiliation"
-#~ msgstr "Azione sconosciuta"
-
-#, fuzzy
-#~ msgid "No Affiliations"
-#~ msgstr "Affiliazioni:"
-
-#, fuzzy
-#~ msgid "Affiliations"
-#~ msgstr "Affiliazioni:"
-
-#, fuzzy
-#~ msgid "No Keywords"
-#~ msgstr "parola chiave"
-
-#, fuzzy
-#~ msgid "Frequent keywords"
-#~ msgstr "Parole chiavi frequenti:"
-
-#, fuzzy
-#~ msgid "Frequent co-authors"
-#~ msgstr "Co-autori frequenti:"
-
-#, fuzzy
-#~ msgid "No Frequent Co-authors"
-#~ msgstr "Co-autori frequenti:"
-
-#, fuzzy
-#~ msgid "No Citation Information available"
-#~ msgstr "Nessun giornale disponibile"
-
-#, fuzzy
-#~ msgid "Total number of citations excluding self-citations:"
-#~ msgstr "Numero totale di citazioni:"
-
-#, fuzzy
-#~ msgid "Average citations per paper excluding self-citations:"
-#~ msgstr "Numero medio di citazioni per articolo:"
-
-#, fuzzy
-#~ msgid "Please enter a group name."
-#~ msgstr "Per favore, inserisce il nome di un utente o il nome di un gruppo."
-
-#, fuzzy
-#~ msgid "Please enter a valid group name."
-#~ msgstr "Per favore, inserisce il nome di un utente o il nome di un gruppo."
-
-#, fuzzy
-#~ msgid "Please choose a group join policy."
-#~ msgstr "Per favore seleziona una categoria"
-
-#, fuzzy
-#~ msgid "Group name already exists. Please choose another group name."
-#~ msgstr "Il soprannome desiderato %s esiste già nel database."
-
-#, fuzzy
-#~ msgid "You are already member of the group."
-#~ msgstr "Non sei un membro di un gruppo."
-
-#, fuzzy
-#~ msgid "Please select only one group."
-#~ msgstr "Per favore, seleziona uno o più:"
-
-#, fuzzy
-#~ msgid "Please select one group."
-#~ msgstr "Per favore, seleziona uno o più:"
-
-#, fuzzy
-#~ msgid "Sorry, you do not have sufficient rights on this group."
-#~ msgstr ""
-#~ "Non possiedi diritti sufficienti a visualizzare il contenuto del cestino."
-
-#, fuzzy
-#~ msgid "The group has already been deleted."
-#~ msgstr "Il record è stato cancellato."
-
-#, fuzzy
-#~ msgid "The user is already member of the group."
-#~ msgstr "Non sei un membro di un gruppo."
-
-#, fuzzy
-#~ msgid "The user request for joining group has already been rejected."
-#~ msgstr "La tua richiesta di appartenenza al gruppo %s è stata rifiutata."
-
-#, fuzzy
-#~ msgid "Restricted"
-#~ msgstr "riservato"
-
-#, fuzzy
-#~ msgid ""
-#~ "Unable to delete field at position %s from page %s of submission '%s'"
-#~ msgstr "Impossibile determinare il numero di pagine di sottomissione."
-
-#, fuzzy
-#~ msgid ""
-#~ "Unable to delete field at position %s from page %s of submission '%s%s'"
-#~ msgstr "Impossibile determinare il numero di pagine di sottomissione."
-
-#, fuzzy
-#~ msgid "You have %i tickets."
-#~ msgstr "Tuoi cestini"
-
-#, fuzzy
-#~ msgid "Training"
-#~ msgstr "Attenzione"
-
-#, fuzzy
-#~ msgid "when subfield $$"
-#~ msgstr "Aggiungi sotto-campo"
-
-#, fuzzy
-#~ msgid "when other subfield"
-#~ msgstr "Aggiungi un altro sotto-campo"
-
-#, fuzzy
-#~ msgid "when subfield"
-#~ msgstr "Aggiungi sotto-campo"
-
-#, fuzzy
-#~ msgid "Manually"
-#~ msgstr "Gennaio"
-
-#, fuzzy
-#~ msgid "ERROR: %s does not exist"
-#~ msgstr "L'utente %s non esiste."
-
-#, fuzzy
-#~ msgid "File %s already exists."
-#~ msgstr "L'utente %s non esiste."
-
-#, fuzzy
-#~ msgid "File %s: written OK."
-#~ msgstr "Scritto da"
-
-#, fuzzy
-#~ msgid "File %s: write failed."
-#~ msgstr "Cancella cestino"
-
-#, fuzzy
-#~ msgid "File %s deleted."
-#~ msgstr "L'utente %s non esiste."
-
-#, fuzzy
-#~ msgid "File %s: delete failed."
-#~ msgstr "Cancella cestino"
-
-#, fuzzy
-#~ msgid "No Knowledge Base"
-#~ msgstr "Basi di conoscenza %s"
-
-#, fuzzy
-#~ msgid "Any collection"
-#~ msgstr "collezione"
-
-#, fuzzy
-#~ msgid "Knowledge base is empty"
-#~ msgstr "Basi di conoscenza %s"
-
-#, fuzzy
-#~ msgid "Update Base Attributes"
-#~ msgstr "Aggiorna attributi del formato"
-
-#, fuzzy
-#~ msgid "Your rule: %s"
-#~ msgstr "I tuoi avvisi"
-
-#, fuzzy
-#~ msgid "Cannot upload file"
-#~ msgstr "Impossibile creare il formato di output"
-
-#, fuzzy
-#~ msgid "You have not selected a file to upload"
-#~ msgstr "Seleziona metodo"
-
-#, fuzzy
-#~ msgid "Fatal: You are not allowed to access this functionality."
-#~ msgstr "Non sei autorizzato ad accedere alle funzioni amministrative."
-
-#, fuzzy
-#~ msgid "Open Tickets"
-#~ msgstr "Tuoi cestini"
-
-#, fuzzy
-#~ msgid "Additional Data for this Person"
-#~ msgstr "file aggiuntivi"
-
-#, fuzzy
-#~ msgid "Forget decision"
-#~ msgstr "Prendi una decisione"
-
-#, fuzzy
-#~ msgid "Rejected!"
-#~ msgstr "Rifiutato"
-
-#, fuzzy
-#~ msgid "Forget decision!"
-#~ msgstr "Prendi una decisione"
-
-#, fuzzy
-#~ msgid "Forget decision."
-#~ msgstr "Prendi una decisione"
-
-#, fuzzy
-#~ msgid "Your papers"
-#~ msgstr "I tuoi avvisi"
-
-#, fuzzy
-#~ msgid "Not your papers"
-#~ msgstr "Password dimenticata?"
-
-#, fuzzy
-#~ msgid "These are mine!"
-#~ msgstr "Ci sono %i cestini"
-
-#, fuzzy
-#~ msgid "These are not mine!"
-#~ msgstr "Ci sono %i cestini"
-
-#, fuzzy
-#~ msgid "Not mine!"
-#~ msgstr "Nota"
-
-#, fuzzy
-#~ msgid "Not Mine."
-#~ msgstr "Nota"
-
-#, fuzzy
-#~ msgid "Not Mine!"
-#~ msgstr "Nota"
-
-#, fuzzy
-#~ msgid "Tickets"
-#~ msgstr "volte"
-
-#, fuzzy
-#~ msgid "Request Tickets"
-#~ msgstr "Regole"
-
-#, fuzzy
-#~ msgid "Submit Attribution Information"
-#~ msgstr "Informazioni generali"
-
-#, fuzzy
-#~ msgid "Please review your actions"
-#~ msgstr "Per favore seleziona una categoria"
-
-#, fuzzy
-#~ msgid "Claim this paper"
-#~ msgstr "aggiungi questo utente"
-
-#, fuzzy
-#~ msgid "You are searching for a person to assign the following papers:"
-#~ msgstr "Sei un membro dei seguenti gruppi:"
-
-#, fuzzy
-#~ msgid "Quit searching."
-#~ msgstr "Esegui ricerca"
-
-#, fuzzy
-#~ msgid "You are about to attribute the following paper"
-#~ msgstr "Sei un membro dei seguenti gruppi:"
-
-#, fuzzy
-#~ msgid "Select All"
-#~ msgstr "Cancella tutti"
-
-#, fuzzy
-#~ msgid "Select None"
-#~ msgstr "Seleziona un punteggio"
-
-#, fuzzy
-#~ msgid "Invert Selection"
-#~ msgstr "Selezione referee"
-
-#, fuzzy
-#~ msgid "No status information found."
-#~ msgstr "Ulteriori informazioni:"
-
-#, fuzzy
-#~ msgid "Review Transaction"
-#~ msgstr "divisione"
-
-#, fuzzy
-#~ msgid " On all pages: "
-#~ msgstr "Memorizza modifiche"
-
-#, fuzzy
-#~ msgid "Not provided"
-#~ msgstr "Non ancora recensito"
-
-#, fuzzy
-#~ msgid "Not available"
-#~ msgstr "Nessun giornale disponibile"
-
-#, fuzzy
-#~ msgid "No comments"
-#~ msgstr "commenti"
-
-#, fuzzy
-#~ msgid "Not Available"
-#~ msgstr "Nessun giornale disponibile"
-
-#, fuzzy
-#~ msgid " Delete this ticket"
-#~ msgstr "Cancella cestino"
-
-#, fuzzy
-#~ msgid "Select name for"
-#~ msgstr "Seleziona un punteggio"
-
-#, fuzzy
-#~ msgid "Paper title: "
-#~ msgstr "Articoli:"
-
-#, fuzzy
-#~ msgid "The following names have been automatically chosen:"
-#~ msgstr "Sono stati riscontrati i seguenti errori"
-
-#, fuzzy
-#~ msgid "Navigation:"
-#~ msgstr "Citazioni:"
-
-#, fuzzy
-#~ msgid "Person Interface FAQ"
-#~ msgstr "Interfaccia di pubblicazione"
-
-#, fuzzy
-#~ msgid "Person Search"
-#~ msgstr "Cerca"
-
-#, fuzzy
-#~ msgid "Open tickets"
-#~ msgstr "volte"
-
-#, fuzzy
-#~ msgid "Selected name on paper"
-#~ msgstr "Seleziona un punteggio"
-
-#, fuzzy
-#~ msgid "Sorry."
-#~ msgstr "Spiacente"
-
-#, fuzzy
-#~ msgid "Please provide at least one transaction."
-#~ msgstr "Per favore seleziona una categoria"
-
-#, fuzzy
-#~ msgid "Error:"
-#~ msgstr "Errore"
-
-#, fuzzy
-#~ msgid "Please provide your information"
-#~ msgstr "Ulteriori informazioni:"
-
-#, fuzzy
-#~ msgid "Please provide your first name"
-#~ msgstr "Per favore, autentificati."
-
-#, fuzzy
-#~ msgid "Your last name:"
-#~ msgstr "Tuoi prestiti"
-
-#, fuzzy
-#~ msgid "Your eMail:"
-#~ msgstr "I tuoi avvisi"
-
-#, fuzzy
-#~ msgid "!Delete the entire request!"
-#~ msgstr "Cancella le recensioni selezionate"
-
-#, fuzzy
-#~ msgid "Mark as your documents"
-#~ msgstr "tutti i tipi di documento"
-
-#, fuzzy
-#~ msgid "Mark as their documents"
-#~ msgstr "Torna al documento"
-
-#, fuzzy
-#~ msgid "Mark as _not_ their documents"
-#~ msgstr "Torna al documento"
-
-#, fuzzy
-#~ msgid "Create a new Person for your search"
-#~ msgstr "Nessun risultato trovato."
-
-#, fuzzy
-#~ msgid "Recent Papers"
-#~ msgstr "Articoli:"
-
-#, fuzzy
-#~ msgid "Publication List "
-#~ msgstr "Data creazione"
-
-#, fuzzy
-#~ msgid "most recent documents:"
-#~ msgstr "Elenco dei documenti con referee"
-
-#, fuzzy
-#~ msgid "Date:"
-#~ msgstr "Data:"
-
-#, fuzzy
-#~ msgid "Time:"
-#~ msgstr "Ora"
-
-#, fuzzy
-#~ msgid "Example:"
-#~ msgstr "Esempio"
-
-#, fuzzy
-#~ msgid "are mandatory"
-#~ msgstr "obbligatorio"
-
-#, fuzzy
-#~ msgid "are mandatory."
-#~ msgstr "obbligatorio"
-
-#, fuzzy
-#~ msgid "Check the"
-#~ msgstr "Fai clic qui"
-
-#, fuzzy
-#~ msgid "Configure Bibknowledge"
-#~ msgstr "Configura BibIndex"
-
-#, fuzzy
-#~ msgid "creating a new basket"
-#~ msgstr "Crea un nuovo cestino"
-
-#, fuzzy
-#~ msgid "You may want to start by"
-#~ msgstr "Potresti voler navigare a cominciare da %s"
-
-#~ msgid "by"
-#~ msgstr "di"
-
-#~ msgid "on"
-#~ msgstr "su"
-
-#, fuzzy
-#~ msgid "basket"
-#~ msgstr "cestini"
-
-#, fuzzy
-#~ msgid "previous basket"
-#~ msgstr "Cestini di gruppo"
-
-#, fuzzy
-#~ msgid "search"
-#~ msgstr "Cerca"
-
-#, fuzzy
-#~ msgid "create a new one"
-#~ msgstr "o creane uno nuovo"
-
-#, fuzzy
-#~ msgid "Adding"
-#~ msgstr "Aggiungi"
-
-#, fuzzy
-#~ msgid "Please choose a basket"
-#~ msgstr "Per favore seleziona una categoria"
-
-#, fuzzy
-#~ msgid "Editing topic"
-#~ msgstr "Modifica cestino"
-
-#~ msgid ""
-#~ "Nested or mismatched parentheses detected. Ignoring all parentheses in "
-#~ "the query..."
-#~ msgstr ""
-#~ "Incontrate parentesi annidate o non appaiate. Ignorate tutte le parentesi "
-#~ "nella query..."
-
-#, fuzzy
-#~ msgid "niceName"
-#~ msgstr "Nome"
-
-#, fuzzy
-#~ msgid "Apply Changes"
-#~ msgstr "Memorizza modifiche"
-
-#, fuzzy
-#~ msgid "Edit this item"
-#~ msgstr "Modifica istituto"
-
-#, fuzzy
-#~ msgid "return_date"
-#~ msgstr "Data creazione"
-
-#~ msgid "Record %s - Add a field"
-#~ msgstr "Record %s - Aggiungi un campo"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s"
-#~ msgstr "Modifica record %(x_recid)s, campo %(x_field)s"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s - Add a subfield"
-#~ msgstr ""
-#~ "Modifica record %(x_recid)s, campo %(x_field)s - Aggiungi un sotto-campo"
-
-#~ msgid "Submit and save record %s"
-#~ msgstr "Invia e memorizza record %s"
-
-#~ msgid "Your comment has been successfully posted"
-#~ msgstr "I tuoi commenti sono stati registrati con successo"
-
-#~ msgid "There are %i baskets"
-#~ msgstr "Ci sono %i cestini"
-
-#~ msgid "updated on"
-#~ msgstr "aggiornato il"
-
-#~ msgid ""
-#~ "This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe"
-#~ "%(x_url_close)s to it"
-#~ msgstr ""
-#~ "Questo cestino appartiene a %(x_name)s. Puoi liberamente "
-#~ "%(x_url_open)siscriverti%(x_url_close)s"
-
-#~ msgid "records"
-#~ msgstr "record"
-
-#~ msgid "Number of views"
-#~ msgstr "Numero di visualizzazioni"
-
-#~ msgid "Non-shared basket"
-#~ msgstr "Cestino non condiviso"
-
-#~ msgid "Group-shared basket"
-#~ msgstr "Cestino di gruppo"
-
-#~ msgid "comments"
-#~ msgstr "commenti"
-
-#~ msgid "last"
-#~ msgstr "ultimo"
-
-#~ msgid "View comments"
-#~ msgstr "Visualizza commenti"
-
-#~ msgid "There is a total of %i comments"
-#~ msgstr "In totale ci sono %i commenti"
-
-#~ msgid "Select basket"
-#~ msgstr "Seleziona cestino"
-
-#~ msgid "Add to a personal basket"
-#~ msgstr "Aggiungi ad un cestino personale"
-
-#~ msgid "%i baskets"
-#~ msgstr "%i cestini"
-
-#~ msgid "Add to a group-shared basket"
-#~ msgstr "Aggiungi ad un cestino di gruppo"
-
-#~ msgid "Adding %i records to these baskets"
-#~ msgstr "Aggiungo %i record a questi cestini"
-
-#~ msgid "No records were added to the selected baskets."
-#~ msgstr "Nessun record è stato aggiunto ai cestini selezionati."
-
-#~ msgid "Details and comments"
-#~ msgstr "Dettagli e commenti"
-
-#~ msgid "Add records to baskets"
-#~ msgstr "Aggiungi record ai cestini"
-
-#, fuzzy
-#~ msgid "Subscribe to this discussion"
-#~ msgstr "Iscriviti a questo cestino"
-
-#, fuzzy
-#~ msgid "Unsubscribe from this discussion"
-#~ msgstr "Disiscriviti da questo cestino"
-
-#, fuzzy
-#~ msgid "Delete comment(s) or supress abuse report(s)"
-#~ msgstr "Sopprimi rapporti di abuso"
-
-#, fuzzy
-#~ msgid "Delete Comments"
-#~ msgstr "Cancella commento"
-
-#~ msgid "ADD TO BASKET"
-#~ msgstr "AGGIUNGERE AL CESTINO"
-
-#, fuzzy
-#~ msgid "Frequently publishes in:"
-#~ msgstr "Pubblica in"
-
-#~ msgid "The collection to which this file belong is restricted: "
-#~ msgstr ""
-#~ "L'accesso alla collezione a cui appartiene questo file è ristretto: "
-
-#~ msgid "Do you really want to delete this record?"
-#~ msgstr "Sei sicuro di voler cancellare questo record?"
-
-#~ msgid ""
-#~ "Do you really want to revert to revision %(revdate)s of record #%(recid)s?"
-#~ msgstr ""
-#~ "Sei veramente sicuro di voler ritornare alla versione %(revdate)s del "
-#~ "record #%(recid)s?"
-
-#~ msgid ""
-#~ "The current version will be replaced with a copy of revision %(revdate)s"
-#~ msgstr ""
-#~ "La versione attuale verrà sostituita con una copia della versione "
-#~ "%(revdate)s"
-
-#~ msgid "You will also lose any unsubmitted changes for this record!"
-#~ msgstr ""
-#~ "Perderai inoltre tutte le modifiche non sottomesse di questo record!"
-
-#, fuzzy
-#~ msgid "This record does not exist. Please try another record ID."
-#~ msgstr "Per favore, prova un altro ID di record."
-
-#, fuzzy
-#~ msgid "Cannot edit deleted record.\""
-#~ msgstr "Non è possibile modificare record cancellati."
-
-#, fuzzy
-#~ msgid ""
-#~ "This record is currently being edited by another user. Please try again "
-#~ "later."
-#~ msgstr "Al momento, un altro utente sta modificando questo record."
-
-#~ msgid ""
-#~ "Your modifications have now been submitted. They will be processed as "
-#~ "soon as the task queue is empty."
-#~ msgstr ""
-#~ "Le tue modifiche sono state inviate. Verranno elaborate non appena la "
-#~ "coda dei processi sarà vuota."
-
-#~ msgid "The record will be deleted as soon as the task queue is empty."
-#~ msgstr ""
-#~ "Il record verrà cancellato non appena la coda dei processi sarà vuota."
-
-#~ msgid "Please enter the ID of the record you want to edit"
-#~ msgstr "Per favore, inserisci l'ID del record che desideri modificare"
-
-#~ msgid "Move up"
-#~ msgstr "Sposta elemento in alto"
-
-#~ msgid "Move down"
-#~ msgstr "Sposta elemento in basso"
-
-#~ msgid "Add Subfield"
-#~ msgstr "Aggiungi sotto-campo"
-
-#~ msgid "Edit institute"
-#~ msgstr "Modifica istituto"
-
-#~ msgid "Add Field"
-#~ msgstr "Aggiungi campo"
-
-#~ msgid "Verbose"
-#~ msgstr "Prolisso"
-
-#~ msgid "Display"
-#~ msgstr "Visualizza"
-
-#~ msgid "Done"
-#~ msgstr "Fatto"
-
-#~ msgid "Add another subfield"
-#~ msgstr "Aggiungi un altro sotto-campo"
-
-#~ msgid ""
-#~ "Tags and values should be filled before pressing Done or Add another "
-#~ "subfield"
-#~ msgstr ""
-#~ "I tag e i valori dovrebbero essere riempiti prima di premere Fatto o "
-#~ "Aggiungi un altro sotto-campo"
-
-#~ msgid "Your changes are TEMPORARY."
-#~ msgstr "Le tue modifiche sono TEMPORANEE."
-
-#~ msgid "To save this record, please click on submit."
-#~ msgstr "Per memorizzare questo record, fai clic su invia."
-
-#, fuzzy
-#~ msgid "Revision %(revdate)s"
-#~ msgstr "Record #%(recid)s, revisione %(revdate)s"
-
-#, fuzzy
-#~ msgid "current version"
-#~ msgstr "Membri attuali"
-
-#, fuzzy
-#~ msgid "View revision"
-#~ msgstr "divisione"
-
-#, fuzzy
-#~ msgid "Back to BibEdit"
-#~ msgstr "Torna ai cestini"
-
-#, fuzzy
-#~ msgid "select_from1"
-#~ msgstr "seleziona utente"
-
-#, fuzzy
-#~ msgid "select_to1"
-#~ msgstr "Seleziona argomento"
-
-#, fuzzy
-#~ msgid "No more requests are waiting."
-#~ msgstr "Alcuni documenti in sospeso."
-
-#, fuzzy
-#~ msgid "next page >>>"
-#~ msgstr "Pagina successiva"
-
-#, fuzzy
-#~ msgid "<<< previous page"
-#~ msgstr "Pagina precedente"
-
-#, fuzzy
-#~ msgid "last page >>|"
-#~ msgstr "ultimo aggiornamento"
-
-#, fuzzy
-#~ msgid "from"
-#~ msgstr "Da:"
-
-#~ msgid "Please try again later."
-#~ msgstr "Per favore, riprova più tardi."
-
-#~ msgid "There are record revisions not yet synchronized with the database."
-#~ msgstr ""
-#~ "Alcune revisioni del record non sono ancora state sincronizzate nel "
-#~ "database."
-
-#~ msgid "Please try again in a few minutes."
-#~ msgstr "Per favore, riprova tra qualche minuto."
-
-#~ msgid ""
-#~ "A new revision of this record is not yet synchronized with the database."
-#~ msgstr ""
-#~ "Una nuova revisione di questo record non è ancora stata sincronizzata con "
-#~ "il database."
-
-#~ msgid ""
-#~ "The new revision is being synchronized with the database and will be "
-#~ "ready shortly."
-#~ msgstr ""
-#~ "È in corso la sincronizzazione della nuova revisione con il database. La "
-#~ "revisione sarà disponibile in breve tempo."
-
-#~ msgid "View all reported reviews"
-#~ msgstr "Visualizza tutte le recensioni riportate"
-
-#~ msgid "Delete a specific comment/review (by ID)"
-#~ msgstr "Cancella uno specifico commento/recensione (tramite ID)"
-
-#~ msgid ""
-#~ "Before you add your comment, you need to %(x_url_open)slogin"
-#~ "%(x_url_close)s first."
-#~ msgstr ""
-#~ "Prima di aggiungere il tuo commento, devi innanzitutto "
-#~ "%(x_url_open)sautenticarti%(x_url_close)s."
-
-#~ msgid "session"
-#~ msgstr "sessione"
-
-#~ msgid "alerts"
-#~ msgstr "avvisi"
-
-#~ msgid "account"
-#~ msgstr "account"
-
-#~ msgid "messages"
-#~ msgstr "messaggi"
-
-#~ msgid "groups"
-#~ msgstr "gruppi"
-
-#~ msgid "submissions"
-#~ msgstr "sottomissioni"
-
-#~ msgid "approvals"
-#~ msgstr "approvazioni"
-
-#~ msgid "Unknown form field found on one of the submission pages."
-#~ msgstr ""
-#~ "Campo del modulo sconosciuto trovato in una delle pagine di sottomissione."
-
-#~ msgid "List of specific approvals"
-#~ msgstr "Elenco di classi di approvazione"
-
-#~ msgid "List of publication categories"
-#~ msgstr "Elenco delle categorie di pubblicazioni"
-
-#~ msgid "List of direct approval categories"
-#~ msgstr "Elenco delle categorie ad approvazione diretta"
-
-#~ msgid "Specific Approval and Refereeing Workflow"
-#~ msgstr "Processo specifico di approvazione e refereeing"
-
-#~ msgid "Internal configuration error"
-#~ msgstr "Errore di configurazione interno"
-
-#~ msgid "There is no format configured for this journals index page"
-#~ msgstr ""
-#~ "Non è stato configurato alcun formato per questa pagina indice di giornale"
-
-#~ msgid "There is no format configured for this journals search page"
-#~ msgstr ""
-#~ "Non è stato configurato alcun formato per questa pagina di ricerca di "
-#~ "giornale"
-
-#~ msgid "There is no format configured for this journals popup page"
-#~ msgstr ""
-#~ "Non è stato configurato alcun formato per questa pagina a comparsa di "
-#~ "giornale"

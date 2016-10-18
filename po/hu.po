@@ -1,32 +1,22 @@
-# # This file is part of Invenio.
-# # Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
-# #
-# # Invenio is free software; you can redistribute it and/or
-# # modify it under the terms of the GNU General Public License as
-# # published by the Free Software Foundation; either version 2 of the
-# # License, or (at your option) any later version.
-# #
-# # Invenio is distributed in the hope that it will be useful, but
-# # WITHOUT ANY WARRANTY; without even the implied warranty of
-# # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# # General Public License for more details.
-# #
-# # You should have received a copy of the GNU General Public License
-# # along with Invenio; if not, write to the Free Software Foundation, Inc.,
-# # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR CERN
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.0.9\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2014-08-31 21:44+0200\n"
-"PO-Revision-Date: 2008-07-03 22:58+0200\n"
-"Last-Translator: Eva Papp <Eva.Papp@cern.ch>\n"
-"Language-Team: HU <info@invenio-software.org>\n"
-"Language: \n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Tibor Simko <tibor.simko@cern.ch>, 2016\n"
+"Language-Team: Hungarian (https://www.transifex.com/inveniosoftware/teams/23537/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: pygettext.py 1.5\n"
+"Language: hu\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: modules/websearch/doc/search-guide.webdoc:361
 #: modules/websearch/doc/search-guide.webdoc:396
@@ -2113,9 +2103,8 @@ msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:218
 #: modules/bibupload/lib/batchuploader_templates.py:260
-#, fuzzy
 msgid "Submit time"
-msgstr "Feltöltési Útmutató"
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:219
 #: modules/bibupload/lib/batchuploader_templates.py:261
@@ -2760,9 +2749,9 @@ msgstr ""
 #: modules/webalert/lib/webalert.py:428
 #, python-format
 msgid ""
-"You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s "
-"is available with a possibility to (a) view search results and (b) subscribe "
-"to an automatic email alerting service for these queries."
+"You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s"
+" is available with a possibility to (a) view search results and (b) "
+"subscribe to an automatic email alerting service for these queries."
 msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:74
@@ -2977,8 +2966,8 @@ msgstr ""
 #: modules/webalert/lib/webalert_templates.py:445
 #, python-format
 msgid ""
-"You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during "
-"the last 30 days or so."
+"You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during"
+" the last 30 days or so."
 msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:450
@@ -3195,26 +3184,23 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:2116
 #: modules/webbasket/lib/webbasket_webinterface.py:429
-#, fuzzy
 msgid "Search baskets"
-msgstr "Kosarak"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:2121
 #: modules/webbasket/lib/webbasket_webinterface.py:741
 #: modules/websearch/lib/websearch_templates.py:2850
 #: modules/websearch/lib/websearch_templates.py:3036
-#, fuzzy
 msgid "Add to basket"
-msgstr "Kosarak"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:2161
 #: modules/webbasket/lib/webbasket_templates.py:217
 #: modules/webbasket/lib/webbasket_templates.py:223
 #: modules/webbasket/lib/webbasket_templates.py:622
 #: modules/webbasket/lib/webbasket_templates.py:724
-#, fuzzy
 msgid "Public baskets"
-msgstr "Kosarak"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:2191
 #, python-format
@@ -3237,9 +3223,8 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:111
 #: modules/webbasket/lib/webbasket_templates.py:177
-#, fuzzy
 msgid "Back to Your Baskets"
-msgstr "Kosarak"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:117
 #: modules/webbasket/lib/webbasket_webinterface.py:1223
@@ -3252,9 +3237,8 @@ msgid "Edit topic"
 msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:558
-#, fuzzy
 msgid "Search baskets for"
-msgstr "Kosarak"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:559
 msgid "Search also in notes (where allowed)"
@@ -3283,9 +3267,8 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:631
 #: modules/webbasket/lib/webbasket_templates.py:757
-#, fuzzy
 msgid "All public baskets"
-msgstr "Kosarak"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:647
 msgid "No items found."
@@ -3431,9 +3414,9 @@ msgid " or return to your %(x_url_open)ssearch%(x_url_close)s"
 msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1398
-#, fuzzy, python-format
+#, python-format
 msgid "Adding %i items to your baskets"
-msgstr "Kosarak"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1399
 #, python-format
@@ -3594,8 +3577,8 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:1756
 #: modules/websession/lib/websession_templates.py:522
 msgid ""
-"You are logged in as a guest user, so your baskets will disappear at the end "
-"of the current session."
+"You are logged in as a guest user, so your baskets will disappear at the end"
+" of the current session."
 msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1757
@@ -3766,9 +3749,8 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:2570
 #: modules/webbasket/lib/webbasket_templates.py:3327
 #: modules/webbasket/lib/webbasket_templates.py:3402
-#, fuzzy
 msgid "Return to basket"
-msgstr "Kosarak"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:2630
 #: modules/webbasket/lib/webbasket_templates.py:3456
@@ -3838,26 +3820,22 @@ msgid "This public basket belongs to you."
 msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:3849
-#, fuzzy
 msgid "All your baskets"
-msgstr "Kosarak"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:3851
 #: modules/webbasket/lib/webbasket_templates.py:3926
-#, fuzzy
 msgid "Your personal baskets"
-msgstr "Kosarak"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:3857
 #: modules/webbasket/lib/webbasket_templates.py:3937
-#, fuzzy
 msgid "Your group baskets"
-msgstr "Kosarak"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:3863
-#, fuzzy
 msgid "Your public baskets"
-msgstr "Kosarak"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:3864
 msgid "All the public baskets"
@@ -4325,8 +4303,8 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1525
 msgid ""
-"Here is a list, sorted by total number of reports, of all users who have had "
-"a comment reported at least once."
+"Here is a list, sorted by total number of reports, of all users who have had"
+" a comment reported at least once."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1533
@@ -4973,8 +4951,8 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:2341
 #, python-format
 msgid ""
-"No match found in collection %(x_collection)s. Other public collections gave "
-"%(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
+"No match found in collection %(x_collection)s. Other public collections gave"
+" %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
 msgstr ""
 
 #: modules/websearch/lib/search_engine.py:2350
@@ -5013,7 +4991,8 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:2534
 #, python-format
 msgid ""
-"Search term %s did not match any record. Nearest terms in any collection are:"
+"Search term %s did not match any record. Nearest terms in any collection "
+"are:"
 msgstr ""
 
 #: modules/websearch/lib/search_engine.py:3290
@@ -5342,7 +5321,8 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3080
 msgid ""
-"Boolean query returned no hits. Please combine your search terms differently."
+"Boolean query returned no hits. Please combine your search terms "
+"differently."
 msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3112
@@ -5393,8 +5373,7 @@ msgstr ""
 #, python-format
 msgid ""
 "Set up a personal %(x_url1_open)semail alert%(x_url1_close)s\n"
-"                                  or subscribe to the %(x_url2_open)sRSS feed"
-"%(x_url2_close)s."
+"                                  or subscribe to the %(x_url2_open)sRSS feed%(x_url2_close)s."
 msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3573
@@ -5535,15 +5514,15 @@ msgstr ""
 #: modules/websession/lib/webaccount.py:115
 #, python-format
 msgid ""
-"You are logged in as guest. You may want to %(x_url_open)slogin"
-"%(x_url_close)s as a regular user."
+"You are logged in as guest. You may want to "
+"%(x_url_open)slogin%(x_url_close)s as a regular user."
 msgstr ""
 
 #: modules/websession/lib/webaccount.py:119
 #, python-format
 msgid ""
-"The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister"
-"%(x_url_close)s first"
+"The %(x_fmt_open)sguest%(x_fmt_close)s users need to "
+"%(x_url_open)sregister%(x_url_close)s first"
 msgstr ""
 
 #: modules/websession/lib/webaccount.py:124
@@ -5744,8 +5723,8 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:425
 msgid ""
-"Note that if you have been using an external login system, then we cannot do "
-"anything and you have to ask there."
+"Note that if you have been using an external login system, then we cannot do"
+" anything and you have to ask there."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:426
@@ -5780,8 +5759,8 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:480
 msgid ""
-"With baskets you can define specific collections of items, store interesting "
-"records you want to access later or share with others."
+"With baskets you can define specific collections of items, store interesting"
+" records you want to access later or share with others."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:489
@@ -5811,9 +5790,9 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:547
 #, python-format
 msgid ""
-"You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout"
-"%(x_url1_close)s; b) edit your %(x_url2_open)saccount settings"
-"%(x_url2_close)s."
+"You are logged in as %(x_user)s. You may want to a) "
+"%(x_url1_open)slogout%(x_url1_close)s; b) edit your %(x_url2_open)saccount "
+"settings%(x_url2_close)s."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:628
@@ -5823,8 +5802,8 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:634
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are "
-"administering or are a member of."
+"You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are"
+" administering or are a member of."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:637
@@ -5848,8 +5827,8 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:646
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with "
-"the documents you approved or refereed."
+"You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with"
+" the documents you approved or refereed."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:649
@@ -5863,9 +5842,8 @@ msgid "You can consult the list of %(x_url_open)syour tickets%(x_url_close)s."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:656
-#, fuzzy
 msgid "Your Tickets"
-msgstr "Kosarak"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:658
 #: modules/websession/lib/websession_webinterface.py:650
@@ -5954,8 +5932,8 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:854
 #, python-format
 msgid ""
-"If you don't own an account yet, please %(x_url_open)sregister"
-"%(x_url_close)s an internal account."
+"If you don't own an account yet, please "
+"%(x_url_open)sregister%(x_url_close)s an internal account."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:862
@@ -6075,8 +6053,8 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:1138
 #, python-format
 msgid ""
-"For more admin-level activities, see the complete %(x_url_open)sAdmin Area"
-"%(x_url_close)s."
+"For more admin-level activities, see the complete %(x_url_open)sAdmin "
+"Area%(x_url_close)s."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1191
@@ -6094,47 +6072,40 @@ msgid "Personalize"
 msgstr "Beállítások"
 
 #: modules/websession/lib/websession_templates.py:1261
-#, fuzzy
 msgid "Your account"
-msgstr "Személyes beállítások"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1267
-#, fuzzy
 msgid "Your alerts"
-msgstr "Emlékeztetők"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1273
 msgid "Your approvals"
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1279
-#, fuzzy
 msgid "Your baskets"
-msgstr "Kosarak"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1285
-#, fuzzy
 msgid "Your groups"
-msgstr "Emlékeztetők"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1291
-#, fuzzy
 msgid "Your loans"
-msgstr "Emlékeztetők"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1297
-#, fuzzy
 msgid "Your messages"
-msgstr "Keresések"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1303
 msgid "Your submissions"
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1309
-#, fuzzy
 msgid "Your searches"
-msgstr "Keresések"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1362
 msgid "Administration"
@@ -6394,15 +6365,16 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:2438
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)s%(x_nb_total)i groups"
-"%(x_url_close)s you are subscribed to (%(x_nb_member)i) or administering "
-"(%(x_nb_admin)i)."
+"You can consult the list of %(x_url_open)s%(x_nb_total)i "
+"groups%(x_url_close)s you are subscribed to (%(x_nb_member)i) or "
+"administering (%(x_nb_admin)i)."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2457
 msgid ""
 "Warning: The password set for MySQL root user is the same as the default "
-"Invenio password. For security purposes, you may want to change the password."
+"Invenio password. For security purposes, you may want to change the "
+"password."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2463
@@ -6413,26 +6385,27 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2469
 msgid ""
-"Warning: The password set for the Invenio admin user is currently empty. For "
-"security purposes, it is strongly recommended that you add a password."
+"Warning: The password set for the Invenio admin user is currently empty. For"
+" security purposes, it is strongly recommended that you add a password."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2475
 msgid ""
-"Warning: The email address set for support email is currently set to "
-"info@invenio-software.org. It is recommended that you change this to your "
-"own address."
+"Warning: The email address set for support email is currently set to info"
+"@invenio-software.org. It is recommended that you change this to your own "
+"address."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2481
 msgid ""
-"A newer version of Invenio is available for download. You may want to visit  "
+"A newer version of Invenio is available for download. You may want to visit"
+"  "
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2488
 msgid ""
-"Cannot download or parse release notes from http://invenio-software.org/repo/"
-"invenio/tree/RELEASE-NOTES"
+"Cannot download or parse release notes from http://invenio-"
+"software.org/repo/invenio/tree/RELEASE-NOTES"
 msgstr ""
 
 #: modules/websession/lib/webuser.py:156
@@ -6523,7 +6496,8 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:134
 msgid ""
-"This request for confirmation of an email address is not valid or is expired."
+"This request for confirmation of an email address is not valid or is "
+"expired."
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:139
@@ -6855,9 +6829,8 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:990
-#, fuzzy
 msgid "Your tickets"
-msgstr "Kosarak"
+msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:1026
 #: modules/websession/lib/websession_webinterface.py:1071
@@ -7017,8 +6990,8 @@ msgstr ""
 #: modules/webstyle/lib/webdoc_webinterface.py:190
 #, python-format
 msgid ""
-"You may want to look at the %(x_url_open)s%(x_category)s pages"
-"%(x_url_close)s."
+"You may want to look at the %(x_url_open)s%(x_category)s "
+"pages%(x_url_close)s."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:368
@@ -7094,7 +7067,8 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:844
 msgid ""
-"Alternative formats uploaded for current version of this file will be removed"
+"Alternative formats uploaded for current version of this file will be "
+"removed"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:845
@@ -7164,8 +7138,8 @@ msgstr ""
 #: modules/websubmit/lib/functions/Shared_Functions.py:183
 msgid ""
 "Because of a human intervention or a temporary problem, the task queue is "
-"currently set to the manual mode. Your submission is well registered but may "
-"take longer than usual before it is fully integrated and searchable.\n"
+"currently set to the manual mode. Your submission is well registered but may"
+" take longer than usual before it is fully integrated and searchable.\n"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:177
@@ -7221,13 +7195,14 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_engine.py:291
 #: modules/websubmit/lib/websubmit_engine.py:880
 msgid ""
-"Unable to create a directory for this submission. The administrator has been "
-"alerted."
+"Unable to create a directory for this submission. The administrator has been"
+" alerted."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:400
 #: modules/websubmit/lib/websubmit_engine.py:978
-msgid "Cannot create submission directory. The administrator has been alerted."
+msgid ""
+"Cannot create submission directory. The administrator has been alerted."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:422
@@ -7299,8 +7274,8 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:375
 msgid ""
-"To continue with a previously interrupted submission, enter an access number "
-"into the box below:"
+"To continue with a previously interrupted submission, enter an access number"
+" into the box below:"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:377
@@ -7705,7 +7680,8 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2478
 #: modules/websubmit/lib/websubmit_templates.py:2532
-msgid "Last request e-mail was sent to the publication committee chair on the "
+msgid ""
+"Last request e-mail was sent to the publication committee chair on the "
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2482
@@ -7808,7 +7784,8 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2554
 msgid ""
-"The referee has sent his final recommendations to the editorial board on the "
+"The referee has sent his final recommendations to the editorial board on the"
+" "
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2562
@@ -7879,8 +7856,8 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:140
 msgid ""
-"The system has encountered an error in retrieving the list of files for this "
-"document."
+"The system has encountered an error in retrieving the list of files for this"
+" document."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:196
@@ -8438,9 +8415,8 @@ msgid "Next Step"
 msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:298
-#, fuzzy
 msgid "Search criteria"
-msgstr "Keresési Útmutató"
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:299
 msgid "Output tags"
@@ -9203,9 +9179,8 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:597
 #: modules/bibcirculation/lib/bibcirculation_templates.py:627
-#, fuzzy
 msgid "Your Requests"
-msgstr "Emlékeztetők"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:598
 msgid "You don't have any request (waiting or pending)."
@@ -9742,9 +9717,8 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3644
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4830
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8084
-#, fuzzy
 msgid "Personal details"
-msgstr "Beállítások"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3767
 msgid "New loan"
@@ -10068,9 +10042,8 @@ msgid "New due date: "
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7975
-#, fuzzy
 msgid "Submit new due date"
-msgstr "Feltöltési Útmutató"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8019
 #, python-format
@@ -10258,7 +10231,8 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11027
 #, python-format
 msgid ""
-"I accept the %s of the service in particular the return of books in due time."
+"I accept the %s of the service in particular the return of books in due "
+"time."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10821
@@ -10490,7 +10464,8 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15526
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15684
 msgid ""
-"Check if the book already exists on Invenio, before to send your ILL request."
+"Check if the book already exists on Invenio, before to send your ILL "
+"request."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15550
@@ -10527,9 +10502,8 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16221
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16408
-#, fuzzy
 msgid "Volume"
-msgstr "Főoldal"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16222
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16409
@@ -10785,8 +10759,8 @@ msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:234
 msgid ""
-"If the expression is empty, a list of all values                          in "
-"270__a will be created."
+"If the expression is empty, a list of all values                          in"
+" 270__a will be created."
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:236
@@ -10847,9 +10821,8 @@ msgid "And the KBA version by:"
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:667
-#, fuzzy
 msgid "Your rule"
-msgstr "Emlékeztetők"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:669
 msgid "The left side of the rule "
@@ -11032,15 +11005,3 @@ msgstr ""
 msgid ""
 "The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"
 msgstr ""
-
-#, fuzzy
-#~ msgid "basket"
-#~ msgstr "Kosarak"
-
-#, fuzzy
-#~ msgid "previous basket"
-#~ msgstr "Kosarak"
-
-#, fuzzy
-#~ msgid "search"
-#~ msgstr "Keresés"
