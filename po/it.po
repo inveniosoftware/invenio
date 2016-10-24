@@ -1,33 +1,21 @@
-# # This file is part of Invenio.
-# # Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
-# #
-# # Invenio is free software; you can redistribute it and/or
-# # modify it under the terms of the GNU General Public License as
-# # published by the Free Software Foundation; either version 2 of the
-# # License, or (at your option) any later version.
-# #
-# # Invenio is distributed in the hope that it will be useful, but
-# # WITHOUT ANY WARRANTY; without even the implied warranty of
-# # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# # General Public License for more details.
-# #
-# # You should have received a copy of the GNU General Public License
-# # along with Invenio; if not, write to the Free Software Foundation, Inc.,
-# # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR CERN
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.1.6\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2014-08-31 22:26+0200\n"
-"PO-Revision-Date: 2015-08-17 09:31+0200\n"
-"Last-Translator: Charlotte Iris Cattaneo <ciris.cattaneo@gmail.com>\n"
-"Language-Team: IT <info@invenio-software.org>\n"
-"Language: it\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Tibor Simko <tibor.simko@cern.ch>, 2016\n"
+"Language-Team: Italian (https://www.transifex.com/inveniosoftware/teams/23537/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: pygettext.py 1.5\n"
-"X-Generator: Poedit 1.8.3\n"
+"Language: it\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: modules/websearch/doc/search-guide.webdoc:361
@@ -1575,8 +1563,8 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1122
 msgid ""
-"(the names will be automatically gathered when the first paper is claimed to "
-"this profile)."
+"(the names will be automatically gathered when the first paper is claimed to"
+" this profile)."
 msgstr ""
 "(I nomi saranno raccolti automaticamente quando il primo saggio è "
 "rivendicato per questo profilo)."
@@ -1657,8 +1645,8 @@ msgid ""
 "confirmation to do so for this paper has been manually claimed before"
 msgstr ""
 "Il risultato di questa richiesta sarà visibile immediatamente pero è "
-"necessario che otteniamo la sua confermazione per farlo perché questo saggio "
-"è già stato richiesto manualmente prima."
+"necessario che otteniamo la sua confermazione per farlo perché questo saggio"
+" è già stato richiesto manualmente prima."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1282
 msgid "This will create a change request for the operators"
@@ -1780,8 +1768,8 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1576
 #, python-format
 msgid ""
-"We do not have a publication list for '%s'. Try using a less specific author "
-"name, or check back in a few days as attributions are updated frequently.  "
+"We do not have a publication list for '%s'. Try using a less specific author"
+" name, or check back in a few days as attributions are updated frequently.  "
 "Or you can send us feedback, at "
 msgstr ""
 "Non abbiamo un elenco delle pubblicazioni per \" %s\".  Provare ad "
@@ -2257,7 +2245,8 @@ msgstr "ERRORE: %s non si può scrivere"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:116
 msgid "Limit to knowledge bases containing string:"
-msgstr "Limita alle basi di conoscenza che contengono la stringa di caratteri:"
+msgstr ""
+"Limita alle basi di conoscenza che contengono la stringa di caratteri:"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:134
 msgid "Really delete"
@@ -4227,9 +4216,11 @@ msgstr "Prestito di libri inter-bibliotecario"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11014
 #, python-format
 msgid ""
-"I accept the %s of the service in particular the return of books in due time."
+"I accept the %s of the service in particular the return of books in due "
+"time."
 msgstr ""
-"Accetto il %s del servizio in particolare il ritorno di libri a tempo debito."
+"Accetto il %s del servizio in particolare il ritorno di libri a tempo "
+"debito."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10808
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11015
@@ -4420,7 +4411,6 @@ msgstr "Dettagli del venditore"
 msgid "Add notes"
 msgstr "Aggiungi note"
 
-# grammar error in English version:there is no “s” at the end of exist
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14362
 msgid "Book does not exists on Invenio."
 msgstr "Il libro non esiste su Invenio."
@@ -4436,8 +4426,8 @@ msgid ""
 "Borrower accepts the %s of the service in particular the return of books in "
 "due time."
 msgstr ""
-"Mutuatario accetta la %s del servizio, in particolare, il ritorno di libri a "
-"tempo debito."
+"Mutuatario accetta la %s del servizio, in particolare, il ritorno di libri a"
+" tempo debito."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14458
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15943
@@ -4463,7 +4453,8 @@ msgstr "Formato stampabile"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15509
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15667
 msgid ""
-"Check if the book already exists on Invenio, before to send your ILL request."
+"Check if the book already exists on Invenio, before to send your ILL "
+"request."
 msgstr ""
 "Controllare se il libro è già presente su Invenio, prima di inviare la "
 "richiesta ILL."
@@ -4479,7 +4470,8 @@ msgstr "Procedere comunque"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15844
 msgid "Book does not exists on Invenio. Please fill the following form."
-msgstr "Libro non esiste su Invenio. Si prega di compilare il seguente modulo."
+msgstr ""
+"Libro non esiste su Invenio. Si prega di compilare il seguente modulo."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16199
 msgid "Article details"
@@ -4576,15 +4568,15 @@ msgstr "Il record richiesto sembra inesistente."
 #: modules/bibclassify/lib/bibclassify_templates.py:128
 #: modules/bibclassify/lib/bibclassify_templates.py:187
 msgid ""
-"Automatically generated <span class=\"keyword single\">single</span>,        "
-"<span class=\"keyword composite\">composite</span>, <span class=\"keyword "
-"author-kw\">author</span>,        and <span class=\"keyword other-kw\">other "
-"keywords</span>."
+"Automatically generated <span class=\"keyword single\">single</span>,"
+"        <span class=\"keyword composite\">composite</span>, <span "
+"class=\"keyword author-kw\">author</span>,        and <span class=\"keyword "
+"other-kw\">other keywords</span>."
 msgstr ""
 "<span class=\"keyword single\">single</span>,        <span class=\"keyword "
-"composite\">composite</span>, <span class=\"keyword author-kw\">author</"
-"span>,        e <span class=\"keyword other-kw\">other keywords</span> "
-"generati automaticamente."
+"composite\">composite</span>, <span class=\"keyword author-"
+"kw\">author</span>,        e <span class=\"keyword other-kw\">other "
+"keywords</span> generati automaticamente."
 
 #: modules/bibclassify/lib/bibclassify_templates.py:233
 msgid "Automated keyword extraction wasn't run for this document yet."
@@ -4652,8 +4644,8 @@ msgstr ""
 
 #: modules/bibclassify/lib/bibclassify_webinterface.py:263
 msgid ""
-"Unfortunately, we don't have a PDF fulltext for this record in the "
-"storage,                     keywords cannot be generated using an automated "
+"Unfortunately, we don't have a PDF fulltext for this record in the storage,"
+"                     keywords cannot be generated using an automated "
 "process."
 msgstr ""
 "Sfortunatamente, non abbiamo un documento PDF per questo record nella "
@@ -4694,7 +4686,8 @@ msgstr ""
 #, python-format
 msgid ""
 "The uploaded file is too small (<%i o) and has therefore not been considered"
-msgstr "Il file caricato e' troppo piccolo (<%i o) ed e' quindi stato ignorato"
+msgstr ""
+"Il file caricato e' troppo piccolo (<%i o) ed e' quindi stato ignorato"
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:582
 #, python-format
@@ -4751,8 +4744,8 @@ msgstr "Aggiungi un nuovo file"
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:898
 msgid "You can decide to hide or not previous version(s) of this file."
 msgstr ""
-"Puoi scegliere se nascondere o no la(le) versione(i) precedente(i) di questo "
-"file."
+"Puoi scegliere se nascondere o no la(le) versione(i) precedente(i) di questo"
+" file."
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:899
 msgid ""
@@ -4766,7 +4759,8 @@ msgstr ""
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:900
 msgid ""
-"Alternative formats uploaded for current version of this file will be removed"
+"Alternative formats uploaded for current version of this file will be "
+"removed"
 msgstr ""
 "Saranno rimossi i formati alternativi caricati per la versione attuale di "
 "questo file"
@@ -4809,8 +4803,7 @@ msgid ""
 "Best regards"
 msgstr ""
 "Al Servizio Assistenza,\n"
-"Necessiterei di aiuto per rivedere o per aggiungere un file al record "
-"%(recid)s.\n"
+"Necessiterei di aiuto per rivedere o per aggiungere un file al record %(recid)s.\n"
 "Allego la nuova versione a questo email.\n"
 "Distinti saluti"
 
@@ -4885,8 +4878,8 @@ msgstr "Il record richiesto sembra non essere ancora integrato."
 
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:137
 msgid ""
-"The system has encountered an error in retrieving the list of files for this "
-"document."
+"The system has encountered an error in retrieving the list of files for this"
+" document."
 msgstr ""
 "Il sistema ha incontrato un errore nel ricuperare l'elenco dei file di "
 "questo documento."
@@ -5035,8 +5028,8 @@ msgid ""
 "Specify fields and their subfields that should be changed in every record "
 "matching the search criteria."
 msgstr ""
-"Specifica campi e sottocampi che devono essere modificati in ogni record che "
-"soddisfa i criteri di ricerca."
+"Specifica campi e sottocampi che devono essere modificati in ogni record che"
+" soddisfa i criteri di ricerca."
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:573
 msgid "Define new field action"
@@ -5143,8 +5136,8 @@ msgstr "Torna ai risultati della ricerca"
 msgid ""
 "WARNING: The following records are pending execution                        "
 "in the task queue.                        If you proceed with the changes, "
-"the modifications made                        with other tool (e.g. BibEdit) "
-"to these records will                        be lost"
+"the modifications made                        with other tool (e.g. BibEdit)"
+" to these records will                        be lost"
 msgstr ""
 "ATTENZIONE: I seguenti record sono in attesa di esecuzione nella coda "
 "compito. Se procede con i cambiamenti, le modifiche fatte con altri "
@@ -5203,11 +5196,11 @@ msgstr "Può controllare lo stato del tuo video qui: %(record_url)s."
 #: modules/bibencode/lib/bibencode_batch_engine.py:125
 #, python-format
 msgid ""
-"You might want to take a look at  %(guidelines_url)s and modify or redo your "
-"submission."
+"You might want to take a look at  %(guidelines_url)s and modify or redo your"
+" submission."
 msgstr ""
-"Potrebbe voler dare un'occhiata a%(guidelines_url)s e modificare o rifare "
-"la sua presentazione."
+"Potrebbe voler dare un'occhiata a%(guidelines_url)s e modificare o rifare la"
+" sua presentazione."
 
 #: modules/bibencode/lib/bibencode_batch_engine.py:136
 #: modules/bibencode/lib/bibencode_batch_engine.py:177
@@ -5218,8 +5211,7 @@ msgstr "direttive del video"
 #, python-format
 msgid "Your video submission%(submission_title)s was successfully processed."
 msgstr ""
-"Il suo video presentato%(submission_title)s è stato elaborato con "
-"successo."
+"Il suo video presentato%(submission_title)s è stato elaborato con successo."
 
 #: modules/bibencode/lib/bibencode_batch_engine.py:164
 #, python-format
@@ -5232,8 +5224,8 @@ msgid ""
 "If the videos quality is not as expected, you might want to take a look at "
 "%(guidelines_url)s and modify or redo your submission."
 msgstr ""
-"Se la qualità dei video non è come previsto, potrebbe voler dare un'occhiata "
-"a %(guidelines_url)s e modificare o rifare la sua presentazione."
+"Se la qualità dei video non è come previsto, potrebbe voler dare un'occhiata"
+" a %(guidelines_url)s e modificare o rifare la sua presentazione."
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter.py:500
 #: modules/bibexport/lib/bibexport_method_fieldexporter.py:515
@@ -5417,8 +5409,8 @@ msgstr "Nessuna descrizione inserita per il modello."
 #: modules/bibformat/lib/bibformat_bfx_engine.py:339
 msgid "No content type specified for the template. Using default: text/xml."
 msgstr ""
-"Nessun tipo di contenuto specificato per il modello. Usando default: text/"
-"xml."
+"Nessun tipo di contenuto specificato per il modello. Usando default: "
+"text/xml."
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:361
 msgid "Missing attribute \"name\" in TEMPLATE_REF."
@@ -5498,13 +5490,14 @@ msgstr "Impossibile trovare elemento di formato chiamato % s."
 #, python-format
 msgid "Error when evaluating format element %s with parameters %s."
 msgstr ""
-"Errore durante la valutazione dell’elemento di formato %s con i parametri %s."
+"Errore durante la valutazione dell’elemento di formato %s con i parametri "
+"%s."
 
 #: modules/bibformat/lib/bibformat_engine.py:662
 #, python-format
 msgid ""
-"Escape mode for format element %s could not be retrieved. Using default mode "
-"instead."
+"Escape mode for format element %s could not be retrieved. Using default mode"
+" instead."
 msgstr ""
 "Modalità di fuga per l'elemento di formato% s non può essere recuperata. "
 "Invece, usare la modalità di default."
@@ -5774,8 +5767,7 @@ msgstr ""
 #: modules/bibformat/lib/bibformatadminlib.py:1287
 #, python-format
 msgid "Tag specification \"%s\" must start with \"tag\" at line %s."
-msgstr ""
-"Specificazione del tag \"%s\" deve incominciare con “tag” alla linea %s."
+msgstr "Specificazione del tag \"%s\" deve incominciare con “tag” alla linea %s."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1294
 #, python-format
@@ -5857,8 +5849,8 @@ msgid ""
 "Could not find a description specified in tag \"<description>\" inside "
 "format template %s."
 msgstr ""
-"Impossibile trovare una descrizione specificata nel tag “<name>” nel modello "
-"di formato %s."
+"Impossibile trovare una descrizione specificata nel tag “<name>” nel modello"
+" di formato %s."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1443
 #, python-format
@@ -5885,8 +5877,8 @@ msgstr ""
 #, python-format
 msgid "Format element %s uses unknown parameter \"%s\" in format template %s."
 msgstr ""
-"Elemento di formato %s usa parametro sconosciuto “%s” nel modello di formato "
-"%s."
+"Elemento di formato %s usa parametro sconosciuto “%s” nel modello di formato"
+" %s."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1499
 #, python-format
@@ -5914,7 +5906,6 @@ msgstr "Mostra tutti% i gli autori"
 msgid "Manage Files of This Record"
 msgstr "Gestire i File di Questo Record"
 
-# # , fuzzy
 #: modules/bibformat/lib/elements/bfe_edit_record.py:46
 msgid "Edit This Record"
 msgstr "Modifica Questo Record"
@@ -6089,7 +6080,9 @@ msgstr "Validazione formato"
 msgid ""
 "Limit display to knowledge bases matching %(keyword_field)s in their rules "
 "and descriptions"
-msgstr "Limitare la visualizzazione alle basi di conoscenza abbinate %(keyword_field)s nelle loro regole a descrizioni"
+msgstr ""
+"Limitare la visualizzazione alle basi di conoscenza abbinate "
+"%(keyword_field)s nelle loro regole a descrizioni"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:89
 msgid "No Knowledge Base"
@@ -6135,8 +6128,8 @@ msgid ""
 "given field. The list is generated dynamically by                          "
 "searching the records using a search expression."
 msgstr ""
-"Una base di conoscenza dinamica è una lista di valori di "
-"un                           determinato campo. L'elenco viene generato in "
+"Una base di conoscenza dinamica è una lista di valori di un"
+"                           determinato campo. L'elenco viene generato in "
 "modo dinamico ricercando i record utilizzando un'espressione di ricerca."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:239
@@ -6154,11 +6147,11 @@ msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:244
 msgid ""
-"If the expression is empty, a list of all values                          in "
-"270__a will be created."
+"If the expression is empty, a list of all values                          in"
+" 270__a will be created."
 msgstr ""
-"Se l’espressione è vuota, un’elenco di tutti i "
-"valori                          sarà creato in 270__"
+"Se l’espressione è vuota, un’elenco di tutti i valori"
+"                          sarà creato in 270__"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:246
 msgid ""
@@ -6166,9 +6159,9 @@ msgid ""
 "it will be replaced by a search string when the                          "
 "knowledge base is used."
 msgstr ""
-"Se l'espressione contiene '%', come '270__a: *% *',                          "
-"sarà sostituita da una stringa di ricerca quando la base di conoscenze viene "
-"usata."
+"Se l'espressione contiene '%', come '270__a: *% *',"
+"                          sarà sostituita da una stringa di ricerca quando "
+"la base di conoscenze viene usata."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:249
 msgid ""
@@ -6182,26 +6175,24 @@ msgstr ""
 msgid ""
 "Example 1: Your records contain field 270__a for                          "
 "the name and address of the author's institute.                          If "
-"you set the field to '270__a' and the expression                          to "
-"'270__a:*Paris*', a list of institutes in Paris                          "
+"you set the field to '270__a' and the expression                          to"
+" '270__a:*Paris*', a list of institutes in Paris                          "
 "will be created."
 msgstr ""
-"Esempio 1: I suoi record contengono il campo di 270__a "
-"per                          il nome e l'indirizzo dell'istituto "
-"dell'autore. Se imposta il campo a '270__a' e "
-"l'espressione                          a '270__a: * Parigi *’, verrà creato "
-"un elenco di istituti a Parigi."
+"Esempio 1: I suoi record contengono il campo di 270__a per"
+"                          il nome e l'indirizzo dell'istituto dell'autore. "
+"Se imposta il campo a '270__a' e l'espressione                          a "
+"'270__a: * Parigi *’, verrà creato un elenco di istituti a Parigi."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:256
 msgid ""
-"Example 2: Return the institute's name (100__a) when "
-"the                          user gives its postal code "
-"(270__a):                          Set field to 100__a, expression to 270__a:"
-"*%*."
+"Example 2: Return the institute's name (100__a) when the"
+"                          user gives its postal code (270__a):"
+"                          Set field to 100__a, expression to 270__a:*%*."
 msgstr ""
-"Esempio 2: Restituire il nome dell'istituto (100__a) quando "
-"l'                          utente dà il suo codice postale (270__a): "
-"Imposta campo a 100__a, espressione a 270__a: *% *."
+"Esempio 2: Restituire il nome dell'istituto (100__a) quando l'"
+"                          utente dà il suo codice postale (270__a): Imposta "
+"campo a 100__a, espressione a 270__a: *% *."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:260
 msgid "Any collection"
@@ -6234,8 +6225,8 @@ msgid ""
 "Here you can add new mappings to this base                         and "
 "change the base attributes."
 msgstr ""
-"Qui è possibile aggiungere nuovi mapping a questa "
-"base                          e modificare gli attributi della base."
+"Qui è possibile aggiungere nuovi mapping a questa base"
+"                          e modificare gli attributi della base."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:362
 msgid "Map From"
@@ -6249,7 +6240,6 @@ msgstr "Ricerca un mapping"
 msgid "Knowledge base is empty"
 msgstr "Base di conoscenza vuota"
 
-# grammatical mistake in English version
 #: modules/bibknowledge/lib/bibknowledge_templates.py:545
 msgid "You can get a these mappings in textual format by: "
 msgstr "È possibile ottenere questi mapping in formato testuale per: "
@@ -6306,8 +6296,8 @@ msgid ""
 "It is not possible to have two rules with the same left side in the same "
 "knowledge base."
 msgstr ""
-"Non è possibile di avere due regole con lo stesso lato sinistro nella stessa "
-"base di conoscenza."
+"Non è possibile di avere due regole con lo stesso lato sinistro nella stessa"
+" base di conoscenza."
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:71
 msgid "BibKnowledge Admin"
@@ -6484,7 +6474,8 @@ msgstr "L'utente '%s' non e' autorizzato a eseguire il batchuploader"
 msgid ""
 "The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"
 msgstr ""
-"L’utente '%(x_user)s' non è autorizzato a modificare la raccolta '%(x_coll)s'"
+"L’utente '%(x_user)s' non è autorizzato a modificare la raccolta "
+"'%(x_coll)s'"
 
 #: modules/bibupload/lib/batchuploader_templates.py:138
 msgid "Warning: Please, select a valid time"
@@ -6536,7 +6527,6 @@ msgstr "Ora"
 msgid "Example"
 msgstr "Esempio"
 
-# # , fuzzy, python-format
 #: modules/bibupload/lib/batchuploader_templates.py:192
 #: modules/bibupload/lib/batchuploader_templates.py:400
 #, python-format
@@ -6555,8 +6545,8 @@ msgid ""
 "%(x_url1_open)supload history%(x_url1_close)s or %(x_url2_open)ssubmit "
 "another file%(x_url2_close)s"
 msgstr ""
-"Il tuo file e' aggiunto alla lista di attesa. Puoi controllare la tua"
-"%(x_url1_open)scronologia dei caricamenti%(x_url1_close)s or "
+"Il tuo file e' aggiunto alla lista di attesa. Puoi controllare la "
+"tua%(x_url1_open)scronologia dei caricamenti%(x_url1_close)s or "
 "%(x_url2_open)ssottomettere un altro file%(x_url2_close)s."
 
 #: modules/bibupload/lib/batchuploader_templates.py:225
@@ -6644,7 +6634,6 @@ msgstr ""
 msgid "All uploaded files were moved to DONE folder."
 msgstr "Tutti i file caricati sono stati spostati nella cartella DONE."
 
-# # , python-format
 #: modules/bibupload/lib/batchuploader_templates.py:435
 #, python-format
 msgid ""
@@ -6654,15 +6643,14 @@ msgstr ""
 "Utilizzando %(x_fmt_open)sl'upload via interfaccia web%(x_fmt_close)s, le "
 "azioni sono eseguire una sola volta."
 
-# # , python-format
 #: modules/bibupload/lib/batchuploader_templates.py:437
 #, python-format
 msgid ""
 "Check the %(x_url_open)sBatch Uploader daemon help page%(x_url_close)s for "
 "executing these actions periodically."
 msgstr ""
-"Controlla la %(x_url_open)sguida al demone Batch Uploader%(x_url_close)s per "
-"eseguire queste azioni periodicamente."
+"Controlla la %(x_url_open)sguida al demone Batch Uploader%(x_url_close)s per"
+" eseguire queste azioni periodicamente."
 
 #: modules/bibupload/lib/batchuploader_templates.py:442
 msgid "Metadata folders"
@@ -6699,7 +6687,8 @@ msgstr "Batchuploader: monitor dei demoni"
 #: modules/miscutil/lib/dateutils.py:98 modules/miscutil/lib/dateutils.py:125
 #: modules/webbasket/lib/webbasket.py:210
 #: modules/webbasket/lib/webbasket.py:851
-#: modules/webbasket/lib/webbasket.py:968 modules/websession/lib/webuser.py:311
+#: modules/webbasket/lib/webbasket.py:968
+#: modules/websession/lib/webuser.py:311
 #: modules/webstyle/lib/webstyle_templates.py:596
 msgid "N/A"
 msgstr "N.d."
@@ -7077,8 +7066,8 @@ msgid ""
 "Please enter a valid name of or a full path to a BibConvert config file or "
 "change postprocess mode."
 msgstr ""
-"Si prega di inserire un nome valido o una traiettoria completa verso un file "
-"BibConvert config o di cambiare il modo postprocesso."
+"Si prega di inserire un nome valido o una traiettoria completa verso un file"
+" BibConvert config o di cambiare il modo postprocesso."
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:218
 #: modules/oaiharvest/lib/oai_harvest_admin.py:342
@@ -7091,8 +7080,8 @@ msgid ""
 "Please enter a valid name of or a full path to a BibFilter script or change "
 "postprocess mode."
 msgstr ""
-"Si prega di inserire un nome valido o una traiettoria completa verso un file "
-"BibConvert script o di cambiare il modo postprocesso."
+"Si prega di inserire un nome valido o una traiettoria completa verso un file"
+" BibConvert script o di cambiare il modo postprocesso."
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:289
 #: modules/oaiharvest/lib/oai_harvest_admin.py:461
@@ -7230,7 +7219,8 @@ msgstr "Ritorna alla selezione principale"
 
 #: modules/webaccess/lib/access_control_config.py:306
 #: modules/websession/lib/websession_templates.py:1210
-#: modules/websession/lib/webuser.py:994 modules/websession/lib/webuser.py:1003
+#: modules/websession/lib/webuser.py:994
+#: modules/websession/lib/webuser.py:1003
 #: modules/websession/lib/webuser.py:1004
 msgid "Run Record Editor"
 msgstr "Esegui Record Editor"
@@ -7242,7 +7232,8 @@ msgstr "Esegui Multi-Record Editor"
 
 #: modules/webaccess/lib/access_control_config.py:308
 #: modules/websession/lib/websession_templates.py:1244
-#: modules/websession/lib/webuser.py:995 modules/websession/lib/webuser.py:1005
+#: modules/websession/lib/webuser.py:995
+#: modules/websession/lib/webuser.py:1005
 #: modules/websession/lib/webuser.py:1006
 msgid "Run Document File Manager"
 msgstr "Esegui Document File Manager"
@@ -7335,7 +7326,6 @@ msgstr "Usare Person/Author Manager"
 msgid "Your account on '%s' has been activated"
 msgstr "Il tuo account su %s è stato attivato"
 
-# # , python-format
 #: modules/webaccess/lib/webaccessadmin_lib.py:3748
 #, python-format
 msgid "Your account earlier created on '%s' has been activated:"
@@ -7412,7 +7402,6 @@ msgstr "Record simili"
 msgid "Cited by"
 msgstr "Citato da"
 
-# # , python-format
 #: modules/webalert/lib/webalert.py:54
 #, python-format
 msgid "You already have an alert named %s."
@@ -7452,14 +7441,14 @@ msgstr "L'avviso %s è stato aggiornato con successo."
 #: modules/webalert/lib/webalert.py:428
 #, python-format
 msgid ""
-"You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s "
-"is available with a possibility to (a) view search results and (b) subscribe "
-"to an automatic email alerting service for these queries."
+"You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s"
+" is available with a possibility to (a) view search results and (b) "
+"subscribe to an automatic email alerting service for these queries."
 msgstr ""
-"Hai effettuato %(x_nb)s ricerche. Una %(x_url_open)slista dettagliata"
-"%(x_url_close)s è disponibile con la possibilità di (a) visualizzare i "
-"risultati della ricerca e (b) iscriversi ad un servizio automatico di avvisi "
-"via email per gli stessi."
+"Hai effettuato %(x_nb)s ricerche. Una %(x_url_open)slista "
+"dettagliata%(x_url_close)s è disponibile con la possibilità di (a) "
+"visualizzare i risultati della ricerca e (b) iscriversi ad un servizio "
+"automatico di avvisi via email per gli stessi."
 
 #: modules/webalert/lib/webalert_templates.py:75
 msgid "Pattern"
@@ -7562,9 +7551,9 @@ msgid ""
 "Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the "
 "%(x_url2_open)spopular searches%(x_url2_close)s, or the input form."
 msgstr ""
-"Imposta un nuovo avviso a partire dalle %(x_url1_open)stue ricerche"
-"%(x_url1_close)s, dalle %(x_url2_open)sricerche comuni%(x_url2_close)s o dal "
-"modulo di inserimento."
+"Imposta un nuovo avviso a partire dalle %(x_url1_open)stue "
+"ricerche%(x_url1_close)s, dalle %(x_url2_open)sricerche "
+"comuni%(x_url2_close)s o dal modulo di inserimento."
 
 #: modules/webalert/lib/webalert_templates.py:318
 #: modules/webcomment/lib/webcomment_templates.py:235
@@ -7635,11 +7624,11 @@ msgstr ""
 #: modules/webalert/lib/webalert_templates.py:446
 #, python-format
 msgid ""
-"You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during "
-"the last 30 days or so."
+"You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during"
+" the last 30 days or so."
 msgstr ""
-"Hai eseguito %(x_nb1)s ricerche (%(x_nb2)s argomenti differenti) durante gli "
-"ultimi 30 giorni."
+"Hai eseguito %(x_nb1)s ricerche (%(x_nb2)s argomenti differenti) durante gli"
+" ultimi 30 giorni."
 
 #: modules/webalert/lib/webalert_templates.py:451
 #, python-format
@@ -7966,8 +7955,8 @@ msgstr "La nota che sta cancellando non esiste ho non ci ha acceso."
 #, python-format
 msgid "Sorry, you do not have sufficient rights to add record #%i."
 msgstr ""
-"Siamo spiacenti, non si possiede i diritti sufficienti per aggiungere record "
-"#% i."
+"Siamo spiacenti, non si possiede i diritti sufficienti per aggiungere record"
+" #% i."
 
 #: modules/webbasket/lib/webbasket.py:1795
 msgid "Some of the items were not added due to lack of sufficient rights."
@@ -8521,8 +8510,8 @@ msgstr "Condivisione cestino con un nuovo gruppo"
 #: modules/webbasket/lib/webbasket_templates.py:2109
 #: modules/websession/lib/websession_templates.py:630
 msgid ""
-"You are logged in as a guest user, so your baskets will disappear at the end "
-"of the current session."
+"You are logged in as a guest user, so your baskets will disappear at the end"
+" of the current session."
 msgstr ""
 "Sei autenticato come utente ospite, perciò i tuoi cestini scompariranno al "
 "termine della sessione corrente."
@@ -8534,8 +8523,8 @@ msgstr ""
 msgid ""
 "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
 msgstr ""
-"Se lo desideri puoi %(x_url_open)sautenticarti o registrarti qui"
-"%(x_url_close)s."
+"Se lo desideri puoi %(x_url_open)sautenticarti o registrarti "
+"qui%(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:2124
 #: modules/websession/lib/websession_webinterface.py:280
@@ -8925,11 +8914,11 @@ msgstr "Deve inserire un testo."
 msgid "You already wrote a review for this record."
 msgstr "Ha già scritto una recensione per questo record."
 
-# grammatical error in English version
 #: modules/webcomment/lib/webcomment.py:1711
 msgid "You already posted a comment short ago. Please retry later."
 msgstr ""
-"Ha già pubblicato un commento un momento fa. Si prega di riprovare più tardi."
+"Ha già pubblicato un commento un momento fa. Si prega di riprovare più "
+"tardi."
 
 #: modules/webcomment/lib/webcomment.py:1723
 msgid "Failed to insert your comment to the database. Please try again."
@@ -9192,7 +9181,8 @@ msgstr "Non sei autorizzato a commentare o recensire."
 #, python-format
 msgid "Note: Your nickname, %s, will be displayed as author of this comment."
 msgstr ""
-"Nota: il tuo soprannome, %s, sarà visualizzato come autore di questo commento"
+"Nota: il tuo soprannome, %s, sarà visualizzato come autore di questo "
+"commento"
 
 #: modules/webcomment/lib/webcomment_templates.py:1207
 #: modules/webcomment/lib/webcomment_templates.py:1324
@@ -9372,8 +9362,8 @@ msgstr "Visualizza tutte le %s recensioni riportate"
 
 #: modules/webcomment/lib/webcomment_templates.py:1656
 msgid ""
-"Here is a list, sorted by total number of reports, of all users who have had "
-"a comment reported at least once."
+"Here is a list, sorted by total number of reports, of all users who have had"
+" a comment reported at least once."
 msgstr ""
 "Ecco una lista, ordinata secondo il numero totale di commenti, di tutti gli "
 "utenti che hanno riportato un commento almeno una volta."
@@ -9491,7 +9481,8 @@ msgstr "Ecco tutti i commenti valutati ordinate in base ai più valutati"
 #, python-format
 msgid "Here are all reviews for record %i, sorted by the most reported"
 msgstr ""
-"Ecco tutte le recensioni per il record %i, ordinate per numero di valutazioni"
+"Ecco tutte le recensioni per il record %i, ordinate per numero di "
+"valutazioni"
 
 #: modules/webcomment/lib/webcomment_templates.py:2020
 msgid "Show comments"
@@ -9548,7 +9539,8 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:2211
 msgid "This is an automatic message, please don't reply to it."
 msgstr ""
-"Questo e' un messaggio automatico, si prega di non rispondere a questo email."
+"Questo e' un messaggio automatico, si prega di non rispondere a questo "
+"email."
 
 #: modules/webcomment/lib/webcomment_templates.py:2213
 #, python-format
@@ -9597,8 +9589,8 @@ msgid ""
 "The size of file \\\"%s\\\" (%s) is larger than maximum allowed file size "
 "(%s). Select files again."
 msgstr ""
-"La misura del file \\\"%s\\\" (%s) è più grande della misura di file massima "
-"autorizzata (%s). Seleziona di nuovo i file."
+"La misura del file \\\"%s\\\" (%s) è più grande della misura di file massima"
+" autorizzata (%s). Seleziona di nuovo i file."
 
 #: modules/webcomment/lib/webcomment_webinterface.py:505
 #: modules/websubmit/lib/websubmit_templates.py:2445
@@ -9820,8 +9812,8 @@ msgid ""
 "It seems that there are no journals defined on this server. Please contact "
 "support if this is not right."
 msgstr ""
-"Non sembrano esserci giornale definiti su questo server. Se pensi che questo "
-"non è corretto contatta il servizio di supporto."
+"Non sembrano esserci giornale definiti su questo server. Se pensi che questo"
+" non è corretto contatta il servizio di supporto."
 
 #: modules/webjournal/lib/webjournal_config.py:239
 msgid "Select a journal on this server"
@@ -10042,7 +10034,6 @@ msgstr "Aggiungi giornale"
 msgid "Edit Settings"
 msgstr "Modifica impostazioni"
 
-# gramma mistake in English version: change “in” to “is”
 #: modules/webmessage/lib/webmessage.py:58
 #: modules/webmessage/lib/webmessage.py:137
 #: modules/webmessage/lib/webmessage.py:203
@@ -10331,8 +10322,8 @@ msgid ""
 "Warning: figure caption search is only available for a subset of papers "
 "mostly from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
-"Attenzione: Ricerca figure caption è disponibile solo per un sottoinsieme di "
-"saggi per lo più da %(x_range_from_year)s-%(x_range_to_year)s."
+"Attenzione: Ricerca figure caption è disponibile solo per un sottoinsieme di"
+" saggi per lo più da %(x_range_from_year)s-%(x_range_to_year)s."
 
 #: modules/websearch/lib/search_engine.py:1930
 #, python-format
@@ -10347,7 +10338,8 @@ msgstr "Invece cercando %s."
 #: modules/websearch/lib/search_engine.py:1940
 msgid "Search term too generic, displaying only partial results..."
 msgstr ""
-"Termine di ricerca troppo generico, mostrando dei risultati solo parziali ..."
+"Termine di ricerca troppo generico, mostrando dei risultati solo parziali "
+"..."
 
 #: modules/websearch/lib/search_engine.py:1943
 msgid ""
@@ -10375,12 +10367,12 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:2716
 #, python-format
 msgid ""
-"No match found in collection %(x_collection)s. Other public collections gave "
-"%(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
+"No match found in collection %(x_collection)s. Other public collections gave"
+" %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
 msgstr ""
 "Nessun risultato trovato nella collezione %(x_collection)s. Le altre "
-"collezioni pubbliche hanno dato %(x_url_open)s%(x_nb_hits)d risultati"
-"%(x_url_close)s."
+"collezioni pubbliche hanno dato %(x_url_open)s%(x_nb_hits)d "
+"risultati%(x_url_close)s."
 
 #: modules/websearch/lib/search_engine.py:2725
 msgid ""
@@ -10435,7 +10427,8 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:2907
 #, python-format
 msgid ""
-"Search term %s did not match any record. Nearest terms in any collection are:"
+"Search term %s did not match any record. Nearest terms in any collection "
+"are:"
 msgstr ""
 "Il termine di ricerca %s non corrisponde ad alcun record. I termini più "
 "vicini in tutte le collezioni sono:"
@@ -10765,7 +10758,8 @@ msgstr "Nessun risultato trovato..."
 
 #: modules/websearch/lib/websearch_templates.py:3096
 msgid ""
-"Boolean query returned no hits. Please combine your search terms differently."
+"Boolean query returned no hits. Please combine your search terms "
+"differently."
 msgstr ""
 "La ricerca booleana non ha dato risultati. Vi preghiamo di combinare "
 "differentemente i termini."
@@ -10818,8 +10812,7 @@ msgstr "Potresti iniziare a sfogliare cominciando con %s."
 #, python-format
 msgid ""
 "Set up a personal %(x_url1_open)semail alert%(x_url1_close)s\n"
-"                                  or subscribe to the %(x_url2_open)sRSS feed"
-"%(x_url2_close)s."
+"                                  or subscribe to the %(x_url2_open)sRSS feed%(x_url2_close)s."
 msgstr ""
 "Imposta un %(x_url1_open)savviso via mail%(x_url1_close)s personale\n"
 "o iscriviti al %(x_url2_open)sfeed RSS%(x_url2_close)s."
@@ -10849,7 +10842,8 @@ msgstr "%s di"
 
 #: modules/websearch/lib/websearch_templates.py:3919
 msgid "People who downloaded this document also downloaded:"
-msgstr "Gli utenti che hanno scaricato questo documento hanno anche scaricato:"
+msgstr ""
+"Gli utenti che hanno scaricato questo documento hanno anche scaricato:"
 
 #: modules/websearch/lib/websearch_templates.py:3935
 msgid "People who viewed this page also viewed:"
@@ -10957,8 +10951,8 @@ msgstr "Copie"
 #: modules/websession/lib/webaccount.py:117
 #, python-format
 msgid ""
-"You are logged in as guest. You may want to %(x_url_open)slogin"
-"%(x_url_close)s as a regular user."
+"You are logged in as guest. You may want to "
+"%(x_url_open)slogin%(x_url_close)s as a regular user."
 msgstr ""
 "Sei autenticato come ospite. Puoi %(x_url_open)sautenticarti%(x_url_close)s "
 "come utente regolare."
@@ -10966,8 +10960,8 @@ msgstr ""
 #: modules/websession/lib/webaccount.py:121
 #, python-format
 msgid ""
-"The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister"
-"%(x_url_close)s first"
+"The %(x_fmt_open)sguest%(x_fmt_close)s users need to "
+"%(x_url_open)sregister%(x_url_close)s first"
 msgstr ""
 "Gli utenti %(x_fmt_open)sospiti%(x_fmt_close)s devono prima "
 "%(x_url_open)sregistrarsi%(x_url_close)s"
@@ -11052,7 +11046,8 @@ msgstr "Si prega di selezionare un membro se desidera rimuoverlo del gruppo."
 msgid ""
 "Please choose a user from the list if you want him to be added to the group."
 msgstr ""
-"Si prega di scegliere un utente dell’elenco se desidera aggiungerlo al gruppo"
+"Si prega di scegliere un utente dell’elenco se desidera aggiungerlo al "
+"gruppo"
 
 #: modules/websession/lib/webgroup.py:664
 msgid "The user is already member of the group."
@@ -11138,8 +11133,8 @@ msgid ""
 "The description should be something meaningful for you to recognize the API "
 "key"
 msgstr ""
-"La descrizione dovrebbe essere qualcosa di significativo in tal modo che lei "
-"possa riconoscere la chiave API"
+"La descrizione dovrebbe essere qualcosa di significativo in tal modo che lei"
+" possa riconoscere la chiave API"
 
 #: modules/websession/lib/websession_templates.py:201
 msgid "Create new key"
@@ -11150,8 +11145,8 @@ msgid ""
 "If you want to change your email or set for the first time your nickname, "
 "please set new values in the form below."
 msgstr ""
-"Se desideri modificare il tuo indirizzo email o impostare per la prima volta "
-"il tuo soprannome, per favore, inserisci i nuovi valori nei campi "
+"Se desideri modificare il tuo indirizzo email o impostare per la prima volta"
+" il tuo soprannome, per favore, inserisci i nuovi valori nei campi "
 "sottostanti."
 
 #: modules/websession/lib/websession_templates.py:264
@@ -11285,8 +11280,8 @@ msgid ""
 "Please select which login method you would like to use to authenticate "
 "yourself"
 msgstr ""
-"Per favore, seleziona quale metodo di autenticazione desideri utilizzare per "
-"autenticarti"
+"Per favore, seleziona quale metodo di autenticazione desideri utilizzare per"
+" autenticarti"
 
 #: modules/websession/lib/websession_templates.py:467
 #: modules/websession/lib/websession_templates.py:482
@@ -11300,8 +11295,8 @@ msgid ""
 "account%(x_fmt_close)s, then please enter your email address in the "
 "following form in order to have a password reset link emailed to you."
 msgstr ""
-"Se hai dimenticato la password del tuo %(x_fmt_open)saccount interno"
-"%(x_fmt_close)s a %(sitename)s, allora inserisci, per favore, il tuo "
+"Se hai dimenticato la password del tuo %(x_fmt_open)saccount "
+"interno%(x_fmt_close)s a %(sitename)s, allora inserisci, per favore, il tuo "
 "indirizzo email nel campo sottostante così da ricevere un link per "
 "reimpostarla."
 
@@ -11321,14 +11316,14 @@ msgid ""
 "then you can recover your password through the %(x_url_open)sCERN "
 "authentication system%(x_url_close)s."
 msgstr ""
-"Se stai utilizzando il %(x_fmt_open)ssistema di login del CERN"
-"%(x_fmt_close)s, puoi ricuperare la tua password tramite il "
+"Se stai utilizzando il %(x_fmt_open)ssistema di login del "
+"CERN%(x_fmt_close)s, puoi ricuperare la tua password tramite il "
 "%(x_url_open)ssistema di autenticazione CERN%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:531
 msgid ""
-"Note that if you have been using an external login system, then we cannot do "
-"anything and you have to ask there."
+"Note that if you have been using an external login system, then we cannot do"
+" anything and you have to ask there."
 msgstr ""
 "Nota che se stavi utilizzando un sistema di autenticazione esterno, allora "
 "non c'è nulla che possiamo fare e devi fare riferimento al sistema esterno."
@@ -11349,8 +11344,8 @@ msgid ""
 "own personal library of documents, or to set up an automatic alert query "
 "that would run periodically and would notify you of search results by email."
 msgstr ""
-"%s ti offre la possibilità di personalizzare l'interfaccia, impostare la tua "
-"biblioteca di documenti personali o impostare una richiesta con avviso "
+"%s ti offre la possibilità di personalizzare l'interfaccia, impostare la tua"
+" biblioteca di documenti personali o impostare una richiesta con avviso "
 "automatico che verrebbe eseguita periodicamente per notificarti i risultati "
 "della ricerca via email."
 
@@ -11374,12 +11369,12 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:586
 msgid ""
-"With baskets you can define specific collections of items, store interesting "
-"records you want to access later or share with others."
+"With baskets you can define specific collections of items, store interesting"
+" records you want to access later or share with others."
 msgstr ""
 "Con i cestini puoi definire le tue collezioni personali di elementi, "
-"memorizzare record interessanti che vuoi ricuperare in seguito o condividere "
-"con altre persone."
+"memorizzare record interessanti che vuoi ricuperare in seguito o condividere"
+" con altre persone."
 
 #: modules/websession/lib/websession_templates.py:595
 msgid ""
@@ -11395,8 +11390,8 @@ msgid ""
 "Check out book you have on loan, submit borrowing requests, etc. Requires "
 "CERN ID."
 msgstr ""
-"Controlla i libri che hai in prestito, sottoponi richieste di prestito, ecc. "
-"Richiede un ID CERN."
+"Controlla i libri che hai in prestito, sottoponi richieste di prestito, ecc."
+" Richiede un ID CERN."
 
 #: modules/websession/lib/websession_templates.py:632
 msgid ""
@@ -11409,13 +11404,13 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:655
 #, python-format
 msgid ""
-"You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout"
-"%(x_url1_close)s; b) edit your %(x_url2_open)saccount settings"
-"%(x_url2_close)s."
+"You are logged in as %(x_user)s. You may want to a) "
+"%(x_url1_open)slogout%(x_url1_close)s; b) edit your %(x_url2_open)saccount "
+"settings%(x_url2_close)s."
 msgstr ""
-"Sei autenticato come %(x_user)s. Puoi a) %(x_url1_open)suscire"
-"%(x_url1_close)s; b) modificare le tue %(x_url2_open)simpostazioni "
-"dell'account%(x_url2_close)s."
+"Sei autenticato come %(x_user)s. Puoi a) "
+"%(x_url1_open)suscire%(x_url1_close)s; b) modificare le tue "
+"%(x_url2_open)simpostazioni dell'account%(x_url2_close)s."
 
 #: modules/websession/lib/websession_templates.py:736
 msgid "Your Alert Searches"
@@ -11424,11 +11419,11 @@ msgstr "Tuoi avvisi di ricerche"
 #: modules/websession/lib/websession_templates.py:742
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are "
-"administering or are a member of."
+"You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are"
+" administering or are a member of."
 msgstr ""
-"Puoi consultare la lista dei %(x_url_open)stuoi gruppi%(x_url_close)s di cui "
-"sei amministratore o membro."
+"Puoi consultare la lista dei %(x_url_open)stuoi gruppi%(x_url_close)s di cui"
+" sei amministratore o membro."
 
 #: modules/websession/lib/websession_templates.py:745
 #: modules/websession/lib/websession_templates.py:2449
@@ -11442,8 +11437,8 @@ msgid ""
 "You can consult the list of %(x_url_open)syour submissions%(x_url_close)s "
 "and inquire about their status."
 msgstr ""
-"Puoi consultare la lista delle %(x_url_open)stue sottomissioni"
-"%(x_url_close)s e controllarne lo stato."
+"Puoi consultare la lista delle %(x_url_open)stue "
+"sottomissioni%(x_url_close)s e controllarne lo stato."
 
 #: modules/websession/lib/websession_templates.py:751
 #: modules/websubmit/web/yoursubmissions.py:154
@@ -11453,11 +11448,11 @@ msgstr "Tue sottomissioni"
 #: modules/websession/lib/websession_templates.py:754
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with "
-"the documents you approved or refereed."
+"You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with"
+" the documents you approved or refereed."
 msgstr ""
-"Puoi consultare la lista delle %(x_url_open)stue approvazioni%(x_url_close)s "
-"con i documenti che hai approvato o di cui hai fatto da referee."
+"Puoi consultare la lista delle %(x_url_open)stue approvazioni%(x_url_close)s"
+" con i documenti che hai approvato o di cui hai fatto da referee."
 
 #: modules/websession/lib/websession_templates.py:757
 #: modules/websubmit/web/yourapprovals.py:88
@@ -11467,7 +11462,8 @@ msgstr "Tue approvazioni"
 #: modules/websession/lib/websession_templates.py:761
 #, python-format
 msgid "You can consult the list of %(x_url_open)syour tickets%(x_url_close)s."
-msgstr "Puoi consultare la lista dei %(x_url_open)stuoi ticket%(x_url_close)s."
+msgstr ""
+"Puoi consultare la lista dei %(x_url_open)stuoi ticket%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:764
 msgid "Your Tickets"
@@ -11570,11 +11566,11 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:962
 #, python-format
 msgid ""
-"If you don't own an account yet, please %(x_url_open)sregister"
-"%(x_url_close)s an internal account."
+"If you don't own an account yet, please "
+"%(x_url_open)sregister%(x_url_close)s an internal account."
 msgstr ""
-"Se non possiedi ancora un account, per favore %(x_url_open)sregistra"
-"%(x_url_close)s un account interno."
+"Se non possiedi ancora un account, per favore "
+"%(x_url_open)sregistra%(x_url_close)s un account interno."
 
 #: modules/websession/lib/websession_templates.py:970
 #, python-format
@@ -11665,11 +11661,11 @@ msgid ""
 "automatic alert search that will look for new preprints and will notify you "
 "daily of new arrivals by email."
 msgstr ""
-"Per favore non utilizzare una password di valore quale la tua password Unix, "
-"AFS o NICE con questo servizio. Il tuo indirizzo email resterà strettamente "
-"confidenziale e non verrà esposto a terze parti. Verrà utilizzato per "
-"identificarti per i vari servizi personalizzati di %s. Per esempio, potresti "
-"impostare una ricerca con avviso automatico che cercherà nuove prestampe e "
+"Per favore non utilizzare una password di valore quale la tua password Unix,"
+" AFS o NICE con questo servizio. Il tuo indirizzo email resterà strettamente"
+" confidenziale e non verrà esposto a terze parti. Verrà utilizzato per "
+"identificarti per i vari servizi personalizzati di %s. Per esempio, potresti"
+" impostare una ricerca con avviso automatico che cercherà nuove prestampe e "
 "ti notificherà giornalmente sui nuovi arrivi via email."
 
 #: modules/websession/lib/websession_templates.py:1167
@@ -11678,7 +11674,8 @@ msgid ""
 "It is not possible to create an account yourself. Contact %s if you want an "
 "account."
 msgstr ""
-"Non è possibile creare da soli un account.Contatta %s se desideri un account."
+"Non è possibile creare da soli un account.Contatta %s se desideri un "
+"account."
 
 #: modules/websession/lib/websession_templates.py:1193
 #, python-format
@@ -11686,8 +11683,8 @@ msgid ""
 "You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s "
 "first."
 msgstr ""
-"Sembri essere un utente ospite. Devi prima %(x_url_open)sautenticarti"
-"%(x_url_close)s."
+"Sembri essere un utente ospite. Devi prima "
+"%(x_url_open)sautenticarti%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:1199
 msgid "You are not authorized to access administrative functions."
@@ -11710,8 +11707,8 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:1250
 #, python-format
 msgid ""
-"For more admin-level activities, see the complete %(x_url_open)sAdmin Area"
-"%(x_url_close)s."
+"For more admin-level activities, see the complete %(x_url_open)sAdmin "
+"Area%(x_url_close)s."
 msgstr ""
 "Per ulteriori attività di amministrazione, vedi la completa "
 "%(x_url_open)sArea di amministrazione%(x_url_close)s."
@@ -11934,8 +11931,7 @@ msgid ""
 msgstr ""
 "Ciao\n"
 "\n"
-"Penso che potrebbe essere interessato/a nel far parte del gruppo\"%(x_name)s"
-"\".\n"
+"Penso che potrebbe essere interessato/a nel far parte del gruppo\"%(x_name)s\".\n"
 "Può raggiungerlo cliccando qua: %(x_url)s.\n"
 "\n"
 "Cordiali saluti.\n"
@@ -12037,18 +12033,19 @@ msgstr "Il gruppo %s è stato cancellato dal suo amministratore."
 #: modules/websession/lib/websession_templates.py:2540
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)s%(x_nb_total)i groups"
-"%(x_url_close)s you are subscribed to (%(x_nb_member)i) or administering "
-"(%(x_nb_admin)i)."
+"You can consult the list of %(x_url_open)s%(x_nb_total)i "
+"groups%(x_url_close)s you are subscribed to (%(x_nb_member)i) or "
+"administering (%(x_nb_admin)i)."
 msgstr ""
-"Puoi consultare la lista dei %(x_url_open)s%(x_nb_total)i gruppi"
-"%(x_url_close)s di cui sei membro (%(x_nb_member)i) o amministratore "
+"Puoi consultare la lista dei %(x_url_open)s%(x_nb_total)i "
+"gruppi%(x_url_close)s di cui sei membro (%(x_nb_member)i) o amministratore "
 "(%(x_nb_admin)i)."
 
 #: modules/websession/lib/websession_templates.py:2559
 msgid ""
 "Warning: The password set for MySQL root user is the same as the default "
-"Invenio password. For security purposes, you may want to change the password."
+"Invenio password. For security purposes, you may want to change the "
+"password."
 msgstr ""
 "Attenzione: La password impostata per l'utente root di MySQL e' la stessa "
 "della password di default d'Invenio. Per ragioni di sicurezza, si consiglia "
@@ -12059,39 +12056,40 @@ msgid ""
 "Warning: The password set for the Invenio MySQL user is the same as the "
 "shipped default. For security purposes, you may want to change the password."
 msgstr ""
-"Attenzione: La password impostata per l'utente Invenio di MySQL e' la stessa "
-"della password di default dell'istallazione. Per ragioni di sicurezza, si "
+"Attenzione: La password impostata per l'utente Invenio di MySQL e' la stessa"
+" della password di default dell'istallazione. Per ragioni di sicurezza, si "
 "consiglia di cambiare la password."
 
 #: modules/websession/lib/websession_templates.py:2571
 msgid ""
-"Warning: The password set for the Invenio admin user is currently empty. For "
-"security purposes, it is strongly recommended that you add a password."
+"Warning: The password set for the Invenio admin user is currently empty. For"
+" security purposes, it is strongly recommended that you add a password."
 msgstr ""
 "Attenzione: L'utente admin di Invenio attualmente non ha password. Per "
 "ragioni di sicurezza, si consiglia di definire una password."
 
 #: modules/websession/lib/websession_templates.py:2577
 msgid ""
-"Warning: The email address set for support email is currently set to "
-"info@invenio-software.org. It is recommended that you change this to your "
-"own address."
+"Warning: The email address set for support email is currently set to info"
+"@invenio-software.org. It is recommended that you change this to your own "
+"address."
 msgstr ""
-"\"Attenzione: L'email impostato per l'assistenza attualmente e' info@invenio-"
-"software.org. Per ragioni di sicurezza, si consiglia di sostituirlo con il "
-"vostro apposito email."
+"\"Attenzione: L'email impostato per l'assistenza attualmente e' info"
+"@invenio-software.org. Per ragioni di sicurezza, si consiglia di sostituirlo"
+" con il vostro apposito email."
 
 #: modules/websession/lib/websession_templates.py:2583
 msgid ""
-"A newer version of Invenio is available for download. You may want to visit  "
+"A newer version of Invenio is available for download. You may want to visit"
+"  "
 msgstr ""
 "Una versione piu' recente di Invenio e' disponibile. Si consiglia di "
 "valutare  "
 
 #: modules/websession/lib/websession_templates.py:2590
 msgid ""
-"Cannot download or parse release notes from http://invenio-software.org/repo/"
-"invenio/tree/RELEASE-NOTES"
+"Cannot download or parse release notes from http://invenio-"
+"software.org/repo/invenio/tree/RELEASE-NOTES"
 msgstr ""
 "Non e' possibile scaricare o processare la documentazione sulla release da "
 "http://invenio-software.org/repo/invenio/tree/RELEASE-NOTES"
@@ -12146,9 +12144,11 @@ msgstr "Hai già confermato la validità del tuo indirizzo email!"
 
 #: modules/websession/lib/websession_webinterface.py:142
 msgid ""
-"This request for confirmation of an email address is not valid or is expired."
+"This request for confirmation of an email address is not valid or is "
+"expired."
 msgstr ""
-"Questa richiesta di conferma di un indirizzo email non è valida od è scaduta."
+"Questa richiesta di conferma di un indirizzo email non è valida od è "
+"scaduta."
 
 #: modules/websession/lib/websession_webinterface.py:147
 msgid "This request for an authorization is not valid or is expired."
@@ -12257,8 +12257,8 @@ msgid ""
 "The external login method %s does not support email address based logins.  "
 "Please contact the site administrators."
 msgstr ""
-"Il metodo di autenticazione esterno %s non supporta autenticazione basata su "
-"indirizzo email.  Per favore, contatta l'amministratore del sito."
+"Il metodo di autenticazione esterno %s non supporta autenticazione basata su"
+" indirizzo email.  Per favore, contatta l'amministratore del sito."
 
 #: modules/websession/lib/websession_webinterface.py:450
 msgid "Your nickname has not been updated"
@@ -12456,8 +12456,8 @@ msgid ""
 "Please follow instructions presented there in order to complete the account "
 "registration process."
 msgstr ""
-"Per favore, segui le istruzioni ivi contenute così da completare il processo "
-"di registrazione dell'account."
+"Per favore, segui le istruzioni ivi contenute così da completare il processo"
+" di registrazione dell'account."
 
 #: modules/websession/lib/websession_webinterface.py:968
 msgid ""
@@ -12499,8 +12499,8 @@ msgid ""
 "The site is having troubles in sending you an email for confirming your "
 "email address."
 msgstr ""
-"Il sito ha incontrato dei problemi nell'inviarti un email di conferma per il "
-"tuo indirizzo."
+"Il sito ha incontrato dei problemi nell'inviarti un email di conferma per il"
+" tuo indirizzo."
 
 #: modules/websession/lib/websession_webinterface.py:1088
 #: modules/websession/lib/websession_webinterface.py:1129
@@ -12610,8 +12610,8 @@ msgstr "Spiacente, la pagina %s non sembra esistere."
 #: modules/webstyle/lib/webdoc_webinterface.py:190
 #, python-format
 msgid ""
-"You may want to look at the %(x_url_open)s%(x_category)s pages"
-"%(x_url_close)s."
+"You may want to look at the %(x_url_open)s%(x_category)s "
+"pages%(x_url_close)s."
 msgstr ""
 "Potresti cominciare a consultare %(x_url_open)sl'indice delle pagine "
 "%(x_category)s%(x_url_close)s."
@@ -12729,8 +12729,8 @@ msgstr ""
 #: modules/websubmit/lib/functions/Shared_Functions.py:205
 msgid ""
 "Because of a human intervention or a temporary problem, the task queue is "
-"currently set to the manual mode. Your submission is well registered but may "
-"take longer than usual before it is fully integrated and searchable.\n"
+"currently set to the manual mode. Your submission is well registered but may"
+" take longer than usual before it is fully integrated and searchable.\n"
 msgstr ""
 "A causa di un intervento di manutenzione o un problema temporaneo, la lista "
 "d'attesa delle operazioni e' attualmente in modalita' manuale. La tua "
@@ -12787,18 +12787,19 @@ msgstr "Impossibile determinare il numero di pagine di sottomissione."
 #: modules/websubmit/lib/websubmit_engine.py:296
 #: modules/websubmit/lib/websubmit_engine.py:908
 msgid ""
-"Unable to create a directory for this submission. The administrator has been "
-"alerted."
+"Unable to create a directory for this submission. The administrator has been"
+" alerted."
 msgstr ""
 "Impossibile creare una directory per questa sottomissione. L'amministratore "
 "e' stato avvisato."
 
 #: modules/websubmit/lib/websubmit_engine.py:435
 #: modules/websubmit/lib/websubmit_engine.py:1035
-msgid "Cannot create submission directory. The administrator has been alerted."
+msgid ""
+"Cannot create submission directory. The administrator has been alerted."
 msgstr ""
-"Impossibile creare una directory di sottomissione. L'amministratore e' stato "
-"avvisato."
+"Impossibile creare una directory di sottomissione. L'amministratore e' stato"
+" avvisato."
 
 #: modules/websubmit/lib/websubmit_engine.py:457
 #: modules/websubmit/lib/websubmit_engine.py:1057
@@ -12835,7 +12836,8 @@ msgstr "L'azione scelta non è supportata da questo tipo di documento."
 
 #: modules/websubmit/lib/websubmit_templates.py:67
 msgid "Login to display all document types you can access"
-msgstr "Connetarsi per visualizzare tutti i tipi di documenti che può accedere"
+msgstr ""
+"Connetarsi per visualizzare tutti i tipi di documenti che può accedere"
 
 #: modules/websubmit/lib/websubmit_templates.py:93
 msgid "Document types available for submission"
@@ -12859,8 +12861,8 @@ msgstr "Seleziona una categoria e poi fai clic su un pulsante di azione."
 
 #: modules/websubmit/lib/websubmit_templates.py:364
 msgid ""
-"To continue with a previously interrupted submission, enter an access number "
-"into the box below:"
+"To continue with a previously interrupted submission, enter an access number"
+" into the box below:"
 msgstr ""
 "Per continuare con una sottomissione precedentemente interrotta, inserisci "
 "un numero di accesso nella casella sottostante:"
@@ -12894,8 +12896,8 @@ msgid ""
 "This is your submission access number. It can be used to continue with an "
 "interrupted submission in case of problems."
 msgstr ""
-"Questo è il numero di accesso della tua sottomissione. Può essere utilizzato "
-"per continuare una sottomissione interrotta in caso di problemi."
+"Questo è il numero di accesso della tua sottomissione. Può essere utilizzato"
+" per continuare una sottomissione interrotta in caso di problemi."
 
 #: modules/websubmit/lib/websubmit_templates.py:548
 msgid "Mandatory fields appear in red in the SUMMARY window."
@@ -13163,8 +13165,8 @@ msgstr "Nota di approvazione:"
 msgid ""
 "This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s."
 msgstr ""
-"Questo documento è ancora %(x_fmt_open)sin attesa di approvazione"
-"%(x_fmt_close)s."
+"Questo documento è ancora %(x_fmt_open)sin attesa di "
+"approvazione%(x_fmt_close)s."
 
 #: modules/websubmit/lib/websubmit_templates.py:2142
 #: modules/websubmit/lib/websubmit_templates.py:2163
@@ -13240,7 +13242,8 @@ msgstr "La richiesta di referee è stata fatta la prima volta il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2264
 #: modules/websubmit/lib/websubmit_templates.py:2318
-msgid "Last request e-mail was sent to the publication committee chair on the "
+msgid ""
+"Last request e-mail was sent to the publication committee chair on the "
 msgstr ""
 "L'ultima email di richiesta spedita alla rappresentanza della commissione "
 "per la pubblicazione è stata inviata il "
@@ -13351,7 +13354,8 @@ msgstr "L'editorial board ha selezionato un referee il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2340
 msgid ""
-"The referee has sent his final recommendations to the editorial board on the "
+"The referee has sent his final recommendations to the editorial board on the"
+" "
 msgstr ""
 "Il referee ha inviato le sue raccomandazioni finali alla editorial board il "
 
@@ -13369,7 +13373,8 @@ msgstr "Ancora nessuna raccomandazione dall'editorial board."
 
 #: modules/websubmit/lib/websubmit_templates.py:2381
 msgid "Last request e-mail was sent to the project leader on the "
-msgstr "L'ultima email di richiesta al leader del progetto è stata inviata il "
+msgstr ""
+"L'ultima email di richiesta al leader del progetto è stata inviata il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2475
 msgid "Comments overview"
@@ -13453,8 +13458,8 @@ msgid ""
 "Unable to move field at position %s to position %s on page %s of submission "
 "'%s%s' - Invalid Field Position Numbers"
 msgstr ""
-"Impossibile spostare campo alla posizione %s per posizionare %s su pagina %s "
-"di sottomissione ‘%s%s’ - Numeri di Posizione di Campo Non Validi"
+"Impossibile spostare campo alla posizione %s per posizionare %s su pagina %s"
+" di sottomissione ‘%s%s’ - Numeri di Posizione di Campo Non Validi"
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3916
 #, python-format
@@ -13463,8 +13468,8 @@ msgid ""
 "submission %s - could not move field at position %s to temporary field "
 "location"
 msgstr ""
-"Impossibile scambiare campo alla posizione %s con il campo alla posizione %s "
-"su pagina %s della sottomissione %s - impossibile muovere il campo alla "
+"Impossibile scambiare campo alla posizione %s con il campo alla posizione %s"
+" su pagina %s della sottomissione %s - impossibile muovere il campo alla "
 "posizione %s a una posizione di campo temporanea"
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3927
@@ -13473,7 +13478,11 @@ msgid ""
 "Unable to swap field at position %s with field at position %s on page %s of "
 "submission %s - could not move field at position %s to position %s. Please "
 "ask Admin to check that a field was not stranded in a temporary position"
-msgstr "Impossibile scambiare campo alla posizione %s con il campo alla posizione %s su pagina %s della sottomissione %s - impossibile moevere campo alla posizione %s alla posizione %s. Si prega di chiedere all'Admin di verificare che il campo non sia bloccato in una posizione temporanea."
+msgstr ""
+"Impossibile scambiare campo alla posizione %s con il campo alla posizione %s"
+" su pagina %s della sottomissione %s - impossibile moevere campo alla "
+"posizione %s alla posizione %s. Si prega di chiedere all'Admin di verificare"
+" che il campo non sia bloccato in una posizione temporanea."
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3938
 #, python-format
@@ -13482,17 +13491,21 @@ msgid ""
 "submission %s - could not move field that was located at position %s to "
 "position %s from temporary position. Field is now stranded in temporary "
 "position and must be corrected manually by an Admin"
-msgstr "Impossibile scambiare campo alla posizione %s con il campo alla posizione %s su pagina %s della sottomissione %s - impossibile moevere campo alla posizione %s alla posizione %s temporanea. Il campo est bloccato in una posizione temoranea et deve essere corretto da un administratore."
+msgstr ""
+"Impossibile scambiare campo alla posizione %s con il campo alla posizione %s"
+" su pagina %s della sottomissione %s - impossibile moevere campo alla "
+"posizione %s alla posizione %s temporanea. Il campo est bloccato in una "
+"posizione temoranea et deve essere corretto da un administratore."
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3949
 #, python-format
 msgid ""
 "Unable to move field at position %s to position %s on page %s of submission "
-"%s - could not decrement the position of the fields below position %s. Tried "
-"to recover - please check that field ordering is not broken"
+"%s - could not decrement the position of the fields below position %s. Tried"
+" to recover - please check that field ordering is not broken"
 msgstr ""
-"Impossibile muovere campo alla posizione %s alla posizione %s su pagina %s di "
-"sottomissione %s - impossibile diminuire la posizione dei campi sotto la "
+"Impossibile muovere campo alla posizione %s alla posizione %s su pagina %s "
+"di sottomissione %s - impossibile diminuire la posizione dei campi sotto la "
 "posizione %s. Provato recuperare - si prega di verificare che l’ordinamento "
 "del campo non sia rotto."
 
@@ -13505,9 +13518,9 @@ msgid ""
 "position."
 msgstr ""
 "Impossibile muovere il campo alla posizione %s alla posizione %s su pagina "
-"%s della sottomissione %s%s - impossibile aumentare la posizione dei campi a "
-"e sotto la posizione %s. Il campo che era alla posizione%s è ora bloccato su "
-"una posizione temporanea."
+"%s della sottomissione %s%s - impossibile aumentare la posizione dei campi a"
+" e sotto la posizione %s. Il campo che era alla posizione%s è ora bloccato "
+"su una posizione temporanea."
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3971
 #, python-format
@@ -13526,7 +13539,8 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:4002
 #, python-format
-msgid "Unable to delete field at position %s from page %s of submission '%s%s'"
+msgid ""
+"Unable to delete field at position %s from page %s of submission '%s%s'"
 msgstr ""
 "Impossibile di eliminare il campo alla posizione %s della pagina %s della "
 "sottomissione '%s%s'"
@@ -13648,568 +13662,3 @@ msgstr "Azione errata per questo documento."
 #: modules/websubmit/web/yourapprovals.py:57
 msgid "You are not authorized to use approval system."
 msgstr "Non hai il permesso di accedere al sistema di approvazione."
-
-#, fuzzy
-#~ msgid "You are about to attribute the following paper"
-#~ msgstr "Sei un membro dei seguenti gruppi:"
-
-#, fuzzy
-#~ msgid "Sorry."
-#~ msgstr "Spiacente"
-
-#, fuzzy
-#~ msgid "Please provide at least one transaction."
-#~ msgstr "Per favore seleziona una categoria"
-
-#, fuzzy
-#~ msgid "Error:"
-#~ msgstr "Errore"
-
-#~ msgid "%i items found"
-#~ msgstr "%i elementi trovati."
-
-#~ msgid "*** basket name ***"
-#~ msgstr "*** Nome cestino ***"
-
-#, fuzzy
-#~ msgid ""
-#~ "<div class=\"webcomment_comment_round_header\">%(x_nb)i Comments for "
-#~ "round \"%(x_name)s\""
-#~ msgstr "%(x_name)s ha scritto il %(x_date)s:"
-
-#, fuzzy
-#~ msgid "%(x_name)s"
-#~ msgstr "collegamento %(x_sitename)s"
-
-#~ msgid "Sorry, you must log in to perform this action."
-#~ msgstr "Spiacente, devi autenticarti per eseguire questa azione."
-
-#~ msgid "Please log in first."
-#~ msgstr "Per favore, autentificati."
-
-#~ msgid "Use the top-right menu to log in."
-#~ msgstr "Utilizza il menu in alto a destra per autentificarti."
-
-#~ msgid "Sorry parameter missing..."
-#~ msgstr "Spiacente, manca parametro..."
-
-#, fuzzy
-#~ msgid "now"
-#~ msgstr "no"
-
-#~ msgid "No fulltext"
-#~ msgstr "Nessun documento integrale"
-
-#~ msgid "Upload succesful"
-#~ msgstr "Caricamento effettuato"
-
-#~ msgid "notes"
-#~ msgstr "commenti"
-
-#~ msgid "last note on"
-#~ msgstr "ultimo commento su"
-
-#~ msgid ", no notes yet"
-#~ msgstr ", nessun commento presente"
-
-#~ msgid ""
-#~ "%(x_nb_people)i out of %(x_nb_total)i people found this review useful"
-#~ msgstr ""
-#~ "%(x_nb_people)i persone su %(x_nb_total)i hanno trovato questa recensione "
-#~ "utile"
-
-#~ msgid "HTML brief"
-#~ msgstr "HTML breve"
-
-#~ msgid "Papers:"
-#~ msgstr "Articoli:"
-
-#~ msgid "Affiliations:"
-#~ msgstr "Affiliazioni:"
-
-#~ msgid "Frequent keywords:"
-#~ msgstr "Parole chiavi frequenti:"
-
-#~ msgid "Frequent co-authors:"
-#~ msgstr "Co-autori frequenti:"
-
-#~ msgid "You have "
-#~ msgstr "Hai "
-
-#~ msgid "tickets"
-#~ msgstr "ticket"
-
-#~ msgid "when field equals"
-#~ msgstr "quando il campo e' uguale"
-
-#~ msgid "on subfield"
-#~ msgstr "nel sotto-campo"
-
-#~ msgid "Manualy"
-#~ msgstr "Manuale"
-
-#~ msgid "ERROR"
-#~ msgstr "ERRORE"
-
-#~ msgid "is not a directory"
-#~ msgstr "non e' una directory"
-
-#~ msgid "is not writable"
-#~ msgstr "non scrivibile"
-
-#~ msgid "already exists."
-#~ msgstr "esiste gia'."
-
-#~ msgid "written OK."
-#~ msgstr "scritto OK."
-
-#~ msgid "write failed."
-#~ msgstr "errore si scrittura."
-
-#~ msgid "deleted"
-#~ msgstr "cancellato"
-
-#~ msgid "delete failed"
-#~ msgstr "Cancellazione non riuscita"
-
-#~ msgid ""
-#~ "Error when formatting the Holding Pen entry. Probably it's content is "
-#~ "broken"
-#~ msgstr ""
-#~ "Errore durante la formattazione della registrazione nel raccoglitore. "
-#~ "Probabilmente il contenuto e' guasto."
-
-#, fuzzy
-#~ msgid "in their rules and descriptions"
-#~ msgstr "Visualizza il riquadro degli ultimi arrivi"
-
-#, fuzzy
-#~ msgid "Your rule"
-#~ msgstr "I tuoi avvisi"
-
-#, fuzzy
-#~ msgid "Cannot create upload"
-#~ msgstr "Impossibile creare il formato di output"
-
-#, fuzzy
-#~ msgid "No such knowledge base"
-#~ msgstr "Basi di conoscenza sconosciute"
-
-#, fuzzy
-#~ msgid "Date:"
-#~ msgstr "Data:"
-
-#, fuzzy
-#~ msgid "Time:"
-#~ msgstr "Ora"
-
-#, fuzzy
-#~ msgid "Example:"
-#~ msgstr "Esempio"
-
-#, fuzzy
-#~ msgid "are mandatory"
-#~ msgstr "obbligatorio"
-
-#, fuzzy
-#~ msgid "are mandatory."
-#~ msgstr "obbligatorio"
-
-#, fuzzy
-#~ msgid "Check the"
-#~ msgstr "Fai clic qui"
-
-#, fuzzy
-#~ msgid "Configure Bibknowledge"
-#~ msgstr "Configura BibIndex"
-
-#, fuzzy
-#~ msgid "creating a new basket"
-#~ msgstr "Crea un nuovo cestino"
-
-#, fuzzy
-#~ msgid "You may want to start by"
-#~ msgstr "Potresti voler navigare a cominciare da %s"
-
-#~ msgid "by"
-#~ msgstr "di"
-
-#~ msgid "on"
-#~ msgstr "su"
-
-#, fuzzy
-#~ msgid "basket"
-#~ msgstr "cestini"
-
-#, fuzzy
-#~ msgid "previous basket"
-#~ msgstr "Cestini di gruppo"
-
-#, fuzzy
-#~ msgid "search"
-#~ msgstr "Cerca"
-
-#, fuzzy
-#~ msgid "create a new one"
-#~ msgstr "o creane uno nuovo"
-
-#, fuzzy
-#~ msgid "Adding"
-#~ msgstr "Aggiungi"
-
-#, fuzzy
-#~ msgid "Please choose a basket"
-#~ msgstr "Per favore seleziona una categoria"
-
-#, fuzzy
-#~ msgid "Editing topic"
-#~ msgstr "Modifica cestino"
-
-#~ msgid ""
-#~ "Nested or mismatched parentheses detected. Ignoring all parentheses in "
-#~ "the query..."
-#~ msgstr ""
-#~ "Incontrate parentesi annidate o non appaiate. Ignorate tutte le parentesi "
-#~ "nella query..."
-
-#, fuzzy
-#~ msgid "niceName"
-#~ msgstr "Nome"
-
-#, fuzzy
-#~ msgid "Apply Changes"
-#~ msgstr "Memorizza modifiche"
-
-#, fuzzy
-#~ msgid "Edit this item"
-#~ msgstr "Modifica istituto"
-
-#, fuzzy
-#~ msgid "return_date"
-#~ msgstr "Data creazione"
-
-#~ msgid "Record %s - Add a field"
-#~ msgstr "Record %s - Aggiungi un campo"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s"
-#~ msgstr "Modifica record %(x_recid)s, campo %(x_field)s"
-
-#~ msgid "Edit record %(x_recid)s, field %(x_field)s - Add a subfield"
-#~ msgstr ""
-#~ "Modifica record %(x_recid)s, campo %(x_field)s - Aggiungi un sotto-campo"
-
-#~ msgid "Submit and save record %s"
-#~ msgstr "Invia e memorizza record %s"
-
-#~ msgid "Your comment has been successfully posted"
-#~ msgstr "I tuoi commenti sono stati registrati con successo"
-
-#~ msgid "There are %i baskets"
-#~ msgstr "Ci sono %i cestini"
-
-#~ msgid "updated on"
-#~ msgstr "aggiornato il"
-
-#~ msgid ""
-#~ "This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe"
-#~ "%(x_url_close)s to it"
-#~ msgstr ""
-#~ "Questo cestino appartiene a %(x_name)s. Puoi liberamente "
-#~ "%(x_url_open)siscriverti%(x_url_close)s"
-
-#~ msgid "records"
-#~ msgstr "record"
-
-#~ msgid "Number of views"
-#~ msgstr "Numero di visualizzazioni"
-
-#~ msgid "Non-shared basket"
-#~ msgstr "Cestino non condiviso"
-
-#~ msgid "Group-shared basket"
-#~ msgstr "Cestino di gruppo"
-
-#~ msgid "comments"
-#~ msgstr "commenti"
-
-#~ msgid "last"
-#~ msgstr "ultimo"
-
-#~ msgid "View comments"
-#~ msgstr "Visualizza commenti"
-
-#~ msgid "There is a total of %i comments"
-#~ msgstr "In totale ci sono %i commenti"
-
-#~ msgid "Select basket"
-#~ msgstr "Seleziona cestino"
-
-#~ msgid "Add to a personal basket"
-#~ msgstr "Aggiungi ad un cestino personale"
-
-#~ msgid "%i baskets"
-#~ msgstr "%i cestini"
-
-#~ msgid "Add to a group-shared basket"
-#~ msgstr "Aggiungi ad un cestino di gruppo"
-
-#~ msgid "Adding %i records to these baskets"
-#~ msgstr "Aggiungo %i record a questi cestini"
-
-#~ msgid "No records were added to the selected baskets."
-#~ msgstr "Nessun record è stato aggiunto ai cestini selezionati."
-
-#~ msgid "Details and comments"
-#~ msgstr "Dettagli e commenti"
-
-#~ msgid "Add records to baskets"
-#~ msgstr "Aggiungi record ai cestini"
-
-#, fuzzy
-#~ msgid "Subscribe to this discussion"
-#~ msgstr "Iscriviti a questo cestino"
-
-#, fuzzy
-#~ msgid "Unsubscribe from this discussion"
-#~ msgstr "Disiscriviti da questo cestino"
-
-#, fuzzy
-#~ msgid "Delete comment(s) or supress abuse report(s)"
-#~ msgstr "Sopprimi rapporti di abuso"
-
-#, fuzzy
-#~ msgid "Delete Comments"
-#~ msgstr "Cancella commento"
-
-#~ msgid "ADD TO BASKET"
-#~ msgstr "AGGIUNGERE AL CESTINO"
-
-#, fuzzy
-#~ msgid "Frequently publishes in:"
-#~ msgstr "Pubblica in"
-
-#~ msgid "The collection to which this file belong is restricted: "
-#~ msgstr ""
-#~ "L'accesso alla collezione a cui appartiene questo file è ristretto: "
-
-#~ msgid "Do you really want to delete this record?"
-#~ msgstr "Sei sicuro di voler cancellare questo record?"
-
-#~ msgid ""
-#~ "Do you really want to revert to revision %(revdate)s of record #%(recid)s?"
-#~ msgstr ""
-#~ "Sei veramente sicuro di voler ritornare alla versione %(revdate)s del "
-#~ "record #%(recid)s?"
-
-#~ msgid ""
-#~ "The current version will be replaced with a copy of revision %(revdate)s"
-#~ msgstr ""
-#~ "La versione attuale verrà sostituita con una copia della versione "
-#~ "%(revdate)s"
-
-#~ msgid "You will also lose any unsubmitted changes for this record!"
-#~ msgstr ""
-#~ "Perderai inoltre tutte le modifiche non sottomesse di questo record!"
-
-#, fuzzy
-#~ msgid "This record does not exist. Please try another record ID."
-#~ msgstr "Per favore, prova un altro ID di record."
-
-#, fuzzy
-#~ msgid "Cannot edit deleted record.\""
-#~ msgstr "Non è possibile modificare record cancellati."
-
-#, fuzzy
-#~ msgid ""
-#~ "This record is currently being edited by another user. Please try again "
-#~ "later."
-#~ msgstr "Al momento, un altro utente sta modificando questo record."
-
-#~ msgid ""
-#~ "Your modifications have now been submitted. They will be processed as "
-#~ "soon as the task queue is empty."
-#~ msgstr ""
-#~ "Le tue modifiche sono state inviate. Verranno elaborate non appena la "
-#~ "coda dei processi sarà vuota."
-
-#~ msgid "The record will be deleted as soon as the task queue is empty."
-#~ msgstr ""
-#~ "Il record verrà cancellato non appena la coda dei processi sarà vuota."
-
-#~ msgid "Please enter the ID of the record you want to edit"
-#~ msgstr "Per favore, inserisci l'ID del record che desideri modificare"
-
-#~ msgid "Move up"
-#~ msgstr "Sposta elemento in alto"
-
-#~ msgid "Move down"
-#~ msgstr "Sposta elemento in basso"
-
-#~ msgid "Add Subfield"
-#~ msgstr "Aggiungi sotto-campo"
-
-#~ msgid "Edit institute"
-#~ msgstr "Modifica istituto"
-
-#~ msgid "Add Field"
-#~ msgstr "Aggiungi campo"
-
-#~ msgid "Verbose"
-#~ msgstr "Prolisso"
-
-#~ msgid "Display"
-#~ msgstr "Visualizza"
-
-#~ msgid "Done"
-#~ msgstr "Fatto"
-
-#~ msgid "Add another subfield"
-#~ msgstr "Aggiungi un altro sotto-campo"
-
-#~ msgid ""
-#~ "Tags and values should be filled before pressing Done or Add another "
-#~ "subfield"
-#~ msgstr ""
-#~ "I tag e i valori dovrebbero essere riempiti prima di premere Fatto o "
-#~ "Aggiungi un altro sotto-campo"
-
-#~ msgid "Your changes are TEMPORARY."
-#~ msgstr "Le tue modifiche sono TEMPORANEE."
-
-#~ msgid "To save this record, please click on submit."
-#~ msgstr "Per memorizzare questo record, fai clic su invia."
-
-#, fuzzy
-#~ msgid "Revision %(revdate)s"
-#~ msgstr "Record #%(recid)s, revisione %(revdate)s"
-
-#, fuzzy
-#~ msgid "current version"
-#~ msgstr "Membri attuali"
-
-#, fuzzy
-#~ msgid "View revision"
-#~ msgstr "divisione"
-
-#, fuzzy
-#~ msgid "Back to BibEdit"
-#~ msgstr "Torna ai cestini"
-
-#, fuzzy
-#~ msgid "select_from1"
-#~ msgstr "seleziona utente"
-
-#, fuzzy
-#~ msgid "select_to1"
-#~ msgstr "Seleziona argomento"
-
-#, fuzzy
-#~ msgid "No more requests are waiting."
-#~ msgstr "Alcuni documenti in sospeso."
-
-#, fuzzy
-#~ msgid "next page >>>"
-#~ msgstr "Pagina successiva"
-
-#, fuzzy
-#~ msgid "<<< previous page"
-#~ msgstr "Pagina precedente"
-
-#, fuzzy
-#~ msgid "last page >>|"
-#~ msgstr "ultimo aggiornamento"
-
-#, fuzzy
-#~ msgid "from"
-#~ msgstr "Da:"
-
-#~ msgid "Please try again later."
-#~ msgstr "Per favore, riprova più tardi."
-
-#~ msgid "There are record revisions not yet synchronized with the database."
-#~ msgstr ""
-#~ "Alcune revisioni del record non sono ancora state sincronizzate nel "
-#~ "database."
-
-#~ msgid "Please try again in a few minutes."
-#~ msgstr "Per favore, riprova tra qualche minuto."
-
-#~ msgid ""
-#~ "A new revision of this record is not yet synchronized with the database."
-#~ msgstr ""
-#~ "Una nuova revisione di questo record non è ancora stata sincronizzata con "
-#~ "il database."
-
-#~ msgid ""
-#~ "The new revision is being synchronized with the database and will be "
-#~ "ready shortly."
-#~ msgstr ""
-#~ "È in corso la sincronizzazione della nuova revisione con il database. La "
-#~ "revisione sarà disponibile in breve tempo."
-
-#~ msgid "View all reported reviews"
-#~ msgstr "Visualizza tutte le recensioni riportate"
-
-#~ msgid "Delete a specific comment/review (by ID)"
-#~ msgstr "Cancella uno specifico commento/recensione (tramite ID)"
-
-#~ msgid ""
-#~ "Before you add your comment, you need to %(x_url_open)slogin"
-#~ "%(x_url_close)s first."
-#~ msgstr ""
-#~ "Prima di aggiungere il tuo commento, devi innanzitutto "
-#~ "%(x_url_open)sautenticarti%(x_url_close)s."
-
-#~ msgid "session"
-#~ msgstr "sessione"
-
-#~ msgid "alerts"
-#~ msgstr "avvisi"
-
-#~ msgid "account"
-#~ msgstr "account"
-
-#~ msgid "messages"
-#~ msgstr "messaggi"
-
-#~ msgid "groups"
-#~ msgstr "gruppi"
-
-#~ msgid "submissions"
-#~ msgstr "sottomissioni"
-
-#~ msgid "approvals"
-#~ msgstr "approvazioni"
-
-#~ msgid "Unknown form field found on one of the submission pages."
-#~ msgstr ""
-#~ "Campo del modulo sconosciuto trovato in una delle pagine di sottomissione."
-
-#~ msgid "List of specific approvals"
-#~ msgstr "Elenco di classi di approvazione"
-
-#~ msgid "List of publication categories"
-#~ msgstr "Elenco delle categorie di pubblicazioni"
-
-#~ msgid "List of direct approval categories"
-#~ msgstr "Elenco delle categorie ad approvazione diretta"
-
-#~ msgid "Specific Approval and Refereeing Workflow"
-#~ msgstr "Processo specifico di approvazione e refereeing"
-
-#~ msgid "Internal configuration error"
-#~ msgstr "Errore di configurazione interno"
-
-#~ msgid "There is no format configured for this journals index page"
-#~ msgstr ""
-#~ "Non è stato configurato alcun formato per questa pagina indice di giornale"
-
-#~ msgid "There is no format configured for this journals search page"
-#~ msgstr ""
-#~ "Non è stato configurato alcun formato per questa pagina di ricerca di "
-#~ "giornale"
-
-#~ msgid "There is no format configured for this journals popup page"
-#~ msgstr ""
-#~ "Non è stato configurato alcun formato per questa pagina a comparsa di "
-#~ "giornale"

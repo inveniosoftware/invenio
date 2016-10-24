@@ -1,34 +1,22 @@
-# # This file is part of Invenio.
-# # Copyright (C) 2010, 2011 CERN.
-# #
-# # Invenio is free software; you can redistribute it and/or
-# # modify it under the terms of the GNU General Public License as
-# # published by the Free Software Foundation; either version 2 of the
-# # License, or (at your option) any later version.
-# #
-# # Invenio is distributed in the hope that it will be useful, but
-# # WITHOUT ANY WARRANTY; without even the implied warranty of
-# # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# # General Public License for more details.
-# #
-# # You should have received a copy of the GNU General Public License
-# # along with Invenio; if not, write to the Free Software Foundation, Inc.,
-# # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR CERN
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.1.6\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2014-08-31 22:26+0200\n"
-"PO-Revision-Date: 2010-07-27 15:13+0100\n"
-"Last-Translator: Nino Jejelava <nino.jejelava@gmail.com>\n"
-"Language-Team: KA <info@invenio-software.org>\n"
-"Language: \n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Tibor Simko <tibor.simko@cern.ch>, 2016\n"
+"Language-Team: Georgian (https://www.transifex.com/inveniosoftware/teams/23537/ka/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ka\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Virtaal 0.6.1\n"
-"Generated-By: pygettext.py 1.5\n"
 
 #: modules/websearch/doc/search-guide.webdoc:361
 #: modules/websearch/doc/search-guide.webdoc:396
@@ -798,9 +786,8 @@ msgid "Search"
 msgstr "ძებნა"
 
 #: modules/webhelp/web/help-central.webdoc:133
-#, fuzzy
 msgid "Citation Metrics"
-msgstr "ციტირებები"
+msgstr ""
 
 #: modules/websearch/doc/search-guide.webdoc:224
 #: modules/websearch/doc/search-guide.webdoc:248
@@ -1398,14 +1385,12 @@ msgid "Click here to review the transactions."
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:309
-#, fuzzy
 msgid "Quit searching."
-msgstr "ძებნის განხორციელება"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:515
-#, fuzzy
 msgid "Your options"
-msgstr "სესხის პარამეტრები"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:525
 msgid "Claim for yourself"
@@ -1416,30 +1401,26 @@ msgid "Attribute to"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:533
-#, fuzzy
 msgid "Search for a person to attribute the paper to"
-msgstr "თქვენ მომდებნო ჯგუფების წევრი ბრძანდებით:"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:593
 #: modules/bibauthorid/lib/bibauthorid_templates.py:687
 #: modules/bibauthorid/lib/bibauthorid_templates.py:759
-#, fuzzy
 msgid "Select All"
-msgstr "ყველაფრის წაშლა"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:594
 #: modules/bibauthorid/lib/bibauthorid_templates.py:688
 #: modules/bibauthorid/lib/bibauthorid_templates.py:760
-#, fuzzy
 msgid "Select None"
-msgstr "ქულის შერჩევა"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:595
 #: modules/bibauthorid/lib/bibauthorid_templates.py:689
 #: modules/bibauthorid/lib/bibauthorid_templates.py:761
-#, fuzzy
 msgid "Invert Selection"
-msgstr "რეფერის შერჩევა"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:597
 #: modules/bibauthorid/lib/bibauthorid_templates.py:691
@@ -1452,14 +1433,12 @@ msgid "Paper Short Info"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:617
-#, fuzzy
 msgid "Author Name"
-msgstr "ავტორი"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:618
-#, fuzzy
 msgid "Affiliation"
-msgstr "წევრობა:"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:619
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:535
@@ -1470,9 +1449,8 @@ msgid "Date"
 msgstr "თარიღი"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:620
-#, fuzzy
 msgid "Experiment"
-msgstr "ექსპერიმენტი"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:621
 #: modules/bibauthorid/lib/bibauthorid_templates.py:736
@@ -1482,14 +1460,12 @@ msgid "Actions"
 msgstr "მოქმედებები"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:641
-#, fuzzy
 msgid "Not assigned"
-msgstr "არ არის დაყენებული"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:657
-#, fuzzy
 msgid "No status information found."
-msgstr "ინფრომაცია სასხის თაობაზე"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:678
 msgid "Operator review of user actions pending"
@@ -1500,19 +1476,16 @@ msgid "Sorry, there are currently no records to be found in this category."
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:751
-#, fuzzy
 msgid "Review Transaction"
-msgstr "რევიზია"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:758
-#, fuzzy
 msgid "On all pages"
-msgstr "ყველა ცვლილების გაუქმება"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:765
-#, fuzzy
 msgid "With selected do"
-msgstr "უაყოფილ იქნა:"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:794
 msgid "Names variants"
@@ -1533,43 +1506,36 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_templates.py:944
 #: modules/bibauthorid/lib/bibauthorid_templates.py:945
 #: modules/bibauthorid/lib/bibauthorid_templates.py:948
-#, fuzzy
 msgid "Not provided"
-msgstr "ჯერ არ არის განხილული"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:946
-#, fuzzy
 msgid "Not available"
-msgstr "არ არის ხელმისაწვდომი ჟურნალი"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:947
-#, fuzzy
 msgid "No comments"
-msgstr "კომენტარების ჩვენება"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:949
-#, fuzzy
 msgid "Not Available"
-msgstr "ინფორმაცია ხელმიუწვდომელია"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:969
-#, fuzzy
 msgid " Delete this ticket"
-msgstr "კალათის წაშლა"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:973
 msgid " Commit this entire ticket"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:993
-#, fuzzy
 msgid "No title available"
-msgstr "არ არის ხელმისაწვდომი ჟურნალი"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1080
-#, fuzzy
 msgid "Choose system"
-msgstr "აირჩიეთ შაბლონი"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1108
 msgid "Make sure we match the right names!"
@@ -1593,31 +1559,27 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1122
 msgid ""
-"(the names will be automatically gathered when the first paper is claimed to "
-"this profile)."
+"(the names will be automatically gathered when the first paper is claimed to"
+" this profile)."
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1124
-#, fuzzy
 msgid "Select name for"
-msgstr "ქულის შერჩევა"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1133
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1160
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1304
-#, fuzzy
 msgid "Error retrieving record title"
-msgstr "ჩანაწერის გამოტანისას აღმოჩდა შეცდომა"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1136
-#, fuzzy
 msgid "Paper title: "
-msgstr "პერიოდული სათაური"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1148
-#, fuzzy
 msgid "The following names have been automatically chosen:"
-msgstr "შემდეგი ფაილები წარმატებით დამატებულია რიგში:"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1153
 #: modules/websubmit/lib/websubmit_templates.py:1212
@@ -1634,9 +1596,8 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1218
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1234
-#, fuzzy
 msgid "Navigation:"
-msgstr "ციტირებები:"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1219
 msgid "Run paper attribution for another author"
@@ -1644,19 +1605,16 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1220
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1237
-#, fuzzy
 msgid "Person Interface FAQ"
-msgstr "გამოქვეყნების ინტერფეისი"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1235
-#, fuzzy
 msgid "Person Search"
-msgstr "ძებნა"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1236
-#, fuzzy
 msgid "Open tickets"
-msgstr "ბილეთები"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1265
 msgid "Symbols legend: "
@@ -1692,9 +1650,8 @@ msgid ""
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1322
-#, fuzzy
 msgid "Selected name on paper"
-msgstr "ქულის შერჩევა"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1333
 msgid "Verification needed to continue"
@@ -1705,14 +1662,12 @@ msgid "This will create a request for the operators"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1375
-#, fuzzy
 msgid "Please provide your information"
-msgstr "იმფორმაცია ახალ გამყიდველზე"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1382
-#, fuzzy
 msgid "Please provide your first name"
-msgstr "გთხოვთ ჯერ შეხვიდეთ. "
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1386
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1388
@@ -1725,9 +1680,8 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1399
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1401
-#, fuzzy
 msgid "Your last name:"
-msgstr "თქვენი კრედითები"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1409
 msgid "Please provide your eMail address"
@@ -1741,32 +1695,28 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1420
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1422
-#, fuzzy
 msgid "Your eMail:"
-msgstr "თქვენი ცვლილებები"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1426
 msgid "You may leave a comment (optional)"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1439
-#, fuzzy
 msgid "Continue claiming*"
-msgstr "განაგრძე ყველა შემთხვევაში"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1441
 msgid "Confirm these changes**"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1444
-#, fuzzy
 msgid "!Delete the entire request!"
-msgstr "არჩეული განხილვების წაშლა"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1457
-#, fuzzy
 msgid "Mark as your documents"
-msgstr "ყველა ტიპის დოკუმეტი"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1472
 msgid "Mark as _not_ your documents"
@@ -1777,9 +1727,8 @@ msgid "Nothing staged as not yours"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1487
-#, fuzzy
 msgid "Mark as their documents"
-msgstr "დოკუმეტთან დაბრუნება"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1498
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1513
@@ -1787,9 +1736,8 @@ msgid "Nothing staged in this category"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1502
-#, fuzzy
 msgid "Mark as _not_ their documents"
-msgstr "დოკუმეტთან დაბრუნება"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1519
 msgid "  * You can come back to this page later. Nothing will be lost. <br />"
@@ -1804,21 +1752,19 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1576
 #, python-format
 msgid ""
-"We do not have a publication list for '%s'. Try using a less specific author "
-"name, or check back in a few days as attributions are updated frequently.  "
+"We do not have a publication list for '%s'. Try using a less specific author"
+" name, or check back in a few days as attributions are updated frequently.  "
 "Or you can send us feedback, at "
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1589
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1701
-#, fuzzy
 msgid "Create a new Person for your search"
-msgstr "ვერაფერი იქნა ნაპოვნი"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1644
-#, fuzzy
 msgid "Recent Papers"
-msgstr "სტატიები:"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1658
 msgid "YES!"
@@ -1830,18 +1776,16 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1665
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1687
-#, fuzzy
 msgid "Publication List "
-msgstr "გამოქვეყნების თარიღი"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1672
 msgid "Showing the"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1672
-#, fuzzy
 msgid "most recent documents:"
-msgstr "მიმთითებელი დოკუმენტების სია"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1681
 msgid "Sorry, there are no documents known for this person"
@@ -1862,9 +1806,8 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:266
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:309
-#, fuzzy
 msgid "Fatal: You are not allowed to access this functionality."
-msgstr "თქვენ არ გაქვთ უფლებები რომ შეასწოროთ ადმინისტრაციული ფუნქციები."
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:653
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:754
@@ -1884,9 +1827,8 @@ msgid "Papers in need of review"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:655
-#, fuzzy
 msgid "Open Tickets"
-msgstr "თქვენი ბილეთები"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:655
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:720
@@ -1915,9 +1857,8 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:725
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:761
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:917
-#, fuzzy
 msgid "Additional Data for this Person"
-msgstr "დამათებითი ინფორმაცია"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:662
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:726
@@ -1948,9 +1889,8 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:730
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:766
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:941
-#, fuzzy
 msgid "Forget decision"
-msgstr "მიიღეთ გადაწყვეტილება"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:667
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:681
@@ -1958,9 +1898,8 @@ msgstr "მიიღეთ გადაწყვეტილება"
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:781
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:942
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:956
-#, fuzzy
 msgid "Confirm!"
-msgstr "დაადასტურეთ"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:668
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:768
@@ -1971,9 +1910,8 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:669
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:769
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:944
-#, fuzzy
 msgid "Rejected!"
-msgstr "უაყოფილია"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:670
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:770
@@ -2014,9 +1952,8 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:673
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:773
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:948
-#, fuzzy
 msgid "Confirmed."
-msgstr "დაადასტურეთ"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:674
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:774
@@ -2033,9 +1970,8 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:783
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:950
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:958
-#, fuzzy
 msgid "Forget decision!"
-msgstr "მიიღეთ გადაწყვეტილება"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:676
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:684
@@ -2043,9 +1979,8 @@ msgstr "მიიღეთ გადაწყვეტილება"
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:784
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:951
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:959
-#, fuzzy
 msgid "Forget decision."
-msgstr "მიიღეთ გადაწყვეტილება"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:677
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:777
@@ -2079,15 +2014,13 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:718
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:721
-#, fuzzy
 msgid "Your papers"
-msgstr "თქვენი ცვლილებები"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:718
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:722
-#, fuzzy
 msgid "Not your papers"
-msgstr "დაკარგეთ თქვენი პაროლი?"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:720
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:724
@@ -2101,9 +2034,8 @@ msgid "These are mine!"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:728
-#, fuzzy
 msgid "These are not mine!"
-msgstr "სესხები არ არის."
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:729
 msgid "It's not mine, but I know whose it is!"
@@ -2119,18 +2051,16 @@ msgid "This is my paper!"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:733
-#, fuzzy
 msgid "Not mine!"
-msgstr "არ არის დაყენებული"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:734
 msgid "This is not my paper!"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:737
-#, fuzzy
 msgid "Not Mine."
-msgstr "არ არის დაყენებული"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:738
 msgid "Marked as my paper!"
@@ -2142,9 +2072,8 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:741
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:749
-#, fuzzy
 msgid "Not Mine!"
-msgstr "არ არის დაყენებული"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:742
 msgid "But this is mine!"
@@ -2163,38 +2092,32 @@ msgstr ""
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:362
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:442
 #: modules/websearch/lib/websearch_templates.py:4209
-#, fuzzy
 msgid "Papers"
-msgstr "სტატიები:"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:760
 msgid "Tickets you created about this person"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:912
-#, fuzzy
 msgid "Tickets"
-msgstr "ბილეთები"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:916
-#, fuzzy
 msgid "Request Tickets"
-msgstr "მოთხოვნები"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:1180
-#, fuzzy
 msgid "Submit Attribution Information"
-msgstr "ამონეჭდეთ ინფრომაცია სესხზე"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:1325
-#, fuzzy
 msgid "Please review your actions"
-msgstr "გთხოვთ მონიშნოთ მოქმედება"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2078
-#, fuzzy
 msgid "Claim this paper"
-msgstr "დაუმატეთ ეს მომხმარებელი"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2179
 msgid ""
@@ -2242,9 +2165,9 @@ msgid "Error"
 msgstr "შეცდომა"
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:45
-#, fuzzy, python-format
+#, python-format
 msgid "You have %i tickets."
-msgstr "თქვენი ბილეთები"
+msgstr ""
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:52
 #: modules/bibknowledge/lib/bibknowledge_templates.py:167
@@ -2279,19 +2202,19 @@ msgid "Not authorized"
 msgstr "არაა აუტორიზირებული"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:79
-#, fuzzy, python-format
+#, python-format
 msgid "ERROR: %s does not exist"
-msgstr "მომხმარებელი %s არ არსებობს."
+msgstr ""
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:81
-#, fuzzy, python-format
+#, python-format
 msgid "ERROR: %s is not a directory"
-msgstr "არ არის დირექტორია"
+msgstr ""
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:83
-#, fuzzy, python-format
+#, python-format
 msgid "ERROR: %s is not writable"
-msgstr "არ არის ჩაწერადი"
+msgstr ""
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:116
 msgid "Limit to knowledge bases containing string:"
@@ -2363,33 +2286,33 @@ msgid "Edit BibCheck config file"
 msgstr "ბიბშემოწმების კონფიგურაციის ფაილის რედაქტირება"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:268
-#, fuzzy, python-format
+#, python-format
 msgid "File %s already exists."
-msgstr "უკვე არსებობს."
+msgstr ""
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:271
-#, fuzzy, python-format
+#, python-format
 msgid "File %s: written OK."
-msgstr "დაწერილია  OK."
+msgstr ""
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:277
-#, fuzzy, python-format
+#, python-format
 msgid "File %s: write failed."
-msgstr "ჩაწერა ვერ მოხერხდა."
+msgstr ""
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:279
 msgid "Save BibCheck config file"
 msgstr "ბიბშემოწმების კონფიგურაციის ფაილის შენახვა"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:312
-#, fuzzy, python-format
+#, python-format
 msgid "File %s deleted."
-msgstr "ფაილი %s არ არსებობს."
+msgstr ""
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:314
-#, fuzzy, python-format
+#, python-format
 msgid "File %s: delete failed."
-msgstr "წაშლა ვერ განხორციელდა"
+msgstr ""
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:316
 msgid "Delete BibCheck config file"
@@ -3137,13 +3060,11 @@ msgid "OK"
 msgstr "დიახ"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1561
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "The item %(x_title)s with barcode %(x_barcode)s has been returned with "
 "success."
 msgstr ""
-"ჩანაწერი <strong>%s</strong>, ბარკოდით <strong>%s</strong>, წარმატებით "
-"დაბრუნებულია."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1617
 msgid "Loan informations"
@@ -3578,9 +3499,8 @@ msgid "Item details"
 msgstr "ჩანაწერზე დეტალები"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2825
-#, fuzzy
 msgid "Edit this record"
-msgstr "ჩანაწერის რედაქტირება "
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2827
 msgid "Additional details"
@@ -4266,7 +4186,8 @@ msgstr "შიდა ბიბლიოთეკური მოთხოვნ�
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11014
 #, python-format
 msgid ""
-"I accept the %s of the service in particular the return of books in due time."
+"I accept the %s of the service in particular the return of books in due "
+"time."
 msgstr "მე ვეთანხმები %s სერვისს, კერძოდ წიგნის დროულად დაბრუნებას."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10808
@@ -4280,19 +4201,16 @@ msgid "Supplier"
 msgstr "მომწოდებელი"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11062
-#, fuzzy
 msgid "Interest from"
-msgstr "საინტერესო_პერიოდი_დან"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11407
-#, fuzzy
 msgid "Periodical Title"
-msgstr "პერიოდული სათაური"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11409
-#, fuzzy
 msgid "Article Title"
-msgstr "სტატიის სათაური"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11413
 msgid "Volume, Issue, Page"
@@ -4501,9 +4419,11 @@ msgstr "ბეჭვდითი ფორმატი"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15509
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15667
 msgid ""
-"Check if the book already exists on Invenio, before to send your ILL request."
+"Check if the book already exists on Invenio, before to send your ILL "
+"request."
 msgstr ""
-"შეამოწმეთ თუ წიგნი უკვე არსებობს Invenio -ზე, სანამ გააგზავნით ILL მოთხოვნას."
+"შეამოწმეთ თუ წიგნი უკვე არსებობს Invenio -ზე, სანამ გააგზავნით ILL "
+"მოთხოვნას."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15533
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15696
@@ -4613,10 +4533,10 @@ msgstr "მოთხოვნილი ჩანაჭერი არ არს
 #: modules/bibclassify/lib/bibclassify_templates.py:128
 #: modules/bibclassify/lib/bibclassify_templates.py:187
 msgid ""
-"Automatically generated <span class=\"keyword single\">single</span>,        "
-"<span class=\"keyword composite\">composite</span>, <span class=\"keyword "
-"author-kw\">author</span>,        and <span class=\"keyword other-kw\">other "
-"keywords</span>."
+"Automatically generated <span class=\"keyword single\">single</span>,"
+"        <span class=\"keyword composite\">composite</span>, <span "
+"class=\"keyword author-kw\">author</span>,        and <span class=\"keyword "
+"other-kw\">other keywords</span>."
 msgstr ""
 
 #: modules/bibclassify/lib/bibclassify_templates.py:233
@@ -4624,9 +4544,8 @@ msgid "Automated keyword extraction wasn't run for this document yet."
 msgstr ""
 
 #: modules/bibclassify/lib/bibclassify_templates.py:233
-#, fuzzy
 msgid "Generate keywords"
-msgstr "ხშირი საკვანძო სიტყვები:"
+msgstr ""
 
 #: modules/bibclassify/lib/bibclassify_templates.py:245
 msgid "There are no suitable keywords for display in this record."
@@ -4637,14 +4556,14 @@ msgid "Show more..."
 msgstr ""
 
 #: modules/bibclassify/lib/bibclassify_templates.py:320
-#, fuzzy, python-format
+#, python-format
 msgid "Unweighted %s keywords:"
-msgstr "ციტირებლია: %s ჩანაწერის მიერ"
+msgstr ""
 
 #: modules/bibclassify/lib/bibclassify_templates.py:326
-#, fuzzy, python-format
+#, python-format
 msgid "Weighted %s keywords:"
-msgstr "ციტირებლია: %s ჩანაწერის მიერ"
+msgstr ""
 
 #: modules/bibclassify/lib/bibclassify_templates.py:365
 #: modules/websearch/lib/websearchadminlib.py:3397
@@ -4664,9 +4583,9 @@ msgid "XML"
 msgstr ""
 
 #: modules/bibclassify/lib/bibclassify_webinterface.py:141
-#, fuzzy, python-format
+#, python-format
 msgid "Unknown type: %s"
-msgstr "დოკუმენტის ტიპი უცნობია"
+msgstr ""
 
 #: modules/bibclassify/lib/bibclassify_webinterface.py:236
 msgid "The site settings do not allow automatic keyword extraction"
@@ -4680,8 +4599,8 @@ msgstr ""
 
 #: modules/bibclassify/lib/bibclassify_webinterface.py:263
 msgid ""
-"Unfortunately, we don't have a PDF fulltext for this record in the "
-"storage,                     keywords cannot be generated using an automated "
+"Unfortunately, we don't have a PDF fulltext for this record in the storage,"
+"                     keywords cannot be generated using an automated "
 "process."
 msgstr ""
 
@@ -4717,7 +4636,8 @@ msgstr ""
 #, python-format
 msgid ""
 "The uploaded file is too small (<%i o) and has therefore not been considered"
-msgstr "ატვირთული ფაილი მეტისმეტად პატარაა (<%i o) და ამიტომ არ იქნა განხილული"
+msgstr ""
+"ატვირთული ფაილი მეტისმეტად პატარაა (<%i o) და ამიტომ არ იქნა განხილული"
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:582
 #, python-format
@@ -4728,14 +4648,16 @@ msgstr "ატვირთული ფაილი მეტისმეტა�
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:589
 msgid ""
 "The uploaded file name is too long and has therefore not been considered"
-msgstr "ატვირთული ფაილის სახელი მეტისმეტად გრძელია და ამიტომ არ იქნა განხილული"
+msgstr ""
+"ატვირთული ფაილის სახელი მეტისმეტად გრძელია და ამიტომ არ იქნა განხილული"
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:601
 msgid ""
 "You have already reached the maximum number of files for this type of "
 "document"
 msgstr ""
-"ამ ტიპის დოკუმეტის კვალობაზე თქვენ უკვე მიაღწიეთ მაქსიმალურ რიცხვს ფაილებისა "
+"ამ ტიპის დოკუმეტის კვალობაზე თქვენ უკვე მიაღწიეთ მაქსიმალურ რიცხვს ფაილებისა"
+" "
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:624
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:635
@@ -4757,9 +4679,9 @@ msgid ""
 "names. Choose a different name and upload your file again. In particular, "
 "note that you should not include the extension in the renaming field."
 msgstr ""
-"თქვენ არ გაქვთ წერტილის გამოყენების უფლება '.', ირიბის '/', ან უკუირიბის '\\"
-"\\' ფაილის სახელებში. არჩიეთ სხვა სახელი და ხელმეორედ ატვირთეტ. კერძოდ თქვენ "
-"არუნდა მიუთითოთ ფალის გაფართოება ფაილის გადარქმევისას."
+"თქვენ არ გაქვთ წერტილის გამოყენების უფლება '.', ირიბის '/', ან უკუირიბის "
+"'\\\\' ფაილის სახელებში. არჩიეთ სხვა სახელი და ხელმეორედ ატვირთეტ. კერძოდ "
+"თქვენ არუნდა მიუთითოთ ფალის გაფართოება ფაილის გადარქმევისას."
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:834
 msgid "Choose how you want to restrict access to this file."
@@ -4784,7 +4706,8 @@ msgstr ""
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:900
 msgid ""
-"Alternative formats uploaded for current version of this file will be removed"
+"Alternative formats uploaded for current version of this file will be "
+"removed"
 msgstr "ალტერნატიული ფორმატები აიტვირთა ამ ფაილის მიმდინარე ვერსიისათვის "
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:901
@@ -4797,14 +4720,12 @@ msgid "Upload"
 msgstr "ატვირთვა"
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:904
-#, fuzzy
 msgid "Uploading..."
-msgstr "ატვირთვა"
+msgstr ""
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:905
-#, fuzzy
 msgid "Please wait..."
-msgstr "გთხოვთ სცადოთ კიდევ ერთხელ."
+msgstr ""
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:918
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:452
@@ -4826,8 +4747,7 @@ msgid ""
 "Best regards"
 msgstr ""
 "ძვირფასო მხარაჭერის გუნდო,\n"
-"მე მჭირდება დახმარება შესასწორებლად ან დასამატებლად შემდეგი ჩანაწერის "
-"%(recid)s.\n"
+"მე მჭირდება დახმარება შესასწორებლად ან დასამატებლად შემდეგი ჩანაწერის %(recid)s.\n"
 "ახალ ვერსიას გიგზავნით ატაჩმენტით.\n"
 "საუკეთესო სურვილებით"
 
@@ -4846,8 +4766,8 @@ msgid ""
 "Having a problem adding or revising a file? Send the new/revised version to "
 "%(mailto_link)s."
 msgstr ""
-"ფაილის დამატებისას ან შესწორებისას პრობლემა შეგექმნათ? გაგზავნეთ ახალი/"
-"შეცვლილი ვერსია შემდეგ მისამართზე %(mailto_link)s."
+"ფაილის დამატებისას ან შესწორებისას პრობლემა შეგექმნათ? გაგზავნეთ "
+"ახალი/შეცვლილი ვერსია შემდეგ მისამართზე %(mailto_link)s."
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:1059
 msgid "revise"
@@ -4882,9 +4802,8 @@ msgstr "ფაილი(s)"
 
 #: modules/bibdocfile/lib/bibdocfile_templates.py:147
 #: modules/webstyle/lib/webstyle_templates.py:745
-#, fuzzy
 msgid "Restricted"
-msgstr "აკრძალული"
+msgstr ""
 
 #: modules/bibdocfile/lib/bibdocfile_templates.py:152
 msgid "see"
@@ -4903,9 +4822,10 @@ msgstr "მოთხოვნილი ჩანაწერილი არ ა
 
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:137
 msgid ""
-"The system has encountered an error in retrieving the list of files for this "
-"document."
-msgstr "სისტემამ შეამჩნია შეცდომა ამ დოკუმენტისათვის ფაილების სიის მოძიებისას."
+"The system has encountered an error in retrieving the list of files for this"
+" document."
+msgstr ""
+"სისტემამ შეამჩნია შეცდომა ამ დოკუმენტისათვის ფაილების სიის მოძიებისას."
 
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:138
 #: modules/websession/lib/websession_webinterface.py:1005
@@ -4915,9 +4835,9 @@ msgid ""
 msgstr "შეცდომა შენახულია და შესწორდება რაც შეიძლება მალე."
 
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:199
-#, fuzzy, python-format
+#, python-format
 msgid "The format %s does not exist for the given version: %s"
-msgstr "ფაილი %s არ არსებობს."
+msgstr ""
 
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:213
 msgid "This file is restricted: "
@@ -4928,11 +4848,8 @@ msgid "An error has happened in trying to stream the request file."
 msgstr "მოთხოვნილი ფაილის დამუშავებისას შიქმნა შეცდომა."
 
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:228
-#, fuzzy
 msgid "The requested file is hidden and can not be accessed."
 msgstr ""
-"მოთხოვნილი ფაილი დამალულია და თქვენ არ გაქვთ საკმარისი უფლებები რომ იხილოთ "
-"იგი."
 
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:235
 msgid "Requested file does not seem to exist."
@@ -5016,14 +4933,12 @@ msgid "Search criteria"
 msgstr "ძებნის კრიტერიუმი"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:332
-#, fuzzy
 msgid "Output tags"
-msgstr "გამავალი ფორმატი"
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:333
-#, fuzzy
 msgid "Filter collection"
-msgstr "კოლექცია"
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:334
 msgid "1. Choose search criteria"
@@ -5040,9 +4955,8 @@ msgstr ""
 "კრიტერიის მიხედვით."
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:337
-#, fuzzy
 msgid "Preview results"
-msgstr "წინასწარი შედეგები"
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:571
 msgid "2. Define changes"
@@ -5057,14 +4971,12 @@ msgstr ""
 "ჩანაწერში, რომელიც ემთხვევა ძიების კრიტერიას."
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:573
-#, fuzzy
 msgid "Define new field action"
-msgstr "განსაზღვრეთ მინდვრის მოქმედება"
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:574
-#, fuzzy
 msgid "Define new subfield action"
-msgstr "განსაზღვრეთ ქვემინდვრის მოქმედება"
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:575
 #: modules/webalert/lib/webalert_templates.py:77
@@ -5072,9 +4984,8 @@ msgid "Field"
 msgstr "ველი"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:576
-#, fuzzy
 msgid "Select action"
-msgstr "ქულის შერჩევა"
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:577
 msgid "Add field"
@@ -5105,23 +5016,20 @@ msgid "Save"
 msgstr "დამახსოვრება"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:584
-#, fuzzy
 msgid "Replace substring"
-msgstr "შემადგენლობის წაშლა"
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:585
-#, fuzzy
 msgid "Replace full content"
-msgstr "შემადგენლობის წაშლა"
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:586
 msgid "with"
 msgstr "ით"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:587
-#, fuzzy
 msgid "when subfield $$"
-msgstr "ქვემინდვრის დამატება"
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:588
 msgid "new value"
@@ -5140,19 +5048,16 @@ msgid "does not exist"
 msgstr "არ არსებობს"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:592
-#, fuzzy
 msgid "condition"
-msgstr "ჩასწორება"
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:593
-#, fuzzy
 msgid "when other subfield"
-msgstr "ქვემინდვრის წაშლა"
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:594
-#, fuzzy
 msgid "when subfield"
-msgstr "ქვემინდვრის დამატება"
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:595
 msgid "Apply only to specific field instances"
@@ -5170,8 +5075,8 @@ msgstr "უკან შედეგებთან"
 msgid ""
 "WARNING: The following records are pending execution                        "
 "in the task queue.                        If you proceed with the changes, "
-"the modifications made                        with other tool (e.g. BibEdit) "
-"to these records will                        be lost"
+"the modifications made                        with other tool (e.g. BibEdit)"
+" to these records will                        be lost"
 msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:691
@@ -5223,8 +5128,8 @@ msgstr ""
 #: modules/bibencode/lib/bibencode_batch_engine.py:125
 #, python-format
 msgid ""
-"You might want to take a look at  %(guidelines_url)s and modify or redo your "
-"submission."
+"You might want to take a look at  %(guidelines_url)s and modify or redo your"
+" submission."
 msgstr ""
 
 #: modules/bibencode/lib/bibencode_batch_engine.py:136
@@ -5238,9 +5143,9 @@ msgid "Your video submission%(submission_title)s was successfully processed."
 msgstr ""
 
 #: modules/bibencode/lib/bibencode_batch_engine.py:164
-#, fuzzy, python-format
+#, python-format
 msgid "Your video is now available here: %(record_url)s."
-msgstr "სიტყვის ინდეხი არ არის ხელმისაწვდომი %s -სათვის."
+msgstr ""
 
 #: modules/bibencode/lib/bibencode_batch_engine.py:166
 #, python-format
@@ -5355,9 +5260,8 @@ msgid "None"
 msgstr "არცერთი"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:672
-#, fuzzy
 msgid "Manually"
-msgstr "სახელმძღვანელო"
+msgstr ""
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:674
 msgid "Daily"
@@ -5449,9 +5353,9 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_bfx_engine.py:486
 #: modules/bibformat/lib/bibformat_bfx_engine.py:537
 #: modules/bibformat/lib/bibformat_bfx_engine.py:733
-#, fuzzy, python-format
+#, python-format
 msgid "Field %s is not defined."
-msgstr "ფაილი %s არ არსებობს."
+msgstr ""
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:452
 msgid "Missing attribute \"value\" in TEXT."
@@ -5466,9 +5370,9 @@ msgid "Missing attrbute \"name\" in IF."
 msgstr ""
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:604
-#, fuzzy, python-format
+#, python-format
 msgid "Invalid regular expression: %s."
-msgstr "რეგულარული გამოსახულებანი:"
+msgstr ""
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:620
 #: modules/bibformat/lib/bibformat_bfx_engine.py:648
@@ -5478,9 +5382,9 @@ msgid "Invalid syntax of IF statement."
 msgstr ""
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:723
-#, fuzzy, python-format
+#, python-format
 msgid "Invalid address: %s %s"
-msgstr "პარამეტრები არასწორია"
+msgstr ""
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:953
 #, python-format
@@ -5501,9 +5405,9 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_engine.py:530
 #: modules/bibformat/lib/bibformat_engine.py:765
 #: modules/bibformat/lib/bibformatadminlib.py:1555
-#, fuzzy, python-format
+#, python-format
 msgid "Could not find format element named %s."
-msgstr "ელემენტის ფორმატის დადასტურება %s"
+msgstr ""
 
 #: modules/bibformat/lib/bibformat_engine.py:624
 #, python-format
@@ -5513,8 +5417,8 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_engine.py:662
 #, python-format
 msgid ""
-"Escape mode for format element %s could not be retrieved. Using default mode "
-"instead."
+"Escape mode for format element %s could not be retrieved. Using default mode"
+" instead."
 msgstr ""
 
 #: modules/bibformat/lib/bibformat_engine.py:734
@@ -5529,15 +5433,15 @@ msgid "Could not read format template named %s. %s."
 msgstr ""
 
 #: modules/bibformat/lib/bibformat_engine.py:1027
-#, fuzzy, python-format
+#, python-format
 msgid "Format element %s could not be found."
-msgstr "მოთხოვნილი გვერდი არ არსებობს"
+msgstr ""
 
 #: modules/bibformat/lib/bibformat_engine.py:1061
 #: modules/bibformat/lib/bibformatadminlib.py:1541
-#, fuzzy, python-format
+#, python-format
 msgid "Error in format element %s. %s."
-msgstr "ელემენტის ფორმატის დადასტურება %s"
+msgstr ""
 
 #: modules/bibformat/lib/bibformat_engine.py:1085
 #, python-format
@@ -5545,24 +5449,24 @@ msgid "Format element %s has no function named \"format\"."
 msgstr ""
 
 #: modules/bibformat/lib/bibformat_engine.py:1416
-#, fuzzy, python-format
+#, python-format
 msgid "Output format with code %s could not be found."
-msgstr "მოთხოვნილი გვერდი არ არსებობს"
+msgstr ""
 
 #: modules/bibformat/lib/bibformat_engine.py:1473
-#, fuzzy, python-format
+#, python-format
 msgid "Output format %s cannot not be read. %s."
-msgstr "გამავალი ფორმატის %s ატრიბუტები"
+msgstr ""
 
 #: modules/bibformat/lib/bibformat_engine.py:1633
-#, fuzzy, python-format
+#, python-format
 msgid "Could not find output format named %s."
-msgstr "გამოტანილი ფორმატის დადასტურება %s"
+msgstr ""
 
 #: modules/bibformat/lib/bibformat_engine.py:1714
-#, fuzzy, python-format
+#, python-format
 msgid "Could not find a fresh name for output format %s."
-msgstr "არ შეუძლია გამავალი ფორმატის შექმნა"
+msgstr ""
 
 #: modules/bibformat/lib/bibformat_templates.py:315
 #: modules/bibformat/lib/bibformat_templates.py:429
@@ -5769,9 +5673,9 @@ msgid "Enter a search query here."
 msgstr "ჩაწერეთ საძიებო სიტყვები აქ."
 
 #: modules/bibformat/lib/bibformatadminlib.py:406
-#, fuzzy, python-format
+#, python-format
 msgid "No Record Found for %s."
-msgstr "ჩანაწერი არ მოიძებნა"
+msgstr ""
 
 #: modules/bibformat/lib/bibformatadminlib.py:1280
 #, python-format
@@ -5811,9 +5715,9 @@ msgstr ""
 
 #: modules/bibformat/lib/bibformatadminlib.py:1343
 #: modules/bibformat/lib/bibformatadminlib.py:1376
-#, fuzzy, python-format
+#, python-format
 msgid "Template \"%s\" does not exist at line %s."
-msgstr "ფაილი %s არ არსებობს."
+msgstr ""
 
 #: modules/bibformat/lib/bibformatadminlib.py:1354
 #, python-format
@@ -5842,9 +5746,9 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:257
 #: modules/bibformat/web/admin/bibformatadmin.py:307
 #: modules/bibformat/web/admin/bibformatadmin.py:1012
-#, fuzzy, python-format
+#, python-format
 msgid "Output format %s cannot not be read. %s"
-msgstr "გამავალი ფორმატის %s ატრიბუტები"
+msgstr ""
 
 #: modules/bibformat/lib/bibformatadminlib.py:1419
 #, python-format
@@ -5860,9 +5764,9 @@ msgid ""
 msgstr ""
 
 #: modules/bibformat/lib/bibformatadminlib.py:1443
-#, fuzzy, python-format
+#, python-format
 msgid "Format template %s calls undefined element \"%s\"."
-msgstr " ფორმატის თარგის %s დამოკიდებულებანი"
+msgstr ""
 
 #: modules/bibformat/lib/bibformatadminlib.py:1452
 #, python-format
@@ -5888,9 +5792,9 @@ msgstr ""
 
 #: modules/bibformat/lib/bibformatadminlib.py:1547
 #: modules/bibformat/web/admin/bibformatadmin.py:1054
-#, fuzzy, python-format
+#, python-format
 msgid "Format element %s cannot not be read. %s"
-msgstr "ფორმატის ელემენტი  %s დამოკიდებულებანი"
+msgstr ""
 
 #: modules/bibformat/lib/elements/bfe_aid_authors.py:287
 #: modules/bibformat/lib/elements/bfe_authors.py:141
@@ -6007,9 +5911,9 @@ msgstr "არ შეუძლია გამავალი ფორმატ
 #: modules/bibformat/web/admin/bibformatadmin.py:522
 #: modules/bibformat/web/admin/bibformatadmin.py:597
 #: modules/bibformat/web/admin/bibformatadmin.py:1034
-#, fuzzy, python-format
+#, python-format
 msgid "Format template %s cannot not be read. %s"
-msgstr " ფორმატის თარგის %s ატრიბუტები"
+msgstr ""
 
 #: modules/bibformat/web/admin/bibformatadmin.py:525
 #: modules/bibformat/web/admin/bibformatadmin.py:600
@@ -6074,16 +5978,15 @@ msgid "Format Validation"
 msgstr "ფორმატის დადასტურება"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:51
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Limit display to knowledge bases matching %(keyword_field)s in their rules "
 "and descriptions"
-msgstr "შეზღუდეთ ნაჩვენები ცოდნის ბაზის შესატყვისები"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:89
-#, fuzzy
 msgid "No Knowledge Base"
-msgstr "ცოდნის ბაზები"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:148
 msgid "Add New Knowledge Base"
@@ -6106,14 +6009,14 @@ msgid "If you upload another file, the current version will be replaced."
 msgstr "თუ თქვენ ატვირთავთ სხვა ფაილს, მიმდინარე ვერსია იქნება წაშლილი."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:194
-#, fuzzy, python-format
+#, python-format
 msgid "The current taxonomy can be accessed with this URL: %s"
-msgstr "მიმდინარე ტაქსონომია ხელმისაწვდომია შემდეგ ბმულზე"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:197
-#, fuzzy, python-format
+#, python-format
 msgid "Please upload the RDF file for taxonomy %s"
-msgstr "გთხოვთ ატვირთოთ RDF ფაილი ტაქსონომიისათვის"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:234
 msgid "Please configure"
@@ -6145,8 +6048,8 @@ msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:244
 msgid ""
-"If the expression is empty, a list of all values                          in "
-"270__a will be created."
+"If the expression is empty, a list of all values                          in"
+" 270__a will be created."
 msgstr ""
 "თუ გამოსახულება ცარიელია, ყველა მნიშვნელობათა სია                           "
 "იქნება 270__a -ით შექმნილი."
@@ -6157,8 +6060,8 @@ msgid ""
 "it will be replaced by a search string when the                          "
 "knowledge base is used."
 msgstr ""
-"თუ გამოსახულება შეიცავს '%', სავით '270__a:*%*',                          ის "
-"იქნება შეცვლილი ძიების სიტყვებით                           ცოდნის ბაზაა "
+"თუ გამოსახულება შეიცავს '%', სავით '270__a:*%*',                          ის"
+" იქნება შეცვლილი ძიების სიტყვებით                           ცოდნის ბაზაა "
 "გამოყენებული."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:249
@@ -6166,37 +6069,28 @@ msgid ""
 "You can enter a collection name if the expression                          "
 "should be evaluated in a specific collection."
 msgstr ""
-"თქვენ შეგიძლიათ შეიყვანოთ კოლექციის სახელი თუ "
-"გამოსახულება                           უნდა იყოს შეფასებული სპეციფიურ "
-"კოლექციაში."
+"თქვენ შეგიძლიათ შეიყვანოთ კოლექციის სახელი თუ გამოსახულება"
+"                           უნდა იყოს შეფასებული სპეციფიურ კოლექციაში."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:251
-#, fuzzy
 msgid ""
 "Example 1: Your records contain field 270__a for                          "
 "the name and address of the author's institute.                          If "
-"you set the field to '270__a' and the expression                          to "
-"'270__a:*Paris*', a list of institutes in Paris                          "
+"you set the field to '270__a' and the expression                          to"
+" '270__a:*Paris*', a list of institutes in Paris                          "
 "will be created."
 msgstr ""
-"მაგალითი: თქვენი ჩანაწერები შეიცავენ ველ 270__a -ს                          "
-"ავტორის ინსტიტუტის სახელი და მისამართისათვის.                          თუ "
-"თქვენ დააყენბს ველს '270__a' და გამოსახულებას                          "
-"'270__a:*Paris*', პარიზის ინსტიტუტების სია                          "
-"შეიქმნება."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:256
 msgid ""
-"Example 2: Return the institute's name (100__a) when "
-"the                          user gives its postal code "
-"(270__a):                          Set field to 100__a, expression to 270__a:"
-"*%*."
+"Example 2: Return the institute's name (100__a) when the"
+"                          user gives its postal code (270__a):"
+"                          Set field to 100__a, expression to 270__a:*%*."
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:260
-#, fuzzy
 msgid "Any collection"
-msgstr "კოლექცია"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:282
 msgid "Exporting: "
@@ -6225,8 +6119,8 @@ msgid ""
 "Here you can add new mappings to this base                         and "
 "change the base attributes."
 msgstr ""
-"აქ თქვენ შეგიძლიათ დაამატოთ დაჯგუფებები ამ ბაზაზე                         და "
-"შეცვალეთ ბაზის ატრიბუტები."
+"აქ თქვენ შეგიძლიათ დაამატოთ დაჯგუფებები ამ ბაზაზე                         და"
+" შეცვალეთ ბაზის ატრიბუტები."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:362
 msgid "Map From"
@@ -6237,9 +6131,8 @@ msgid "Search for a mapping"
 msgstr "დაჯგუფებების ძიება"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:480
-#, fuzzy
 msgid "Knowledge base is empty"
-msgstr "ცოდნის ბაზა %s"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:545
 msgid "You can get a these mappings in textual format by: "
@@ -6250,31 +6143,29 @@ msgid "And the KBA version by:"
 msgstr "და KBA ვერსია:"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:627
-#, fuzzy
 msgid "Update Base Attributes"
-msgstr "ფორმატის ატრიბუტების განახლება"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:670
-#, fuzzy
 msgid "This knowledge base is not used in any format elements."
-msgstr "ამ ცოდნის ბაზას უკვე აქვს ტაქსონომიის ფაილი."
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:700
-#, fuzzy, python-format
+#, python-format
 msgid "Your rule: %s"
-msgstr "თქვენი წესი"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:702
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "The left side of the rule (%s) already appears in these knowledge bases:"
-msgstr "უკვე ჩდება ამ ცოდნის ბაზებში"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:705
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "The right side of the rule (%s) already appears in these knowledge bases:"
-msgstr "უკვე ჩდება ამ ცოდნის ბაზებში"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:719
 msgid "Please select action"
@@ -6311,19 +6202,17 @@ msgstr "ცოდნის ბაზები"
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:105
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:116
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:128
-#, fuzzy
 msgid "Cannot upload file"
-msgstr "ვერ უზრუნველყოფს ატვირთვას"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:106
-#, fuzzy
 msgid "You have not selected a file to upload"
-msgstr "ამოირიეთ ფაილი ასატვირთად:"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:140
-#, fuzzy, python-format
+#, python-format
 msgid "File %s uploaded."
-msgstr "ფაილი ატვირთულია"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:142
 msgid "File uploaded"
@@ -6406,9 +6295,8 @@ msgid "Download user distribution:"
 msgstr "მომხმარებლის დისტრიბუციის გადმოწერა:"
 
 #: modules/bibsort/lib/bibsortadminlib.py:367
-#, fuzzy
 msgid "BibSort Guide"
-msgstr "წარდგენის ცნობარი"
+msgstr ""
 
 #: modules/bibsword/lib/bibsword_webinterface.py:157
 msgid "BibSword Admin Interface"
@@ -6451,9 +6339,8 @@ msgid "No records match that file name"
 msgstr ""
 
 #: modules/bibupload/lib/batchuploader_engine.py:262
-#, fuzzy
 msgid "File already exists"
-msgstr "უკვე არსებობს."
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_engine.py:262
 msgid "A file with the same name and format already exists"
@@ -6465,14 +6352,13 @@ msgid "No rights to upload to collection '%s'"
 msgstr ""
 
 #: modules/bibupload/lib/batchuploader_engine.py:466
-#, fuzzy
 msgid "Guests are not authorized to run batchuploader"
-msgstr "თქვენ არ გაქვთ უფლება გამოიყენოთ შეტყობინებები."
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_engine.py:468
-#, fuzzy, python-format
+#, python-format
 msgid "The user '%s' is not authorized to run batchuploader"
-msgstr "თქვენ არ გაქვთ უფლება გამოიყენოთ შეტყობინებები."
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_engine.py:581
 #: modules/bibupload/lib/batchuploader_engine.py:594
@@ -6498,20 +6384,17 @@ msgid "Warning: Please, select a valid date"
 msgstr "გაფრთხილება: გთხოვთ, ამოირჩიოთ სწორი თარიღი"
 
 #: modules/bibupload/lib/batchuploader_templates.py:185
-#, fuzzy
 msgid "Select file to upload"
-msgstr "ამოირიეთ ფაილი ასატვირთად:"
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:186
-#, fuzzy
 msgid "File type"
-msgstr "ფაილის ტიპი "
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:187
 #: modules/bibupload/lib/batchuploader_templates.py:395
-#, fuzzy
 msgid "Upload mode"
-msgstr "ატვირთვის რეჟიმი:"
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:188
 #: modules/bibupload/lib/batchuploader_templates.py:396
@@ -6536,26 +6419,22 @@ msgstr "მაგალითი"
 
 #: modules/bibupload/lib/batchuploader_templates.py:192
 #: modules/bibupload/lib/batchuploader_templates.py:400
-#, fuzzy, python-format
+#, python-format
 msgid "All fields with %(x_fmt_open)s*%(x_fmt_close)s are mandatory"
-msgstr "თუ %(x_fmt_open)sno%(x_fmt_close)s თქვენ უნდა მიუთითოთ კალათა"
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:194
 #: modules/bibupload/lib/batchuploader_templates.py:391
-#, fuzzy
 msgid "Upload priority"
-msgstr "ისტორიის განახლება"
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:214
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Your file has been successfully queued. You can check your "
 "%(x_url1_open)supload history%(x_url1_close)s or %(x_url2_open)ssubmit "
 "another file%(x_url2_close)s"
 msgstr ""
-"თქვენი ფაილი წარმატებით დაემატებულია რიგში. თქვენ შეგიძლიათ შეამოწმოთ თქვენი "
-"%(x_url1_open)sატვირთვის ისტორია%(x_url1_close)s ან %(x_url2_open)sდაამატოთ "
-"სხვა ფაილი%(x_url2_close)s"
 
 #: modules/bibupload/lib/batchuploader_templates.py:225
 #, python-format
@@ -6609,14 +6488,12 @@ msgid "Daemon monitor"
 msgstr "სერვისის მონიტორინგი"
 
 #: modules/bibupload/lib/batchuploader_templates.py:392
-#, fuzzy
 msgid "Input directory"
-msgstr "გამავალი დირექტორია"
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:394
-#, fuzzy
 msgid "Filename matching"
-msgstr "ფაილის სახელის დამთხვევა:"
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:409
 #, python-format
@@ -6624,14 +6501,12 @@ msgid "<b>%s documents</b> have been found."
 msgstr "<b>%s დოკუმენტი</b> ნაპოვნია."
 
 #: modules/bibupload/lib/batchuploader_templates.py:411
-#, fuzzy
 msgid "The following files have been successfully queued:"
-msgstr "შემდეგი ფაილები წარმატებით დამატებულია რიგში:"
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:416
-#, fuzzy
 msgid "The following errors have occurred:"
-msgstr "შემდეგი შეცდომები წარმოიშვა:"
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:423
 msgid ""
@@ -6644,13 +6519,11 @@ msgid "All uploaded files were moved to DONE folder."
 msgstr "ყველა ატვირთული ფაილი გადატანილია DONE საქაღალდეში."
 
 #: modules/bibupload/lib/batchuploader_templates.py:435
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Using %(x_fmt_open)sweb interface upload%(x_fmt_close)s, actions are "
 "executed a single time."
 msgstr ""
-"<b>ვებ ინტერფეისით ატვირთვა</b>, -ის გამოყენებისას ქმედება განხორციელდება "
-"მხოლოდ ერთხელ."
 
 #: modules/bibupload/lib/batchuploader_templates.py:437
 #, python-format
@@ -6672,9 +6545,8 @@ msgid "Last BibSched tasks:"
 msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:475
-#, fuzzy
 msgid "Next scheduled BibSched run:"
-msgstr "დაგეგმილი დრო:"
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:180
 msgid "Document batch upload result"
@@ -6685,9 +6557,8 @@ msgid "Invalid MARCXML"
 msgstr ""
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:260
-#, fuzzy
 msgid "Upload successful"
-msgstr "ატვირთვა წარმატებით დასრულდა"
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:310
 msgid "Batch Uploader: Daemon monitor"
@@ -6898,9 +6769,8 @@ msgid "The error report has been sent."
 msgstr "შეცდომის რეპორტი გაგზავნილია."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:99
-#, fuzzy
 msgid "Many thanks for helping us to improve the service."
-msgstr "დიდი მადლობა Invenio -ს გაუმჯობესებისათვის."
+msgstr ""
 
 #: modules/miscutil/lib/errorlib_webinterface.py:101
 msgid "Use the back button of your browser to return to the previous page."
@@ -7044,26 +6914,22 @@ msgstr "OAI საწყისის საიდენტიფიკაცი�
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:207
 #: modules/oaiharvest/lib/oai_harvest_admin.py:331
-#, fuzzy
 msgid "Please enter a name for the source."
-msgstr "გთხოვთ შეიყვანოთ ან მომხმარებლის სახელი ან ჯგუფის სახელი"
+msgstr ""
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:209
 #: modules/oaiharvest/lib/oai_harvest_admin.py:333
-#, fuzzy
 msgid "Please enter a metadata prefix."
-msgstr "გთხოვთ შეიყვანოთ ან მომხმარებლის სახელი ან ჯგუფის სახელი"
+msgstr ""
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:211
-#, fuzzy
 msgid "Please enter a base url."
-msgstr "გთხოვთ შეიყვანოთ ან მომხმარებლის სახელი ან ჯგუფის სახელი"
+msgstr ""
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:213
 #: modules/oaiharvest/lib/oai_harvest_admin.py:335
-#, fuzzy
 msgid "Please choose a frequency of harvesting"
-msgstr "გთხოვთ აირჩოთ კატეგორია"
+msgstr ""
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:215
 #: modules/oaiharvest/lib/oai_harvest_admin.py:339
@@ -7150,21 +7016,17 @@ msgid "Error when retrieving the record"
 msgstr "ჩანაწერის გამოტანისას აღმოჩდა შეცდომა"
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:1126
-#, fuzzy
 msgid ""
 "Error when formatting the Holding Pen entry. Probably its content is broken"
 msgstr ""
-"დაკავების კალამის ჩანაწერის ფორმატირებისას შეიქმნა შეცდომა. შესაძლოა მისი "
-"შემადგენლობა დაზიანებულია"
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:1131
 msgid "Accept Holding Pen version"
 msgstr "დაკავების კალმის ვერსიის მიღება"
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:1151
-#, fuzzy
 msgid "Record deleted from the holding pen"
-msgstr "დაკავების კალამიდან წაშლა"
+msgstr ""
 
 #: modules/oaiharvest/lib/oai_harvest_templates.py:53
 #: modules/oaiharvest/lib/oai_harvest_templates.py:70
@@ -7252,9 +7114,8 @@ msgid "Run Record Merger"
 msgstr "ჩანაწერის შემაერთებლის გაშვება"
 
 #: modules/webaccess/lib/access_control_config.py:310
-#, fuzzy
 msgid "Run BibSword client"
-msgstr "BibCirculation -ის გაშვება"
+msgstr ""
 
 #: modules/webaccess/lib/access_control_config.py:311
 #: modules/websession/lib/websession_templates.py:1224
@@ -7313,9 +7174,8 @@ msgstr "WebJournal -ის კონფიგურება"
 
 #: modules/webaccess/lib/access_control_config.py:322
 #: modules/websession/lib/websession_templates.py:1246
-#, fuzzy
 msgid "Configure BibSort"
-msgstr "BibFormat -ის კონფიგურება"
+msgstr ""
 
 #: modules/webaccess/lib/access_control_config.py:323
 #: modules/websession/lib/websession_templates.py:1214
@@ -7328,9 +7188,8 @@ msgid "Run Batch Uploader"
 msgstr "ჯგუფური ამტვირთავის გაშვება"
 
 #: modules/webaccess/lib/access_control_config.py:325
-#, fuzzy
 msgid "Run Person/Author Manager"
-msgstr "ფაილების მენეჯერის გაშვება"
+msgstr ""
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3747
 #, python-format
@@ -7454,13 +7313,13 @@ msgstr "შეტყობინება %s წარმატებით გ�
 #: modules/webalert/lib/webalert.py:428
 #, python-format
 msgid ""
-"You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s "
-"is available with a possibility to (a) view search results and (b) subscribe "
-"to an automatic email alerting service for these queries."
+"You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s"
+" is available with a possibility to (a) view search results and (b) "
+"subscribe to an automatic email alerting service for these queries."
 msgstr ""
-"თქენ განახორციელეთ %(x_nb)s ძებნა. %(x_url_open)sდეტალური ლისტი"
-"%(x_url_close)s ხელმისაწვდომია შესაძლებლობებით (ა) იხილოთ ძიების შედეგები და "
-"(ბ) ჩაეწეროთ ავტომატურ ე-მეილის შეტყობინება ამ მოთხოვნებისათვის."
+"თქენ განახორციელეთ %(x_nb)s ძებნა. %(x_url_open)sდეტალური "
+"ლისტი%(x_url_close)s ხელმისაწვდომია შესაძლებლობებით (ა) იხილოთ ძიების "
+"შედეგები და (ბ) ჩაეწეროთ ავტომატურ ე-მეილის შეტყობინება ამ მოთხოვნებისათვის."
 
 #: modules/webalert/lib/webalert_templates.py:75
 msgid "Pattern"
@@ -7636,8 +7495,8 @@ msgstr ""
 #: modules/webalert/lib/webalert_templates.py:446
 #, python-format
 msgid ""
-"You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during "
-"the last 30 days or so."
+"You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during"
+" the last 30 days or so."
 msgstr ""
 "თქვენ განახორციელეთ %(x_nb1)s ძიება (%(x_nb2)s განსხვავებული კითხვა) "
 "დაახლოებით ბოლო 30 დღის განმავლობაში."
@@ -7825,54 +7684,45 @@ msgstr "ჯერ"
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:292
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:352
 #: modules/websearch/lib/websearch_templates.py:4242
-#, fuzzy
 msgid "No Papers"
-msgstr "სტატიები:"
+msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:302
-#, fuzzy
 msgid "Papers written alone"
-msgstr "პერიოდული სათაური"
+msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:470
 #: modules/websearch/lib/websearch_templates.py:4280
-#, fuzzy
 msgid "No Keywords"
-msgstr "საკვანძო სიტყვები"
+msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:473
 #: modules/websearch/lib/websearch_templates.py:4283
-#, fuzzy
 msgid "Frequent keywords"
-msgstr "ხშირი საკვანძო სიტყვები:"
+msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:532
-#, fuzzy
 msgid "No Collaborations"
-msgstr "კოლექციები"
+msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:535
-#, fuzzy
 msgid "Collaborations"
-msgstr "კოლექციები"
+msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:561
 #: modules/websearch/lib/websearch_templates.py:4255
-#, fuzzy
 msgid "unknown affiliation"
-msgstr "უცნობი მოქმდება"
+msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:573
 #: modules/websearch/lib/websearch_templates.py:4262
-#, fuzzy
 msgid "No Affiliations"
-msgstr "წევრობა:"
+msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:575
 #: modules/websearch/lib/websearch_templates.py:4264
-#, fuzzy
 msgid "Affiliations"
-msgstr "წევრობა:"
+msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:590
 msgid "Frequent co-authors (excluding collaborations)"
@@ -7880,20 +7730,18 @@ msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:613
 #: modules/websearch/lib/websearch_templates.py:4299
-#, fuzzy
 msgid "No Frequent Co-authors"
-msgstr "ხშირი თანა ავტორები:"
+msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:630
-#, fuzzy, python-format
+#, python-format
 msgid "Citations%s:"
-msgstr "ციტირებები:"
+msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:634
 #: modules/websearch/lib/websearch_templates.py:4366
-#, fuzzy
 msgid "No Citation Information available"
-msgstr "ინფორმაცია ხელმიუწვდომელია"
+msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:706
 #: modules/websearch/lib/websearch_templates.py:4323
@@ -7922,17 +7770,15 @@ msgid "The selected item does not exist or you do not have access to it."
 msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:143
-#, fuzzy
 msgid "Returning to the public basket view."
-msgstr "თვიურ ხედდთან დაბრუნება"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:418
 #: modules/webbasket/lib/webbasket.py:477
 #: modules/webbasket/lib/webbasket.py:1550
 #: modules/webbasket/lib/webbasket.py:1615
-#, fuzzy
 msgid "You do not have permission to write notes to this item."
-msgstr "თქვენ არ გაგაჩნიათ ულება ამ ელემენტის ნახვის."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:431
 #: modules/webbasket/lib/webbasket.py:1562
@@ -7965,9 +7811,8 @@ msgid "The selected basket is no longer public."
 msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:1680
-#, fuzzy
 msgid "You do not have permission to delete this note."
-msgstr "თქვენ არ გაგაჩნიათ ულება ამ ელემენტის ნახვის."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:1691
 msgid ""
@@ -7975,9 +7820,9 @@ msgid ""
 msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:1789
-#, fuzzy, python-format
+#, python-format
 msgid "Sorry, you do not have sufficient rights to add record #%i."
-msgstr "თქვენ არ გაგაჩნიათ ულება ამ ელემენტის ნახვის."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:1795
 msgid "Some of the items were not added due to lack of sufficient rights."
@@ -7996,9 +7841,8 @@ msgid "Please provide a url for the external source."
 msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:1833
-#, fuzzy
 msgid "The url you have provided is not valid."
-msgstr "ელემენტი რომელიც თქვნ აირჩიეთ არ არსებობს"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:1840
 msgid ""
@@ -8015,14 +7859,12 @@ msgstr ""
 #: modules/webbasket/lib/webbasket.py:1896
 #: modules/webbasket/lib/webbasket.py:2017
 #: modules/webbasket/lib/webbasket.py:2086
-#, fuzzy
 msgid "Sorry, you do not have sufficient rights on this basket."
-msgstr "თქვენ არ გაგაჩნიათ უფლებები რომ იხილოთ კალათის შემადგენლობა."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:1905
-#, fuzzy
 msgid "No records to add."
-msgstr "ჩანაწერის კალათასი კოპირება"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:1945
 #: modules/webbasket/lib/webbasket.py:2789
@@ -8030,14 +7872,12 @@ msgid "Cannot add items to the selected basket. Invalid parameters."
 msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:1955
-#, fuzzy
 msgid "Untitled basket"
-msgstr "კალათის შესწორება"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:1955
-#, fuzzy
 msgid "Untitled topic"
-msgstr "თემის შესწორება"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:1957
 msgid ""
@@ -8134,11 +7974,10 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:2766
 #: modules/webbasket/lib/webbasket.py:2804
-#, fuzzy
 msgid ""
 "The category you have selected does not exist. Please select a valid "
 "category."
-msgstr "ელემენტი რომელიც თქვნ აირჩიეთ არ არსებობს"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:2830
 msgid "The selected group does not exist or you do not have access to it."
@@ -8149,21 +7988,16 @@ msgid "The selected output format is not available or is invalid."
 msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:91
-#, fuzzy
 msgid ""
 "You have no personal or group baskets or are subscribed to any public "
 "baskets."
 msgstr ""
-"თქვენ არ გაქვთ პირადი ან საჯარო კალათა და არ ხართ ჩაწერილი არცერთ საჯარო "
-"კალათაშ"
 
 #: modules/webbasket/lib/webbasket_templates.py:92
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You may want to start by %(x_url_open)screating a new basket%(x_url_close)s."
 msgstr ""
-"You may want to look at the %(x_url_open)s%(x_category)s pages"
-"%(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:116
 #: modules/webbasket/lib/webbasket_templates.py:182
@@ -8189,9 +8023,9 @@ msgid "Search also in notes (where allowed)"
 msgstr "ასევე ეძებე სანიშნებში (თუ შესაძლებელია)"
 
 #: modules/webbasket/lib/webbasket_templates.py:578
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_search_for_term)s in %(x_collection_list)s"
-msgstr "ეძებე %(x_collection_name)s -ში"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:615
 msgid "Results overview"
@@ -8202,9 +8036,9 @@ msgstr "შედეგების მიმოხილვა"
 #: modules/webbasket/lib/webbasket_templates.py:789
 #: modules/webbasket/lib/webbasket_templates.py:898
 #: modules/webbasket/lib/webbasket_templates.py:1002
-#, fuzzy, python-format
+#, python-format
 msgid "%i matching items"
-msgstr "მომხმარებელი არ ემთხვევა"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:654
 #: modules/webbasket/lib/webbasket_templates.py:1000
@@ -8264,17 +8098,17 @@ msgid "There is currently no publicly accessible basket"
 msgstr "ამჟამად საჯაროდ ხელმისაწვდომი კალათები არ არის"
 
 #: modules/webbasket/lib/webbasket_templates.py:1289
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Displaying public baskets %(x_from)i - %(x_to)i out of "
 "%(x_total_public_basket)i public baskets in total."
-msgstr "ნაჩვენებია %s - %s საჯარო კალათა, საიდანაც %s საჯარო კალათაა ჯამში."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1356
 #: modules/webbasket/lib/webbasket_templates.py:1380
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_title)s, by %(x_name)s on %(x_date)s:"
-msgstr "განხილულია %(x_nickname)s ის მიერ %(x_date)s"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1359
 #: modules/webbasket/lib/webbasket_templates.py:1383
@@ -8304,9 +8138,8 @@ msgstr "ახალი თემის შექმნა"
 
 #: modules/webbasket/lib/webbasket_templates.py:1459
 #: modules/webbasket/lib/webbasket_templates.py:1853
-#, fuzzy
 msgid "Basket name"
-msgstr "კალათის სახელი"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1462
 msgid "Create a new basket"
@@ -8337,31 +8170,29 @@ msgid "URL"
 msgstr "ბმული"
 
 #: modules/webbasket/lib/webbasket_templates.py:1620
-#, fuzzy, python-format
+#, python-format
 msgid "%i items have been successfully added to your basket"
-msgstr "ელემენტი წარმატებით დაემატა თქვენ კალათას"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1621
-#, fuzzy, python-format
+#, python-format
 msgid "Proceed to the %(x_url_open)sbasket%(x_url_close)s"
-msgstr "ჩაეწერეთ %(x_url2_open)sRSS ფიდზე%(x_url2_close)s."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1626
-#, fuzzy, python-format
+#, python-format
 msgid " or return to your %(x_url_open)sprevious basket%(x_url_close)s"
 msgstr ""
-"თქვენ შეგიძლიათ შეხვიდეთ თქვენს %(x_url_open)sანგარიშზე%(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1630
-#, fuzzy, python-format
+#, python-format
 msgid " or return to your %(x_url_open)ssearch%(x_url_close)s"
 msgstr ""
-"თქვენ შეგიძლიათ შეხვიდეთ თქვენს %(x_url_open)sანგარიშზე%(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1743
-#, fuzzy, python-format
+#, python-format
 msgid "Adding %i items to your baskets"
-msgstr "ელემენტია თქვენს კალათაში"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1744
 #, python-format
@@ -8440,9 +8271,9 @@ msgid "Delete basket"
 msgstr "კალათის წაშლა"
 
 #: modules/webbasket/lib/webbasket_templates.py:1931
-#, fuzzy, python-format
+#, python-format
 msgid "Editing basket %(x_basket_name)s"
-msgstr "კალათის შესწორება"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1940
 #: modules/webbasket/lib/webbasket_templates.py:1995
@@ -8450,9 +8281,8 @@ msgid "Save changes"
 msgstr "ცვლილებების შენახვა"
 
 #: modules/webbasket/lib/webbasket_templates.py:1961
-#, fuzzy
 msgid "Topic name"
-msgstr "თემის სახელი"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1990
 #, python-format
@@ -8523,8 +8353,8 @@ msgstr "კალათის გაზიარება ახალ ჯგუ
 #: modules/webbasket/lib/webbasket_templates.py:2109
 #: modules/websession/lib/websession_templates.py:630
 msgid ""
-"You are logged in as a guest user, so your baskets will disappear at the end "
-"of the current session."
+"You are logged in as a guest user, so your baskets will disappear at the end"
+" of the current session."
 msgstr ""
 "თქვენ შემოსული ხართ როგორც სტუმარი, ამიტომ თქვენი კალათები წაიშლება სესიის "
 "დამთავრების შემდგომ."
@@ -8536,8 +8366,8 @@ msgstr ""
 msgid ""
 "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
 msgstr ""
-"თუ გნებავთ, თქვენ შეგიძლიათ %(x_url_open)sშეხვიდეთ ან დარეგისტრირდეთ აქ"
-"%(x_url_close)s."
+"თუ გნებავთ, თქვენ შეგიძლიათ %(x_url_open)sშეხვიდეთ ან დარეგისტრირდეთ "
+"აქ%(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:2124
 #: modules/websession/lib/websession_webinterface.py:280
@@ -8552,15 +8382,15 @@ msgstr "უკან ძიების შედეგებთან"
 
 #: modules/webbasket/lib/webbasket_templates.py:2308
 #: modules/webbasket/lib/webbasket_templates.py:3340
-#, fuzzy, python-format
+#, python-format
 msgid "%i items"
-msgstr "ელემენტები"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:2309
 #: modules/webbasket/lib/webbasket_templates.py:3342
-#, fuzzy, python-format
+#, python-format
 msgid "%i notes"
-msgstr "აღნიშვნების დათვალიერება"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:2309
 #: modules/webbasket/lib/webbasket_templates.py:3342
@@ -8568,9 +8398,9 @@ msgid "no notes yet"
 msgstr "ჯერ არ არის შენიშვნები"
 
 #: modules/webbasket/lib/webbasket_templates.py:2312
-#, fuzzy, python-format
+#, python-format
 msgid "%i subscribers"
-msgstr "ჩაწერილები"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:2314
 #: modules/webbasket/lib/webbasket_templates.py:3344
@@ -8579,9 +8409,8 @@ msgstr "ბოლო განახლება"
 
 #: modules/webbasket/lib/webbasket_templates.py:2326
 #: modules/webbasket/lib/webbasket_templates.py:2408
-#, fuzzy
 msgid "Add item"
-msgstr "ელემენტების დამატება"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:2331
 #: modules/webbasket/lib/webbasket_templates.py:2413
@@ -8601,9 +8430,8 @@ msgid "This basket is publicly accessible at the following address:"
 msgstr "ეს კალათა საჯაროდაა ხლმისაწვდომი შემდეგ მისამართზე:"
 
 #: modules/webbasket/lib/webbasket_templates.py:2488
-#, fuzzy
 msgid "This basket does not contain any records yet."
-msgstr "ეს კოლექცია ჯერ არ შეიცავს დოკუმენტებს."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:2522
 msgid "You do not have sufficient rights to view this basket's content."
@@ -8638,9 +8466,8 @@ msgstr "ელემენტის წაშლა"
 #: modules/webbasket/lib/webbasket_templates.py:3044
 #: modules/webbasket/lib/webbasket_templates.py:3557
 #: modules/webbasket/lib/webbasket_templates.py:3857
-#, fuzzy
 msgid "This record does not seem to exist any more"
-msgstr "მოთხოვნილი ჩანაჭერი არ არსებობს."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:2804
 #: modules/webbasket/lib/webbasket_templates.py:3648
@@ -8714,9 +8541,9 @@ msgstr "პასუხი"
 
 #: modules/webbasket/lib/webbasket_templates.py:3237
 #: modules/webbasket/lib/webbasket_templates.py:4035
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_title)s, by %(x_name)s on %(x_date)s"
-msgstr "განხილულია %(x_nickname)s ის მიერ %(x_date)s"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:3239
 #: modules/webbasket/lib/webbasket_templates.py:4037
@@ -8755,9 +8582,8 @@ msgid "Your personal baskets"
 msgstr "თქვენი პირადი კალათები"
 
 #: modules/webbasket/lib/webbasket_templates.py:4223
-#, fuzzy
 msgid "All your topics"
-msgstr "ყველა თქვენი კალათა"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:4234
 #: modules/webbasket/lib/webbasket_templates.py:4334
@@ -8765,27 +8591,24 @@ msgid "Your group baskets"
 msgstr "თქვენი ჯგუფური კალათები"
 
 #: modules/webbasket/lib/webbasket_templates.py:4239
-#, fuzzy
 msgid "All your groups"
-msgstr "თქვენი ჯგუფები"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:4250
 msgid "Your public baskets"
 msgstr "თქვენი საჯარო კალათები"
 
 #: modules/webbasket/lib/webbasket_templates.py:4254
-#, fuzzy
 msgid "All your public baskets"
-msgstr "ყველა საჯარო კალათა"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:4259
 msgid "All the public baskets"
 msgstr "ყველა საჯარო კალათები"
 
 #: modules/webbasket/lib/webbasket_templates.py:4292
-#, fuzzy
 msgid "Please select a basket..."
-msgstr "გთხოვთ აირჩიოთ პრობლემა"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_webinterface.py:159
 #: modules/webbasket/lib/webbasket_webinterface.py:320
@@ -8834,9 +8657,8 @@ msgid "Bad page number --> showing first page."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:175
-#, fuzzy
 msgid "Bad number of results per page --> showing 10 results per page."
-msgstr "შედეგების რაოდენობა თვითოეული გვერდისათვის"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:184
 msgid "Bad display order --> showing most helpful first."
@@ -8849,9 +8671,8 @@ msgstr ""
 #: modules/webcomment/lib/webcomment.py:237
 #: modules/webcomment/lib/webcomment.py:1596
 #: modules/webcomment/lib/webcomment.py:1649
-#, fuzzy
 msgid "Comments on records have been disallowed by the administrator."
-msgstr "ჯგუფი %s წაშლილია ადმინისტრატორის მიერ."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:245
 #: modules/webcomment/lib/webcomment.py:268
@@ -8861,15 +8682,12 @@ msgid "Your feedback has been recorded, many thanks."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:252
-#, fuzzy
 msgid "You have already reported an abuse for this comment."
 msgstr ""
-"ამ ტიპის დოკუმეტის კვალობაზე თქვენ უკვე მიაღწიეთ მაქსიმალურ რიცხვს ფაილებისა "
 
 #: modules/webcomment/lib/webcomment.py:259
-#, fuzzy
 msgid "The comment you have reported no longer exists."
-msgstr "ელემენტი რომელიც თქვნ აირჩიეთ არ არსებობს"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:275
 msgid "Sorry, you have already voted. This vote has not been recorded."
@@ -8882,9 +8700,8 @@ msgid ""
 msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:289
-#, fuzzy
 msgid "You have been unsubscribed from this discussion."
-msgstr "ამ დისკუსიისგან ამოსაწერათ, გადადით <%(x_url)s>"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:1188
 #, python-format
@@ -8917,9 +8734,8 @@ msgid "%s is an invalid user ID."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:1606
-#, fuzzy
 msgid "Cannot reply to a review."
-msgstr "მოუხსენებლი განხილვა"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:1661
 msgid "You must enter a title."
@@ -8934,9 +8750,8 @@ msgid "You must enter a text."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:1692
-#, fuzzy
 msgid "You already wrote a review for this record."
-msgstr "თქვენ არ ხართ ავტორიზებული ამ ინფორმაციის სანახავად."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:1711
 msgid "You already posted a comment short ago. Please retry later."
@@ -8951,19 +8766,18 @@ msgid "Unknown action --> showing you the default add comment form."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:1859
-#, fuzzy, python-format
+#, python-format
 msgid "Record ID %s does not exist in the database."
-msgstr "შეყვანილი ელ-ფოსტის მისამართი არ არსებობს მონაემთაბაზაში."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:1867
-#, fuzzy
 msgid "No record ID was given."
-msgstr "უკაცრავად, ჩანაწერის იდენტიფიკატორი არ იქნა მითითებული."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:1875
-#, fuzzy, python-format
+#, python-format
 msgid "Record ID %s is an invalid ID."
-msgstr "უკაცრავად, %s არ არის სწორი საიდენტიფიკაციო მნიშვნელობა."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:1883
 #, python-format
@@ -8977,14 +8791,14 @@ msgid "Write a comment"
 msgstr "კომენტარის დაწერა"
 
 #: modules/webcomment/lib/webcomment_templates.py:95
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_nb)i Comments for round \"%(x_name)s\""
-msgstr "%(x_name)s დაწერეს %(x_date)s ზე:"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:98
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_nb)i Comments"
-msgstr "%i კომენტარი"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:126
 #, python-format
@@ -9023,9 +8837,9 @@ msgstr "თქვენ შეიძლება გინდოდედ გა
 #: modules/webcomment/lib/webcomment_templates.py:246
 #: modules/webcomment/lib/webcomment_templates.py:731
 #: modules/webcomment/lib/webcomment_templates.py:741
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_nb)i comments for round \"%(x_name)s\""
-msgstr "%(x_name)s დაწერეს %(x_date)s ზე:"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:269
 #: modules/webcomment/lib/webcomment_templates.py:836
@@ -9065,16 +8879,14 @@ msgid "Rate this document"
 msgstr "შეაფასე ეს დოკუმენტი"
 
 #: modules/webcomment/lib/webcomment_templates.py:335
-#, fuzzy
 msgid "Be the first to review this document.</div>"
-msgstr "იყავი პირველი ვინც განიხილავს ამ დოკუმენტს"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:379
 #: modules/webcomment/lib/webcomment_templates.py:440
 #: modules/webcomment/lib/webcomment_templates.py:782
-#, fuzzy
 msgid "Close"
-msgstr "დახურვა"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:386
 #: modules/webcomment/lib/webcomment_templates.py:837
@@ -9113,10 +8925,9 @@ msgid "Reviewed by %(x_nickname)s on %(x_date)s"
 msgstr "განხილულია %(x_nickname)s ის მიერ %(x_date)s"
 
 #: modules/webcomment/lib/webcomment_templates.py:513
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_nb_people)s out of %(x_nb_total)s people found this review useful"
 msgstr ""
-"%(x_nb_people)i ადამიანმა %(x_nb_total)i -დან ჩათვალა ეს განხილვა სასარგებლოდ"
 
 #: modules/webcomment/lib/webcomment_templates.py:535
 msgid "Undelete review"
@@ -9203,7 +9014,8 @@ msgstr "თქვენ არ ხარ ავტორიზებული �
 #: modules/webcomment/lib/webcomment_templates.py:1203
 #, python-format
 msgid "Note: Your nickname, %s, will be displayed as author of this comment."
-msgstr "თქვენი მეტსახელი, %s, იქნება გამოყენებული როგორც ამ ცომენტარის ავტორი."
+msgstr ""
+"თქვენი მეტსახელი, %s, იქნება გამოყენებული როგორც ამ ცომენტარის ავტორი."
 
 #: modules/webcomment/lib/webcomment_templates.py:1207
 #: modules/webcomment/lib/webcomment_templates.py:1324
@@ -9212,28 +9024,25 @@ msgid ""
 "Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. "
 "%(x_nickname)s will be displayed as the author of this comment."
 msgstr ""
-"შენიშვნა: თქვენ არ გაქვთ %(x_url_open)sგანსაზღვრული ზედმეტსახელი"
-"%(x_url_close)s. %(x_nickname)s იქნება გამოყენებული როგორც ამ კომენტარის "
-"ავტორი."
+"შენიშვნა: თქვენ არ გაქვთ %(x_url_open)sგანსაზღვრული "
+"ზედმეტსახელი%(x_url_close)s. %(x_nickname)s იქნება გამოყენებული როგორც ამ "
+"კომენტარის ავტორი."
 
 #: modules/webcomment/lib/webcomment_templates.py:1224
 msgid "Once logged in, authorized users can also attach files."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1239
-#, fuzzy
 msgid "Optionally, attach a file to this comment"
-msgstr "ოპტიმალურად, დაამატეთ შენიშვნა ამ ელემენტს"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1240
-#, fuzzy
 msgid "Optionally, attach files to this comment"
-msgstr "ოპტიმალურად, დაამატეთ შენიშვნა ამ ელემენტს"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1241
-#, fuzzy
 msgid "Max one file"
-msgstr " ახალი ფაილის დამატება"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1242
 #, python-format
@@ -9387,8 +9196,8 @@ msgstr "იხილეთ ყველა %s მოხსენებული 
 
 #: modules/webcomment/lib/webcomment_templates.py:1656
 msgid ""
-"Here is a list, sorted by total number of reports, of all users who have had "
-"a comment reported at least once."
+"Here is a list, sorted by total number of reports, of all users who have had"
+" a comment reported at least once."
 msgstr ""
 "აქ არის სია, სორტირებული რეპორტების საერთო რაოდენობით, ყველა მომხმარებელის "
 "ვისი კომენტარიც იყო მოხსენებული ერთხელ მაინც."
@@ -9589,9 +9398,8 @@ msgid "For any question, please use <%(CFG_SITE_SUPPORT_EMAIL)s>"
 msgstr "ნებისმიერი კითხვისათვის გამოიყენეთ <%(CFG_SITE_SUPPORT_EMAIL)s>"
 
 #: modules/webcomment/lib/webcomment_templates.py:2294
-#, fuzzy
 msgid "Your comment will be lost."
-msgstr "თქვენი კომენტარი წარმატებით იქნა დამატებული."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_webinterface.py:265
 #: modules/webcomment/lib/webcomment_webinterface.py:522
@@ -9607,9 +9415,8 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_webinterface.py:352
 #: modules/webcomment/lib/webcomment_webinterface.py:589
 #: modules/webcomment/lib/webcomment_webinterface.py:666
-#, fuzzy
 msgid "You do not have access to the specified comment"
-msgstr "თქვენ არ გაგაჩნიათ ულება ამ ელემენტის ნახვის."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_webinterface.py:423
 #, python-format
@@ -9634,38 +9441,34 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_webinterface.py:818
 #: modules/webcomment/lib/webcomment_webinterface.py:858
-#, fuzzy
 msgid "Page Not Found"
-msgstr "%s გვერდი არ არის ნაპოვნი"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_webinterface.py:819
-#, fuzzy
 msgid "The requested comment could not be found"
-msgstr "მოთხოვნილი გვერდი არ არსებობს"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_webinterface.py:839
 msgid "You cannot access files of a deleted comment"
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_webinterface.py:859
-#, fuzzy
 msgid "The requested file could not be found"
-msgstr "მოთხოვნილი გვერდი არ არსებობს"
+msgstr ""
 
 #: modules/webcomment/lib/webcommentadminlib.py:122
-#, fuzzy
 msgid "Invalid comment ID."
-msgstr "კომენტარის საიდენტიფიკაციო"
+msgstr ""
 
 #: modules/webcomment/lib/webcommentadminlib.py:142
-#, fuzzy, python-format
+#, python-format
 msgid "Comment ID %s does not exist."
-msgstr "მომხმარებელი %s არ არსებობს."
+msgstr ""
 
 #: modules/webcomment/lib/webcommentadminlib.py:156
-#, fuzzy, python-format
+#, python-format
 msgid "Record ID %s does not exist."
-msgstr "მომხმარებელი %s არ არსებობს."
+msgstr ""
 
 #: modules/webcomment/web/admin/webcommentadmin.py:45
 #: modules/webcomment/web/admin/webcommentadmin.py:59
@@ -9785,9 +9588,8 @@ msgid "Announcements"
 msgstr ""
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:97
-#, fuzzy
 msgid "Training"
-msgstr "გაფრთხილება"
+msgstr ""
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:98
 msgid "Events"
@@ -10048,9 +9850,8 @@ msgid "Issue regenerated"
 msgstr "პრობლემა წარმოიქმნა"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:275
-#, fuzzy
 msgid "Regenerate Issue"
-msgstr "აირჩიეთ საკითხი:"
+msgstr ""
 
 #: modules/webjournal/web/admin/webjournaladmin.py:328
 msgid "Publishing Interface"
@@ -10072,9 +9873,8 @@ msgstr ""
 
 #: modules/webmessage/lib/webmessage.py:75
 #: modules/webmessage/lib/webmessage.py:219
-#, fuzzy
 msgid "This message does not exist."
-msgstr "მოთხოვნილი გვერდი არ არსებობს"
+msgstr ""
 
 #: modules/webmessage/lib/webmessage.py:144
 msgid "The message could not be deleted."
@@ -10384,8 +10184,8 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:2716
 #, python-format
 msgid ""
-"No match found in collection %(x_collection)s. Other public collections gave "
-"%(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
+"No match found in collection %(x_collection)s. Other public collections gave"
+" %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
 msgstr ""
 "დამთხვევა ვერ მოიძებნა %(x_collection)s კოლექციაში. სხვა საჯარო კოლექციებმა "
 "მოგვცეს %(x_url_open)s%(x_nb_hits)d შედეგი%(x_url_close)s."
@@ -10399,26 +10199,22 @@ msgstr ""
 "კოლექციებში გნებავთ ძიება, გთხოვთ ჯერ მიუთითოთ კოლექცია."
 
 #: modules/websearch/lib/search_engine.py:2831
-#, fuzzy
 msgid "Your search did not match any records.  Please try again."
 msgstr ""
-"ძიების სიტყვა %s არ დაემთხვა არცერთ ჩანაწერს. წყობილი სიტყვები ყველა "
-"კოლექციაში არიან:"
 
 #: modules/websearch/lib/search_engine.py:2840
-#, fuzzy
 msgid "No match found, please enter different search terms."
-msgstr "გამოიყენეთ სხვადასხვა ძიების სიტყვები."
+msgstr ""
 
 #: modules/websearch/lib/search_engine.py:2846
-#, fuzzy, python-format
+#, python-format
 msgid "There are no records referring to %s."
-msgstr "მოთხოვნები არ არის."
+msgstr ""
 
 #: modules/websearch/lib/search_engine.py:2848
-#, fuzzy, python-format
+#, python-format
 msgid "There are no records cited by %s."
-msgstr "მოთხოვნები არ არის."
+msgstr ""
 
 #: modules/websearch/lib/search_engine.py:2853
 #, python-format
@@ -10442,20 +10238,19 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:2907
 #, python-format
 msgid ""
-"Search term %s did not match any record. Nearest terms in any collection are:"
+"Search term %s did not match any record. Nearest terms in any collection "
+"are:"
 msgstr ""
 "ძიების სიტყვა %s არ დაემთხვა არცერთ ჩანაწერს. წყობილი სიტყვები ყველა "
 "კოლექციაში არიან:"
 
 #: modules/websearch/lib/search_engine.py:3708
 #: modules/websearch/lib/search_engine.py:3828
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. The records will not be "
 "sorted."
 msgstr ""
-"უკაცრავად, %s არ არის ნებადართული დახარისხების კრიტერიუმი. დასახარისხებლად "
-"ვიყენებ სათაურს."
 
 #: modules/websearch/lib/search_engine.py:3816
 #, python-format
@@ -10468,9 +10263,9 @@ msgstr ""
 
 #: modules/websearch/lib/search_engine.py:4068
 #: modules/websearch/lib/search_engine.py:4387
-#, fuzzy, python-format
+#, python-format
 msgid "The record %d replaces it."
-msgstr "ჩანაწერი წაშლილია."
+msgstr ""
 
 #: modules/websearch/lib/search_engine.py:4266
 msgid "Use different search terms."
@@ -10644,7 +10439,8 @@ msgid ""
 "This is a hosted external collection. Please click on the Search button to "
 "see its content."
 msgstr ""
-"ეს არის გარე კოლექცია. გთხოვთ დააჭიროთ ძიების ღილაკს რომ იხილოთ შემადგენლობა."
+"ეს არის გარე კოლექცია. გთხოვთ დააჭიროთ ძიების ღილაკს რომ იხილოთ "
+"შემადგენლობა."
 
 #: modules/websearch/lib/websearch_templates.py:1489
 msgid "This collection does not contain any document yet."
@@ -10664,8 +10460,8 @@ msgstr "ციტირებულია %i ჩანაწერის მი�
 #, python-format
 msgid "Words nearest to %(x_word)s inside %(x_field)s in any collection are:"
 msgstr ""
-"ყველაზე ახლო სიტყვები %(x_word)s -თან %(x_field)s -ში ნებისმიერი კოლექციიდან "
-"არიან:"
+"ყველაზე ახლო სიტყვები %(x_word)s -თან %(x_field)s -ში ნებისმიერი კოლექციიდან"
+" არიან:"
 
 #: modules/websearch/lib/websearch_templates.py:1728
 #, python-format
@@ -10768,7 +10564,8 @@ msgstr "შედგეი არ მოიძებნა..."
 
 #: modules/websearch/lib/websearch_templates.py:3096
 msgid ""
-"Boolean query returned no hits. Please combine your search terms differently."
+"Boolean query returned no hits. Please combine your search terms "
+"differently."
 msgstr ""
 "ორობით შეკითხვაზე შედეგი არ არის. გთხოვთ შერწყოთ თქვენი ძიების სიტყვები "
 "სხვანაერად"
@@ -10821,12 +10618,10 @@ msgstr "იქნებ გნებავთ დაიწყოთ დათვ
 #, python-format
 msgid ""
 "Set up a personal %(x_url1_open)semail alert%(x_url1_close)s\n"
-"                                  or subscribe to the %(x_url2_open)sRSS feed"
-"%(x_url2_close)s."
+"                                  or subscribe to the %(x_url2_open)sRSS feed%(x_url2_close)s."
 msgstr ""
 "დააყენეთ პირადი %(x_url1_open)sელფოსტის შეტყობინება%(x_url1_close)s\n"
-"                                  ან ჩაეწერეთ %(x_url2_open)sRSS ფიდზე"
-"%(x_url2_close)s."
+"                                  ან ჩაეწერეთ %(x_url2_open)sRSS ფიდზე%(x_url2_close)s."
 
 #: modules/websearch/lib/websearch_templates.py:3676
 #, python-format
@@ -10840,9 +10635,8 @@ msgstr "გნებავთ შეტყობინების მიღე�
 #: modules/websearch/lib/websearch_templates.py:3754
 #: modules/websearch/lib/websearch_templates.py:3779
 #: modules/websearch/lib/websearch_templates.py:3829
-#, fuzzy
 msgid "Back to search"
-msgstr "უკან ძიების შედეგებთან"
+msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3789
 #: modules/websearch/lib/websearch_templates.py:3805
@@ -10875,9 +10669,8 @@ msgid ".. of which self-citations: %s records"
 msgstr ".. აქედან თვით-ციტირებულია: %s ჩანაწერი"
 
 #: modules/websearch/lib/websearch_templates.py:4288
-#, fuzzy
 msgid "Frequent co-authors"
-msgstr "ხშირი თანა ავტორები:"
+msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:4362
 msgid "Citations:"
@@ -10900,23 +10693,20 @@ msgid "Average citations per paper:"
 msgstr "საშუალო ციტირება სტატიაზე:"
 
 #: modules/websearch/lib/websearch_templates.py:4476
-#, fuzzy
 msgid "Total number of citations excluding self-citations"
-msgstr "ციტირების საერთო რიცხვი:"
+msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:4487
-#, fuzzy
 msgid "Average citations per paper excluding self-citations"
-msgstr "საშუალო ციტირება სტატიაზე:"
+msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:4501
 msgid "Breakdown of papers by citations:"
 msgstr "სტატიების ციტირებით დაშლა"
 
 #: modules/websearch/lib/websearch_templates.py:4534
-#, fuzzy
 msgid "Additional Citation Metrics"
-msgstr "დამათებითი ინფორმაცია"
+msgstr ""
 
 #: modules/websearch/lib/websearch_webcoll.py:652
 msgid "brief"
@@ -10951,9 +10741,8 @@ msgid "Usage statistics"
 msgstr "გამოყენების სტატისტიკა"
 
 #: modules/websearch/lib/websearchadminlib.py:3400
-#, fuzzy
 msgid "Files"
-msgstr "ფაილი"
+msgstr ""
 
 #: modules/websearch/lib/websearchadminlib.py:3401
 msgid "Plots"
@@ -10966,17 +10755,18 @@ msgstr "დაკავებები"
 #: modules/websession/lib/webaccount.py:117
 #, python-format
 msgid ""
-"You are logged in as guest. You may want to %(x_url_open)slogin"
-"%(x_url_close)s as a regular user."
+"You are logged in as guest. You may want to "
+"%(x_url_open)slogin%(x_url_close)s as a regular user."
 msgstr ""
 "თქვენ შემოსული ხართ, როგორც სტუმარი. თქვენ შეიძლება გინდათ "
-"%(x_url_open)sშემოხვიდეთ%(x_url_close)s როგორც დარეგისტრირებული მომხმარებელი."
+"%(x_url_open)sშემოხვიდეთ%(x_url_close)s როგორც დარეგისტრირებული "
+"მომხმარებელი."
 
 #: modules/websession/lib/webaccount.py:121
 #, python-format
 msgid ""
-"The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister"
-"%(x_url_close)s first"
+"The %(x_fmt_open)sguest%(x_fmt_close)s users need to "
+"%(x_url_open)sregister%(x_url_close)s first"
 msgstr ""
 "%(x_fmt_open)sსტუმარ%(x_fmt_close)s მომხმარებლებს სჭირდება "
 "%(x_url_open)sრეგისტრაცია%(x_url_close)s"
@@ -11003,42 +10793,35 @@ msgstr ""
 
 #: modules/websession/lib/webgroup.py:158
 #: modules/websession/lib/webgroup.py:432
-#, fuzzy
 msgid "Please enter a group name."
-msgstr "გთხოვთ შეიყვანოთ ან მომხმარებლის სახელი ან ჯგუფის სახელი"
+msgstr ""
 
 #: modules/websession/lib/webgroup.py:168
 #: modules/websession/lib/webgroup.py:442
-#, fuzzy
 msgid "Please enter a valid group name."
-msgstr "გთხოვთ შეიყვანოთ ან მომხმარებლის სახელი ან ჯგუფის სახელი"
+msgstr ""
 
 #: modules/websession/lib/webgroup.py:178
 #: modules/websession/lib/webgroup.py:452
-#, fuzzy
 msgid "Please choose a group join policy."
-msgstr "გთხოვთ აირჩოთ კატეგორია"
+msgstr ""
 
 #: modules/websession/lib/webgroup.py:188
 #: modules/websession/lib/webgroup.py:462
-#, fuzzy
 msgid "Group name already exists. Please choose another group name."
-msgstr "ფაილი სახელწოდებით %s უკვე არსებობს. გთხოვთ აირჩოთ სხვა სახელი."
+msgstr ""
 
 #: modules/websession/lib/webgroup.py:260
-#, fuzzy
 msgid "You are already member of the group."
-msgstr "თქვენ არ ხართ ჯგუფის წევრი."
+msgstr ""
 
 #: modules/websession/lib/webgroup.py:302
-#, fuzzy
 msgid "Please select only one group."
-msgstr "გთხოვთ აირჩიოთ ერთი ან რამოდენიმე:"
+msgstr ""
 
 #: modules/websession/lib/webgroup.py:359
-#, fuzzy
 msgid "Please select one group."
-msgstr "გთხოვთ აირჩიოთ ერთი ან რამოდენიმე:"
+msgstr ""
 
 #: modules/websession/lib/webgroup.py:384
 #: modules/websession/lib/webgroup.py:399
@@ -11053,14 +10836,12 @@ msgstr ""
 
 #: modules/websession/lib/webgroup.py:391
 #: modules/websession/lib/webgroup.py:562
-#, fuzzy
 msgid "Sorry, you do not have sufficient rights on this group."
-msgstr "თქვენ არ გაგაჩნიათ ულება ამ ელემენტის ნახვის."
+msgstr ""
 
 #: modules/websession/lib/webgroup.py:499
-#, fuzzy
 msgid "The group has already been deleted."
-msgstr "ჩანაწერი წაშლილია."
+msgstr ""
 
 #: modules/websession/lib/webgroup.py:611
 msgid "Please choose a member if you want to remove him from the group."
@@ -11072,9 +10853,8 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/webgroup.py:664
-#, fuzzy
 msgid "The user is already member of the group."
-msgstr "თქვენ არ ხართ ჯგუფის წევრი."
+msgstr ""
 
 #: modules/websession/lib/webgroup.py:718
 msgid ""
@@ -11083,9 +10863,8 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/webgroup.py:731
-#, fuzzy
 msgid "The user request for joining group has already been rejected."
-msgstr "თქვენი თხოვნა %s ჯგუფში გასაწევრიანებლად უარყოფილია."
+msgstr ""
 
 #: modules/websession/lib/webgroup_dblayer.py:314
 #: modules/websession/lib/webuser.py:309
@@ -11102,8 +10881,8 @@ msgid ""
 "You can consult the list of your external groups directly in the "
 "%(x_url_open)sgroups page%(x_url_close)s."
 msgstr ""
-"თქვენ შეგიძლიათ ნახოთ თქვენი გარე ჯგუფების სია %(x_url_open)sჯგუფების გვერდზე"
-"%(x_url_close)s."
+"თქვენ შეგიძლიათ ნახოთ თქვენი გარე ჯგუფების სია %(x_url_open)sჯგუფების "
+"გვერდზე%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:99
 msgid "External user groups"
@@ -11118,23 +10897,20 @@ msgid "These are your current API keys"
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:163
-#, fuzzy
 msgid "Description: "
-msgstr "აღწერა"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:164
-#, fuzzy
 msgid "Status: "
-msgstr "სტატუსი"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:167
 msgid "API key"
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:168
-#, fuzzy
 msgid "Delete key"
-msgstr "კალათის წაშლა"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:196
 msgid "If you want to create a new API key, please enter a description for it"
@@ -11158,9 +10934,8 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:201
-#, fuzzy
 msgid "Create new key"
-msgstr "ახალი კალათის შექმნა"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:263
 msgid ""
@@ -11313,9 +11088,10 @@ msgid ""
 "account%(x_fmt_close)s, then please enter your email address in the "
 "following form in order to have a password reset link emailed to you."
 msgstr ""
-"თუ თქვენ დაკარგეთ პაროლი %(sitename)s %(x_fmt_open)sანგარიშისათვის"
-"%(x_fmt_close)s, მაშინ გთხოვთ შეიყვანოთ თქვენი ელფოსტის მისამართი ქვემოთ "
-"მოცემულ ფორმაში, რომ გამოგიგზავნოთ წერილი პაროლის გადასატვირთად."
+"თუ თქვენ დაკარგეთ პაროლი %(sitename)s "
+"%(x_fmt_open)sანგარიშისათვის%(x_fmt_close)s, მაშინ გთხოვთ შეიყვანოთ თქვენი "
+"ელფოსტის მისამართი ქვემოთ მოცემულ ფორმაში, რომ გამოგიგზავნოთ წერილი პაროლის "
+"გადასატვირთად."
 
 #: modules/websession/lib/websession_templates.py:523
 #: modules/websession/lib/websession_templates.py:1153
@@ -11333,14 +11109,14 @@ msgid ""
 "then you can recover your password through the %(x_url_open)sCERN "
 "authentication system%(x_url_close)s."
 msgstr ""
-"თუ თქვენ იყენებდით %(x_fmt_open)sცერნის ავტორიზაციის სისტემას"
-"%(x_fmt_close)s, თქვენ შეგიძლიათ აღადგინოთ თქვენი პაროლი "
+"თუ თქვენ იყენებდით %(x_fmt_open)sცერნის ავტორიზაციის "
+"სისტემას%(x_fmt_close)s, თქვენ შეგიძლიათ აღადგინოთ თქვენი პაროლი "
 "%(x_url_open)sცერნის ავტორიზაციის სისტემით%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:531
 msgid ""
-"Note that if you have been using an external login system, then we cannot do "
-"anything and you have to ask there."
+"Note that if you have been using an external login system, then we cannot do"
+" anything and you have to ask there."
 msgstr ""
 "გთხოვთ გაითვალისწინოთ რომ, თუ თქვენ იყენებდით გარე სისტემას, თქვენ უნდა "
 "მიმართოთ მის ადმინისტრატორს."
@@ -11375,8 +11151,8 @@ msgid ""
 "Set or change your account email address or password. Specify your "
 "preferences about the look and feel of the interface."
 msgstr ""
-"დააყენეთ ან შეცვალეთ თქვენი ანგარიშის ელფოსტის მისამართი ან პაროლი. მიუთითეთ "
-"თქვენი პარამეტრები ინტერფეისის შესაცვლელად."
+"დააყენეთ ან შეცვალეთ თქვენი ანგარიშის ელფოსტის მისამართი ან პაროლი. მიუთითეთ"
+" თქვენი პარამეტრები ინტერფეისის შესაცვლელად."
 
 #: modules/websession/lib/websession_templates.py:578
 msgid "View all the searches you performed during the last 30 days."
@@ -11384,8 +11160,8 @@ msgstr "იხილეთ ყველა ძიება რომელიც
 
 #: modules/websession/lib/websession_templates.py:586
 msgid ""
-"With baskets you can define specific collections of items, store interesting "
-"records you want to access later or share with others."
+"With baskets you can define specific collections of items, store interesting"
+" records you want to access later or share with others."
 msgstr ""
 "კალათების გამოყენებით თქვენ შეგიძლიათ განსაზღვროთ ელემენტების კოლექციები, "
 "შეინახოთ საინტერესო ჩანაწერები რომელიც გნებავთ რომ მომავალში იხილოთ ან "
@@ -11419,9 +11195,9 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:655
 #, python-format
 msgid ""
-"You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout"
-"%(x_url1_close)s; b) edit your %(x_url2_open)saccount settings"
-"%(x_url2_close)s."
+"You are logged in as %(x_user)s. You may want to a) "
+"%(x_url1_open)slogout%(x_url1_close)s; b) edit your %(x_url2_open)saccount "
+"settings%(x_url2_close)s."
 msgstr ""
 "თქვენ შემოსული ხართ როგორც %(x_user)s. თქვენ შეიძლება გინდოდეთ ა) "
 "%(x_url1_open)sგამოსვლა%(x_url1_close)s; ბ) შეასწოროთ თქვენი "
@@ -11434,8 +11210,8 @@ msgstr "თქვენი ძიების შეტყობინება�
 #: modules/websession/lib/websession_templates.py:742
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are "
-"administering or are a member of."
+"You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are"
+" administering or are a member of."
 msgstr ""
 "თქვენ შეგიძლიათ იხილოთ სია %(x_url_open)sთქვენი ჯგუფების%(x_url_close)s "
 "რომლებსაც თქვენ განაგებთ ან გაწევრიანებული ხართ."
@@ -11463,8 +11239,8 @@ msgstr "თქვენი  წარდგენები"
 #: modules/websession/lib/websession_templates.py:754
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with "
-"the documents you approved or refereed."
+"You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with"
+" the documents you approved or refereed."
 msgstr ""
 "თქვენ შეგიძლიათ იხილოთ%(x_url_open)sთქვენი დასტურების სია%(x_url_close)s "
 "დოკუმენტებზე რომლებიც დაადასტურეთ ან მიმართეთ."
@@ -11517,7 +11293,8 @@ msgstr "იმისათვის რომ დაადასტუროთ 
 msgid ""
 "Please note that this URL will remain valid for about %(days)s days only."
 msgstr ""
-"გთხოვთ გაითვალისწინოთ რომ ეს მისამართი ძალაში იქნება დაახლოებით %(days)s დღე."
+"გთხოვთ გაითვალისწინოთ რომ ეს მისამართი ძალაში იქნება დაახლოებით %(days)s "
+"დღე."
 
 #: modules/websession/lib/websession_templates.py:852
 #, python-format
@@ -11563,7 +11340,8 @@ msgstr ""
 #, python-format
 msgid "If you wish you can %(x_url_open)slogin here%(x_url_close)s."
 msgstr ""
-"თუ თქვენ გნებავთ, თქვენ შეგიძლიათ %(x_url_open)sშემოხვიდეთ აქ%(x_url_close)s."
+"თუ თქვენ გნებავთ, თქვენ შეგიძლიათ %(x_url_open)sშემოხვიდეთ "
+"აქ%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:955
 msgid "If you already have an account, please login using the form below."
@@ -11583,11 +11361,11 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:962
 #, python-format
 msgid ""
-"If you don't own an account yet, please %(x_url_open)sregister"
-"%(x_url_close)s an internal account."
+"If you don't own an account yet, please "
+"%(x_url_open)sregister%(x_url_close)s an internal account."
 msgstr ""
-"თუ თქვენ ჯერ არ გაქვთ ანგარიში, გთხოვთ %(x_url_open)sდაარეგისტრიროთ"
-"%(x_url_close)s ინტერნეტ ანგარიში."
+"თუ თქვენ ჯერ არ გაქვთ ანგარიში, გთხოვთ "
+"%(x_url_open)sდაარეგისტრიროთ%(x_url_close)s ინტერნეტ ანგარიში."
 
 #: modules/websession/lib/websession_templates.py:970
 #, python-format
@@ -11649,7 +11427,8 @@ msgstr "ახალი პაროლის დაყენება"
 #: modules/websession/lib/websession_templates.py:1108
 msgid "Please enter your email address and desired nickname and password:"
 msgstr ""
-"გთზოვთ შეიყვანოთ თქვენი ელ-ფოსტის მისამართი და სასურველი მეტსახელი და პაროლი:"
+"გთზოვთ შეიყვანოთ თქვენი ელ-ფოსტის მისამართი და სასურველი მეტსახელი და "
+"პაროლი:"
 
 #: modules/websession/lib/websession_templates.py:1110
 msgid ""
@@ -11681,8 +11460,8 @@ msgstr ""
 "გთხოვთ ნუ გამოიყენებთ მნიშვნელოვან პაროლებს როგორიცაა Unix, AFS ან NICE "
 "პაროლები. თქვენი ელფოსტის მისამართი იქნება მკაცრად გასაიდუმლოებული და "
 "არიქნება გაცემული მესამე პირისთვის. ის იქნება გამოყენებლი თქვენი "
-"იდენტიფიცირებისათვის %s -ზე. მაგალითად, თქვენ შეგეძლებათ დააყენოთ ავტომატური "
-"შეტყობინებები ძიების შედეგებზე და შეგატყობინოთ ელფოსტის მეშვეობით."
+"იდენტიფიცირებისათვის %s -ზე. მაგალითად, თქვენ შეგეძლებათ დააყენოთ ავტომატური"
+" შეტყობინებები ძიების შედეგებზე და შეგატყობინოთ ელფოსტის მეშვეობით."
 
 #: modules/websession/lib/websession_templates.py:1167
 #, python-format
@@ -11698,8 +11477,8 @@ msgid ""
 "You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s "
 "first."
 msgstr ""
-"თქვენ ხართ შემოსული როგორც სტუმარი. გთხოვთ ჯერ %(x_url_open)sშემოხვიდეთ"
-"%(x_url_close)s სისტემაში."
+"თქვენ ხართ შემოსული როგორც სტუმარი. გთხოვთ ჯერ "
+"%(x_url_open)sშემოხვიდეთ%(x_url_close)s სისტემაში."
 
 #: modules/websession/lib/websession_templates.py:1199
 msgid "You are not authorized to access administrative functions."
@@ -11721,8 +11500,8 @@ msgstr "იხილეთ რამდენიმე საინტერე�
 #: modules/websession/lib/websession_templates.py:1250
 #, python-format
 msgid ""
-"For more admin-level activities, see the complete %(x_url_open)sAdmin Area"
-"%(x_url_close)s."
+"For more admin-level activities, see the complete %(x_url_open)sAdmin "
+"Area%(x_url_close)s."
 msgstr ""
 "მეტი ადმინისტრატორის ფუნქციებისათვის, იხილეთ სრული %(x_url_open)sადმინის "
 "სივრცე%(x_url_close)s."
@@ -11934,7 +11713,7 @@ msgid "Invitation to join \"%s\" group"
 msgstr "მოიწვიეთ ჯგუფში \"%s\" გასაწევრიანებლად"
 
 #: modules/websession/lib/websession_templates.py:2183
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Hello:\n"
 "\n"
@@ -11943,12 +11722,6 @@ msgid ""
 "\n"
 "Best regards.\n"
 msgstr ""
-"გამარჯობა:\n"
-"\n"
-"ჩემი აზრით თქვენთვის შესაძლოა საინტერესო იყოს ჯგუფში გაწევრიანება \"%s\".\n"
-"თქვენ შეგიძლიათ გაწევრიანდეთ აქ მიჭერით: %s.\n"
-"\n"
-"საუკეთესო სურვილებით.\n"
 
 #: modules/websession/lib/websession_templates.py:2197
 #, python-format
@@ -12045,62 +11818,50 @@ msgstr "ჯგუფი %s წაშლილია ადმინისტრ�
 #: modules/websession/lib/websession_templates.py:2540
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)s%(x_nb_total)i groups"
-"%(x_url_close)s you are subscribed to (%(x_nb_member)i) or administering "
-"(%(x_nb_admin)i)."
+"You can consult the list of %(x_url_open)s%(x_nb_total)i "
+"groups%(x_url_close)s you are subscribed to (%(x_nb_member)i) or "
+"administering (%(x_nb_admin)i)."
 msgstr ""
-"თქვენ შეგიძლიათ იხილოთ %(x_url_open)s%(x_nb_total)i ჯგუფების სია"
-"%(x_url_close)s რომელზეც ჩაწერილი ხართ (%(x_nb_member)i) ან მართავთ "
+"თქვენ შეგიძლიათ იხილოთ %(x_url_open)s%(x_nb_total)i ჯგუფების "
+"სია%(x_url_close)s რომელზეც ჩაწერილი ხართ (%(x_nb_member)i) ან მართავთ "
 "(%(x_nb_admin)i)."
 
 #: modules/websession/lib/websession_templates.py:2559
-#, fuzzy
 msgid ""
 "Warning: The password set for MySQL root user is the same as the default "
-"Invenio password. For security purposes, you may want to change the password."
+"Invenio password. For security purposes, you may want to change the "
+"password."
 msgstr ""
-"გაფრთხილება :  პაროლი რომელიც დააყენეთ MySQL -ზე იგივეა რაც სტანდარტული "
-"Invenio -ს პაროლი. თქვენი უსაფრთხოებისათივს, თქვენ უნდა შეცვალოთ პაროლი."
 
 #: modules/websession/lib/websession_templates.py:2565
-#, fuzzy
 msgid ""
 "Warning: The password set for the Invenio MySQL user is the same as the "
 "shipped default. For security purposes, you may want to change the password."
 msgstr ""
-"გაფრთხილება : დაყენებული პაროლი Invenio -ს მონაცემთა ბაზაზე იგივეა რაც  "
-"სტანდარტული პაროლი Invenio -ს პაროლი. უსაფრთხოებისათვის გირჩევთ შეცვალოთ "
-"პაროლი."
 
 #: modules/websession/lib/websession_templates.py:2571
-#, fuzzy
 msgid ""
-"Warning: The password set for the Invenio admin user is currently empty. For "
-"security purposes, it is strongly recommended that you add a password."
+"Warning: The password set for the Invenio admin user is currently empty. For"
+" security purposes, it is strongly recommended that you add a password."
 msgstr ""
-"გაფრთხილება : პაროლი Invenio admin მომხმარებლისათვის ამჟამად ცარიელია. "
-"უსაფრთხოებისათვის რეკომენდირებულია რომ დაადოთ პაროლი."
 
 #: modules/websession/lib/websession_templates.py:2577
-#, fuzzy
 msgid ""
-"Warning: The email address set for support email is currently set to "
-"info@invenio-software.org. It is recommended that you change this to your "
-"own address."
+"Warning: The email address set for support email is currently set to info"
+"@invenio-software.org. It is recommended that you change this to your own "
+"address."
 msgstr ""
-"გაფრთხილება: მხარდაჭერის პაროლი ამჟამად არის info@invenio-software.org . "
-"რეკომენდირებულია რომ თქვენ შეცვალოთ ის თქვენს ელფოსტის მისამართზე."
 
 #: modules/websession/lib/websession_templates.py:2583
-#, fuzzy
 msgid ""
-"A newer version of Invenio is available for download. You may want to visit  "
-msgstr "Invenio -ს ახალი ვერსია შეიძლება იყოს გადმოწერილი. გთხოვთ გვეახლეთ"
+"A newer version of Invenio is available for download. You may want to visit"
+"  "
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2590
 msgid ""
-"Cannot download or parse release notes from http://invenio-software.org/repo/"
-"invenio/tree/RELEASE-NOTES"
+"Cannot download or parse release notes from http://invenio-"
+"software.org/repo/invenio/tree/RELEASE-NOTES"
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:91
@@ -12140,8 +11901,8 @@ msgstr "თქვენი ანგარიშის ჩასართავ�
 #, python-format
 msgid "You can now go to %(x_url_open)syour account page%(x_url_close)s."
 msgstr ""
-"თქვენ უკვე შეგიძლიათ გადახვიდეთ %(x_url_open)sთქვენ ანგარისის გვერდზე"
-"%(x_url_close)s."
+"თქვენ უკვე შეგიძლიათ გადახვიდეთ %(x_url_open)sთქვენ ანგარისის "
+"გვერდზე%(x_url_close)s."
 
 #: modules/websession/lib/websession_webinterface.py:130
 #: modules/websession/lib/websession_webinterface.py:139
@@ -12154,7 +11915,8 @@ msgstr "თქვენ უკვე დაადასტურეთ თქვ
 
 #: modules/websession/lib/websession_webinterface.py:142
 msgid ""
-"This request for confirmation of an email address is not valid or is expired."
+"This request for confirmation of an email address is not valid or is "
+"expired."
 msgstr ""
 "ეს მოთხოვნა ელ-ფოსტის მისამართის დასადასტურებლად არ არის სწორი ან უკვე "
 "ამოიწურა."
@@ -12268,9 +12030,8 @@ msgstr ""
 "გთხოვთ დაუკავშირდეთ საიტის ადმინისტრატორს."
 
 #: modules/websession/lib/websession_webinterface.py:450
-#, fuzzy
 msgid "Your nickname has not been updated"
-msgstr "ეს ჩანაწერი განახლებულია"
+msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:464
 msgid "Settings successfully edited."
@@ -12616,11 +12377,11 @@ msgstr "უკაცრავად, მაგრამ გვერდი %s �
 #: modules/webstyle/lib/webdoc_webinterface.py:190
 #, python-format
 msgid ""
-"You may want to look at the %(x_url_open)s%(x_category)s pages"
-"%(x_url_close)s."
+"You may want to look at the %(x_url_open)s%(x_category)s "
+"pages%(x_url_close)s."
 msgstr ""
-"You may want to look at the %(x_url_open)s%(x_category)s pages"
-"%(x_url_close)s."
+"You may want to look at the %(x_url_open)s%(x_category)s "
+"pages%(x_url_close)s."
 
 #: modules/webstyle/lib/webpage.py:249
 msgid "Warning"
@@ -12712,13 +12473,10 @@ msgid "In case of doubt, please contact %(x_admin_email)s."
 msgstr "თუ არხართ დარწმუნებული, დაუკავშირდით %(x_admin_email)s."
 
 #: modules/websubmit/lib/functions/Shared_Functions.py:200
-#, fuzzy
 msgid ""
 "Note that your submission has been inserted into the bibliographic task "
 "queue and is waiting for execution.\n"
 msgstr ""
-"შენიშნეთ რომ თქვენი დამატება წარმატებით დაემატა ბიბლიოგრაფიულ რიგში და "
-"ელოდება შესრულებას.\n"
 
 #: modules/websubmit/lib/functions/Shared_Functions.py:203
 #, python-format
@@ -12734,8 +12492,8 @@ msgstr ""
 #: modules/websubmit/lib/functions/Shared_Functions.py:205
 msgid ""
 "Because of a human intervention or a temporary problem, the task queue is "
-"currently set to the manual mode. Your submission is well registered but may "
-"take longer than usual before it is fully integrated and searchable.\n"
+"currently set to the manual mode. Your submission is well registered but may"
+" take longer than usual before it is fully integrated and searchable.\n"
 msgstr ""
 "ადამიანის ჩარევის გამო ან დრობითი პრობლემის, დავალებების რიგი გადავიდა "
 "ხელოვნურ რეჟიმზე. თქვენი დამატება წარმატებით დარეგისტრირდა, მაგრამ შეიძლება "
@@ -12788,15 +12546,16 @@ msgstr "ვერ ხერხდება წარდგენილი გვ
 #: modules/websubmit/lib/websubmit_engine.py:296
 #: modules/websubmit/lib/websubmit_engine.py:908
 msgid ""
-"Unable to create a directory for this submission. The administrator has been "
-"alerted."
+"Unable to create a directory for this submission. The administrator has been"
+" alerted."
 msgstr ""
 "ვერ ხერხდება დირექტორიის შექმნა ამ დამატებისათვის. შეტყობინება გაეგზავა "
 "ადმინისტრატორს."
 
 #: modules/websubmit/lib/websubmit_engine.py:435
 #: modules/websubmit/lib/websubmit_engine.py:1035
-msgid "Cannot create submission directory. The administrator has been alerted."
+msgid ""
+"Cannot create submission directory. The administrator has been alerted."
 msgstr ""
 "ვერ ხერხდება დამატების დირექტორიის შექმნა. შეტყობინება გაეგზავნა "
 "ადმინისტრატორს."
@@ -12820,9 +12579,9 @@ msgid ""
 "inserted into the form</em> (e.g. by copy and pasting some text from a PDF "
 "file)."
 msgstr ""
-"ადგილი აქვს სერიოზულ ფუნქციუ შეცდომას. შეტყობინება გაეგზავნა ადმინისტრატორს. "
-"<br /><em>შეიძლება გამოწვეული იყოს არასწორი სიმბოლოების გამოყენების გამო</"
-"em> (მაგალითად PDF ფაილიდან დაკოპირებით)."
+"ადგილი აქვს სერიოზულ ფუნქციუ შეცდომას. შეტყობინება გაეგზავნა ადმინისტრატორს."
+" <br /><em>შეიძლება გამოწვეული იყოს არასწორი სიმბოლოების გამოყენების "
+"გამო</em> (მაგალითად PDF ფაილიდან დაკოპირებით)."
 
 #: modules/websubmit/lib/websubmit_engine.py:1468
 #, python-format
@@ -12859,8 +12618,8 @@ msgstr "გთხოვთ აირჩიოთ კატეგორია დ
 
 #: modules/websubmit/lib/websubmit_templates.py:364
 msgid ""
-"To continue with a previously interrupted submission, enter an access number "
-"into the box below:"
+"To continue with a previously interrupted submission, enter an access number"
+" into the box below:"
 msgstr ""
 "იმისათვის რომ შეძლოთ გაგრძელება უწინ შეწყვეტილი წარდგენის, საჭიროა წვდომის "
 "ნომრის შეყვანა შემდგომ გრაფაში:  "
@@ -13199,13 +12958,10 @@ msgid "WARNING! Upon confirmation, an email will be sent to the referee."
 msgstr "ყურადღება! დადასტურების შემდგომ ელფოსტა გაეგზავნება რეფერის."
 
 #: modules/websubmit/lib/websubmit_templates.py:2153
-#, fuzzy
 msgid ""
 "As a referee for this document, you may approve or reject it from the "
 "submission interface"
 msgstr ""
-"როგორც ამ დოკუმენტის რეფერი, თქვენ შეგიძლიათ დააჭიროთ ამ ღილაკს მის "
-"დასადასტურებლად ან უარსაყოფად"
 
 #: modules/websubmit/lib/websubmit_templates.py:2155
 msgid "Approve/Reject"
@@ -13241,7 +12997,8 @@ msgstr "ის ჯეერ შმოწმებული იყო რეფ�
 
 #: modules/websubmit/lib/websubmit_templates.py:2264
 #: modules/websubmit/lib/websubmit_templates.py:2318
-msgid "Last request e-mail was sent to the publication committee chair on the "
+msgid ""
+"Last request e-mail was sent to the publication committee chair on the "
 msgstr ""
 "ბოლო მოთხოვნის ელფოსტა გაეგზავნა გამომცემლობის კომიტეტის თავჯდომარესთან"
 
@@ -13284,7 +13041,8 @@ msgid ""
 "The publication committee has sent his final recommendations to the project "
 "leader on the "
 msgstr ""
-"პუბლიკაციის კომიტეტმა გაგზავნა მისი ბოლო რეკომენდაცია პროექტის ხელმძღვანელთან"
+"პუბლიკაციის კომიტეტმა გაგზავნა მისი ბოლო რეკომენდაცია პროექტის "
+"ხელმძღვანელთან"
 
 #: modules/websubmit/lib/websubmit_templates.py:2291
 #: modules/websubmit/lib/websubmit_templates.py:2358
@@ -13346,7 +13104,8 @@ msgstr "რეფერი აირჩა შემსწორებელთ�
 
 #: modules/websubmit/lib/websubmit_templates.py:2340
 msgid ""
-"The referee has sent his final recommendations to the editorial board on the "
+"The referee has sent his final recommendations to the editorial board on the"
+" "
 msgstr "რეფერიმ გაგზავნა მისი ბოლო რეკომენდაცია შემსტორებელთა გუნდთან"
 
 #: modules/websubmit/lib/websubmit_templates.py:2348
@@ -13413,14 +13172,12 @@ msgid "reject"
 msgstr "უაყავით"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:686
-#, fuzzy
 msgid "Sorry, invalid arguments"
-msgstr "უკაცრავად,  არასწორი URL..."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:693
-#, fuzzy
 msgid "Note: the requested submission has already been completed"
-msgstr "თქვენი თხოვნა %s ჯგუფში გასაწევრიანებლად უარყოფილია."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:697
 msgid ""
@@ -13476,8 +13233,8 @@ msgstr ""
 #, python-format
 msgid ""
 "Unable to move field at position %s to position %s on page %s of submission "
-"%s - could not decrement the position of the fields below position %s. Tried "
-"to recover - please check that field ordering is not broken"
+"%s - could not decrement the position of the fields below position %s. Tried"
+" to recover - please check that field ordering is not broken"
 msgstr ""
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3960
@@ -13496,14 +13253,15 @@ msgid ""
 msgstr ""
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3992
-#, fuzzy, python-format
+#, python-format
 msgid "Unable to delete field at position %s from page %s of submission '%s'"
-msgstr "ვერ ხერხდება წარდგენილი გვერდების რიცხვის დადგენა."
+msgstr ""
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:4002
-#, fuzzy, python-format
-msgid "Unable to delete field at position %s from page %s of submission '%s%s'"
-msgstr "ვერ ხერხდება წარდგენილი გვერდების რიცხვის დადგენა."
+#, python-format
+msgid ""
+"Unable to delete field at position %s from page %s of submission '%s%s'"
+msgstr ""
 
 #: modules/websubmit/web/approve.py:53
 msgid "approve.py: cannot determine document reference"
@@ -13582,7 +13340,8 @@ msgstr "ლიმიტი"
 
 #: modules/websubmit/web/publiline.py:748
 msgid "users in brackets are already attached to the role, try another one..."
-msgstr "მომხმარებლები ჩაწერილნი ფრჩხილებში უკვე ერთვიან როლს, ცადეთ სხვები... "
+msgstr ""
+"მომხმარებლები ჩაწერილნი ფრჩხილებში უკვე ერთვიან როლს, ცადეთ სხვები... "
 
 #: modules/websubmit/web/publiline.py:754
 msgid "Removing users from the editorial board"
@@ -13621,243 +13380,3 @@ msgstr "არასწორი მოქმედება აღნიშნ�
 #: modules/websubmit/web/yourapprovals.py:57
 msgid "You are not authorized to use approval system."
 msgstr "თქვენ არ გაქვთ ავტორიზაცია დადასტურებული სისტემის გამოყენებისთვის."
-
-#, fuzzy
-#~ msgid "You are about to attribute the following paper"
-#~ msgstr "თქვენ მომდებნო ჯგუფების წევრი ბრძანდებით:"
-
-#, fuzzy
-#~ msgid "Sorry."
-#~ msgstr "უკაცრავად"
-
-#, fuzzy
-#~ msgid "Please provide at least one transaction."
-#~ msgstr "გთხოვთ მონიშნოთ მოქმედება"
-
-#, fuzzy
-#~ msgid "Error:"
-#~ msgstr "შეცდომა"
-
-#~ msgid "Check if the book already exists on Invenio,"
-#~ msgstr "შეამოწმეთ თუ წიგნი უკვე არსებობს Invenio -ზე,"
-
-#, fuzzy
-#~ msgid "%i items found"
-#~ msgstr "ელემენტია ნაპოვნი"
-
-#~ msgid "*** basket name ***"
-#~ msgstr "*** კალათის სახელი ***"
-
-#, fuzzy
-#~ msgid ""
-#~ "<div class=\"webcomment_comment_round_header\">%(x_nb)i Comments for "
-#~ "round \"%(x_name)s\""
-#~ msgstr "%(x_name)s დაწერეს %(x_date)s ზე:"
-
-#, fuzzy
-#~ msgid "%(x_name)s"
-#~ msgstr "%(x_sitename)s ბმული"
-
-#~ msgid "Sorry, you must log in to perform this action."
-#~ msgstr ""
-#~ "უკაცრავად, მაგრამ თქვენ ჯერ უნდა შეხვიდეთ იმისთვის რომ ეს მოქმედება "
-#~ "განახორციელოთ."
-
-#~ msgid "Please log in first."
-#~ msgstr "გთხოვთ ჯერ შეხვიდეთ. "
-
-#~ msgid "Use the top-right menu to log in."
-#~ msgstr "გამოიყენეთ ზედა-მარჯვენა მენიუ შესასვლელად."
-
-#~ msgid "Sorry parameter missing..."
-#~ msgstr "უკაცრავად პარამეტრი აკლია..."
-
-#~ msgid "period_of_interest_from"
-#~ msgstr "საინტერესო_პერიოდი_დან"
-
-#~ msgid "jsCal3"
-#~ msgstr "jsCal3"
-
-#~ msgid "period_of_interest_to"
-#~ msgstr "საინტერესო_პერიოდი_მდე"
-
-#~ msgid "jsCal4"
-#~ msgstr "jsCal4"
-
-#~ msgid "jsCal1"
-#~ msgstr "jsCal1"
-
-#~ msgid "jsCal2"
-#~ msgstr "jsCal2"
-
-#, fuzzy
-#~ msgid "now"
-#~ msgstr "არა"
-
-#~ msgid "No fulltext"
-#~ msgstr "სრული ტექსტი არ არის"
-
-#~ msgid "notes"
-#~ msgstr "შენიშვნები"
-
-#~ msgid "last note on"
-#~ msgstr "ბოლო შენიშვნა"
-
-#, fuzzy
-#~ msgid ", no notes yet"
-#~ msgstr "ჯერ არ არის შენიშვნები"
-
-#~ msgid "HTML brief"
-#~ msgstr "მოკლე HTML"
-
-#~ msgid "You have "
-#~ msgstr "თქვენ გაქვთ"
-
-#~ msgid "ERROR"
-#~ msgstr "შეცდომა"
-
-#~ msgid "already exists."
-#~ msgstr "უკვე არსებობს."
-
-#~ msgid "deleted"
-#~ msgstr "წაშლა"
-
-#~ msgid "in their rules and descriptions"
-#~ msgstr "მათ წესებში და აღწერილობებში"
-
-#~ msgid "The left side of the rule "
-#~ msgstr "წესის მარცხენა ნაწილი"
-
-#~ msgid "The right side of the rule "
-#~ msgstr "წესის მარჯვენა ნაწილი"
-
-#~ msgid "upload is a file"
-#~ msgstr "ფაილის ატვირთვა"
-
-#~ msgid "No such knowledge base"
-#~ msgstr "არ არსებობს მსგავსი ცოდნის ბაზა"
-
-#~ msgid ""
-#~ "Cannot download release notes from http://cdsware.cern.ch/, please check "
-#~ "your internet connection"
-#~ msgstr ""
-#~ "ვერ ხერხდება რელისის გადმოწერა http://cdsware.cern.ch/ დან, გთხოვთ "
-#~ "შეამოწმოთ ინტერნეტთან კავშირი."
-
-#~ msgid "Date:"
-#~ msgstr "თარიღი:"
-
-#~ msgid "Time:"
-#~ msgstr "დრო:"
-
-#~ msgid "Example:"
-#~ msgstr "მაგალითი:"
-
-#~ msgid "All fields with"
-#~ msgstr "ყველა ველი რომელიც შეიცავს"
-
-#~ msgid "are mandatory"
-#~ msgstr "სავალდებულოა"
-
-#~ msgid "Input dir:"
-#~ msgstr "შეყვანის დირექტორია:"
-
-#~ msgid "are mandatory."
-#~ msgstr "სავალდებულოა"
-
-#~ msgid "Check the"
-#~ msgstr "შეამოწმეთ"
-
-#~ msgid " Batch Uploader daemon help page"
-#~ msgstr "ჯგუფური ატვირთვის სერვისის დამხმარე გვერდი"
-
-#~ msgid " for executing these actions periodically."
-#~ msgstr "ამ ქმედებების პერიოდულად შესრულებისათვის."
-
-#~ msgid "Configure Bibknowledge"
-#~ msgstr "Bibknowledge -ის კონფიგურება"
-
-#~ msgid "creating a new basket"
-#~ msgstr "ახალი კალათის შექმნა"
-
-#~ msgid "You may want to start by"
-#~ msgstr "თქვენ შეიძლება გინდათ დაიწყოთ"
-
-#~ msgid "In"
-#~ msgstr "ში"
-
-#~ msgid "by"
-#~ msgstr "ით"
-
-#~ msgid "on"
-#~ msgstr "ზე"
-
-#~ msgid "basket"
-#~ msgstr "კალათა"
-
-#~ msgid "Proceed to the"
-#~ msgstr "გააგრძელეთ"
-
-#~ msgid "previous basket"
-#~ msgstr "წინა კალათა"
-
-#~ msgid "or return to your"
-#~ msgstr "ან დაბრუნდით თქვენს"
-
-#~ msgid "search"
-#~ msgstr "ძებნა"
-
-#~ msgid "create a new one"
-#~ msgstr "შექმენით ახალი"
-
-#~ msgid "Adding"
-#~ msgstr "ვამატებ"
-
-#~ msgid "Please choose a basket"
-#~ msgstr "გთხოვთ აირჩიოთ კალათა"
-
-#~ msgid "first"
-#~ msgstr "პირველი"
-
-#~ msgid "Editing topic"
-#~ msgstr "თემის შესწორება"
-
-#~ msgid "Item "
-#~ msgstr "ელემენტი"
-
-#~ msgid " of "
-#~ msgstr "ის"
-
-#~ msgid ""
-#~ "Nested or mismatched parentheses detected. Ignoring all parentheses in "
-#~ "the query..."
-#~ msgstr ""
-#~ "წყობილი ან აცდენილი ფრჩხილებია შენიშნული. ვუგუვებელყოფ ყველა ფრჩხილს ამ "
-#~ "მოთხოვნაზე ..."
-
-#~ msgid "niceName"
-#~ msgstr "ლამაზისახელი"
-
-#~ msgid "Apply Changes"
-#~ msgstr "დაუმათეთ ცვლილებები"
-
-#~ msgid "Replace text"
-#~ msgstr "ტექსტის ჩანაცვლება"
-
-#~ msgid "Edit this item"
-#~ msgstr "ამ ჩანაწერის რედაქტირება"
-
-#~ msgid "order_date"
-#~ msgstr "განკარგულების_თარიღი"
-
-#~ msgid "expected_date"
-#~ msgstr "მოსალოდნელი_თარიღი"
-
-#~ msgid "arrival_date"
-#~ msgstr "ჩამოსვლის_თარღი"
-
-#~ msgid "due_date"
-#~ msgstr "დედლაინი"
-
-#~ msgid "return_date"
-#~ msgstr "დაბრუნების_თარიღი"

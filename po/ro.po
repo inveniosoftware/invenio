@@ -1,32 +1,22 @@
-# # This file is part of Invenio.
-# # Copyright (C) 2009, 2010, 2011 CERN.
-# #
-# # Invenio is free software; you can redistribute it and/or
-# # modify it under the terms of the GNU General Public License as
-# # published by the Free Software Foundation; either version 2 of the
-# # License, or (at your option) any later version.
-# #
-# # Invenio is distributed in the hope that it will be useful, but
-# # WITHOUT ANY WARRANTY; without even the implied warranty of
-# # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# # General Public License for more details.
-# #
-# # You should have received a copy of the GNU General Public License
-# # along with Invenio; if not, write to the Free Software Foundation, Inc.,
-# # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR CERN
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.1.6\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2014-08-31 22:26+0200\n"
-"PO-Revision-Date: 2010-12-07 10:51+0100\n"
-"Last-Translator: Ludmila Marian <ludmila.marian@gmail.com>\n"
-"Language-Team: RO <info@invenio-software.org>\n"
-"Language: \n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Tibor Simko <tibor.simko@cern.ch>, 2016\n"
+"Language-Team: Romanian (https://www.transifex.com/inveniosoftware/teams/23537/ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: pygettext.py 1.5\n"
+"Language: ro\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));\n"
 
 #: modules/websearch/doc/search-guide.webdoc:361
 #: modules/websearch/doc/search-guide.webdoc:396
@@ -1399,9 +1389,8 @@ msgid "Quit searching."
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:515
-#, fuzzy
 msgid "Your options"
-msgstr "Alertele tale"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:525
 msgid "Claim for yourself"
@@ -1412,30 +1401,26 @@ msgid "Attribute to"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:533
-#, fuzzy
 msgid "Search for a person to attribute the paper to"
-msgstr "Sunteţi membru al următoarelor grupuri:"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:593
 #: modules/bibauthorid/lib/bibauthorid_templates.py:687
 #: modules/bibauthorid/lib/bibauthorid_templates.py:759
-#, fuzzy
 msgid "Select All"
-msgstr "Şterge tot"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:594
 #: modules/bibauthorid/lib/bibauthorid_templates.py:688
 #: modules/bibauthorid/lib/bibauthorid_templates.py:760
-#, fuzzy
 msgid "Select None"
-msgstr "Selectaţi"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:595
 #: modules/bibauthorid/lib/bibauthorid_templates.py:689
 #: modules/bibauthorid/lib/bibauthorid_templates.py:761
-#, fuzzy
 msgid "Invert Selection"
-msgstr "orice colecţie"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:597
 #: modules/bibauthorid/lib/bibauthorid_templates.py:691
@@ -1448,14 +1433,12 @@ msgid "Paper Short Info"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:617
-#, fuzzy
 msgid "Author Name"
-msgstr "Autor:"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:618
-#, fuzzy
 msgid "Affiliation"
-msgstr "Afilieri:"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:619
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:535
@@ -1466,9 +1449,8 @@ msgid "Date"
 msgstr "Dată"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:620
-#, fuzzy
 msgid "Experiment"
-msgstr "experiment"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:621
 #: modules/bibauthorid/lib/bibauthorid_templates.py:736
@@ -1502,9 +1484,8 @@ msgid "On all pages"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:765
-#, fuzzy
 msgid "With selected do"
-msgstr "A fost respins pe:"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:794
 msgid "Names variants"
@@ -1525,43 +1506,36 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_templates.py:944
 #: modules/bibauthorid/lib/bibauthorid_templates.py:945
 #: modules/bibauthorid/lib/bibauthorid_templates.py:948
-#, fuzzy
 msgid "Not provided"
-msgstr "Nu a fost încă examinat"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:946
-#, fuzzy
 msgid "Not available"
-msgstr "Niciun jurnal nu este disponibil"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:947
-#, fuzzy
 msgid "No comments"
-msgstr "comentarii"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:949
-#, fuzzy
 msgid "Not Available"
-msgstr "Niciun jurnal nu este disponibil"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:969
-#, fuzzy
 msgid " Delete this ticket"
-msgstr "Şterge comentariu"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:973
 msgid " Commit this entire ticket"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:993
-#, fuzzy
 msgid "No title available"
-msgstr "Niciun jurnal nu este disponibil"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1080
-#, fuzzy
 msgid "Choose system"
-msgstr "Alege un subiect"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1108
 msgid "Make sure we match the right names!"
@@ -1585,8 +1559,8 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1122
 msgid ""
-"(the names will be automatically gathered when the first paper is claimed to "
-"this profile)."
+"(the names will be automatically gathered when the first paper is claimed to"
+" this profile)."
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1124
@@ -1622,9 +1596,8 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1218
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1234
-#, fuzzy
 msgid "Navigation:"
-msgstr "Citaţii:"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1219
 msgid "Run paper attribution for another author"
@@ -1632,14 +1605,12 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1220
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1237
-#, fuzzy
 msgid "Person Interface FAQ"
-msgstr "Interfaţa pentru publicare"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1235
-#, fuzzy
 msgid "Person Search"
-msgstr "Caută"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1236
 msgid "Open tickets"
@@ -1709,9 +1680,8 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1399
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1401
-#, fuzzy
 msgid "Your last name:"
-msgstr "Numele grupului:"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1409
 msgid "Please provide your eMail address"
@@ -1741,9 +1711,8 @@ msgid "Confirm these changes**"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1444
-#, fuzzy
 msgid "!Delete the entire request!"
-msgstr "Ştergeţi comentariile selectate"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1457
 msgid "Mark as your documents"
@@ -1758,9 +1727,8 @@ msgid "Nothing staged as not yours"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1487
-#, fuzzy
 msgid "Mark as their documents"
-msgstr "Discutaţi despre acest document"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1498
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1513
@@ -1784,8 +1752,8 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1576
 #, python-format
 msgid ""
-"We do not have a publication list for '%s'. Try using a less specific author "
-"name, or check back in a few days as attributions are updated frequently.  "
+"We do not have a publication list for '%s'. Try using a less specific author"
+" name, or check back in a few days as attributions are updated frequently.  "
 "Or you can send us feedback, at "
 msgstr ""
 
@@ -1820,9 +1788,8 @@ msgid "most recent documents:"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1681
-#, fuzzy
 msgid "Sorry, there are no documents known for this person"
-msgstr "Ne pare rău, dar această categorie nu există pentru aceast jurnal."
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1683
 msgid ""
@@ -2047,9 +2014,8 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:718
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:721
-#, fuzzy
 msgid "Your papers"
-msgstr "Alertele tale"
+msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:718
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:722
@@ -2236,9 +2202,9 @@ msgid "Not authorized"
 msgstr ""
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:79
-#, fuzzy, python-format
+#, python-format
 msgid "ERROR: %s does not exist"
-msgstr "Utilizatorul %s nu există."
+msgstr ""
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:81
 #, python-format
@@ -4220,7 +4186,8 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11014
 #, python-format
 msgid ""
-"I accept the %s of the service in particular the return of books in due time."
+"I accept the %s of the service in particular the return of books in due "
+"time."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10808
@@ -4452,7 +4419,8 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15509
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15667
 msgid ""
-"Check if the book already exists on Invenio, before to send your ILL request."
+"Check if the book already exists on Invenio, before to send your ILL "
+"request."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15533
@@ -4563,10 +4531,10 @@ msgstr ""
 #: modules/bibclassify/lib/bibclassify_templates.py:128
 #: modules/bibclassify/lib/bibclassify_templates.py:187
 msgid ""
-"Automatically generated <span class=\"keyword single\">single</span>,        "
-"<span class=\"keyword composite\">composite</span>, <span class=\"keyword "
-"author-kw\">author</span>,        and <span class=\"keyword other-kw\">other "
-"keywords</span>."
+"Automatically generated <span class=\"keyword single\">single</span>,"
+"        <span class=\"keyword composite\">composite</span>, <span "
+"class=\"keyword author-kw\">author</span>,        and <span class=\"keyword "
+"other-kw\">other keywords</span>."
 msgstr ""
 
 #: modules/bibclassify/lib/bibclassify_templates.py:233
@@ -4586,14 +4554,14 @@ msgid "Show more..."
 msgstr ""
 
 #: modules/bibclassify/lib/bibclassify_templates.py:320
-#, fuzzy, python-format
+#, python-format
 msgid "Unweighted %s keywords:"
-msgstr "Citat de: %s documente"
+msgstr ""
 
 #: modules/bibclassify/lib/bibclassify_templates.py:326
-#, fuzzy, python-format
+#, python-format
 msgid "Weighted %s keywords:"
-msgstr "Citat de: %s documente"
+msgstr ""
 
 #: modules/bibclassify/lib/bibclassify_templates.py:365
 #: modules/websearch/lib/websearchadminlib.py:3397
@@ -4629,8 +4597,8 @@ msgstr ""
 
 #: modules/bibclassify/lib/bibclassify_webinterface.py:263
 msgid ""
-"Unfortunately, we don't have a PDF fulltext for this record in the "
-"storage,                     keywords cannot be generated using an automated "
+"Unfortunately, we don't have a PDF fulltext for this record in the storage,"
+"                     keywords cannot be generated using an automated "
 "process."
 msgstr ""
 
@@ -4726,7 +4694,8 @@ msgstr ""
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:900
 msgid ""
-"Alternative formats uploaded for current version of this file will be removed"
+"Alternative formats uploaded for current version of this file will be "
+"removed"
 msgstr ""
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:901
@@ -4743,9 +4712,8 @@ msgid "Uploading..."
 msgstr ""
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:905
-#, fuzzy
 msgid "Please wait..."
-msgstr "Vă rugăm să selectaţi unul sau mai multe:"
+msgstr ""
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:918
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:452
@@ -4834,8 +4802,8 @@ msgstr ""
 
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:137
 msgid ""
-"The system has encountered an error in retrieving the list of files for this "
-"document."
+"The system has encountered an error in retrieving the list of files for this"
+" document."
 msgstr ""
 
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:138
@@ -4846,9 +4814,9 @@ msgid ""
 msgstr ""
 
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:199
-#, fuzzy, python-format
+#, python-format
 msgid "The format %s does not exist for the given version: %s"
-msgstr "Utilizatorul %s nu există."
+msgstr ""
 
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:213
 msgid "This file is restricted: "
@@ -5050,9 +5018,8 @@ msgid "contains"
 msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:591
-#, fuzzy
 msgid "does not exist"
-msgstr "Utilizatorul %s nu există."
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:592
 msgid "condition"
@@ -5063,9 +5030,8 @@ msgid "when other subfield"
 msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:594
-#, fuzzy
 msgid "when subfield"
-msgstr "orice câmp"
+msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:595
 msgid "Apply only to specific field instances"
@@ -5083,8 +5049,8 @@ msgstr ""
 msgid ""
 "WARNING: The following records are pending execution                        "
 "in the task queue.                        If you proceed with the changes, "
-"the modifications made                        with other tool (e.g. BibEdit) "
-"to these records will                        be lost"
+"the modifications made                        with other tool (e.g. BibEdit)"
+" to these records will                        be lost"
 msgstr ""
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:691
@@ -5136,8 +5102,8 @@ msgstr ""
 #: modules/bibencode/lib/bibencode_batch_engine.py:125
 #, python-format
 msgid ""
-"You might want to take a look at  %(guidelines_url)s and modify or redo your "
-"submission."
+"You might want to take a look at  %(guidelines_url)s and modify or redo your"
+" submission."
 msgstr ""
 
 #: modules/bibencode/lib/bibencode_batch_engine.py:136
@@ -5268,9 +5234,8 @@ msgid "None"
 msgstr ""
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:672
-#, fuzzy
 msgid "Manually"
-msgstr "Ianuarie"
+msgstr ""
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:674
 msgid "Daily"
@@ -5379,9 +5344,9 @@ msgid "Missing attrbute \"name\" in IF."
 msgstr ""
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:604
-#, fuzzy, python-format
+#, python-format
 msgid "Invalid regular expression: %s."
-msgstr "Expresie regulată:"
+msgstr ""
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:620
 #: modules/bibformat/lib/bibformat_bfx_engine.py:648
@@ -5426,8 +5391,8 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_engine.py:662
 #, python-format
 msgid ""
-"Escape mode for format element %s could not be retrieved. Using default mode "
-"instead."
+"Escape mode for format element %s could not be retrieved. Using default mode"
+" instead."
 msgstr ""
 
 #: modules/bibformat/lib/bibformat_engine.py:734
@@ -5442,9 +5407,9 @@ msgid "Could not read format template named %s. %s."
 msgstr ""
 
 #: modules/bibformat/lib/bibformat_engine.py:1027
-#, fuzzy, python-format
+#, python-format
 msgid "Format element %s could not be found."
-msgstr "Documentaţia elementele de format"
+msgstr ""
 
 #: modules/bibformat/lib/bibformat_engine.py:1061
 #: modules/bibformat/lib/bibformatadminlib.py:1541
@@ -5682,9 +5647,9 @@ msgid "Enter a search query here."
 msgstr ""
 
 #: modules/bibformat/lib/bibformatadminlib.py:406
-#, fuzzy, python-format
+#, python-format
 msgid "No Record Found for %s."
-msgstr "Documentul nu a fost găsit"
+msgstr ""
 
 #: modules/bibformat/lib/bibformatadminlib.py:1280
 #, python-format
@@ -5724,9 +5689,9 @@ msgstr ""
 
 #: modules/bibformat/lib/bibformatadminlib.py:1343
 #: modules/bibformat/lib/bibformatadminlib.py:1376
-#, fuzzy, python-format
+#, python-format
 msgid "Template \"%s\" does not exist at line %s."
-msgstr "Utilizatorul %s nu există."
+msgstr ""
 
 #: modules/bibformat/lib/bibformatadminlib.py:1354
 #, python-format
@@ -5994,9 +5959,8 @@ msgid ""
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:89
-#, fuzzy
 msgid "No Knowledge Base"
-msgstr "Gestionează bazele de cunoştinţe"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:148
 msgid "Add New Knowledge Base"
@@ -6050,8 +6014,8 @@ msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:244
 msgid ""
-"If the expression is empty, a list of all values                          in "
-"270__a will be created."
+"If the expression is empty, a list of all values                          in"
+" 270__a will be created."
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:246
@@ -6071,23 +6035,21 @@ msgstr ""
 msgid ""
 "Example 1: Your records contain field 270__a for                          "
 "the name and address of the author's institute.                          If "
-"you set the field to '270__a' and the expression                          to "
-"'270__a:*Paris*', a list of institutes in Paris                          "
+"you set the field to '270__a' and the expression                          to"
+" '270__a:*Paris*', a list of institutes in Paris                          "
 "will be created."
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:256
 msgid ""
-"Example 2: Return the institute's name (100__a) when "
-"the                          user gives its postal code "
-"(270__a):                          Set field to 100__a, expression to 270__a:"
-"*%*."
+"Example 2: Return the institute's name (100__a) when the"
+"                          user gives its postal code (270__a):"
+"                          Set field to 100__a, expression to 270__a:*%*."
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:260
-#, fuzzy
 msgid "Any collection"
-msgstr "orice colecţie"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:282
 msgid "Exporting: "
@@ -6126,9 +6088,8 @@ msgid "Search for a mapping"
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:480
-#, fuzzy
 msgid "Knowledge base is empty"
-msgstr "Gestionează bazele de cunoştinţe"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:545
 msgid "You can get a these mappings in textual format by: "
@@ -6139,18 +6100,17 @@ msgid "And the KBA version by:"
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:627
-#, fuzzy
 msgid "Update Base Attributes"
-msgstr "Actualizează atributele formatului"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:670
 msgid "This knowledge base is not used in any format elements."
 msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:700
-#, fuzzy, python-format
+#, python-format
 msgid "Your rule: %s"
-msgstr "Alertele tale"
+msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:702
 #, python-format
@@ -6906,20 +6866,17 @@ msgstr ""
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:207
 #: modules/oaiharvest/lib/oai_harvest_admin.py:331
-#, fuzzy
 msgid "Please enter a name for the source."
-msgstr "Vă rugăm să introduceţi un nume de utilizator sau un nume de grup."
+msgstr ""
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:209
 #: modules/oaiharvest/lib/oai_harvest_admin.py:333
-#, fuzzy
 msgid "Please enter a metadata prefix."
-msgstr "Vă rugăm să introduceţi un nume de utilizator sau un nume de grup."
+msgstr ""
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:211
-#, fuzzy
 msgid "Please enter a base url."
-msgstr "Vă rugăm să introduceţi un nume de utilizator sau un nume de grup."
+msgstr ""
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:213
 #: modules/oaiharvest/lib/oai_harvest_admin.py:335
@@ -7169,9 +7126,8 @@ msgstr ""
 
 #: modules/webaccess/lib/access_control_config.py:322
 #: modules/websession/lib/websession_templates.py:1246
-#, fuzzy
 msgid "Configure BibSort"
-msgstr "Configurare BibFormat"
+msgstr ""
 
 #: modules/webaccess/lib/access_control_config.py:323
 #: modules/websession/lib/websession_templates.py:1214
@@ -7307,9 +7263,9 @@ msgstr ""
 #: modules/webalert/lib/webalert.py:428
 #, python-format
 msgid ""
-"You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s "
-"is available with a possibility to (a) view search results and (b) subscribe "
-"to an automatic email alerting service for these queries."
+"You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s"
+" is available with a possibility to (a) view search results and (b) "
+"subscribe to an automatic email alerting service for these queries."
 msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:75
@@ -7479,8 +7435,8 @@ msgstr ""
 #: modules/webalert/lib/webalert_templates.py:446
 #, python-format
 msgid ""
-"You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during "
-"the last 30 days or so."
+"You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during"
+" the last 30 days or so."
 msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:451
@@ -7675,9 +7631,8 @@ msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:470
 #: modules/websearch/lib/websearch_templates.py:4280
-#, fuzzy
 msgid "No Keywords"
-msgstr "cuvânt cheie"
+msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:473
 #: modules/websearch/lib/websearch_templates.py:4283
@@ -7685,32 +7640,27 @@ msgid "Frequent keywords"
 msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:532
-#, fuzzy
 msgid "No Collaborations"
-msgstr "Afilieri:"
+msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:535
-#, fuzzy
 msgid "Collaborations"
-msgstr "colecţii"
+msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:561
 #: modules/websearch/lib/websearch_templates.py:4255
-#, fuzzy
 msgid "unknown affiliation"
-msgstr "Afilieri:"
+msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:573
 #: modules/websearch/lib/websearch_templates.py:4262
-#, fuzzy
 msgid "No Affiliations"
-msgstr "Afilieri:"
+msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:575
 #: modules/websearch/lib/websearch_templates.py:4264
-#, fuzzy
 msgid "Affiliations"
-msgstr "Afilieri:"
+msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:590
 msgid "Frequent co-authors (excluding collaborations)"
@@ -7722,9 +7672,9 @@ msgid "No Frequent Co-authors"
 msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:630
-#, fuzzy, python-format
+#, python-format
 msgid "Citations%s:"
-msgstr "Citaţii:"
+msgstr ""
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:634
 #: modules/websearch/lib/websearch_templates.py:4366
@@ -7851,9 +7801,8 @@ msgid "Sorry, you do not have sufficient rights on this basket."
 msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:1905
-#, fuzzy
 msgid "No records to add."
-msgstr "%s documente găsite"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:1945
 #: modules/webbasket/lib/webbasket.py:2789
@@ -7865,9 +7814,8 @@ msgid "Untitled basket"
 msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:1955
-#, fuzzy
 msgid "Untitled topic"
-msgstr "Alege un subiect"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:1957
 msgid ""
@@ -8024,9 +7972,9 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:789
 #: modules/webbasket/lib/webbasket_templates.py:898
 #: modules/webbasket/lib/webbasket_templates.py:1002
-#, fuzzy, python-format
+#, python-format
 msgid "%i matching items"
-msgstr "Niciun utilizator potrivit"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:654
 #: modules/webbasket/lib/webbasket_templates.py:1000
@@ -8339,8 +8287,8 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:2109
 #: modules/websession/lib/websession_templates.py:630
 msgid ""
-"You are logged in as a guest user, so your baskets will disappear at the end "
-"of the current session."
+"You are logged in as a guest user, so your baskets will disappear at the end"
+" of the current session."
 msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:2110
@@ -8412,9 +8360,8 @@ msgid "This basket is publicly accessible at the following address:"
 msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:2488
-#, fuzzy
 msgid "This basket does not contain any records yet."
-msgstr "Această colecţie nu conţine niciun document încă."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:2522
 msgid "You do not have sufficient rights to view this basket's content."
@@ -8449,9 +8396,8 @@ msgstr "Şterge elementul "
 #: modules/webbasket/lib/webbasket_templates.py:3044
 #: modules/webbasket/lib/webbasket_templates.py:3557
 #: modules/webbasket/lib/webbasket_templates.py:3857
-#, fuzzy
 msgid "This record does not seem to exist any more"
-msgstr "Ne pare rău, dar colecţia %s nu există."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:2804
 #: modules/webbasket/lib/webbasket_templates.py:3648
@@ -8575,9 +8521,8 @@ msgid "Your group baskets"
 msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:4239
-#, fuzzy
 msgid "All your groups"
-msgstr "Adaugă la grupuri"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:4250
 msgid "Your public baskets"
@@ -8592,9 +8537,8 @@ msgid "All the public baskets"
 msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:4292
-#, fuzzy
 msgid "Please select a basket..."
-msgstr "Vă rugăm să selectaţi unul sau mai multe:"
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_webinterface.py:159
 #: modules/webbasket/lib/webbasket_webinterface.py:320
@@ -8672,9 +8616,8 @@ msgid "You have already reported an abuse for this comment."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:259
-#, fuzzy
 msgid "The comment you have reported no longer exists."
-msgstr "Acest comentariu a fost raportat de %i ori"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:275
 msgid "Sorry, you have already voted. This vote has not been recorded."
@@ -8737,9 +8680,8 @@ msgid "You must enter a text."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:1692
-#, fuzzy
 msgid "You already wrote a review for this record."
-msgstr "Toate review-urile raportate, sortate in funcţie de frecvenţa."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:1711
 msgid "You already posted a comment short ago. Please retry later."
@@ -8754,18 +8696,18 @@ msgid "Unknown action --> showing you the default add comment form."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:1859
-#, fuzzy, python-format
+#, python-format
 msgid "Record ID %s does not exist in the database."
-msgstr "Utilizatorul %s nu există."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:1867
 msgid "No record ID was given."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:1875
-#, fuzzy, python-format
+#, python-format
 msgid "Record ID %s is an invalid ID."
-msgstr "Ne pare rău, %s nu este o valoare validă pentru ID."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:1883
 #, python-format
@@ -8779,14 +8721,14 @@ msgid "Write a comment"
 msgstr "Scrie un comentariu"
 
 #: modules/webcomment/lib/webcomment_templates.py:95
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_nb)i Comments for round \"%(x_name)s\""
-msgstr "%(x_name)s a scris pe %(x_date)s:"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:98
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_nb)i Comments"
-msgstr "Comentarii"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:126
 #, python-format
@@ -9172,8 +9114,8 @@ msgstr "Vedeţi toate %s review-uri raportate"
 
 #: modules/webcomment/lib/webcomment_templates.py:1656
 msgid ""
-"Here is a list, sorted by total number of reports, of all users who have had "
-"a comment reported at least once."
+"Here is a list, sorted by total number of reports, of all users who have had"
+" a comment reported at least once."
 msgstr ""
 " Lista sortată după numărul total de raportări, conţinând toţi utilizatorii "
 "care au avut un comentariu raportat cel puţin o dată."
@@ -9364,9 +9306,8 @@ msgid "For any question, please use <%(CFG_SITE_SUPPORT_EMAIL)s>"
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:2294
-#, fuzzy
 msgid "Your comment will be lost."
-msgstr "Comentariul dumneavoastră a fost adăugat cu succes."
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_webinterface.py:265
 #: modules/webcomment/lib/webcomment_webinterface.py:522
@@ -9403,9 +9344,8 @@ msgid "You cannot vote for a deleted comment"
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_webinterface.py:671
-#, fuzzy
 msgid "You cannot report a deleted comment"
-msgstr "Vedeţi toate comentariile raportate"
+msgstr ""
 
 #: modules/webcomment/lib/webcomment_webinterface.py:818
 #: modules/webcomment/lib/webcomment_webinterface.py:858
@@ -9425,19 +9365,18 @@ msgid "The requested file could not be found"
 msgstr ""
 
 #: modules/webcomment/lib/webcommentadminlib.py:122
-#, fuzzy
 msgid "Invalid comment ID."
-msgstr "ID comentariu"
+msgstr ""
 
 #: modules/webcomment/lib/webcommentadminlib.py:142
-#, fuzzy, python-format
+#, python-format
 msgid "Comment ID %s does not exist."
-msgstr "Utilizatorul %s nu există."
+msgstr ""
 
 #: modules/webcomment/lib/webcommentadminlib.py:156
-#, fuzzy, python-format
+#, python-format
 msgid "Record ID %s does not exist."
-msgstr "Utilizatorul %s nu există."
+msgstr ""
 
 #: modules/webcomment/web/admin/webcommentadmin.py:45
 #: modules/webcomment/web/admin/webcommentadmin.py:59
@@ -9829,9 +9768,8 @@ msgstr ""
 
 #: modules/webmessage/lib/webmessage.py:75
 #: modules/webmessage/lib/webmessage.py:219
-#, fuzzy
 msgid "This message does not exist."
-msgstr "Utilizatorul %s nu există."
+msgstr ""
 
 #: modules/webmessage/lib/webmessage.py:144
 msgid "The message could not be deleted."
@@ -10139,8 +10077,8 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:2716
 #, python-format
 msgid ""
-"No match found in collection %(x_collection)s. Other public collections gave "
-"%(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
+"No match found in collection %(x_collection)s. Other public collections gave"
+" %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
 msgstr ""
 
 #: modules/websearch/lib/search_engine.py:2725
@@ -10187,7 +10125,8 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:2907
 #, python-format
 msgid ""
-"Search term %s did not match any record. Nearest terms in any collection are:"
+"Search term %s did not match any record. Nearest terms in any collection "
+"are:"
 msgstr ""
 
 #: modules/websearch/lib/search_engine.py:3708
@@ -10499,7 +10438,8 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3096
 msgid ""
-"Boolean query returned no hits. Please combine your search terms differently."
+"Boolean query returned no hits. Please combine your search terms "
+"differently."
 msgstr ""
 "Căutarea booleană nu a returnat rezultate. Vă rugăm să combinaţi diferit "
 "termenii de căutare."
@@ -10552,8 +10492,7 @@ msgstr "Aţi putea să începeţi navigarea de la %s."
 #, python-format
 msgid ""
 "Set up a personal %(x_url1_open)semail alert%(x_url1_close)s\n"
-"                                  or subscribe to the %(x_url2_open)sRSS feed"
-"%(x_url2_close)s."
+"                                  or subscribe to the %(x_url2_open)sRSS feed%(x_url2_close)s."
 msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3676
@@ -10568,9 +10507,8 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:3754
 #: modules/websearch/lib/websearch_templates.py:3779
 #: modules/websearch/lib/websearch_templates.py:3829
-#, fuzzy
 msgid "Back to search"
-msgstr "Înapoi la rezultatele căutării"
+msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3789
 #: modules/websearch/lib/websearch_templates.py:3805
@@ -10627,14 +10565,12 @@ msgid "Average citations per paper:"
 msgstr "Numărul mediu de citaţii:"
 
 #: modules/websearch/lib/websearch_templates.py:4476
-#, fuzzy
 msgid "Total number of citations excluding self-citations"
-msgstr "Numărul total de citaţii:"
+msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:4487
-#, fuzzy
 msgid "Average citations per paper excluding self-citations"
-msgstr "Numărul mediu de citaţii:"
+msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:4501
 msgid "Breakdown of papers by citations:"
@@ -10691,15 +10627,15 @@ msgstr ""
 #: modules/websession/lib/webaccount.py:117
 #, python-format
 msgid ""
-"You are logged in as guest. You may want to %(x_url_open)slogin"
-"%(x_url_close)s as a regular user."
+"You are logged in as guest. You may want to "
+"%(x_url_open)slogin%(x_url_close)s as a regular user."
 msgstr ""
 
 #: modules/websession/lib/webaccount.py:121
 #, python-format
 msgid ""
-"The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister"
-"%(x_url_close)s first"
+"The %(x_fmt_open)sguest%(x_fmt_close)s users need to "
+"%(x_url_open)sregister%(x_url_close)s first"
 msgstr ""
 
 #: modules/websession/lib/webaccount.py:126
@@ -10720,15 +10656,13 @@ msgstr ""
 
 #: modules/websession/lib/webgroup.py:158
 #: modules/websession/lib/webgroup.py:432
-#, fuzzy
 msgid "Please enter a group name."
-msgstr "Vă rugăm să introduceţi un nume de utilizator sau un nume de grup."
+msgstr ""
 
 #: modules/websession/lib/webgroup.py:168
 #: modules/websession/lib/webgroup.py:442
-#, fuzzy
 msgid "Please enter a valid group name."
-msgstr "Vă rugăm să introduceţi un nume de utilizator sau un nume de grup."
+msgstr ""
 
 #: modules/websession/lib/webgroup.py:178
 #: modules/websession/lib/webgroup.py:452
@@ -10741,19 +10675,16 @@ msgid "Group name already exists. Please choose another group name."
 msgstr ""
 
 #: modules/websession/lib/webgroup.py:260
-#, fuzzy
 msgid "You are already member of the group."
-msgstr "Nu sunteţi membru al unui grup."
+msgstr ""
 
 #: modules/websession/lib/webgroup.py:302
-#, fuzzy
 msgid "Please select only one group."
-msgstr "Vă rugăm să selectaţi unul sau mai multe:"
+msgstr ""
 
 #: modules/websession/lib/webgroup.py:359
-#, fuzzy
 msgid "Please select one group."
-msgstr "Vă rugăm să selectaţi unul sau mai multe:"
+msgstr ""
 
 #: modules/websession/lib/webgroup.py:384
 #: modules/websession/lib/webgroup.py:399
@@ -10772,9 +10703,8 @@ msgid "Sorry, you do not have sufficient rights on this group."
 msgstr ""
 
 #: modules/websession/lib/webgroup.py:499
-#, fuzzy
 msgid "The group has already been deleted."
-msgstr "Mesajul nu a putut fi şters."
+msgstr ""
 
 #: modules/websession/lib/webgroup.py:611
 msgid "Please choose a member if you want to remove him from the group."
@@ -10786,9 +10716,8 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/webgroup.py:664
-#, fuzzy
 msgid "The user is already member of the group."
-msgstr "Nu sunteţi membru al unui grup."
+msgstr ""
 
 #: modules/websession/lib/webgroup.py:718
 msgid ""
@@ -10797,9 +10726,8 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/webgroup.py:731
-#, fuzzy
 msgid "The user request for joining group has already been rejected."
-msgstr "Cererea dumneavoastră de creare a unui cont a fost respinsă pe '%s':"
+msgstr ""
 
 #: modules/websession/lib/webgroup_dblayer.py:314
 #: modules/websession/lib/webuser.py:309
@@ -10830,23 +10758,20 @@ msgid "These are your current API keys"
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:163
-#, fuzzy
 msgid "Description: "
-msgstr "Descriere"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:164
-#, fuzzy
 msgid "Status: "
-msgstr "Status"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:167
 msgid "API key"
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:168
-#, fuzzy
 msgid "Delete key"
-msgstr "Şterge"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:196
 msgid "If you want to create a new API key, please enter a description for it"
@@ -10870,9 +10795,8 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:201
-#, fuzzy
 msgid "Create new key"
-msgstr "Creează un subiect nou"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:263
 msgid ""
@@ -11035,8 +10959,8 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:531
 msgid ""
-"Note that if you have been using an external login system, then we cannot do "
-"anything and you have to ask there."
+"Note that if you have been using an external login system, then we cannot do"
+" anything and you have to ask there."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:532
@@ -11071,8 +10995,8 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:586
 msgid ""
-"With baskets you can define specific collections of items, store interesting "
-"records you want to access later or share with others."
+"With baskets you can define specific collections of items, store interesting"
+" records you want to access later or share with others."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:595
@@ -11096,9 +11020,9 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:655
 #, python-format
 msgid ""
-"You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout"
-"%(x_url1_close)s; b) edit your %(x_url2_open)saccount settings"
-"%(x_url2_close)s."
+"You are logged in as %(x_user)s. You may want to a) "
+"%(x_url1_open)slogout%(x_url1_close)s; b) edit your %(x_url2_open)saccount "
+"settings%(x_url2_close)s."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:736
@@ -11108,8 +11032,8 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:742
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are "
-"administering or are a member of."
+"You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are"
+" administering or are a member of."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:745
@@ -11133,8 +11057,8 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:754
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with "
-"the documents you approved or refereed."
+"You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with"
+" the documents you approved or refereed."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:757
@@ -11232,8 +11156,8 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:962
 #, python-format
 msgid ""
-"If you don't own an account yet, please %(x_url_open)sregister"
-"%(x_url_close)s an internal account."
+"If you don't own an account yet, please "
+"%(x_url_open)sregister%(x_url_close)s an internal account."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:970
@@ -11353,8 +11277,8 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:1250
 #, python-format
 msgid ""
-"For more admin-level activities, see the complete %(x_url_open)sAdmin Area"
-"%(x_url_close)s."
+"For more admin-level activities, see the complete %(x_url_open)sAdmin "
+"Area%(x_url_close)s."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1303
@@ -11665,15 +11589,16 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:2540
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)s%(x_nb_total)i groups"
-"%(x_url_close)s you are subscribed to (%(x_nb_member)i) or administering "
-"(%(x_nb_admin)i)."
+"You can consult the list of %(x_url_open)s%(x_nb_total)i "
+"groups%(x_url_close)s you are subscribed to (%(x_nb_member)i) or "
+"administering (%(x_nb_admin)i)."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2559
 msgid ""
 "Warning: The password set for MySQL root user is the same as the default "
-"Invenio password. For security purposes, you may want to change the password."
+"Invenio password. For security purposes, you may want to change the "
+"password."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2565
@@ -11684,26 +11609,27 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2571
 msgid ""
-"Warning: The password set for the Invenio admin user is currently empty. For "
-"security purposes, it is strongly recommended that you add a password."
+"Warning: The password set for the Invenio admin user is currently empty. For"
+" security purposes, it is strongly recommended that you add a password."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2577
 msgid ""
-"Warning: The email address set for support email is currently set to "
-"info@invenio-software.org. It is recommended that you change this to your "
-"own address."
+"Warning: The email address set for support email is currently set to info"
+"@invenio-software.org. It is recommended that you change this to your own "
+"address."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2583
 msgid ""
-"A newer version of Invenio is available for download. You may want to visit  "
+"A newer version of Invenio is available for download. You may want to visit"
+"  "
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2590
 msgid ""
-"Cannot download or parse release notes from http://invenio-software.org/repo/"
-"invenio/tree/RELEASE-NOTES"
+"Cannot download or parse release notes from http://invenio-"
+"software.org/repo/invenio/tree/RELEASE-NOTES"
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:91
@@ -11752,7 +11678,8 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:142
 msgid ""
-"This request for confirmation of an email address is not valid or is expired."
+"This request for confirmation of an email address is not valid or is "
+"expired."
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:147
@@ -11851,9 +11778,8 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:450
-#, fuzzy
 msgid "Your nickname has not been updated"
-msgstr "Căsuţa poştală a fost golită."
+msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:464
 msgid "Settings successfully edited."
@@ -12185,8 +12111,8 @@ msgstr ""
 #: modules/webstyle/lib/webdoc_webinterface.py:190
 #, python-format
 msgid ""
-"You may want to look at the %(x_url_open)s%(x_category)s pages"
-"%(x_url_close)s."
+"You may want to look at the %(x_url_open)s%(x_category)s "
+"pages%(x_url_close)s."
 msgstr ""
 
 #: modules/webstyle/lib/webpage.py:249
@@ -12293,8 +12219,8 @@ msgstr ""
 #: modules/websubmit/lib/functions/Shared_Functions.py:205
 msgid ""
 "Because of a human intervention or a temporary problem, the task queue is "
-"currently set to the manual mode. Your submission is well registered but may "
-"take longer than usual before it is fully integrated and searchable.\n"
+"currently set to the manual mode. Your submission is well registered but may"
+" take longer than usual before it is fully integrated and searchable.\n"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:189
@@ -12344,13 +12270,14 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_engine.py:296
 #: modules/websubmit/lib/websubmit_engine.py:908
 msgid ""
-"Unable to create a directory for this submission. The administrator has been "
-"alerted."
+"Unable to create a directory for this submission. The administrator has been"
+" alerted."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:435
 #: modules/websubmit/lib/websubmit_engine.py:1035
-msgid "Cannot create submission directory. The administrator has been alerted."
+msgid ""
+"Cannot create submission directory. The administrator has been alerted."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:457
@@ -12408,8 +12335,8 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:364
 msgid ""
-"To continue with a previously interrupted submission, enter an access number "
-"into the box below:"
+"To continue with a previously interrupted submission, enter an access number"
+" into the box below:"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:366
@@ -12777,7 +12704,8 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2264
 #: modules/websubmit/lib/websubmit_templates.py:2318
-msgid "Last request e-mail was sent to the publication committee chair on the "
+msgid ""
+"Last request e-mail was sent to the publication committee chair on the "
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2268
@@ -12880,7 +12808,8 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2340
 msgid ""
-"The referee has sent his final recommendations to the editorial board on the "
+"The referee has sent his final recommendations to the editorial board on the"
+" "
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2348
@@ -12946,14 +12875,12 @@ msgid "reject"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:686
-#, fuzzy
 msgid "Sorry, invalid arguments"
-msgstr "Ne pare rău, %s nu este o valoare validă pentru ID."
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:693
-#, fuzzy
 msgid "Note: the requested submission has already been completed"
-msgstr "Cererea dumneavoastră de creare a unui cont a fost respinsă pe '%s':"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:697
 msgid ""
@@ -13009,8 +12936,8 @@ msgstr ""
 #, python-format
 msgid ""
 "Unable to move field at position %s to position %s on page %s of submission "
-"%s - could not decrement the position of the fields below position %s. Tried "
-"to recover - please check that field ordering is not broken"
+"%s - could not decrement the position of the fields below position %s. Tried"
+" to recover - please check that field ordering is not broken"
 msgstr ""
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:3960
@@ -13035,7 +12962,8 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmitadmin_engine.py:4002
 #, python-format
-msgid "Unable to delete field at position %s from page %s of submission '%s%s'"
+msgid ""
+"Unable to delete field at position %s from page %s of submission '%s%s'"
 msgstr ""
 
 #: modules/websubmit/web/approve.py:53
@@ -13154,116 +13082,3 @@ msgstr ""
 #: modules/websubmit/web/yourapprovals.py:57
 msgid "You are not authorized to use approval system."
 msgstr ""
-
-#, fuzzy
-#~ msgid "You are about to attribute the following paper"
-#~ msgstr "Sunteţi membru al următoarelor grupuri:"
-
-#, fuzzy
-#~ msgid "Sorry."
-#~ msgstr "Ne pare rău"
-
-#, fuzzy
-#~ msgid "Error:"
-#~ msgstr "Eroare"
-
-#~ msgid "HTML brief"
-#~ msgstr "HTML scurt"
-
-#~ msgid "Add Field"
-#~ msgstr "Adaugă câmp"
-
-#~ msgid "Move up"
-#~ msgstr "Mutare în sus"
-
-#~ msgid "Move down"
-#~ msgstr "Mutare în jos"
-
-#~ msgid "older versions"
-#~ msgstr "versiuni mai vechi"
-
-#~ msgid "Configure BibHarvest"
-#~ msgstr "Configurare BibHarvest"
-
-#~ msgid "updated on"
-#~ msgstr "actualizat la data de"
-
-#~ msgid "Number of views"
-#~ msgstr "Număr de vizualizări"
-
-#~ msgid "View"
-#~ msgstr "Vezi"
-
-#~ msgid "last comment:"
-#~ msgstr "ultimul comentariu:"
-
-#~ msgid "last"
-#~ msgstr "ultimul"
-
-#~ msgid "View comments"
-#~ msgstr "Vezi comentarii"
-
-#~ msgid "There is a total of %i comments"
-#~ msgstr "In total sunt %i comentarii"
-
-#~ msgid "by"
-#~ msgstr "de"
-
-#~ msgid "on"
-#~ msgstr "pe"
-
-#~ msgid "delete comments"
-#~ msgstr "şterge comentarii"
-
-#~ msgid "Details and comments"
-#~ msgstr "Detalii si comentarii"
-
-#~ msgid "View all reported reviews"
-#~ msgstr "Vedeţi toate review-rile raportate"
-
-#~ msgid "Delete a specific comment/review (by ID)"
-#~ msgstr "Ştergeţi un comentariu/review (dupa ID)"
-
-#~ msgid "Here is comment/review %s"
-#~ msgstr "Comentariul/review-ul %s"
-
-#~ msgid "Here is comment/review %(x_cmtID)s written by user %(x_user)s"
-#~ msgstr "Comentariul/review-ul %(x_cmtID)s scris de utilizatorul %(x_user)s"
-
-#~ msgid ""
-#~ "Before you add your comment, you need to %(x_url_open)slogin"
-#~ "%(x_url_close)s first."
-#~ msgstr ""
-#~ "Înainte de a adăuga un comentariu, trebuie sa va "
-#~ "%(x_url_open)sautentificaţi%(x_url_close)s."
-
-#~ msgid "Delete Comment"
-#~ msgstr "Şterge comentariu"
-
-#~ msgid "account"
-#~ msgstr "cont"
-
-#~ msgid "groups"
-#~ msgstr "grupuri"
-
-#~ msgid "statistics"
-#~ msgstr "statistici"
-
-#~ msgid "Internal configuration error"
-#~ msgstr "Eroare de configurare internă"
-
-#~ msgid "There is no format configured for this journals index page"
-#~ msgstr ""
-#~ "Nu există niciun format configurat pentru pagina de index a acestui jurnal"
-
-#~ msgid "There is no format configured for this journals search page"
-#~ msgstr ""
-#~ "Nu există niciun format configurat pentru pagina de cautare a acestui "
-#~ "jurnal"
-
-#~ msgid "There is no format configured for this journals popup page"
-#~ msgstr ""
-#~ "Nu există niciun format configurat pentru pagina de popup a acestui jurnal"
-
-#~ msgid "We could not find a current issue in the Database"
-#~ msgstr "Ediţia curentă nu a fost gasită in baza de date"
