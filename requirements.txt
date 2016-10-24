@@ -5,7 +5,6 @@ reportlab==2.5
 python-dateutil<=1.9999
 python-magic==0.4.2
 http://inveniosoftware.org/download/python/pyRXP-1.16-daily-unix.tar.gz
-http://www.reportlab.com/ftp/pyRXP-1.16-daily-unix.tar.gz
 numpy==1.7.0
 lxml==3.1.2
 mechanize==0.2.5
