@@ -117,7 +117,8 @@ def get_groups(uid):
     query = """SELECT g.id, g.name
                FROM usergroup g, user_usergroup ug
                WHERE ug.id_user=%s AND
-                     ug.id_usergroup=g.id
+                     ug.id_usergroup=g.id AND
+                     ug.user_status<>'P'
             """
     res = run_sql(query, (uid, ))
     res = list(res)
