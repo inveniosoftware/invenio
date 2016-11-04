@@ -184,6 +184,7 @@ LHCB                   ---LHCB
 LHCB JOURNAL           ---LHCB-JOURNAL
 LHCB ANA               ---LHCB-ANA
 LHCHXSWG               ---LHCHXSWG
+LHCHXSWG INT           ---LHCHXSWG-INT
 SN ATLAS               ---SN-ATLAS
 PAS SUSY               ---CMS-PAS-SUS
 CMS PAS EXO            ---CMS-PAS-EXO
