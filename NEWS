@@ -6,6 +6,58 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+Invenio v1.0.10 -- released 2016-11-09
+--------------------------------------
+
+New features
+~~~~~~~~~~~~
+
++ installation
+
+  - Initial release of kickstart installations scripts. Ported from
+    the old `tiborsimko/invenio-devscripts` repository of helper
+    scripts and adapted to resemble Invenio 3 kickstart installation
+    scripts. Tested on Ubuntu 12.04 and CentOS 6.
+
+Improved features
+~~~~~~~~~~~~~~~~~
+
++ I18N
+
+  - Updates Catalan, French, German, Italian, Russian, Slovak, and
+    Spanish translations from Transifex.
+
++ installation
+
+  - Installation scripts now support Ubuntu 14.04 LTS.
+  - Uses `/usr/sbin/service foo` consistently everywhere to restart
+    daemons instead of deprecated `/etc/init.d/foo`.
+
+Bug fixes
+~~~~~~~~~
+
++ WebAccess
+
+  - Improves the WebAccess FireRole documentation by providing
+    corrected example on how to use groups in FireRole definitions.
+    (#3107) (#3225)
+
++ WebSearch
+
+  - Fixes asynchronous external collection getter tests following the
+    update of the Invenio project web site.
+
++ global
+
+  - Silences most MySQL UTF-8 warnings related to inserting into and
+    updating BLOB table columns.
+
++ installation
+
+  - Amends canonical location of py-editdist and pyRXP packages,
+    fixing the installation problem.
+  - Fixes Apache virtual host configuration generation on CentOS 6.
+
 Invenio v1.0.9 -- released 2015-05-21
 -------------------------------------
 

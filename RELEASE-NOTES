@@ -1,8 +1,8 @@
-============================
- Invenio v1.0.9 is released
-============================
+=============================
+ Invenio v1.0.10 is released
+=============================
 
-Invenio v1.0.9 was released on May 21, 2015.
+Invenio v1.0.10 was released on November 9, 2016.
 
 About
 -----
@@ -11,52 +11,63 @@ Invenio is a digital library framework enabling you to build your own
 digital library or document repository on the web.
 
 This old stable release update is recommended to all Invenio sites
-using v1.0.8 or previous releases.
+using v1.0.9 or previous releases.
 
-Security fixes
---------------
+New features
+------------
 
-+ WebStyle:
++ installation
 
-  - Adds back the `HttpOnly` cookie attribute in order to better
-    protect against potential XSS vulnerabilities.  (#3064)
+  - Initial release of kickstart installations scripts. Ported from
+    the old `tiborsimko/invenio-devscripts` repository of helper
+    scripts and adapted to resemble Invenio 3 kickstart installation
+    scripts. Tested on Ubuntu 12.04 and CentOS 6.
 
 Improved features
 -----------------
 
-+ installation:
++ I18N
 
-  - Apache virtual environments are now created with appropriate
-    `WSGIDaemonProcess` user value, taken from the configuration
-    variable `CFG_BIBSCHED_PROCESS_USER`, provided it is set.  This
-    change makes it easier to run Invenio under non-Apache user
-    identity.
+  - Updates Catalan, French, German, Italian, Russian, Slovak, and
+    Spanish translations from Transifex.
 
-  - Apache virtual environments are now created with appropriate
-    `WSGIPythonHome` directive so that it would be easier to run
-    Invenio from within Python virtual environments.
++ installation
+
+  - Installation scripts now support Ubuntu 14.04 LTS.
+  - Uses `/usr/sbin/service foo` consistently everywhere to restart
+    daemons instead of deprecated `/etc/init.d/foo`.
 
 Bug fixes
 ---------
 
-+ global:
++ WebAccess
 
-  - Replaces `invenio-demo.cern.ch` by `demo.invenio-software.org`
-    which is the new canonical URL of the demo site.  (#2867)
+  - Improves the WebAccess FireRole documentation by providing
+    corrected example on how to use groups in FireRole definitions.
+    (#3107) (#3225)
 
-+ testutils:
++ WebSearch
 
-  - Switches off SSL verification when running the test suite.  Useful
-    for Python-2.7.9 where self-signed SSL certificates (that are
-    usually used on development installations) would cause apparent
-    test failures.  (#2868)
+  - Fixes asynchronous external collection getter tests following the
+    update of the Invenio project web site.
+
++ global
+
+  - Silences most MySQL UTF-8 warnings related to inserting into and
+    updating BLOB table columns.
+
++ installation
+
+  - Amends canonical location of py-editdist and pyRXP packages,
+    fixing the installation problem.
+  - Fixes Apache virtual host configuration generation on CentOS 6.
 
 Download
 --------
 
-- http://invenio-software.org/download/invenio-1.0.9.tar.gz
-- http://invenio-software.org/download/invenio-1.0.9.tar.gz.md5
-- http://invenio-software.org/download/invenio-1.0.9.tar.gz.sig
+- http://invenio-software.org/download/invenio-1.0.10.tar.gz
+- http://invenio-software.org/download/invenio-1.0.10.tar.gz.md5
+- http://invenio-software.org/download/invenio-1.0.10.tar.gz.sig
 
 Installation
 ------------
@@ -66,19 +77,19 @@ Please follow the INSTALL file bundled in the distribution tarball.
 Upgrade
 -------
 
-If you are upgrading from Invenio v1.0.8, then:
+If you are upgrading from Invenio v1.0.9, then:
 
 a) Stop your bibsched queue and your Apache server.
 
 b) Install the update::
 
-     $ tar xvfz invenio-1.0.9.tar.gz
-     $ cd invenio-1.0.9
+     $ tar xvfz invenio-1.0.10.tar.gz
+     $ cd invenio-1.0.10
      $ sudo rsync -a /opt/invenio/etc/ /opt/invenio/etc.OLD/
      $ sh /opt/invenio/etc/build/config.nice
      $ make
      $ make check-custom-templates
-     $ make update-v1.0.8-tables
+     $ make update-v1.0.9-tables
      $ sudo -u www-data make install
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
      $ sudo rsync -a /opt/invenio/etc.OLD/ \
