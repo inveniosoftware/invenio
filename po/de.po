@@ -486,7 +486,7 @@ msgstr "Autor"
 #: modules/webhelp/web/help-central.webdoc:98
 #: modules/websearch/doc/search-guide.webdoc:20
 msgid "Search Guide"
-msgstr ""
+msgstr "Suche Handbuch"
 
 #: modules/websearch/doc/search-guide.webdoc:347
 #: modules/websearch/doc/search-guide.webdoc:382
@@ -1061,7 +1061,7 @@ msgstr "Sammlung"
 
 #: modules/websearch/doc/admin/websearch-admin-guide.webdoc:20
 msgid "WebSearch Admin Guide"
-msgstr ""
+msgstr "WebSearch Admin Guide"
 
 #: modules/websearch/doc/search-guide.webdoc:335
 #: modules/websearch/doc/search-guide.webdoc:371
@@ -1367,7 +1367,7 @@ msgstr "Zum persönlichen Korb hinzufügen"
 
 #: modules/websubmit/doc/admin/websubmit-admin-guide.webdoc:20
 msgid "WebSubmit Admin Guide"
-msgstr ""
+msgstr "WebSubmit Admin Guide"
 
 #: modules/websearch/doc/search-tips.webdoc:340
 #: modules/websubmit/lib/websubmit_templates.py:1118
@@ -1380,7 +1380,7 @@ msgstr "oder"
 
 #: modules/bibedit/lib/bibedit_templates.py:266
 msgid "Comparison of:"
-msgstr ""
+msgstr "Vergleich:"
 
 #: modules/bibedit/lib/bibedit_templates.py:267
 msgid "Revision"
@@ -1786,7 +1786,7 @@ msgstr "%(x_sitename)s Link"
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:111
 #, python-format
 msgid "%(x_sitename)s links"
-msgstr ""
+msgstr "%(x_sitename)s links"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:130
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:129
@@ -1796,7 +1796,7 @@ msgstr "externer Link"
 #: modules/bibformat/lib/elements/bfe_fulltext.py:130
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:129
 msgid "external links"
-msgstr ""
+msgstr "Externe Links"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:272
 msgid "Fulltext"
@@ -2007,7 +2007,7 @@ msgstr "Test"
 #: modules/bibharvest/lib/bibharvest_templates.py:461
 #: modules/bibharvest/lib/oai_harvest_admin.py:105
 msgid "history"
-msgstr ""
+msgstr "Vorgeschichte"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:465
 #: modules/bibharvest/lib/oai_harvest_admin.py:109
@@ -2024,7 +2024,7 @@ msgstr "Downloadchronik"
 
 #: modules/bibrank/lib/bibrank_downloads_grapher.py:103
 msgid "Download user distribution:"
-msgstr ""
+msgstr "Download Nutzungsverteilung:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:129
 msgid "Warning: Please, select a valid time"
@@ -3420,7 +3420,7 @@ msgstr "Titel"
 
 #: modules/webbasket/lib/webbasket_templates.py:1249
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: modules/webbasket/lib/webbasket_templates.py:1279
 #, python-format
@@ -3430,7 +3430,7 @@ msgstr "%i Elemente erfolgreich zu Ihren Körben hinzugefügt."
 #: modules/webbasket/lib/webbasket_templates.py:1280
 #, python-format
 msgid "Proceed to the %(x_url_open)sbasket%(x_url_close)s"
-msgstr ""
+msgstr "Weiter zu %(x_url_open)sbasket%(x_url_close)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:1285
 #, python-format
@@ -3696,7 +3696,7 @@ msgstr "Eintrag nach oben schieben"
 
 #: modules/webbasket/lib/webbasket_templates.py:2206
 msgid "You cannot move this item up"
-msgstr ""
+msgstr "Sie können diesen Artikel nicht nach oben schieben"
 
 #: modules/webbasket/lib/webbasket_templates.py:2220
 msgid "Move item down"
@@ -3704,7 +3704,7 @@ msgstr "Eintrag nach unten schieben"
 
 #: modules/webbasket/lib/webbasket_templates.py:2224
 msgid "You cannot move this item down"
-msgstr ""
+msgstr "Sie können diesen Artikel nicht nach unten schieben"
 
 #: modules/webbasket/lib/webbasket_templates.py:2238
 #: modules/webbasket/lib/webbasket_templates.py:3142
@@ -3983,7 +3983,7 @@ msgstr "Es wurde keine Datensatz-ID angegeben."
 #: modules/webcomment/lib/webcomment_templates.py:186
 #, python-format
 msgid "You may want to start browsing from %s"
-msgstr ""
+msgstr "Sie könnten Ihre Durchsuchen beginnen von %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:264
 #: modules/webcomment/lib/webcomment_templates.py:722
@@ -4274,7 +4274,7 @@ msgstr "Meistkommentierte Datensätze anzeigen"
 #: modules/webcomment/lib/webcomment_templates.py:1390
 #: modules/webcomment/web/admin/webcommentadmin.py:209
 msgid "View latest commented records"
-msgstr ""
+msgstr "Kürzlich kommentierte Datensätze anzeigen"
 
 #: modules/webcomment/lib/webcomment_templates.py:1392
 #: modules/webcomment/web/admin/webcommentadmin.py:142
@@ -4289,7 +4289,7 @@ msgstr "Meistrezensierte Datensätze anzeigen"
 #: modules/webcomment/lib/webcomment_templates.py:1398
 #: modules/webcomment/web/admin/webcommentadmin.py:208
 msgid "View latest reviewed records"
-msgstr ""
+msgstr "Kürzlich rezensierte Datensätze anzeigen"
 
 #: modules/webcomment/lib/webcomment_templates.py:1400
 #: modules/webcomment/web/admin/webcommentadmin.py:142
@@ -4789,7 +4789,7 @@ msgstr "Alle löschen"
 
 #: modules/webmessage/lib/webmessage_templates.py:189
 msgid "Re:"
-msgstr ""
+msgstr "Re:"
 
 #: modules/webmessage/lib/webmessage_templates.py:281
 msgid "Send later?"
@@ -4798,7 +4798,7 @@ msgstr "Später senden?"
 #: modules/webmessage/lib/webmessage_templates.py:282
 #: modules/websubmit/lib/websubmit_templates.py:3071
 msgid "To:"
-msgstr ""
+msgstr "To:"
 
 #: modules/webmessage/lib/webmessage_templates.py:283
 msgid "Users"
@@ -4907,7 +4907,7 @@ msgstr ""
 #: modules/webmessage/lib/webmessage_webinterface.py:360
 #: modules/webmessage/lib/webmessage_webinterface.py:408
 msgid "You are not authorized to use messages."
-msgstr ""
+msgstr "Sie sind nicht berechtigt Nachrichten zu nutzen."
 
 #: modules/webmessage/lib/webmessage_webinterface.py:414
 msgid "Read a message"
@@ -5148,7 +5148,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:469
 #, python-format
 msgid "Search on %(x_CFG_SITE_NAME_INTL)s"
-msgstr ""
+msgstr "Suche auf %(x_CFG_SITE_NAME_INTL)s"
 
 #: modules/websearch/lib/websearch_templates.py:693
 #: modules/websearch/lib/websearch_templates.py:842
@@ -5455,7 +5455,7 @@ msgstr "Die Sammlung %s scheint nicht zu existieren."
 #: modules/websearch/lib/websearch_webinterface.py:983
 #, python-format
 msgid "You may want to start browsing from %s."
-msgstr ""
+msgstr "Sie können von %s starten zu browsen."
 
 #: modules/websearch/lib/websearch_templates.py:3566
 #, python-format
@@ -5469,7 +5469,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:3573
 #, python-format
 msgid "Subscribe to the %(x_url2_open)sRSS feed%(x_url2_close)s."
-msgstr ""
+msgstr "%(x_url2_open)sRSS feed%(x_url2_close)s. abonnieren."
 
 #: modules/websearch/lib/websearch_templates.py:3582
 msgid "Interested in being notified about new results for this query?"
@@ -6649,7 +6649,7 @@ msgstr "Konto registriert am %s"
 
 #: modules/websession/lib/webuser.py:712
 msgid "New account on"
-msgstr ""
+msgstr "Neues Konto auf"
 
 #: modules/websession/lib/webuser.py:714
 msgid "PLEASE ACTIVATE"
@@ -6657,7 +6657,7 @@ msgstr "Bitte aktivieren"
 
 #: modules/websession/lib/webuser.py:715
 msgid "A new account has been created on"
-msgstr ""
+msgstr "Ihr neues Konto wurde erstellt auf"
 
 #: modules/websession/lib/webuser.py:717
 msgid " and is awaiting activation"
@@ -6670,6 +6670,7 @@ msgstr "   Benutzername/E-Mail"
 #: modules/websession/lib/webuser.py:720
 msgid "You can approve or reject this account request at"
 msgstr ""
+"Sie können die Anfrage nach diesem Konto bestätigen oder ablehnen über"
 
 #: modules/websession/lib/webuser.py:902 modules/websession/lib/webuser.py:903
 msgid "Run File Manager"
@@ -7147,7 +7148,7 @@ msgstr "Letzte Aktualisierung"
 
 #: modules/webstyle/lib/webstyle_templates.py:504
 msgid "Powered by"
-msgstr ""
+msgstr "Powered by"
 
 #: modules/webstyle/lib/webstyle_templates.py:505
 msgid "Maintained by"
@@ -7171,7 +7172,7 @@ msgstr "Zurückverfolgung"
 
 #: modules/webstyle/lib/webstyle_templates.py:669
 msgid "Client"
-msgstr ""
+msgstr "Client"
 
 #: modules/webstyle/lib/webstyle_templates.py:671
 msgid "Please send an error report to the administrator."
@@ -7227,11 +7228,11 @@ msgstr "Hilfe Seiten"
 #: modules/webstyle/lib/webdoc_webinterface.py:148
 #: modules/webstyle/lib/webdoc_webinterface.py:151
 msgid "Hacking Pages"
-msgstr ""
+msgstr "Hacking Seiten"
 
 #: modules/webstyle/lib/webdoc_webinterface.py:157
 msgid "Hacking Invenio"
-msgstr ""
+msgstr "Invenio Hacking"
 
 #: modules/webstyle/lib/webdoc_webinterface.py:159
 msgid "Latest modifications:"
@@ -7341,6 +7342,7 @@ msgstr "Neue Datei hinzufügen"
 #: modules/websubmit/lib/websubmit_managedocfiles.py:842
 msgid "You can decide to hide or not previous version(s) of this file."
 msgstr ""
+"Sie können entscheiden, ob die Vorgängerversionen verborgen werden sollen."
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:843
 msgid ""
@@ -7364,7 +7366,7 @@ msgstr "Behalte vorherige Version"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:847
 msgid "Upload"
-msgstr ""
+msgstr "Hochladen"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:859
 #: modules/websubmit/lib/websubmit_webinterface.py:449
@@ -7594,7 +7596,7 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:377
 msgid "GO"
-msgstr ""
+msgstr "GEHEN"
 
 #: modules/websubmit/lib/websubmit_templates.py:498
 #: modules/websubmit/lib/websubmit_templates.py:967
@@ -7694,7 +7696,7 @@ msgstr "Funktion"
 
 #: modules/websubmit/lib/websubmit_templates.py:1067
 msgid "Score"
-msgstr ""
+msgstr "Ergebnis"
 
 #: modules/websubmit/lib/websubmit_templates.py:1068
 msgid "Running function"
@@ -7728,7 +7730,7 @@ msgstr "Datei(en)"
 
 #: modules/websubmit/lib/websubmit_templates.py:1231
 msgid "see"
-msgstr ""
+msgstr "ansehen"
 
 #: modules/websubmit/lib/websubmit_templates.py:1429
 msgid "For"
@@ -7794,7 +7796,7 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1664
 msgid "Go to specific approval workflow"
-msgstr ""
+msgstr "Gehe zur  Akzeptierungs-Workflow"
 
 #: modules/websubmit/lib/websubmit_templates.py:1752
 msgid "List of refereed categories"
@@ -8038,7 +8040,7 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_templates.py:2495
 #: modules/websubmit/lib/websubmit_templates.py:2556
 msgid "No recommendation from the referee yet."
-msgstr ""
+msgstr "Bisher keine Empfehlung von dem Referenten."
 
 #: modules/websubmit/lib/websubmit_templates.py:2497
 #: modules/websubmit/lib/websubmit_templates.py:2507
@@ -8046,7 +8048,7 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_templates.py:2566
 #: modules/websubmit/lib/websubmit_templates.py:2574
 msgid "Send a recommendation"
-msgstr ""
+msgstr "Empfehlung schicken"
 
 #: modules/websubmit/lib/websubmit_templates.py:2502
 #: modules/websubmit/lib/websubmit_templates.py:2570
@@ -8092,7 +8094,7 @@ msgstr "Bisher keine finale Einscheidung getroffen."
 #: modules/websubmit/web/publiline.py:1133
 #: modules/websubmit/web/publiline.py:1143
 msgid "Take a decision"
-msgstr ""
+msgstr "Treffe eine Entscheidung"
 
 #: modules/websubmit/lib/websubmit_templates.py:2535
 msgid ""
@@ -8141,7 +8143,7 @@ msgstr "Letzte E-Mail-Anfrage wurde an den Projektleiter geschickt am "
 
 #: modules/websubmit/lib/websubmit_templates.py:2689
 msgid "Comments overview"
-msgstr ""
+msgstr "Überblick Kommentare"
 
 #: modules/websubmit/lib/websubmit_templates.py:2811
 msgid "search for user"
@@ -8160,7 +8162,7 @@ msgstr "Nutzer auswählen"
 
 #: modules/websubmit/lib/websubmit_templates.py:2827
 msgid "connected"
-msgstr ""
+msgstr "verbunden"
 
 #: modules/websubmit/lib/websubmit_templates.py:2830
 msgid "add this user"
@@ -8200,7 +8202,7 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_webinterface.py:196
 #, python-format
 msgid "The format %s does not exist for the given version: %s"
-msgstr ""
+msgstr "Das Format %s ist für die gegebene Version nicht vorhanden: %s"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:210
 msgid "This file is restricted: "
@@ -8213,6 +8215,7 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_webinterface.py:225
 msgid "The requested file is hidden and can not be accessed."
 msgstr ""
+"Die angeforderte Datei ist versteckt und kann nicht zugegriffen werden."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:232
 msgid "Requested file does not seem to exist."
@@ -8225,6 +8228,7 @@ msgstr "Zugang zum Volltext"
 #: modules/websubmit/lib/websubmit_webinterface.py:315
 msgid "An error has happened in trying to retrieve the requested file."
 msgstr ""
+"Ein Fehler ist bei dem Versuch, die angeforderte Datei abzurufen passiert."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:317
 msgid "Not enough information to retrieve the document"
@@ -8233,6 +8237,7 @@ msgstr "Nicht genügend Informationen, um das Dokument zu wiederzufinden"
 #: modules/websubmit/lib/websubmit_webinterface.py:325
 msgid "An error has happened in trying to retrieving the requested file."
 msgstr ""
+"Ein Fehler ist bei dem Versuch, das Abrufen der angeforderte Datei passiert."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:376
 msgid "Manage Document Files"
@@ -8446,7 +8451,7 @@ msgstr "Veröffentliche"
 #: modules/webjournal/lib/webjournaladminlib.py:292
 #: modules/webjournal/lib/webjournaladminlib.py:309
 msgid "Refresh"
-msgstr ""
+msgstr "Aktualisiere Ansicht"
 
 #: modules/webjournal/lib/webjournal_templates.py:480
 #: modules/webjournal/lib/webjournaladminlib.py:357
@@ -8455,7 +8460,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7062
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14199
 msgid "Update"
-msgstr ""
+msgstr "Aktualisieren"
 
 #: modules/webjournal/lib/webjournal_templates.py:659
 msgid "Apply"
@@ -8488,7 +8493,7 @@ msgstr "Zeitschriften Artikel Fehler"
 
 #: modules/webjournal/lib/webjournal_config.py:173
 msgid "We could not know which article you were looking for"
-msgstr ""
+msgstr "Wir wissen nicht, nach welchem Artikel Sie suchen"
 
 #: modules/webjournal/lib/webjournal_config.py:206
 msgid "No journals available"
@@ -8496,7 +8501,7 @@ msgstr "Keine Zeitschriften verfügbar"
 
 #: modules/webjournal/lib/webjournal_config.py:207
 msgid "We could not provide you any journals"
-msgstr ""
+msgstr "Wir können keine Zeitschriften vorhalten"
 
 #: modules/webjournal/lib/webjournal_config.py:208
 msgid ""
@@ -8510,7 +8515,7 @@ msgstr "Eine Zeitschrift auf diesem Server auswählen"
 
 #: modules/webjournal/lib/webjournal_config.py:234
 msgid "We couldn't guess which journal you are looking for"
-msgstr ""
+msgstr "Wir können nicht erraten, nach welcher Zeitschrift Sie suchen"
 
 #: modules/webjournal/lib/webjournal_config.py:235
 msgid ""
@@ -8524,7 +8529,7 @@ msgstr "Keine aktuelle Ausgabe"
 
 #: modules/webjournal/lib/webjournal_config.py:262
 msgid "We could not find any informtion on the current issue"
-msgstr ""
+msgstr "Wir konnten keine Information auf der aktuellen Ausgabe finden"
 
 #: modules/webjournal/lib/webjournal_config.py:263
 msgid ""
@@ -8661,11 +8666,11 @@ msgstr "Heute keine Seminare"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_seminars.py:248
 msgid "What's on today"
-msgstr ""
+msgstr "Was passiert heute"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_seminars.py:249
 msgid "Seminars of the week"
-msgstr ""
+msgstr "Seminare der Woche"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_whatsNew.py:164
 msgid "There are no new articles for the moment"
@@ -8673,16 +8678,16 @@ msgstr "Momentan gibt es keine neuen Artikel."
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_whatsNew.py:287
 msgid "What's new"
-msgstr ""
+msgstr "Welche sind die Neuigkeiten"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_weather.py:225
 msgid "Under the CERN sky"
-msgstr ""
+msgstr "Unter dem CERN Himmel"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_article_author.py:48
 #, python-format
 msgid "About your article at %(url)s"
-msgstr ""
+msgstr "Über Ihre Artikel auf %(url)s"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_imprint.py:122
 msgid "Issue No."
@@ -8700,6 +8705,10 @@ msgid ""
 "Have a look at the following article:\n"
 "<%(url)s>"
 msgstr ""
+"Hallo,\n"
+"\n"
+"Werfen Sie einen Blick auf dem folgenden Artikel:\n"
+"<%(url)s>"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_article_body.py:260
 msgid "Send this article"
@@ -8707,15 +8716,15 @@ msgstr "Diesen Artikel verschicken"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_rss.py:141
 msgid "Subscribe by RSS"
-msgstr ""
+msgstr "Als RRS abbonnieren"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:87
 msgid "News Articles"
-msgstr ""
+msgstr "Nachrichten Artikel"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:88
 msgid "Official News"
-msgstr ""
+msgstr "Offizielle Nachrichten"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:89
 msgid "Training and Development"
@@ -8727,7 +8736,7 @@ msgstr "Generelle Informationen"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_archive.py:106
 msgid "Archive"
-msgstr ""
+msgstr "Archiv"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_archive.py:133
 msgid "Select Year:"
@@ -8747,7 +8756,7 @@ msgstr "Vergleiche zwei Datensatz-Überarbeitungen"
 
 #: modules/bibedit/lib/bibedit_webinterface.py:207
 msgid "Failed to create a ticket"
-msgstr ""
+msgstr "Ticket konnte nicht erstellt werden"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:297
 msgid "Next Step"
@@ -8759,7 +8768,7 @@ msgstr "Suchkriterien"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:299
 msgid "Output tags"
-msgstr ""
+msgstr "Ausgabe Kennzeichnungen"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:300
 msgid "Filter collection"
@@ -8952,7 +8961,7 @@ msgstr "Sicht als: "
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:533
 msgid "Job"
-msgstr ""
+msgstr "Job"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:588
 msgid "Total"
@@ -8984,7 +8993,7 @@ msgstr "monatlich"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:192
 msgid "Edit Export Job"
-msgstr ""
+msgstr "Job Export bearbeiten"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:239
 msgid "Query Results"
@@ -8992,7 +9001,7 @@ msgstr "Suchergebnisse"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:246
 msgid "Export Job Queries"
-msgstr ""
+msgstr "Job-Anfragen exportieren"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:320
 msgid "New Query"
@@ -9004,12 +9013,12 @@ msgstr "Anfrage bearbeiten"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:356
 msgid "Export Job Results"
-msgstr ""
+msgstr "Job Ergebnisse exportieren"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:389
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:423
 msgid "Export Job Result"
-msgstr ""
+msgstr "Job Ergebnisse exportieren"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:465
 #: modules/bibexport/lib/bibexport_method_fieldexporter.py:500
@@ -9313,7 +9322,7 @@ msgstr "Sie sind nicht berechtigt die Fernleihe zu nutzen."
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:282
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10732
 msgid "Interlibrary loan request for books"
-msgstr ""
+msgstr "Fernleihe für Bücher"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:290
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1511
@@ -9385,7 +9394,7 @@ msgstr "Anfrage"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:333
 msgid "See this book on BibCirculation"
-msgstr ""
+msgstr "Dieses Buch bei BibCirculation schauen"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:408
 msgid "0 borrower(s) found."
@@ -9525,7 +9534,7 @@ msgstr "Ihre Anfragen"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:598
 msgid "You don't have any request (waiting or pending)."
-msgstr ""
+msgstr "Sie haben keine (ausstehenden) Anfragen."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:601
 #: modules/bibcirculation/lib/bibcirculation_templates.py:677
@@ -9565,7 +9574,7 @@ msgstr "Verlängerungen"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:779
 #: modules/bibcirculation/lib/bibcirculation_templates.py:928
 msgid "Enter your period of interest"
-msgstr ""
+msgstr "Bitte Ihren Interessens-Zeitraum angegben"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:930
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2555
@@ -9697,7 +9706,7 @@ msgstr "Informationen zur Ausleihe"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15867
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16092
 msgid "Publisher"
-msgstr ""
+msgstr "Verlag"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1628
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11967
@@ -9807,7 +9816,7 @@ msgstr "Telefon"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14898
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16105
 msgid "Mailbox"
-msgstr ""
+msgstr "Mailbox"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2189
 msgid "Barcode(s)"
@@ -9895,7 +9904,7 @@ msgstr "Autor(en)"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2487
 msgid "Print loan information"
-msgstr ""
+msgstr "Informationen zur Ausleihe ausdrucken"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2627
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2730
@@ -9953,7 +9962,7 @@ msgstr "Mehr Details"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6578
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7032
 msgid "No of loans"
-msgstr ""
+msgstr "Anzahl der Ausleihe"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3028
 msgid "Add new copy"
@@ -10051,7 +10060,7 @@ msgstr "Details zur Bibliothek"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3521
 msgid "No of items"
-msgstr ""
+msgstr "Anzahl der Elemente"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3571
 msgid "Notes about this borrower"
@@ -10061,7 +10070,7 @@ msgstr "Bemerkung zu dem Bibliotheksbenutzer"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4830
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8084
 msgid "Personal details"
-msgstr ""
+msgstr "Persönliche Details"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3767
 msgid "New loan"
@@ -10081,7 +10090,7 @@ msgstr "Bibliotheksbenutzer benachrichtigen"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3771
 msgid "Requests, Loans and ILL overview on"
-msgstr ""
+msgstr "Anfragen, Ausleihen und ILL Übersicht über"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3772
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3776
@@ -10095,7 +10104,7 @@ msgstr "Fernleihe"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3839
 msgid "Request option(s)"
-msgstr ""
+msgstr "Anfrage-Option(en)"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3946
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7925
@@ -10128,7 +10137,7 @@ msgstr "Ausleih-Optionen"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4709
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9927
 msgid "See notes"
-msgstr ""
+msgstr "Siehe Notizen"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4099
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4279
@@ -10145,7 +10154,7 @@ msgstr "Ausleih-Bemerkung"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4323
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4574
 msgid "see notes"
-msgstr ""
+msgstr "siehe Notizen"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4148
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4328
@@ -10157,7 +10166,7 @@ msgstr "keine Bemerkungen"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4362
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4489
 msgid "Send recall"
-msgstr ""
+msgstr "Rückruf schicken"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4436
 msgid "CERN Library"
@@ -10190,11 +10199,11 @@ msgstr "Benachrichtigung"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4490
 msgid "Load"
-msgstr ""
+msgstr "Laden"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4510
 msgid "Send"
-msgstr ""
+msgstr "Senden"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4687
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7927
@@ -10298,7 +10307,7 @@ msgstr "Die Information wurde aktualiesiert."
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5842
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5903
 msgid "New library information"
-msgstr ""
+msgstr "Neue Informationen der Bibliothek"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5946
 msgid "A new library has been registered."
@@ -10336,7 +10345,7 @@ msgstr "Buchtitel"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15866
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16090
 msgid "Place"
-msgstr ""
+msgstr "Ort"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6555
 #, python-format
@@ -10358,11 +10367,11 @@ msgstr "Ein %s wurde hinzugefügt."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7181
 msgid "Update copy information"
-msgstr ""
+msgstr "Aktualisiere Informationen zum Kopien"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7571
 msgid "New copy information"
-msgstr ""
+msgstr "Informationen zu neue Kopie"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7615
 msgid "This item has been updated."
@@ -10418,7 +10427,7 @@ msgstr "Dieses Exemplar hat keine Vormerkungen"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8478
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8973
 msgid "Enter the period of interest"
-msgstr ""
+msgstr "Interesse Zeitraum eingeben"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8479
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8974
@@ -10433,7 +10442,7 @@ msgstr "Zu:  "
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8538
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9007
 msgid "A new request has been registered with success."
-msgstr ""
+msgstr "Eine neue Anfrage wurde erfolgreich registriert."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9562
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9805
@@ -10527,7 +10536,7 @@ msgstr "Details zu Fernleihanfragen"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16287
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16414
 msgid "Period of interest - From"
-msgstr ""
+msgstr "Interessenszeitraum - Von"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10447
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10600
@@ -10540,7 +10549,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16288
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16415
 msgid "Period of interest - To"
-msgstr ""
+msgstr "Interessenszeitraum - Bis"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10449
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10601
@@ -10590,7 +10599,7 @@ msgstr "Anbieter"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11075
 msgid "Interest from"
-msgstr ""
+msgstr "Interesse von"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11421
 msgid "Periodical Title"
@@ -10619,13 +10628,13 @@ msgstr "Anfrage des Bibliotheksbenutzers"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14417
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14853
 msgid "Period of interest (From)"
-msgstr ""
+msgstr "Interessenszeitraum (Von)"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11492
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14471
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14854
 msgid "Period of interest (To)"
-msgstr ""
+msgstr "Interessenszeitraum (Bis)"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11493
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12385
@@ -10683,7 +10692,7 @@ msgstr "Vorherige Bemerkung"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12954
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15104
 msgid "Library notes"
-msgstr ""
+msgstr "Notizen der Bibliothek"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11617
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11649
@@ -10706,7 +10715,7 @@ msgstr "Bibliothek/Anbieter"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12919
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13144
 msgid "Cost"
-msgstr ""
+msgstr "Kosten"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11834
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11966
@@ -10798,11 +10807,11 @@ msgstr "Bemerkungen zu dieser Fernleihe"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15315
 msgid "No more requests are pending or waiting."
-msgstr ""
+msgstr "Keine weiteren Anfragen sind anhängig oder warten."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15466
 msgid "Printable format"
-msgstr ""
+msgstr "Ausdruckbares Format"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15526
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15684
@@ -10820,7 +10829,7 @@ msgstr "0 Exemplare gefunden."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15618
 msgid "Proceed anyway"
-msgstr ""
+msgstr "Trotzdem fortfahren"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15861
 msgid "Book does not exists on Invenio. Please fill the following form."
@@ -10968,7 +10977,7 @@ msgstr "Löschen von BibCheck-Konfigurationsdatei"
 #: modules/bibharvest/lib/oai_repository_admin.py:258
 #: modules/bibharvest/lib/oai_repository_admin.py:337
 msgid "Return to main selection"
-msgstr ""
+msgstr "Zurück zur Hauptauswahl"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:118
 msgid "Overview of sources"
@@ -10980,11 +10989,11 @@ msgstr ""
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:137
 msgid "Not Set"
-msgstr ""
+msgstr "Nicht gestellt"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:138
 msgid "never"
-msgstr ""
+msgstr "nie"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:149
 msgid "Never harvested"
@@ -11064,7 +11073,7 @@ msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:142
 msgid "Add New Taxonomy"
-msgstr ""
+msgstr "Einer neuen Taxonomie hinzufügen"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:183
 msgid "This knowledge base already has a taxonomy file."
@@ -11265,23 +11274,23 @@ msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:408
 msgid "Left side exists"
-msgstr ""
+msgstr "Linke Seite existiert"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:416
 msgid "Right side exists"
-msgstr ""
+msgstr "Rechte Seite existiert"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:589
 msgid "Knowledge base name missing"
-msgstr ""
+msgstr "Name der Wissensbasis fehlt"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:609
 msgid "Unknown knowledge base"
-msgstr ""
+msgstr "Unbekannte Wissensbasis"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:610
 msgid "There is no knowledge base with that name."
-msgstr ""
+msgstr "Es gibt keine Wissensbasis mit diesem Namen."
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:629
 msgid "No such knowledge base"
@@ -11293,7 +11302,7 @@ msgstr "Wissensdatenbank löschen"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:157
 msgid "BibSword Admin Interface"
-msgstr ""
+msgstr "BibSword Admin Interface"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:171
 #: modules/bibsword/lib/bibsword_webinterface.py:277
@@ -11337,12 +11346,12 @@ msgstr ""
 
 #: modules/bibupload/lib/batchuploader_engine.py:203
 msgid "A file with the same name and format already exists"
-msgstr ""
+msgstr "Eine Datei mit dem gleichen Namen und Format ist bereits vorhanden"
 
 #: modules/bibupload/lib/batchuploader_engine.py:204
 #, python-format
 msgid "No rights to upload to collection '%s'"
-msgstr ""
+msgstr "Keine Rechte, die Sammlung '%s' hochzuladen"
 
 #: modules/bibupload/lib/batchuploader_engine.py:413
 #: modules/bibupload/lib/batchuploader_engine.py:426

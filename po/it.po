@@ -1380,7 +1380,7 @@ msgstr "o"
 
 #: modules/bibedit/lib/bibedit_templates.py:266
 msgid "Comparison of:"
-msgstr ""
+msgstr "Confronto di:"
 
 #: modules/bibedit/lib/bibedit_templates.py:267
 msgid "Revision"
@@ -4612,13 +4612,13 @@ msgstr "Record non trovato"
 #: modules/webcomment/lib/webcomment_webinterface.py:573
 #: modules/webcomment/lib/webcomment_webinterface.py:650
 msgid "Specified comment does not belong to this record"
-msgstr ""
+msgstr "Il commento specificato non appartiene a questo record"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:344
 #: modules/webcomment/lib/webcomment_webinterface.py:579
 #: modules/webcomment/lib/webcomment_webinterface.py:656
 msgid "You do not have access to the specified comment"
-msgstr ""
+msgstr "Non ha accesso al documento specificato"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:491
 #: modules/websubmit/lib/websubmit_templates.py:2659
@@ -4628,11 +4628,11 @@ msgstr "Aggiungi commento"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:584
 msgid "You cannot vote for a deleted comment"
-msgstr ""
+msgstr "Non può votare per un documento cancellato."
 
 #: modules/webcomment/lib/webcomment_webinterface.py:661
 msgid "You cannot report a deleted comment"
-msgstr ""
+msgstr "Non può segnalare un commento cancellato"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:788
 #: modules/webcomment/lib/webcomment_webinterface.py:828
@@ -4645,7 +4645,7 @@ msgstr "Il commento richiesto non e' reperibile"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:809
 msgid "You cannot access files of a deleted comment"
-msgstr ""
+msgstr "Non può accedere ai file di un commento cancellato"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:829
 msgid "The requested file could not be found"
@@ -4982,6 +4982,8 @@ msgid ""
 "Warning: full-text search is only available for a subset of papers mostly "
 "from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
+"Attenzione: ricerca full-text è disponibile solo per un sottoinsieme di "
+"saggio per lo più da%(x_range_from_year)s-%(x_range_to_year)s."
 
 #: modules/websearch/lib/search_engine.py:1829
 #, python-format
@@ -4989,6 +4991,8 @@ msgid ""
 "Warning: figure caption search is only available for a subset of papers "
 "mostly from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
+"Attenzione: Ricerca figure caption è disponibile solo per un sottoinsieme di"
+" saggi per lo più da %(x_range_from_year)s-%(x_range_to_year)s."
 
 #: modules/websearch/lib/search_engine.py:1838
 msgid ""
@@ -6254,7 +6258,7 @@ msgstr "Sei abilitato per i seguenti ruoli: %(x_role)s."
 
 #: modules/websession/lib/websession_templates.py:1110
 msgid "Run BibSword Client"
-msgstr ""
+msgstr "Usare BibSword Cliente"
 
 #: modules/websession/lib/websession_templates.py:1136
 msgid "Here are some interesting web admin links for you:"
@@ -6474,7 +6478,7 @@ msgstr "Invita nuovi membri"
 #: modules/websession/lib/websession_templates.py:2080
 #, python-format
 msgid "Invitation to join \"%s\" group"
-msgstr ""
+msgstr "Invito a raggiungere gruppo “%s”"
 
 #: modules/websession/lib/websession_templates.py:2081
 #, python-format
@@ -6486,6 +6490,13 @@ msgid ""
 "\n"
 "Best regards.\n"
 msgstr ""
+"Ciao\n"
+"\n"
+"Penso che potrebbe essere interessato/a nel far parte del gruppo\"%(x_name)s\".\n"
+"Può raggiungerlo cliccando qua: %(x_url)s.\n"
+"\n"
+"Cordiali saluti.\n"
+"\n"
 
 #: modules/websession/lib/websession_templates.py:2095
 #, python-format
@@ -6854,7 +6865,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:406
 msgid "Your nickname has not been updated"
-msgstr ""
+msgstr "Il suo nickname non è stato aggiornato"
 
 #: modules/websession/lib/websession_webinterface.py:420
 msgid "Settings successfully edited."
@@ -6866,6 +6877,8 @@ msgid ""
 "Note that if you have changed your email address, you will have to "
 "%(x_url_open)sreset your password%(x_url_close)s anew."
 msgstr ""
+"Nota che se ha cambiato il suo indirizzo e-mail, dovrà %(x_url_open)sreset "
+"la password%(x_url_close)s di nuovo."
 
 #: modules/websession/lib/websession_webinterface.py:429
 #: modules/websession/lib/websession_webinterface.py:923
@@ -7428,6 +7441,8 @@ msgid ""
 "Note that your submission has been inserted into the bibliographic task "
 "queue and is waiting for execution.\n"
 msgstr ""
+"Nota che la tua sottomissione e' stata inserita nella lista d'attesa delle "
+"operazioni bibliografiche è sta aspettando la sua esecuzione.\n"
 
 #: modules/websubmit/lib/functions/Shared_Functions.py:181
 #, python-format
@@ -7749,7 +7764,7 @@ msgstr "tutti i tipi di documento"
 
 #: modules/websubmit/lib/websubmit_templates.py:1485
 msgid "Subm.No."
-msgstr ""
+msgstr "Subm.No."
 
 #: modules/websubmit/lib/websubmit_templates.py:1486
 msgid "Reference"
@@ -8210,7 +8225,7 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_webinterface.py:196
 #, python-format
 msgid "The format %s does not exist for the given version: %s"
-msgstr ""
+msgstr "Il formato %s non esiste per la versione data:% s"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:210
 msgid "This file is restricted: "
@@ -8219,10 +8234,11 @@ msgstr "Questo file è riservato: "
 #: modules/websubmit/lib/websubmit_webinterface.py:222
 msgid "An error has happened in trying to stream the request file."
 msgstr ""
+"Un errore è accaduto nel tentativo di trasmettere il file di richiesta."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:225
 msgid "The requested file is hidden and can not be accessed."
-msgstr ""
+msgstr "Il file richiesto è nascosto e non vi si può accedere."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:232
 msgid "Requested file does not seem to exist."
@@ -8234,7 +8250,7 @@ msgstr "Accesso al testo completo"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:315
 msgid "An error has happened in trying to retrieve the requested file."
-msgstr ""
+msgstr "Un errore ha accaduto nel tentativo di recuperare il file richiesto."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:317
 msgid "Not enough information to retrieve the document"
@@ -8243,7 +8259,7 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:325
 msgid "An error has happened in trying to retrieving the requested file."
-msgstr ""
+msgstr "Un errore ha accaduto nel tentativo di recuperare il file richiesto."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:376
 msgid "Manage Document Files"
@@ -8252,12 +8268,12 @@ msgstr "Gestioni file di documenti"
 #: modules/websubmit/lib/websubmit_webinterface.py:394
 #, python-format
 msgid "Your modifications to record #%i have been submitted"
-msgstr ""
+msgstr "Le sue modifiche apportate al record # %i sono state sottoposte"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:402
 #, python-format
 msgid "Your modifications to record #%i have been cancelled"
-msgstr ""
+msgstr "Le sue modifiche apportate al record # %i sono state cancellate"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:411
 msgid "Edit"
@@ -8270,7 +8286,7 @@ msgstr "Modifica record"
 #: modules/websubmit/lib/websubmit_webinterface.py:427
 #: modules/websubmit/lib/websubmit_webinterface.py:458
 msgid "Document File Manager"
-msgstr ""
+msgstr "Document File Manager"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:428
 #: modules/websubmit/lib/websubmit_webinterface.py:458
@@ -8441,6 +8457,7 @@ msgstr ""
 #, python-format
 msgid "If you cannot read this email please go to %(x_journal_link)s"
 msgstr ""
+"Se non può leggere questa e-mail, si prega di andare a %(x_journal_link)s"
 
 #: modules/webjournal/lib/webjournal_templates.py:415
 #: modules/webjournal/lib/webjournal_templates.py:664
@@ -9749,25 +9766,26 @@ msgstr "Seleziona richiesta"
 #, python-format
 msgid "There are no requests waiting on the item <strong>%s</strong>."
 msgstr ""
+"Non ci sono richieste in attesa per quest’articolo <strong>%s</strong>."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1754
 msgid "Welcome to Invenio BibCirculation Admin"
-msgstr ""
+msgstr "Benvenuto a Invenio BibCirculation Admin"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1818
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5527
 msgid "Search borrower by"
-msgstr ""
+msgstr "Ricerca mutuatario per"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1899
 msgid "0 item(s) found."
-msgstr ""
+msgstr "Nessun articolo trovato."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1926
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15578
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15740
 msgid "No. Copies"
-msgstr ""
+msgstr "Numero di Copie"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2093
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8758
@@ -9776,12 +9794,12 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14727
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16534
 msgid "Select user"
-msgstr ""
+msgstr "seleziona utente"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2182
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2268
 msgid "User information"
-msgstr ""
+msgstr "Informazioni dell’utente"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2186
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2272
@@ -9811,7 +9829,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14896
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16103
 msgid "Phone"
-msgstr ""
+msgstr "Telefono"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2188
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2274
@@ -9833,11 +9851,11 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14898
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16105
 msgid "Mailbox"
-msgstr ""
+msgstr "Casella di posta"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2189
 msgid "Barcode(s)"
-msgstr ""
+msgstr "Codice a barre"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2190
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2335
@@ -9871,19 +9889,19 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16118
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16290
 msgid "Continue"
-msgstr ""
+msgstr "Proseguire"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2275
 msgid "List of borrowed books"
-msgstr ""
+msgstr "Elenco dei libri presi in prestito"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2279
 msgid "Write note(s)"
-msgstr ""
+msgstr "Scrivi note"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2397
 msgid "Notification has been sent!"
-msgstr ""
+msgstr "Notifica inviata!"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2482
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2825
@@ -9917,23 +9935,23 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16219
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16406
 msgid "Author(s)"
-msgstr ""
+msgstr "Autore/i"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2487
 msgid "Print loan information"
-msgstr ""
+msgstr "Stampare informazioni di prestito"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2627
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2730
 msgid "Cancel hold request"
-msgstr ""
+msgstr "Cancellare richiesta di presa"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2665
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3079
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3271
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3801
 msgid "There are no requests."
-msgstr ""
+msgstr "Non ci sono richieste."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2823
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6315
@@ -9965,42 +9983,42 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16087
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16403
 msgid "Item details"
-msgstr ""
+msgstr "Dettagli articolo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2830
 msgid "Edit this record"
-msgstr ""
+msgstr "Modifica questo record"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2832
 msgid "Additional details"
-msgstr ""
+msgstr "Dettaglio aggiuntivi"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2866
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6578
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7032
 msgid "No of loans"
-msgstr ""
+msgstr "Numero di prestiti"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3028
 msgid "Add new copy"
-msgstr ""
+msgstr "Aggiungere una copia"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3029
 msgid "Order new copy"
-msgstr ""
+msgstr "Ordinare nuova copia"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3030
 msgid "ILL request"
-msgstr ""
+msgstr "Richiesta ILL"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3031
 msgid "Hold requests and loans overview on"
-msgstr ""
+msgstr "Richieste di presa et quadro d’insieme dei prestiti in funzione"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3032
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3035
 msgid "Hold requests"
-msgstr ""
+msgstr "Richieste di prestiti"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3032
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3033
@@ -10013,30 +10031,30 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3777
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3778
 msgid "More details"
-msgstr ""
+msgstr "Più dettagli"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3033
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3036
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3773
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3777
 msgid "Loans"
-msgstr ""
+msgstr "Prestiti"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3034
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3775
 msgid "Historical overview"
-msgstr ""
+msgstr "Quadro d’insieme historico"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3167
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3907
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4645
 msgid "There are no loans."
-msgstr ""
+msgstr "Non ci sono prestiti"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3201
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3395
 msgid "Returned on"
-msgstr ""
+msgstr "Ritornato il"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3202
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3396
@@ -10046,7 +10064,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4558
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4685
 msgid "Renewals"
-msgstr ""
+msgstr "Rinnovamenti"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3203
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3397
@@ -10055,7 +10073,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4308
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4559
 msgid "Overdue letters"
-msgstr ""
+msgstr "Lettere arretrate"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3462
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3566
@@ -10065,49 +10083,49 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14145
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15138
 msgid "No notes"
-msgstr ""
+msgstr "Nessuna nota"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3467
 msgid "Notes about this library"
-msgstr ""
+msgstr "Note su questa libreria"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3515
 msgid "Library details"
-msgstr ""
+msgstr "Dettagli libreria"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3521
 msgid "No of items"
-msgstr ""
+msgstr "Numero di articoli"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3571
 msgid "Notes about this borrower"
-msgstr ""
+msgstr "Note su questo mutuatario"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3644
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4830
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8084
 msgid "Personal details"
-msgstr ""
+msgstr "Detagli personali"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3767
 msgid "New loan"
-msgstr ""
+msgstr "Nuovo prestito"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3768
 msgid "New request"
-msgstr ""
+msgstr "Nuova richiesta"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3769
 msgid "New ILL request"
-msgstr ""
+msgstr "Nuova richiesta ILL"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3770
 msgid "Notify this borrower"
-msgstr ""
+msgstr "Avvisare questo mutuario"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3771
 msgid "Requests, Loans and ILL overview on"
-msgstr ""
+msgstr "Richieste, Prestiti e quadro d’insieme di ILL in funzione"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3772
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3776
@@ -10117,125 +10135,125 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3774
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3778
 msgid "ILL"
-msgstr ""
+msgstr "ILL"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3839
 msgid "Request option(s)"
-msgstr ""
+msgstr "Opzioni di richieste"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3946
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7925
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9433
 msgid "Loan date"
-msgstr ""
+msgstr "Data di prestito"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3950
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5843
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5908
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11076
 msgid "Type"
-msgstr ""
+msgstr "Tipo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3951
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4688
 msgid "Loan notes"
-msgstr ""
+msgstr "Note di prestito"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3952
 msgid "Loans status"
-msgstr ""
+msgstr "Stato di prestito"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3953
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4689
 msgid "Loan options"
-msgstr ""
+msgstr "Opzioni di prestito"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3971
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4709
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9927
 msgid "See notes"
-msgstr ""
+msgstr "Visualizzare note"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4099
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4279
 msgid "No result for your search."
-msgstr ""
+msgstr "Nessun risultato per la sua ricerca"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4129
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4309
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4560
 msgid "Loan Notes"
-msgstr ""
+msgstr "Note di prestito"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4143
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4323
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4574
 msgid "see notes"
-msgstr ""
+msgstr "visualizzare note"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4148
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4328
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4579
 msgid "no notes"
-msgstr ""
+msgstr "nessuna nota"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4182
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4362
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4489
 msgid "Send recall"
-msgstr ""
+msgstr "Mandare richiamo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4436
 msgid "CERN Library"
-msgstr ""
+msgstr "libreria CERN"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4467
 msgid "Message"
-msgstr ""
+msgstr "Messaggio"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4468
 msgid "Choose a template"
-msgstr ""
+msgstr "Scegliere modello"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4485
 msgid "Templates"
-msgstr ""
+msgstr "Modelli"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4486
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4686
 msgid "Overdue letter"
-msgstr ""
+msgstr "Lettera arretrata"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4487
 msgid "Reminder"
-msgstr ""
+msgstr "Promemoria"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4488
 msgid "Notification"
-msgstr ""
+msgstr "Notifica"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4490
 msgid "Load"
-msgstr ""
+msgstr "Caricare"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4510
 msgid "Send"
-msgstr ""
+msgstr "Manda"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4687
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7927
 msgid "Loan status"
-msgstr ""
+msgstr "Stato prestito"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4874
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8115
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9435
 msgid "Write notes"
-msgstr ""
+msgstr "Scrivi note"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4934
 msgid "Notes about borrower"
-msgstr ""
+msgstr "Note sul mutuatario"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4943
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5041
@@ -10251,7 +10269,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13244
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15236
 msgid "[delete]"
-msgstr ""
+msgstr "[cancella]"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4986
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5085
@@ -10259,19 +10277,19 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10055
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15279
 msgid "Write new note"
-msgstr ""
+msgstr "Scrivi una nuova nota"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5032
 msgid "Notes about loan"
-msgstr ""
+msgstr "Note sul prestito"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5225
 msgid "Book Information"
-msgstr ""
+msgstr "Informazioni sul libro"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5229
 msgid "EAN"
-msgstr ""
+msgstr "EAN"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5232
 msgid "Publication date"
@@ -10279,7 +10297,7 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5233
 msgid "Publication place"
-msgstr ""
+msgstr "Luogo di publicazione"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5234
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6321
@@ -10292,64 +10310,64 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15869
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16093
 msgid "Edition"
-msgstr ""
+msgstr "Edizione"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5235
 msgid "Number of pages"
-msgstr ""
+msgstr "Numero di pagine"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5236
 msgid "Sub-library"
-msgstr ""
+msgstr "Sub-biblioteca"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5237
 msgid "CERN Central Library"
-msgstr ""
+msgstr "Libreria centrale del CERN"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5476
 msgid "A new borrower has been registered."
-msgstr ""
+msgstr "Un nuovo mutuatario si è registrato"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5661
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5723
 msgid "Borrower information"
-msgstr ""
+msgstr "Informazioni mutuatario"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5763
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6241
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13994
 msgid "The information has been updated."
-msgstr ""
+msgstr "L’informazione è stata aggiornata."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5842
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5903
 msgid "New library information"
-msgstr ""
+msgstr "Informazioni della nuova libreria"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5946
 msgid "A new library has been registered."
-msgstr ""
+msgstr "Una nuova libreria è stata registrata"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5999
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7671
 msgid "Search library by"
-msgstr ""
+msgstr "Ricerca libreria per"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6032
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7716
 msgid "Library(ies)"
-msgstr ""
+msgstr "Libreria/e"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6135
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6198
 msgid "Library information"
-msgstr ""
+msgstr "Informazioni della libreria"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6316
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14380
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15864
 msgid "Book title"
-msgstr ""
+msgstr "Titolo del libro"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6318
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10934
@@ -10362,70 +10380,70 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15866
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16090
 msgid "Place"
-msgstr ""
+msgstr "Luogo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6555
 #, python-format
 msgid "Copies of %s"
-msgstr ""
+msgstr "Copie di %s"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6628
 msgid "New copy details"
-msgstr ""
+msgstr "Dettagli della nuova copia"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6792
 msgid "new copy"
-msgstr ""
+msgstr "Nuova copia"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6819
 #, python-format
 msgid "A %s has been added."
-msgstr ""
+msgstr "Un %s è stato aggiunto."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7181
 msgid "Update copy information"
-msgstr ""
+msgstr "Aggiorna copia informazioni"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7571
 msgid "New copy information"
-msgstr ""
+msgstr "Nuova copia informazioni"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7615
 msgid "This item has been updated."
-msgstr ""
+msgstr "Questo articolo è stato aggiornato."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7698
 msgid "0 library(ies) found."
-msgstr ""
+msgstr "0 libreria/e trovate"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7797
 msgid "Notes about library"
-msgstr ""
+msgstr "Note sulla libreria"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7929
 msgid "Requested ?"
-msgstr ""
+msgstr "Richiesto?"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7950
 msgid "New due date: "
-msgstr ""
+msgstr "Nuova data di scadenza: "
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7975
 msgid "Submit new due date"
-msgstr ""
+msgstr "Sottomettere nuova data di scadenza"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8019
 #, python-format
 msgid "The due date has been updated. New due date: %s"
-msgstr ""
+msgstr "La data di scadenza è stata aggiornata. Nuova data di scadenza: %s"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8020
 msgid "Back borrower's loans"
-msgstr ""
+msgstr "Ritorno prestiti del mutuatario"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8273
 msgid "Select item"
-msgstr ""
+msgstr "Seleziona articolo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8312
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8907
@@ -10435,38 +10453,38 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14893
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16100
 msgid "Borrower details"
-msgstr ""
+msgstr "Dettagli mutuatario"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8350
 msgid "This item has no holdings."
-msgstr ""
+msgstr "Questo articolo non ha contenimento"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8478
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8973
 msgid "Enter the period of interest"
-msgstr ""
+msgstr "Inserire periodo di interesso"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8479
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8974
 msgid "From:  "
-msgstr ""
+msgstr "Da: "
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8480
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8975
 msgid "To:  "
-msgstr ""
+msgstr "A: "
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8538
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9007
 msgid "A new request has been registered with success."
-msgstr ""
+msgstr "Una nuova richiesta è stata registrata con successo."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9562
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9805
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13126
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13414
 msgid "Order details"
-msgstr ""
+msgstr "Dettagli ordinazione"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9562
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9807
@@ -10474,21 +10492,21 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13126
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13415
 msgid "Vendor"
-msgstr ""
+msgstr "Venditore"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9625
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9808
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9903
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13416
 msgid "Price"
-msgstr ""
+msgstr "Prezzo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9626
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9810
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13232
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13418
 msgid "Order date"
-msgstr ""
+msgstr "Data di ordinazione"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9627
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9811
@@ -10506,25 +10524,25 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13419
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15100
 msgid "Expected date"
-msgstr ""
+msgstr "Data aspettata"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9853
 msgid "A new purchase has been registered with success."
-msgstr ""
+msgstr "Un nuovo acquisto è stato registrato con successo."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9902
 msgid "Ordered date"
-msgstr ""
+msgstr "Data ordinata"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9951
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11127
 msgid "select"
-msgstr ""
+msgstr "seleziona"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10003
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15227
 msgid "Notes about acquisition"
-msgstr ""
+msgstr "Note sulla acquisizione"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10444
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10598
@@ -10540,7 +10558,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16286
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16413
 msgid "ILL request details"
-msgstr ""
+msgstr "Dettagli richiesta ILL"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10445
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10599
@@ -10553,7 +10571,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16287
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16414
 msgid "Period of interest - From"
-msgstr ""
+msgstr "Periodo di interesse - Da"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10447
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10600
@@ -10566,7 +10584,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16288
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16415
 msgid "Period of interest - To"
-msgstr ""
+msgstr "Periodo di interesse - A"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10449
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10601
@@ -10580,21 +10598,21 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16289
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16416
 msgid "Additional comments"
-msgstr ""
+msgstr "Commenti aggiuntivi"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10450
 msgid "Borrower wants only this edition?"
-msgstr ""
+msgstr "Mutuatario vuole solo questa edizione?"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10602
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14856
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16099
 msgid "Only this edition"
-msgstr ""
+msgstr "Solo questa edizione"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10666
 msgid "A new ILL request has been registered with success."
-msgstr ""
+msgstr "Una nuova richiesta ILL è stata registrata con successo."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10820
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11027
@@ -10603,65 +10621,67 @@ msgid ""
 "I accept the %s of the service in particular the return of books in due "
 "time."
 msgstr ""
+"Accetto il %s del servizio in particolare il ritorno di libri a tempo "
+"debito."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10821
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11028
 msgid "I want this edition only."
-msgstr ""
+msgstr "Voglio solo questa edizione."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11072
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15098
 msgid "Supplier"
-msgstr ""
+msgstr "Fornitore"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11075
 msgid "Interest from"
-msgstr ""
+msgstr "Interesso da"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11421
 msgid "Periodical Title"
-msgstr ""
+msgstr "Titolo del periodico"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11423
 msgid "Article Title"
-msgstr ""
+msgstr "Titolo dell’ Articolo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11427
 msgid "Volume, Issue, Page"
-msgstr ""
+msgstr "Volume, Emissione, Pagina"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11429
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16226
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16412
 msgid "ISSN"
-msgstr ""
+msgstr "ISSN"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11488
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12380
 msgid "Borrower request"
-msgstr ""
+msgstr "Richiesta del mutuatario"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11491
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14417
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14853
 msgid "Period of interest (From)"
-msgstr ""
+msgstr "Periodo di interesse (Da)"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11492
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14471
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14854
 msgid "Period of interest (To)"
-msgstr ""
+msgstr "Periodo di interesse (A)"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11493
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12385
 msgid "Borrower comments"
-msgstr ""
+msgstr "Commenti del mutuatario"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11494
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12386
 msgid "Only this edition?"
-msgstr ""
+msgstr "Solo questa edizione?"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11531
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11560
@@ -10677,7 +10697,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12806
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12912
 msgid "ILL request ID"
-msgstr ""
+msgstr "ILL richiesta ID"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11531
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11560
@@ -10694,7 +10714,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13234
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13420
 msgid "Previous notes"
-msgstr ""
+msgstr "Note precedenti"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11578
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11745
@@ -10709,7 +10729,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12954
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15104
 msgid "Library notes"
-msgstr ""
+msgstr "Note della libreria"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11617
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11649
@@ -10719,7 +10739,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12807
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12913
 msgid "Library/Supplier"
-msgstr ""
+msgstr "Libreria/Fornitore"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11694
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11842
@@ -10732,7 +10752,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12919
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13144
 msgid "Cost"
-msgstr ""
+msgstr "Costo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11834
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11966
@@ -10742,64 +10762,64 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12916
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15101
 msgid "Arrival date"
-msgstr ""
+msgstr "Data di arrivo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11873
 msgid "Barcoce"
-msgstr ""
+msgstr "Codice a barre"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13014
 msgid "An ILL request has been updated with success."
-msgstr ""
+msgstr "Una richiesta ILL è stata aggiornata con successo."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13502
 msgid "Purchase information updated with success."
-msgstr ""
+msgstr "Informazione d’acquisto aggiornata con successo."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13576
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13641
 msgid "New vendor information"
-msgstr ""
+msgstr "Informazioni nuovo venditore"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13686
 msgid "A new vendor has been registered."
-msgstr ""
+msgstr "Un nuovo venditore è stato registrato."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13740
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14048
 msgid "Search vendor by"
-msgstr ""
+msgstr "Cerca venditore per"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13777
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14085
 msgid "Vendor(s)"
-msgstr ""
+msgstr "Venditore/i"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13884
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13951
 msgid "Vendor information"
-msgstr ""
+msgstr "Informazioni venditore"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14150
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14240
 msgid "Notes about this vendor"
-msgstr ""
+msgstr "Note su questo venditore"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14193
 msgid "Vendor details"
-msgstr ""
+msgstr "Dettagli del venditore"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14279
 msgid "Add notes"
-msgstr ""
+msgstr "Aggiungi note"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14377
 msgid "Book does not exists on Invenio."
-msgstr ""
+msgstr "Il libro non esiste su Invenio."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14377
 msgid "Please fill the following form."
-msgstr ""
+msgstr "Si prega di compilare il seguente modulo."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14473
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15959
@@ -10808,27 +10828,29 @@ msgid ""
 "Borrower accepts the %s of the service in particular the return of books in "
 "due time."
 msgstr ""
+"Mutuatario accetta la %s del servizio, in particolare, il ritorno di libri a"
+" tempo debito."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14474
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15960
 msgid "Borrower wants this edition only."
-msgstr ""
+msgstr "Mutuatario vuole solo questa edizione."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14607
 msgid "Only this edition."
-msgstr ""
+msgstr "Solo questa edizione."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15143
 msgid "Notes about this ILL"
-msgstr ""
+msgstr "Note su questa ILL"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15315
 msgid "No more requests are pending or waiting."
-msgstr ""
+msgstr "Non ci sono più richieste in attesa."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15466
 msgid "Printable format"
-msgstr ""
+msgstr "Formato stampabile"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15526
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15684
@@ -10836,57 +10858,60 @@ msgid ""
 "Check if the book already exists on Invenio, before to send your ILL "
 "request."
 msgstr ""
+"Controllare se il libro è già presente su Invenio, prima di inviare la "
+"richiesta ILL."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15550
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15713
 msgid "0 items found."
-msgstr ""
+msgstr "0 articoli trovati."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15618
 msgid "Proceed anyway"
-msgstr ""
+msgstr "Procedere comunque"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15861
 msgid "Book does not exists on Invenio. Please fill the following form."
 msgstr ""
+"Libro non esiste su Invenio. Si prega di compilare il seguente modulo."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16216
 msgid "Article details"
-msgstr ""
+msgstr "Dettagli articolo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16217
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16404
 msgid "Periodical title"
-msgstr ""
+msgstr "Titolo periodico"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16218
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16405
 msgid "Article title"
-msgstr ""
+msgstr "Titolo articolo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16220
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16407
 msgid "Report number"
-msgstr ""
+msgstr "Numero di rapporto"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16221
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16408
 msgid "Volume"
-msgstr ""
+msgstr "Volume"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16222
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16409
 msgid "Issue"
-msgstr ""
+msgstr "Emissione"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16223
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16410
 msgid "Page"
-msgstr ""
+msgstr "Pagina"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16225
 msgid "Budget code"
-msgstr ""
+msgstr "Codice bilancio"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:60
 msgid "BibCheck Admin"
@@ -11083,23 +11108,23 @@ msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:140
 msgid "Add New Knowledge Base"
-msgstr ""
+msgstr "Aggiungi Base di Conoscenza"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:141
 msgid "Configure a dynamic KB"
-msgstr ""
+msgstr "Configura una KB dinamica"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:142
 msgid "Add New Taxonomy"
-msgstr ""
+msgstr "Aggiungi nuova Tassonomia"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:183
 msgid "This knowledge base already has a taxonomy file."
-msgstr ""
+msgstr "Questa base di conoscenza ha già un file di tassonomia."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:184
 msgid "If you upload another file, the current version will be replaced."
-msgstr ""
+msgstr "Se carica un altro file, la versione attuale verrà sostituita."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:186
 msgid "The current taxonomy can be accessed with this URL"
@@ -11111,7 +11136,7 @@ msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:224
 msgid "Please configure"
-msgstr ""
+msgstr "Si prega di configurare"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:225
 msgid ""
@@ -11119,6 +11144,9 @@ msgid ""
 "given field. The list is generated dynamically by                          "
 "searching the records using a search expression."
 msgstr ""
+"Una base di conoscenza dinamica è una lista di valori di un"
+"                           determinato campo. L'elenco viene generato in "
+"modo dinamico ricercando i record utilizzando un'espressione di ricerca."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:229
 msgid ""
@@ -11128,12 +11156,18 @@ msgid ""
 "'270__a:*Paris*', a list of institutes in Paris                          "
 "will be created."
 msgstr ""
+"Esempio: Suoi record contengono campo 270__a per                           "
+"il nome e l'indirizzo dell'istituto dell'autore. Se imposta il campo a "
+"'270__a' e l'espressione                          a '270__a: * Parigi *' , "
+"verrà creato un elenco di istituti a Parigi."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:234
 msgid ""
 "If the expression is empty, a list of all values                          in"
 " 270__a will be created."
 msgstr ""
+"Se l’espressione è vuota, un’elenco di tutti i valori"
+"                          sarà creato in 270__"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:236
 msgid ""
@@ -11141,16 +11175,21 @@ msgid ""
 "it will be replaced by a search string when the                          "
 "knowledge base is used."
 msgstr ""
+"Se l'espressione contiene '%', come '270__a: *% *',"
+"                          sarà sostituita da una stringa di ricerca quando "
+"la base di conoscenze viene usata."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:239
 msgid ""
 "You can enter a collection name if the expression                          "
 "should be evaluated in a specific collection."
 msgstr ""
+"Può inserire un nome di raccolta se l'espressione                           "
+"dovrebbe essere valutata in una raccolta specifica."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:255
 msgid "Exporting: "
-msgstr ""
+msgstr "Esportando: "
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:296
 #: modules/bibknowledge/lib/bibknowledge_templates.py:557
@@ -11175,22 +11214,24 @@ msgid ""
 "Here you can add new mappings to this base                         and "
 "change the base attributes."
 msgstr ""
+"Qui è possibile aggiungere nuovi mapping a questa base"
+"                          e modificare gli attributi della base."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:333
 msgid "Map From"
-msgstr ""
+msgstr "Mappare Da"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:396
 msgid "Search for a mapping"
-msgstr ""
+msgstr "Ricerca un mapping"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:514
 msgid "You can get a these mappings in textual format by: "
-msgstr ""
+msgstr "È possibile ottenere questi mapping in formato testuale per: "
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:516
 msgid "And the KBA version by:"
-msgstr ""
+msgstr "E la versione KBA per:"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:667
 msgid "Your rule"
@@ -11210,33 +11251,35 @@ msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:685
 msgid "Please select action"
-msgstr ""
+msgstr "Si prega di selezionare un’azione"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:686
 msgid "Replace the selected rules with this rule"
-msgstr ""
+msgstr "Sostituire le regole selezionate con questa regola"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:687
 msgid "Add this rule in the current knowledge base"
-msgstr ""
+msgstr "Aggiungere questa regola alla base di conoscenza attuale"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:688
 msgid "Cancel: do not add this rule"
-msgstr ""
+msgstr "Cancella: non aggiungere questa regola"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:719
 msgid ""
 "It is not possible to have two rules with the same left side in the same "
 "knowledge base."
 msgstr ""
+"Non è possibile di avere due regole con lo stesso lato sinistro nella stessa"
+" base di conoscenza."
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:80
 msgid "BibKnowledge Admin"
-msgstr ""
+msgstr "Amministratore BibKnowledge"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:100
 msgid "Knowledge Bases"
-msgstr ""
+msgstr "Basi di conoscenza"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:118
 msgid "upload is a file"
@@ -11248,7 +11291,7 @@ msgstr ""
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:144
 msgid "File uploaded"
-msgstr ""
+msgstr "File caricato"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:173
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:217
@@ -11292,23 +11335,23 @@ msgstr "Dipendenze basi di conoscenza %s"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:408
 msgid "Left side exists"
-msgstr ""
+msgstr "Lato sinistro esiste"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:416
 msgid "Right side exists"
-msgstr ""
+msgstr "Lato destro esiste"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:589
 msgid "Knowledge base name missing"
-msgstr ""
+msgstr "Manca il nome della base di conoscenza"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:609
 msgid "Unknown knowledge base"
-msgstr ""
+msgstr "Base di conoscenza sconosciuta"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:610
 msgid "There is no knowledge base with that name."
-msgstr ""
+msgstr "Non esiste una base di conoscenza con quel nome."
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:629
 msgid "No such knowledge base"
@@ -11320,56 +11363,56 @@ msgstr "Cancella basi di conoscenza"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:157
 msgid "BibSword Admin Interface"
-msgstr ""
+msgstr "Interfaccia di amministrazione di BibSword"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:171
 #: modules/bibsword/lib/bibsword_webinterface.py:277
 #: modules/bibsword/lib/bibsword_webinterface.py:301
 #: modules/bibsword/lib/bibsword_webinterface.py:330
 msgid "Export with BibSword: Step 2/4"
-msgstr ""
+msgstr "Esporta con BibSword: Step 2/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:222
 #: modules/bibsword/lib/bibsword_webinterface.py:233
 #: modules/bibsword/lib/bibsword_webinterface.py:291
 msgid "Export with BibSword: Step 1/4"
-msgstr ""
+msgstr "Esporta con BibSword: Step 1/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:315
 #: modules/bibsword/lib/bibsword_webinterface.py:343
 #: modules/bibsword/lib/bibsword_webinterface.py:374
 msgid "Export with BibSword: Step 3/4"
-msgstr ""
+msgstr "Esporta con BibSword: Step 3/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:358
 #: modules/bibsword/lib/bibsword_webinterface.py:389
 msgid "Export with BibSword: Step 4/4"
-msgstr ""
+msgstr "Esporta con BibSword: Step 4/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:434
 msgid "Export with BibSword: Acknowledgement"
-msgstr ""
+msgstr "Esporta con BibSword: Riconoscimento"
 
 #: modules/bibupload/lib/batchuploader_engine.py:202
 msgid "More than one possible recID, ambiguous behaviour"
-msgstr ""
+msgstr "più di un recID possibile, comportamento ambiguo"
 
 #: modules/bibupload/lib/batchuploader_engine.py:202
 msgid "No records match that file name"
-msgstr ""
+msgstr "Nessun record corrisponde a questo nome di file"
 
 #: modules/bibupload/lib/batchuploader_engine.py:203
 msgid "File already exists"
-msgstr ""
+msgstr "File già esiste"
 
 #: modules/bibupload/lib/batchuploader_engine.py:203
 msgid "A file with the same name and format already exists"
-msgstr ""
+msgstr "Un file con lo stesso nome e formato già esiste"
 
 #: modules/bibupload/lib/batchuploader_engine.py:204
 #, python-format
 msgid "No rights to upload to collection '%s'"
-msgstr ""
+msgstr "Nessun diritto di caricare la raccolta '%s'"
 
 #: modules/bibupload/lib/batchuploader_engine.py:413
 #: modules/bibupload/lib/batchuploader_engine.py:426
@@ -11377,3 +11420,5 @@ msgstr ""
 msgid ""
 "The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"
 msgstr ""
+"L’utente '%(x_user)s' non è autorizzato a modificare la raccolta "
+"'%(x_coll)s'"

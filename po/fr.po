@@ -4618,13 +4618,13 @@ msgstr "Notice introuvable"
 #: modules/webcomment/lib/webcomment_webinterface.py:573
 #: modules/webcomment/lib/webcomment_webinterface.py:650
 msgid "Specified comment does not belong to this record"
-msgstr ""
+msgstr "Commentaires spécifiques qui n'appartiennent pas a cet article"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:344
 #: modules/webcomment/lib/webcomment_webinterface.py:579
 #: modules/webcomment/lib/webcomment_webinterface.py:656
 msgid "You do not have access to the specified comment"
-msgstr ""
+msgstr "Vous n'avez pas l'autorisation sur le commentaire spécifié  "
 
 #: modules/webcomment/lib/webcomment_webinterface.py:491
 #: modules/websubmit/lib/websubmit_templates.py:2659
@@ -4634,11 +4634,11 @@ msgstr "Ajouter un commentaire"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:584
 msgid "You cannot vote for a deleted comment"
-msgstr ""
+msgstr "Vous ne pouvez pas voter pour un commentaire supprimé"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:661
 msgid "You cannot report a deleted comment"
-msgstr ""
+msgstr "Vous ne pouvez pas reporter un commentaire supprimé "
 
 #: modules/webcomment/lib/webcomment_webinterface.py:788
 #: modules/webcomment/lib/webcomment_webinterface.py:828
@@ -4651,7 +4651,7 @@ msgstr "Le commentaire demandé n'a pas été trouvé"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:809
 msgid "You cannot access files of a deleted comment"
-msgstr ""
+msgstr "Vous ne pouvez pas accéder aux fichier d'un commentaire supprimé"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:829
 msgid "The requested file could not be found"
@@ -4998,6 +4998,9 @@ msgid ""
 "Warning: figure caption search is only available for a subset of papers "
 "mostly from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
+"Attention: la recherche dans les légendes des figures n'est disponible que "
+"pour un sous-ensemble des papiers, principalement pour "
+"%(x_range_from_year)s-%(x_range_to_year)s."
 
 #: modules/websearch/lib/search_engine.py:1838
 msgid ""
@@ -6862,7 +6865,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:406
 msgid "Your nickname has not been updated"
-msgstr ""
+msgstr "Votre pseudonyme n'a pas été mis a jour"
 
 #: modules/websession/lib/websession_webinterface.py:420
 msgid "Settings successfully edited."
@@ -7437,6 +7440,8 @@ msgid ""
 "Note that your submission has been inserted into the bibliographic task "
 "queue and is waiting for execution.\n"
 msgstr ""
+"Notez que votre soumission a été insérée dans la tache bibliographique et "
+"est en attente d'exécution.\n"
 
 #: modules/websubmit/lib/functions/Shared_Functions.py:181
 #, python-format
@@ -8218,7 +8223,7 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_webinterface.py:196
 #, python-format
 msgid "The format %s does not exist for the given version: %s"
-msgstr ""
+msgstr "Le format %s n'existe pas pour cette version donnée: %s"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:210
 msgid "This file is restricted: "

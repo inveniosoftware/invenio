@@ -4608,13 +4608,13 @@ msgstr "No s'ha trobat el registre"
 #: modules/webcomment/lib/webcomment_webinterface.py:573
 #: modules/webcomment/lib/webcomment_webinterface.py:650
 msgid "Specified comment does not belong to this record"
-msgstr ""
+msgstr "El comentari especificat no pertany a aquest registre"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:344
 #: modules/webcomment/lib/webcomment_webinterface.py:579
 #: modules/webcomment/lib/webcomment_webinterface.py:656
 msgid "You do not have access to the specified comment"
-msgstr ""
+msgstr "No teniu accés al comentari especificat"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:491
 #: modules/websubmit/lib/websubmit_templates.py:2659
@@ -4624,11 +4624,11 @@ msgstr "Afegeix un comentari"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:584
 msgid "You cannot vote for a deleted comment"
-msgstr ""
+msgstr "No podeu votar un comentari esborrat"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:661
 msgid "You cannot report a deleted comment"
-msgstr ""
+msgstr "No podeu denunciar un comentari esborrat"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:788
 #: modules/webcomment/lib/webcomment_webinterface.py:828
@@ -4641,7 +4641,7 @@ msgstr "No s'ha trobat el comentari sol·licitat"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:809
 msgid "You cannot access files of a deleted comment"
-msgstr ""
+msgstr "No podeu accedir als fitxers d'un comentari esborrat"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:829
 msgid "The requested file could not be found"
@@ -4977,6 +4977,9 @@ msgid ""
 "Warning: full-text search is only available for a subset of papers mostly "
 "from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
+"Atenció: la cerca a text complet només està disponible per a un subconjunt "
+"de documents, majoritàriament d'entre "
+"%(x_range_from_year)s-%(x_range_to_year)s."
 
 #: modules/websearch/lib/search_engine.py:1829
 #, python-format
@@ -4984,6 +4987,9 @@ msgid ""
 "Warning: figure caption search is only available for a subset of papers "
 "mostly from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
+"Atenció: la cerca als peus d'imatges només està disponible per a un "
+"subconjunt de documents, majoritàriament d'entre "
+"%(x_range_from_year)s-%(x_range_to_year)s."
 
 #: modules/websearch/lib/search_engine.py:1838
 msgid ""
@@ -6841,7 +6847,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:406
 msgid "Your nickname has not been updated"
-msgstr ""
+msgstr "El vostre alias no ha estat actualitzat."
 
 #: modules/websession/lib/websession_webinterface.py:420
 msgid "Settings successfully edited."
@@ -8199,7 +8205,7 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_webinterface.py:196
 #, python-format
 msgid "The format %s does not exist for the given version: %s"
-msgstr ""
+msgstr "El format %s no existeix per a la versió %s"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:210
 msgid "This file is restricted: "
@@ -10903,7 +10909,7 @@ msgstr "ERROR"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:80
 msgid "does not exist"
-msgstr ""
+msgstr "no existeix"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:82
 msgid "is not a directory"
