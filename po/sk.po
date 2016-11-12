@@ -10,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2014-08-31 22:26+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Tibor Simko <tibor.simko@cern.ch>, 2016\n"
+"Last-Translator: helix84 <helix84@centrum.sk>, 2016\n"
 "Language-Team: Slovak (https://www.transifex.com/inveniosoftware/teams/23537/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1382,19 +1382,19 @@ msgstr "ALEBO"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:257
 msgid "Click here to review the transactions."
-msgstr ""
+msgstr "Kliknutím sem skontrolujete transakcie."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:309
 msgid "Quit searching."
-msgstr ""
+msgstr "Ukončiť hľadanie."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:515
 msgid "Your options"
-msgstr ""
+msgstr "Vaše možnosti"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:525
 msgid "Claim for yourself"
-msgstr ""
+msgstr "Prideliť sebe"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:529
 msgid "Attribute to"
@@ -1408,37 +1408,37 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_templates.py:687
 #: modules/bibauthorid/lib/bibauthorid_templates.py:759
 msgid "Select All"
-msgstr ""
+msgstr "Vybrať všetky"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:594
 #: modules/bibauthorid/lib/bibauthorid_templates.py:688
 #: modules/bibauthorid/lib/bibauthorid_templates.py:760
 msgid "Select None"
-msgstr ""
+msgstr "Zrušiť výber"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:595
 #: modules/bibauthorid/lib/bibauthorid_templates.py:689
 #: modules/bibauthorid/lib/bibauthorid_templates.py:761
 msgid "Invert Selection"
-msgstr ""
+msgstr "Invertovať výber"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:597
 #: modules/bibauthorid/lib/bibauthorid_templates.py:691
 msgid "Hide successful claims"
-msgstr ""
+msgstr "Skryť úspešné priradenia"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:616
 #: modules/bibauthorid/lib/bibauthorid_templates.py:735
 msgid "Paper Short Info"
-msgstr ""
+msgstr "Krátke informácie o publikácii"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:617
 msgid "Author Name"
-msgstr ""
+msgstr "Meno autora"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:618
 msgid "Affiliation"
-msgstr ""
+msgstr "Afiliácia"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:619
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:535
@@ -1450,7 +1450,7 @@ msgstr "Dátum"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:620
 msgid "Experiment"
-msgstr ""
+msgstr "Experiment"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:621
 #: modules/bibauthorid/lib/bibauthorid_templates.py:736
@@ -1461,31 +1461,32 @@ msgstr "Akcie"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:641
 msgid "Not assigned"
-msgstr ""
+msgstr "Nepriradené"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:657
 msgid "No status information found."
-msgstr ""
+msgstr "Neboli nájdené informácie o stave."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:678
 msgid "Operator review of user actions pending"
-msgstr ""
+msgstr "Kontrola čakajúcich operácií používateľa prevádzkovateľom."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:722
 msgid "Sorry, there are currently no records to be found in this category."
 msgstr ""
+"Ľutujeme, momentálne sa v tejto kategórii nenachádzajú žiadne záznamy."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:751
 msgid "Review Transaction"
-msgstr ""
+msgstr "Skontrolovať transakciu"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:758
 msgid "On all pages"
-msgstr ""
+msgstr "Na všetkých stránkach"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:765
 msgid "With selected do"
-msgstr ""
+msgstr "Na vybraných"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:794
 msgid "Names variants"
@@ -1493,33 +1494,33 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:916
 msgid "These records have been marked as not being from this person."
-msgstr ""
+msgstr "Tieto záznamy boli označené, že nie sú od tejto osoby."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:917
 msgid "They will be regarded in the next run of the author "
-msgstr ""
+msgstr "Budú zohľadnené pri ďalšom spustení autora"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:918
 msgid "disambiguation algorithm and might disappear from this listing."
-msgstr ""
+msgstr "algoritmu na rozlíšenie autorov a môžu z tohto zoznamu zmiznúť."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:944
 #: modules/bibauthorid/lib/bibauthorid_templates.py:945
 #: modules/bibauthorid/lib/bibauthorid_templates.py:948
 msgid "Not provided"
-msgstr ""
+msgstr "Neposkytnuté"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:946
 msgid "Not available"
-msgstr ""
+msgstr "Nedostupné"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:947
 msgid "No comments"
-msgstr ""
+msgstr "Bez komentárov"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:949
 msgid "Not Available"
-msgstr ""
+msgstr "Nedostupné"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:969
 msgid " Delete this ticket"
@@ -1531,55 +1532,56 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:993
 msgid "No title available"
-msgstr ""
+msgstr "Žiaden názov nie je k dispozícii"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1080
 msgid "Choose system"
-msgstr ""
+msgstr "Vybrať systém"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1108
 msgid "Make sure we match the right names!"
-msgstr ""
+msgstr "Uistite sa, že sme našli správne mená!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1110
 msgid "Please select an author on each of the records that will be assigned."
-msgstr ""
+msgstr "Prosím, vyberte autora pri každom zo záznamov, ktoré budú priradené."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1111
 msgid "Papers without a name selected will be ignored in the process."
-msgstr ""
+msgstr "Publikácie bez vybraného mena tento proces nebude brať do úvahy."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1120
 msgid "Claim for person with id"
-msgstr ""
+msgstr "Priradiť osobe s identifikátorom"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1121
 msgid "This seems to be an empty profile without names associated to it yet"
-msgstr ""
+msgstr "Zdá sa, že toto je prázdny profil bez priradených mien"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1122
 msgid ""
 "(the names will be automatically gathered when the first paper is claimed to"
 " this profile)."
 msgstr ""
+"(mená sa pridajú automaticky, keď do tohto profilu pridáte prvú publikáciu)"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1124
 msgid "Select name for"
-msgstr ""
+msgstr "Vybrať meno pre"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1133
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1160
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1304
 msgid "Error retrieving record title"
-msgstr ""
+msgstr "Chyba pri získavaní názvu záznamu"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1136
 msgid "Paper title: "
-msgstr ""
+msgstr "Názov publikácie:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1148
 msgid "The following names have been automatically chosen:"
-msgstr ""
+msgstr "Nasledovné mená boli vybrané automaticky:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1153
 #: modules/websubmit/lib/websubmit_templates.py:1212
@@ -1588,11 +1590,11 @@ msgstr "Pre"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1164
 msgid " --  With name: "
-msgstr ""
+msgstr " --  S menom: "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1169
 msgid "Ignore"
-msgstr ""
+msgstr "Ignorovať"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1218
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1234
@@ -1618,136 +1620,142 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1265
 msgid "Symbols legend: "
-msgstr ""
+msgstr "Legenda symbolov:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1270
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1329
 msgid "Everything is shiny, captain!"
-msgstr ""
+msgstr "Všetko je v poriadku, kapitán!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1271
 msgid "The result of this request will be visible immediately"
-msgstr ""
+msgstr "Výsledok tejto požiadavky sa prejaví okamžite"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1276
 msgid "Confirmation needed to continue"
-msgstr ""
+msgstr "Aby bolo možné pokračovať, je potrebné potvrdenie"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1277
 msgid ""
 "The result of this request will be visible immediately but we need your "
 "confirmation to do so for this paper has been manually claimed before"
 msgstr ""
+"Výsledok tejto požiadavky sa prejaví okamžite, ale potrebujeme od vás "
+"potvrdenie, pretože táto publikácia bola v minulosti už priradená"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1282
 msgid "This will create a change request for the operators"
-msgstr ""
+msgstr "Týmto sa vytvorí požiadavka na zmenu pre prevádzkovateľa"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1283
 msgid ""
 "The result of this request will be visible upon confirmation through an "
 "operator"
-msgstr ""
+msgstr "Výsledok tejto požiadavky sa prejaví po potvrdení prevádzkovateľa"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1322
 msgid "Selected name on paper"
-msgstr ""
+msgstr "Vybrané meno na publikácii"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1333
 msgid "Verification needed to continue"
-msgstr ""
+msgstr "Aby bolo možné pokračovať, je potrebné overenie"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1337
 msgid "This will create a request for the operators"
-msgstr ""
+msgstr "Týmto sa vytvorí požiadavku pre prevádzkovateľa"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1375
 msgid "Please provide your information"
-msgstr ""
+msgstr "Prosím, zadajte svoje informácie"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1382
 msgid "Please provide your first name"
-msgstr ""
+msgstr "Prosím, zadajte svoje krstné meno"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1386
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1388
 msgid "Your first name:"
-msgstr ""
+msgstr "Vaše krstné meno:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1394
 msgid "Please provide your last name"
-msgstr ""
+msgstr "Prosím, zadajte svoje priezvisko"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1399
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1401
 msgid "Your last name:"
-msgstr ""
+msgstr "Vaše priezvisko:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1409
 msgid "Please provide your eMail address"
-msgstr ""
+msgstr "Prosím, zadajte svoju e-mailovú adresu"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1415
 msgid ""
 "This eMail address is reserved by a user. Please log in or provide an "
 "alternative eMail address"
 msgstr ""
+"Túto e-mailová adresa už má niektorý používateľ rezervovanú. Buď sa "
+"prihláste alebo zadajte inú e-mailovú adresu"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1420
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1422
 msgid "Your eMail:"
-msgstr ""
+msgstr "Vaša e-mailová adresa:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1426
 msgid "You may leave a comment (optional)"
-msgstr ""
+msgstr "Môžete napísať komentár (nepovinné)"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1439
 msgid "Continue claiming*"
-msgstr ""
+msgstr "Pokračovať v priraďovaní*"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1441
 msgid "Confirm these changes**"
-msgstr ""
+msgstr "Potvrdiť tieto zmeny**"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1444
 msgid "!Delete the entire request!"
-msgstr ""
+msgstr "!Zmazať celú požiadavku!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1457
 msgid "Mark as your documents"
-msgstr ""
+msgstr "Označiť dokumenty ako vaše"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1472
 msgid "Mark as _not_ your documents"
-msgstr ""
+msgstr "Označiť dokumenty ako NIE vaše"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1483
 msgid "Nothing staged as not yours"
-msgstr ""
+msgstr "Nič nie je pripravené s označením, že nie je vaše"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1487
 msgid "Mark as their documents"
-msgstr ""
+msgstr "Označiť dokumenty ako ich"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1498
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1513
 msgid "Nothing staged in this category"
-msgstr ""
+msgstr "Nič nie je pripravené v tejto kategórii"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1502
 msgid "Mark as _not_ their documents"
-msgstr ""
+msgstr "Označiť dokumenty ako NIE ich"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1519
 msgid "  * You can come back to this page later. Nothing will be lost. <br />"
-msgstr ""
+msgstr "  * Na túto stránku sa môžete vrátiť neskôr. Nič sa nestratí. <br />"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1520
 msgid ""
 "  ** Performs all requested changes. Changes subject to permission "
 "restrictions will be submitted to an operator for manual review."
 msgstr ""
+"  ** Vykoná všetky požadované zmeny. Zmeny, ktoré podliehajú obmedzeniam "
+"oprávnení budú odoslané prevádzkovateľovi na ručnú kontrolu."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1576
 #, python-format
@@ -1764,7 +1772,7 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1644
 msgid "Recent Papers"
-msgstr ""
+msgstr "Nedávne publikácie"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1658
 msgid "YES!"
@@ -1777,19 +1785,19 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1665
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1687
 msgid "Publication List "
-msgstr ""
+msgstr "Zoznam publikácií"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1672
 msgid "Showing the"
-msgstr ""
+msgstr "Zobrazuje sa"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1672
 msgid "most recent documents:"
-msgstr ""
+msgstr "najnovšie dokumenty:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1681
 msgid "Sorry, there are no documents known for this person"
-msgstr ""
+msgstr "Ľutujeme, nepoznáme žiadne dokumenty tejto osoby"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1683
 msgid ""

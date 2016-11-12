@@ -1390,11 +1390,11 @@ msgstr "Abandona la búsqueda"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:515
 msgid "Your options"
-msgstr ""
+msgstr "Su opciones"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:525
 msgid "Claim for yourself"
-msgstr ""
+msgstr "Reclamación por usted mismo"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:529
 msgid "Attribute to"
@@ -1430,15 +1430,15 @@ msgstr "Esconder las reivindicaciones satisfechas"
 #: modules/bibauthorid/lib/bibauthorid_templates.py:616
 #: modules/bibauthorid/lib/bibauthorid_templates.py:735
 msgid "Paper Short Info"
-msgstr ""
+msgstr "Papel Corto Info"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:617
 msgid "Author Name"
-msgstr ""
+msgstr "Nombre del Autor"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:618
 msgid "Affiliation"
-msgstr ""
+msgstr "Afiliacion"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:619
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:535
@@ -1450,7 +1450,7 @@ msgstr "Fecha"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:620
 msgid "Experiment"
-msgstr ""
+msgstr "Experimento"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:621
 #: modules/bibauthorid/lib/bibauthorid_templates.py:736
@@ -1461,7 +1461,7 @@ msgstr "Acciones"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:641
 msgid "Not assigned"
-msgstr ""
+msgstr "No asignado"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:657
 msgid "No status information found."
@@ -1481,11 +1481,11 @@ msgstr "Revise la transacción"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:758
 msgid "On all pages"
-msgstr ""
+msgstr "En todas las paginas."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:765
 msgid "With selected do"
-msgstr ""
+msgstr "Con seleccionado hacer"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:794
 msgid "Names variants"
@@ -1531,11 +1531,11 @@ msgstr " Dar por buena toda esta tarea"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:993
 msgid "No title available"
-msgstr ""
+msgstr "Ningún título disponible"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1080
 msgid "Choose system"
-msgstr ""
+msgstr "Escoja sistema"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1108
 msgid "Make sure we match the right names!"
@@ -1553,17 +1553,19 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1120
 msgid "Claim for person with id"
-msgstr ""
+msgstr "Reclamar por persona con id"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1121
 msgid "This seems to be an empty profile without names associated to it yet"
-msgstr ""
+msgstr "Esto parece ser un perfil vacío sin nombres todavía asociados a el "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1122
 msgid ""
 "(the names will be automatically gathered when the first paper is claimed to"
 " this profile)."
 msgstr ""
+"(los nombres se recogerán automáticamente cuando se reclama el primer papel "
+"para este perfil)."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1124
 msgid "Select name for"
@@ -1768,6 +1770,9 @@ msgid ""
 " name, or check back in a few days as attributions are updated frequently.  "
 "Or you can send us feedback, at "
 msgstr ""
+"No tenemos una lista de publicaciones para '% s'. Trate de usar un nombre de"
+" autor menos específico, o comprobar de nuevo en unos días como atribuciones"
+" se actualizan con frecuencia. O usted puede enviarnos sus comentarios, por"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1589
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1701
@@ -4765,11 +4770,11 @@ msgstr "Subir"
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:904
 msgid "Uploading..."
-msgstr ""
+msgstr "Cargando…"
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:905
 msgid "Please wait..."
-msgstr ""
+msgstr "Por favor espera…"
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:918
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:452
@@ -12650,6 +12655,8 @@ msgid ""
 "Note that your submission has been inserted into the bibliographic task "
 "queue and is waiting for execution.\n"
 msgstr ""
+"Tenga en cuenta que su presentación se ha insertado en la cola de tareas "
+"bibliográficas y está en espera de ejecución.\n"
 
 #: modules/websubmit/lib/functions/Shared_Functions.py:203
 #, python-format
