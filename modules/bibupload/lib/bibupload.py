@@ -655,7 +655,7 @@ def find_records_from_extoaiid(extoaiid, extoaisrc=None):
             # in the locally used CFG_OAI_ID_FIELD that matches. This can happen
             # if oai harvesting is used to duplicate records.
             recid = find_record_from_oaiid(extoaiid)
-            if recid != None:
+            if recid is not None:
                 ret.add(recid)
         return ret
     except Error, error:
@@ -2303,7 +2303,7 @@ def task_run_core():
     return not stat['nb_errors'] >= 1
 
 def log_record_uploading(oai_rec_id, task_id, bibrec_id, insertion_db, pretend=False):
-    if oai_rec_id != "" and oai_rec_id != None:
+    if oai_rec_id != "" and oai_rec_id is not None:
         query = """UPDATE oaiHARVESTLOG SET date_inserted=NOW(), inserted_to_db=%s, id_bibrec=%s WHERE oai_id = %s AND bibupload_task_id = %s ORDER BY date_harvested LIMIT 1"""
         try:
             if not pretend:
