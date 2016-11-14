@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -36,12 +36,12 @@ import urllib2
 from urllib import urlencode, quote_plus, quote, FancyURLopener
 from urlparse import urlparse
 from cgi import parse_qs, escape
-from md5 import md5
 
 try:
-    from hashlib import sha256, sha1
+    from hashlib import sha256, sha1, md5
     HASHLIB_IMPORTED = True
 except ImportError:
+    from md5 import md5
     HASHLIB_IMPORTED = False
 
 from invenio import webinterface_handler_config as apache
