@@ -94,14 +94,10 @@
 		    <th class="no-border">Name</th>
 		    <td class="no-border">{{ record.display_name }}{{ ' (%s)' % record.native_name if record.native_name }}</td>
 	    </tr>
-        {% if record.institution_history -%}
+        {% if record.current_institution -%}
 		<tr>
 			<th>Current Institution</th>
-			{% if record.current_institution %}
 			<td>{{ record.current_institution }}</td>
-			{% else %}
-			<td>{{ (record.institution_history|first).name }}</td>
-			{% endif %}
 		</tr>
 		{% endif %}
 
