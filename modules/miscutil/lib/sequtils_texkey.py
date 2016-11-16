@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013, 2015 CERN.
+## Copyright (C) 2012, 2013, 2015, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -160,7 +160,7 @@ class TexkeySeq(SequenceGenerator):
         if not main_author:
             # Try with corporate author
             main_author = record_get_field_value(bibrecord,
-                                                 tag="100",
+                                                 tag="110",
                                                  ind1="",
                                                  ind2="",
                                                  code="a")
@@ -176,10 +176,18 @@ class TexkeySeq(SequenceGenerator):
 
         # Remove utf-8 special characters
         main_author = unidecode(main_author.decode('utf-8'))
+        texkey_first_part = ""
         try:
-            texkey_first_part = main_author.split(',')[0].replace(" ", "")
+            texkey_first_part = main_author.split(',')[0]
         except KeyError:
-            texkey_first_part = ""
+            raise TexkeyNoAuthorError
+
+        # sanitize for texkey use, require at least one letter
+        texkey_first_part = re.sub(r'[^-A-Za-z0-9.:/^_;&*<>?|!$+]', '',
+                                   texkey_first_part)
+        if len(texkey_first_part) < 1 \
+           or not re.search(r'[A-Za-z]', texkey_first_part):
+            raise TexkeyNoAuthorError
 
         year = _get_year(
             record_get_field_value(bibrecord,
