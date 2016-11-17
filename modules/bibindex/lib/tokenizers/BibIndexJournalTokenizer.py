@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -39,9 +39,9 @@ if CFG_CERN_SITE:
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*\s\w.*\s\(\d+\)\s\w.*$'
     CFG_JOURNAL_PUBINFO_JOURNAL_VOLUME_FORM = "773__p 773__v"
 elif CFG_INSPIRE_SITE:
-    CFG_JOURNAL_TAG = '773__%'
-    CFG_JOURNAL_PUBINFO_STANDARD_FORM = "773__p,773__v,773__c"
-    CFG_JOURNAL_PUBINFO_JOURNAL_VOLUME_FORM = "773__p,773__v"
+    CFG_JOURNAL_TAG = '773%_%'
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM = ["773__p,773__v,773__c", "7731_p,7731_v,7731_c"]
+    CFG_JOURNAL_PUBINFO_JOURNAL_VOLUME_FORM = ["773__p,773__v", "7731_p,7731_v"]
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*,\w.*,\w.*$'
 else:
     CFG_JOURNAL_TAG = '909C4%'
@@ -89,8 +89,12 @@ class BibIndexJournalTokenizer(BibIndexMultiFieldTokenizer):
 
         def replace_tags(tags_values, pubinfo):
             for tag, val in tags_values.items():
-                    pubinfo = pubinfo.replace(tag, val)
-            if self.tag[:-1] in pubinfo:
+                pubinfo = pubinfo.replace(tag, val)
+            if CFG_INSPIRE_SITE:
+                if '773__' in pubinfo or '7731_' in pubinfo:
+                # some subfield was missing, do nothing
+                    return None
+            elif self.tag[:-1] in pubinfo:
                 # some subfield was missing, do nothing
                 return None
             else:
@@ -104,19 +108,25 @@ class BibIndexJournalTokenizer(BibIndexMultiFieldTokenizer):
             for tag, val in dpubinfo.items():
                 lwords.append(val)
                 if tag.endswith('c') and '-' in val:
-                        val = val.split('-')[0]
-                        lwords.append(val)
+                    val = val.split('-')[0]
+                    lwords.append(val)
 
             # Store journal and volume for searches without a page
             # Store J.Phys.,B50
-            word = replace_tags(dpubinfo, self.journal_pubinfo_journal_volume_form)
-            if word is not None:
-                lwords.append(word)
+            if isinstance(self.journal_pubinfo_journal_volume_form, str):
+                self.journal_pubinfo_journal_volume_form = [self.journal_pubinfo_journal_volume_form]
+            for jvolume_form in self.journal_pubinfo_journal_volume_form:
+                word = replace_tags(dpubinfo, jvolume_form)
+                if word is not None and word not in lwords:
+                    lwords.append(word)
             # Store full info for searches with all info
             # Store J.Phys.,B50,16-24
-            word = replace_tags(dpubinfo, self.journal_pubinfo_standard_form)
-            if word is not None:
-                lwords.append(word)
+            if isinstance(self.journal_pubinfo_standard_form, str):
+                self.journal_pubinfo_standard_form = [self.journal_pubinfo_standard_form]
+            for standardform in self.journal_pubinfo_standard_form:
+                word = replace_tags(dpubinfo, standardform)
+                if word is not None and word not in lwords:
+                    lwords.append(word)
             # Store info without ending page for searches without ending page
             # Replace page range with just the starting page
             # 777__c = '16-24' becomes 777__c = '16'
@@ -124,9 +134,10 @@ class BibIndexJournalTokenizer(BibIndexMultiFieldTokenizer):
             for tag in dpubinfo.keys():
                 if tag.endswith('c'):
                     dpubinfo[tag] = dpubinfo[tag].split('-')[0]
-            word = replace_tags(dpubinfo, self.journal_pubinfo_standard_form)
-            if word is not None:
-                lwords.append(word)
+            for standardform in self.journal_pubinfo_standard_form:
+                word = replace_tags(dpubinfo, standardform)
+                if word is not None and word not in lwords:
+                    lwords.append(word)
 
         # return list of words and pubinfos:
         return lwords
