@@ -39,9 +39,9 @@ if CFG_CERN_SITE:
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*\s\w.*\s\(\d+\)\s\w.*$'
     CFG_JOURNAL_PUBINFO_JOURNAL_VOLUME_FORM = "773__p 773__v"
 elif CFG_INSPIRE_SITE:
-    CFG_JOURNAL_TAG = '773%_%'
-    CFG_JOURNAL_PUBINFO_STANDARD_FORM = ["773__p,773__v,773__c", "7731_p,7731_v,7731_c"]
-    CFG_JOURNAL_PUBINFO_JOURNAL_VOLUME_FORM = ["773__p,773__v", "7731_p,7731_v"]
+    CFG_JOURNAL_TAG = '773__%'
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM = "773__p,773__v,773__c"
+    CFG_JOURNAL_PUBINFO_JOURNAL_VOLUME_FORM = "773__p,773__v"
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*,\w.*,\w.*$'
 else:
     CFG_JOURNAL_TAG = '909C4%'
@@ -62,11 +62,17 @@ class BibIndexJournalTokenizer(BibIndexMultiFieldTokenizer):
     """
 
     def __init__(self, stemming_language = None, remove_stopwords = False, remove_html_markup = False, remove_latex_markup = False):
-        self.tag = CFG_JOURNAL_TAG
+
+        if CFG_INSPIRE_SITE:
+            self.tag = '773%_%'
+            self.journal_pubinfo_standard_form = [CFG_JOURNAL_PUBINFO_STANDARD_FORM, "7731_p,7731_v,7731_c"]
+            self.journal_pubinfo_journal_volume_form = [CFG_JOURNAL_PUBINFO_JOURNAL_VOLUME_FORM, "7731_p,7731_v"]
+        else:
+            self.tag = CFG_JOURNAL_TAG
+            self.journal_pubinfo_standard_form = [CFG_JOURNAL_PUBINFO_STANDARD_FORM]
+            self.journal_pubinfo_journal_volume_form = [CFG_JOURNAL_PUBINFO_JOURNAL_VOLUME_FORM]
         self.nonmarc_tag = 'journal_info'
-        self.journal_pubinfo_standard_form = CFG_JOURNAL_PUBINFO_STANDARD_FORM
         self.journal_pubinfo_standard_form_regexp_check = CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
-        self.journal_pubinfo_journal_volume_form = CFG_JOURNAL_PUBINFO_JOURNAL_VOLUME_FORM
 
 
     def tokenize(self, recID):
@@ -97,36 +103,32 @@ class BibIndexJournalTokenizer(BibIndexMultiFieldTokenizer):
             elif self.tag[:-1] in pubinfo:
                 # some subfield was missing, do nothing
                 return None
-            else:
-                return pubinfo
+
+            return pubinfo
 
 
         # construct standard format:
-        lwords = []
+        lwords = set()
         for dpubinfo in dpubinfos.values():
             # index all journal subfields separately
             for tag, val in dpubinfo.items():
-                lwords.append(val)
+                lwords.add(val)
                 if tag.endswith('c') and '-' in val:
                     val = val.split('-')[0]
-                    lwords.append(val)
+                    lwords.add(val)
 
             # Store journal and volume for searches without a page
             # Store J.Phys.,B50
-            if isinstance(self.journal_pubinfo_journal_volume_form, str):
-                self.journal_pubinfo_journal_volume_form = [self.journal_pubinfo_journal_volume_form]
             for jvolume_form in self.journal_pubinfo_journal_volume_form:
                 word = replace_tags(dpubinfo, jvolume_form)
-                if word is not None and word not in lwords:
-                    lwords.append(word)
+                if word is not None:
+                    lwords.add(word)
             # Store full info for searches with all info
             # Store J.Phys.,B50,16-24
-            if isinstance(self.journal_pubinfo_standard_form, str):
-                self.journal_pubinfo_standard_form = [self.journal_pubinfo_standard_form]
             for standardform in self.journal_pubinfo_standard_form:
                 word = replace_tags(dpubinfo, standardform)
-                if word is not None and word not in lwords:
-                    lwords.append(word)
+                if word is not None:
+                    lwords.add(word)
             # Store info without ending page for searches without ending page
             # Replace page range with just the starting page
             # 777__c = '16-24' becomes 777__c = '16'
@@ -136,11 +138,11 @@ class BibIndexJournalTokenizer(BibIndexMultiFieldTokenizer):
                     dpubinfo[tag] = dpubinfo[tag].split('-')[0]
             for standardform in self.journal_pubinfo_standard_form:
                 word = replace_tags(dpubinfo, standardform)
-                if word is not None and word not in lwords:
-                    lwords.append(word)
+                if word is not None:
+                    lwords.add(word)
 
         # return list of words and pubinfos:
-        return lwords
+        return list(lwords)
 
     def tokenize_via_recjson(self, recID):
         """
