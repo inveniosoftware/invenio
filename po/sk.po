@@ -4897,7 +4897,7 @@ msgstr ""
 
 #: modules/bibedit/lib/bibedit_templates.py:280
 msgid "Comparison of:"
-msgstr ""
+msgstr "Porovnanie:"
 
 #: modules/bibedit/lib/bibedit_templates.py:281
 msgid "Revision"
@@ -5479,7 +5479,7 @@ msgstr "Menu"
 #: modules/bibknowledge/lib/bibknowledge_templates.py:586
 #: modules/bibknowledge/lib/bibknowledge_templates.py:655
 msgid "Close Editor"
-msgstr ""
+msgstr "Zatvoriť editor"
 
 #: modules/bibformat/lib/bibformat_templates.py:318
 #: modules/bibformat/lib/bibformat_templates.py:431
@@ -5487,7 +5487,7 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:599
 #: modules/bibformat/lib/bibformat_templates.py:630
 msgid "Modify Template Attributes"
-msgstr ""
+msgstr "Zmeniť atribúty šablóny"
 
 #: modules/bibformat/lib/bibformat_templates.py:319
 #: modules/bibformat/lib/bibformat_templates.py:432
@@ -5495,7 +5495,7 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:600
 #: modules/bibformat/lib/bibformat_templates.py:631
 msgid "Template Editor"
-msgstr ""
+msgstr "Editor šablón"
 
 #: modules/bibformat/lib/bibformat_templates.py:320
 #: modules/bibformat/lib/bibformat_templates.py:433
@@ -5506,11 +5506,11 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:1384
 #: modules/bibformat/lib/bibformat_templates.py:1490
 msgid "Check Dependencies"
-msgstr ""
+msgstr "Skontrolovať závislosti"
 
 #: modules/bibformat/lib/bibformat_templates.py:390
 msgid "Update Format Attributes"
-msgstr ""
+msgstr "Aktualizovať atribúty formátu"
 
 #: modules/bibformat/lib/bibformat_templates.py:580
 #: modules/bibformat/lib/bibformat_templates.py:596
@@ -5567,7 +5567,7 @@ msgstr "Spravuj výstupné formáty"
 #: modules/bibformat/web/admin/bibformatadmin.py:704
 #: modules/bibformat/web/admin/bibformatadmin.py:1030
 msgid "Manage Format Templates"
-msgstr ""
+msgstr "Spravovať šablóny formátu"
 
 #: modules/bibformat/lib/bibformat_templates.py:944
 #: modules/bibformat/lib/bibformat_templates.py:1068
@@ -5577,19 +5577,19 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:956
 #: modules/bibformat/web/admin/bibformatadmin.py:1049
 msgid "Format Elements Documentation"
-msgstr ""
+msgstr "Dokumentácia prvkov formátu"
 
 #: modules/bibformat/lib/bibformat_templates.py:1019
 msgid "Add New Format Template"
-msgstr ""
+msgstr "Pridať novú šablónu formátu"
 
 #: modules/bibformat/lib/bibformat_templates.py:1020
 msgid "Check Format Templates Extensively"
-msgstr ""
+msgstr "Rozsiahla kontrola šablón formátu"
 
 #: modules/bibformat/lib/bibformat_templates.py:1059
 msgid "Code"
-msgstr ""
+msgstr "Kód"
 
 #: modules/bibformat/lib/bibformat_templates.py:1142
 msgid "Add New Output Format"
@@ -5615,7 +5615,7 @@ msgstr "Pravidlá"
 #: modules/bibformat/lib/bibformat_templates.py:1383
 #: modules/bibformat/lib/bibformat_templates.py:1489
 msgid "Modify Output Format Attributes"
-msgstr ""
+msgstr "Zmeniť atribútu výstupného formátu"
 
 #: modules/bibformat/lib/bibformat_templates.py:1282
 #: modules/bibformat/lib/bibformatadminlib.py:565
@@ -5625,11 +5625,11 @@ msgstr "Odstráň pravidlo"
 #: modules/bibformat/lib/bibformat_templates.py:1335
 #: modules/bibformat/lib/bibformatadminlib.py:572
 msgid "Add New Rule"
-msgstr ""
+msgstr "Pridať nové pravidlo"
 
 #: modules/bibformat/lib/bibformat_templates.py:1910
 msgid "No problem found with format"
-msgstr ""
+msgstr "Nebol nájdený žiaden problém s formátom"
 
 #: modules/bibformat/lib/bibformat_templates.py:1912
 msgid "An error has been found"
@@ -5637,7 +5637,7 @@ msgstr "Chyba bola nájdená"
 
 #: modules/bibformat/lib/bibformat_templates.py:1914
 msgid "The following errors have been found"
-msgstr ""
+msgstr "Boli nájdené nasledovné chyby"
 
 #: modules/bibformat/lib/bibformatadminlib.py:62
 #: modules/bibformat/web/admin/bibformatadmin.py:76
@@ -5652,7 +5652,7 @@ msgstr "Testuj na zázname:"
 
 #: modules/bibformat/lib/bibformatadminlib.py:355
 msgid "Enter a search query here."
-msgstr ""
+msgstr "Sen zadajte vyhľadávací reťazec"
 
 #: modules/bibformat/lib/bibformatadminlib.py:406
 #, python-format
@@ -5787,11 +5787,11 @@ msgstr "Schovaj"
 #: modules/bibformat/lib/elements/bfe_authors.py:142
 #, python-format
 msgid "Show all %i authors"
-msgstr ""
+msgstr "Zobraziť všetkých %i autorov"
 
 #: modules/bibformat/lib/elements/bfe_edit_files.py:50
 msgid "Manage Files of This Record"
-msgstr ""
+msgstr "Spravovať súbory tohto záznamu"
 
 #: modules/bibformat/lib/elements/bfe_edit_record.py:46
 msgid "Edit This Record"
@@ -5810,24 +5810,24 @@ msgstr "Nahraj plný text"
 #: modules/bibformat/lib/elements/bfe_fulltext.py:90
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:61
 msgid "additional files"
-msgstr ""
+msgstr "ďalšie súbory"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:133
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:120
 #, python-format
 msgid "%(x_sitename)s link"
-msgstr ""
+msgstr "Odkaz na %(x_sitename)s"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:133
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:120
 #, python-format
 msgid "%(x_sitename)s links"
-msgstr ""
+msgstr "Odkazy na %(x_sitename)s"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:142
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:138
 msgid "external link"
-msgstr ""
+msgstr "externý odkaz"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:142
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:138
@@ -5865,7 +5865,7 @@ msgstr "Chránený výstupný formát"
 #: modules/bibformat/web/admin/bibformatadmin.py:543
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:562
 msgid "Ok"
-msgstr ""
+msgstr "OK"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:214
 #, python-format
@@ -5875,12 +5875,12 @@ msgstr "Výstupný formát %s pravidlá"
 #: modules/bibformat/web/admin/bibformatadmin.py:272
 #, python-format
 msgid "Output Format %s Attributes"
-msgstr ""
+msgstr "Atribúty výstupného formátu %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:320
 #, python-format
 msgid "Output Format %s Dependencies"
-msgstr ""
+msgstr "Závislosti výstupného formátu %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:392
 msgid "Delete Output Format"
@@ -5901,22 +5901,22 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:600
 #: modules/bibformat/web/admin/bibformatadmin.py:1037
 msgid "Restricted Format Template"
-msgstr ""
+msgstr "Šablóna obmedzeného formátu"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:548
 #, python-format
 msgid "Format Template %s"
-msgstr ""
+msgstr "Šablóna formátu %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:608
 #, python-format
 msgid "Format Template %s Attributes"
-msgstr ""
+msgstr "Atribúty šablóny formátu %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:642
 #, python-format
 msgid "Format Template %s Dependencies"
-msgstr ""
+msgstr "Závislosti šablóny formátu %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:704
 msgid "Delete Format Template"
@@ -5925,31 +5925,31 @@ msgstr "Zmaž šablónu formátu"
 #: modules/bibformat/web/admin/bibformatadmin.py:930
 #, python-format
 msgid "Format Element %s Dependencies"
-msgstr ""
+msgstr "Závislosti prvku formátu %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:963
 #, python-format
 msgid "Test Format Element %s"
-msgstr ""
+msgstr "Otestovať formát prvku %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1026
 #, python-format
 msgid "Validation of Output Format %s"
-msgstr ""
+msgstr "Overenie výstupného formátu %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1045
 #, python-format
 msgid "Validation of Format Template %s"
-msgstr ""
+msgstr "Overenie šablóny formátu %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1057
 msgid "Restricted Format Element"
-msgstr ""
+msgstr "Prvok obmedzeného formátu"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1064
 #, python-format
 msgid "Validation of Format Element %s"
-msgstr ""
+msgstr "Overenie formátu prvku %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1068
 msgid "No format specified for validation. Please specify one."
@@ -5957,7 +5957,7 @@ msgstr ""
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1071
 msgid "Format Validation"
-msgstr ""
+msgstr "Overenie formátu"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:51
 #, python-format
@@ -6340,7 +6340,7 @@ msgstr "Upozornenie: prosím zvoľte platný súbor"
 
 #: modules/bibupload/lib/batchuploader_templates.py:146
 msgid "Warning: The date format is not correct"
-msgstr ""
+msgstr "Upozornenie: Formát dátumu je nesprávny"
 
 #: modules/bibupload/lib/batchuploader_templates.py:150
 msgid "Warning: Please, select a valid date"
@@ -6362,7 +6362,7 @@ msgstr "Mód nahrania"
 #: modules/bibupload/lib/batchuploader_templates.py:188
 #: modules/bibupload/lib/batchuploader_templates.py:396
 msgid "Upload later? then select:"
-msgstr ""
+msgstr "Ak chcete nahrať neskôr, vyberte:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:190
 #: modules/bibupload/lib/batchuploader_templates.py:398
@@ -6820,7 +6820,7 @@ msgstr "test"
 #: modules/oaiharvest/lib/oai_harvest_admin.py:106
 #: modules/oaiharvest/lib/oai_harvest_templates.py:456
 msgid "history"
-msgstr ""
+msgstr "história"
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:110
 #: modules/oaiharvest/lib/oai_harvest_templates.py:460
@@ -7029,7 +7029,7 @@ msgstr "nezdá sa byť OAI-odpovedajúcim baseURL"
 
 #: modules/oaiharvest/lib/oai_harvest_templates.py:278
 msgid "View next entries..."
-msgstr ""
+msgstr "Zobraziť ďalšie záznamy..."
 
 #: modules/oaiharvest/lib/oai_harvest_templates.py:335
 msgid "previous month"
