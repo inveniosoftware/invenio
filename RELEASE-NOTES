@@ -1,8 +1,8 @@
 ============================
- Invenio v1.1.6 is released
+ Invenio v1.1.7 is released
 ============================
 
-Invenio v1.1.6 was released on May 21, 2015.
+Invenio v1.1.7 was released on November 20, 2016.
 
 About
 -----
@@ -11,52 +11,113 @@ Invenio is a digital library framework enabling you to build your own
 digital library or document repository on the web.
 
 This old stable release update is recommended to all Invenio sites
-using v1.1.5 or previous releases.
+using v1.1.6 or previous releases.
 
-Security fixes
---------------
+New features
+------------
 
-+ WebStyle:
++ installation
 
-  - Adds back the `HttpOnly` cookie attribute in order to better
-    protect against potential XSS vulnerabilities.  (#3064)
+  - Initial release of kickstart installations scripts. Ported from
+    the old `tiborsimko/invenio-devscripts` repository of helper
+    scripts and adapted to resemble Invenio 3 kickstart installation
+    scripts. Tested on Ubuntu 12.04 and CentOS 6.
 
 Improved features
 -----------------
 
-+ installation:
++ I18N
 
-  - Apache virtual environments are now created with appropriate
-    `WSGIDaemonProcess` user value, taken from the configuration
-    variable `CFG_BIBSCHED_PROCESS_USER`, provided it is set.  This
-    change makes it easier to run Invenio under non-Apache user
-    identity.
+  - Updates Slovak translation from Transifex.
+  - Updates German, French, Slovak and Spanish translations from
+    Transifex.
+  - Updates Catalan, French, German, Italian, Russian, Slovak, and
+    Spanish translations from Transifex.
+  - Completes Italian translation.
 
-  - Apache virtual environments are now created with appropriate
-    `WSGIPythonHome` directive so that it would be easier to run
-    Invenio from within Python virtual environments.
++ installation
+
+  - Installation scripts now support Ubuntu 14.04 LTS.
+  - Uses `/usr/sbin/service foo` consistently everywhere to restart
+    daemons instead of deprecated `/etc/init.d/foo`.
+  - Pinned specific JSON-js and Mediaelement versions instead of using
+    the latest master branch commits. (#11)
+
++ urlutils
+
+  - Uses `md5` from `hashlib` when available. (#3382)
 
 Bug fixes
 ---------
 
-+ global:
++ BibDocFile
 
-  - Replaces `invenio-demo.cern.ch` by `demo.invenio-software.org`
-    which is the new canonical URL of the demo site.  (#2867)
+  - Purges old extracted text too, when purging a BibDoc. (#3519)
 
-+ testutils:
++ BibSched
 
-  - Switches off SSL verification when running the test suite.  Useful
-    for Python-2.7.9 where self-signed SSL certificates (that are
-    usually used on development installations) would cause apparent
-    test failures.  (#2868)
+  - Makes `recid` argument optional in tasklet `bst_create_icons`.
+    (#2192)
+
++ OAIHarvest
+
+  - Fixes the parsing of resumptiontoken in incoming OAI-PMH XML which
+    could fail when the resumptiontoken was empty.
+
++ OAIRepository
+
+  - Fixes default configuration of CFG_OAI_METADATA_FORMATS, correctly
+    assigning the XSD and XML namespace to the corresponding metadata
+    prefix.
+
++ WebAccess
+
+  - Improves the WebAccess FireRole documentation by providing
+    corrected example on how to use groups in FireRole definitions.
+    (#3107) (#3225)
+
++ WebSearch
+
+  - Fixes asynchronous external collection getter tests following the
+    update of the Invenio project web site.
+
++ WebSession
+
+  - Removes pending groups from user info object.  (#3526)
+
++ bibupload
+
+  - In case of replicating datasets between instances by means of OAI
+    harvesting it is plausible to check for external OAI-IDs not only
+    in the field specified by CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG but
+    also in CFG_OAI_ID_FIELD. (#2812) (PR #2816)
+
++ global
+
+  - Silences most MySQL UTF-8 warnings related to inserting into and
+    updating BLOB table columns.
+
++ installation
+
+  - Amends canonical location of py-editdist and pyRXP packages,
+    fixing the installation problem.
+  - Amends installation procedures to download necessary jQuery
+    plugins from Invenio-hosted web site, fixing problems with non-
+    existing Google Code pages. (#3620)
+  - Fixes Apache virtual host configuration generation on CentOS 6.
+
++ inveniogc
+
+  - Fixes garbage collection of temporary directories created by
+    websubmit_icon_creator and websubmit_file_stamper. (#3556) (PR
+    #3558)
 
 Download
 --------
 
-- http://invenio-software.org/download/invenio-1.1.6.tar.gz
-- http://invenio-software.org/download/invenio-1.1.6.tar.gz.md5
-- http://invenio-software.org/download/invenio-1.1.6.tar.gz.sig
+- http://invenio-software.org/download/invenio-1.1.7.tar.gz
+- http://invenio-software.org/download/invenio-1.1.7.tar.gz.md5
+- http://invenio-software.org/download/invenio-1.1.7.tar.gz.sig
 
 Installation
 ------------
@@ -72,8 +133,8 @@ a) Stop your bibsched queue and your Apache server.
 
 b) Install the update::
 
-     $ tar xvfz invenio-1.1.6.tar.gz
-     $ cd invenio-1.1.6
+     $ tar xvfz invenio-1.1.7.tar.gz
+     $ cd invenio-1.1.7
      $ sudo rsync -a /opt/invenio/etc/ /opt/invenio/etc.OLD/
      $ sh /opt/invenio/etc/build/config.nice
      $ make
