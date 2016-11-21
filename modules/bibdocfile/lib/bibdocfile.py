@@ -3712,7 +3712,7 @@ def decompose_bibdocfile_very_old_url(url):
 def get_docname_from_url(url):
     """Return a potential docname given a url"""
     path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
-    filename = os.path.split(path)[-1]
+    filename = os.path.split(path)[-1] or 'fulltext'
     return file_strip_ext(filename)
 
 def get_format_from_url(url):
