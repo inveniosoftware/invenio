@@ -935,6 +935,14 @@ def find_records_from_extoaiid(extoaiid, extoaisrc=None):
                     write_message('WARNING: Found recid %s for extoaiid="%s" that doesn\'t specify any provenance, while input record does.' % (id_bibrec, extoaiid), stream=sys.stderr)
                 if extoaisrc is None:
                     write_message('WARNING: Found recid %s for extoaiid="%s" that specify a provenance (%s), while input record does not have a provenance.' % (id_bibrec, extoaiid, this_extoaisrc), stream=sys.stderr)
+
+    if len(ret) == 0:
+        # no oaiid in CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG. Check if we have one
+        # in the locally used CFG_OAI_ID_FIELD that matches. This can happen
+        # if oai harvesting is used to duplicate records.
+        recid = find_record_from_oaiid(extoaiid)
+        if recid is not None:
+            ret.add(recid)
     return ret
 
 def find_record_from_oaiid(oaiid):
@@ -2994,7 +3002,7 @@ def task_run_core():
     return not stat['nb_errors'] >= 1
 
 def log_record_uploading(oai_rec_id, task_id, bibrec_id, insertion_db, pretend=False):
-    if oai_rec_id != "" and oai_rec_id != None:
+    if oai_rec_id != "" and oai_rec_id is not None:
         query = """UPDATE oaiHARVESTLOG SET date_inserted=NOW(), inserted_to_db=%s, id_bibrec=%s WHERE oai_id = %s AND bibupload_task_id = %s ORDER BY date_harvested LIMIT 1"""
         if not pretend:
             run_sql(query, (str(insertion_db), str(bibrec_id), str(oai_rec_id), str(task_id), ))

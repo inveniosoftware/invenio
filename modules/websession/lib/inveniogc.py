@@ -1,7 +1,7 @@
 # -*- mode: python; coding: utf-8; -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2007, 2008, 2010, 2011, 2012 CERN.
+# Copyright (C) 2007, 2008, 2010, 2011, 2012, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -172,16 +172,16 @@ def clean_tempfiles():
             % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
                CFG_MAX_ATIME_RM_BIBDOC, vstr))
 
-    write_message("- deleting old temporary WebSubmit icons")
+    write_message("- deleting old temporary WebSubmit icon dirs")
     gc_exec_command('find %s %s -name "websubmit_icon_creator_*"'
-        ' -atime +%s -exec rm %s -f {} \;' \
+        ' -atime +%s -exec rm %s -rf {} \;' \
             % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
                CFG_MAX_ATIME_RM_ICON, vstr))
 
     if not CFG_INSPIRE_SITE:
-        write_message("- deleting old temporary WebSubmit stamps")
+        write_message("- deleting old temporary WebSubmit stamp dirs")
         gc_exec_command('find %s %s -name "websubmit_file_stamper_*"'
-            ' -atime +%s -exec rm %s -f {} \;' \
+            ' -atime +%s -exec rm %s -rf {} \;' \
                 % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
                 CFG_MAX_ATIME_RM_STAMP, vstr))
 

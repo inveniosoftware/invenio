@@ -2130,6 +2130,9 @@ class BibDoc(object):
                     for flag in CFG_BIBDOCFILE_AVAILABLE_FLAGS:
                         self.more_info.unset_flag(flag, afile.get_format(), afile.get_version())
                     try:
+                        text_file_path = os.path.join(self.basedir, '.text;%i' % afile.get_version())
+                        if os.path.exists(text_file_path):
+                            os.remove(text_file_path)
                         os.remove(afile.get_full_path())
                     except Exception, dummy:
                         register_exception()
