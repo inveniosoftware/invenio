@@ -1124,7 +1124,7 @@ def perform_request_harvest_record(oai_src_id=None, ln=CFG_SITE_LANG, record_id=
     else:
         enable_reporting = True
 
-    form_text = "<p><small>Enter one OAI ID per line. Ex: oai:arXiv.org:hep-th/9901001 or arXiv:1308.1234 or hep-th/9901001</small></p>"
+    form_text = "<p><small>Enter one OAI ID per line. Ex: oai:arXiv.org:hep-th/9901001</small></p>"
     form_text += oaiharvest_templates.tmpl_admin_w200_textarea(ln=ln, title="", \
                                                               name="record_id", value=record_str)
     form_text += oaiharvest_templates.tmpl_admin_checkboxes(ln=ln, \
