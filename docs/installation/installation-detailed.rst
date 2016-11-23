@@ -22,8 +22,7 @@ Detailed installation guide
 
 .. admonition:: CAVEAT LECTOR
 
-   Invenio v3.0 alpha is a bleeding-edge developer preview version that is
-   scheduled for public release in Q3/2016.
+   Invenio v3.0 alpha is a bleeding-edge developer preview version.
 
 Introduction
 ------------

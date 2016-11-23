@@ -79,7 +79,7 @@ Invenio v3.x
 *Not released yet; however a developer preview is available on GitHub.*
 
 Invenio v3.0 will be released when the Invenio code base is fully split into a
-set of standalone independent Python packages. *(ETA: Q3/2016)*
+set of standalone independent Python packages.
 
 Invenio v2.x
 ------------

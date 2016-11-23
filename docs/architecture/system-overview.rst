@@ -24,8 +24,7 @@ Invenio v3.x
 
 .. admonition:: CAVEAT LECTOR
 
-   Invenio v3.0 alpha is a bleeding-edge developer preview version that is
-   scheduled for public release in Q3/2016.
+   Invenio v3.0 alpha is a bleeding-edge developer preview version.
 
 Invenio v3.0 build on top of `Flask`_ web development framework, using `Jinja2`_
 template engine, `SQLAlchemy`_ Object Relational Mapper, `JSONSchema`_ data
