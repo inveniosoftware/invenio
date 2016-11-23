@@ -391,6 +391,13 @@ Let's see in detail what the Elasticsearch provisioning script does.
    :end-before: # sphinxdoc-install-elasticsearch-centos7-end
    :literal:
 
+Some packages require extra plugins to be installed.
+
+.. include:: ../../scripts/provision-elasticsearch.sh
+   :start-after: # sphinxdoc-install-elasticsearch-plugins-begin
+   :end-before: # sphinxdoc-install-elasticsearch-plugins-end
+   :literal:
+
 Finally, let's clean after ourselves:
 
 * on Ubuntu 14.04 LTS (Trusty Tahr):

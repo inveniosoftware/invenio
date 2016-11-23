@@ -70,7 +70,8 @@ redis:
 
 elasticsearch:
   restart: "always"
-  image: elasticsearch:2
+  build: .
+  dockerfile: ./elasticsearch/Dockerfile
   ports:
     - "29200:9200"
     - "29300:9300"

@@ -25,12 +25,21 @@
 # quit on errors:
 set -o errexit
 
-# check environment variables:
-if [ -v ${INVENIO_ELASTICSEARCH_HOST} ]; then
-    echo "[ERROR] Please set environment variable INVENIO_ELASTICSEARCH_HOST before runnning this script."
-    echo "[ERROR] Example: export INVENIO_ELASTICSEARCH_HOST=192.168.50.12"
-    exit 1
+# runs as root or needs sudo?
+if [[ "$EUID" -ne 0 ]]; then
+  sudo='sudo'
+else
+  sudo=''
 fi
+
+check_environment_variables () {
+    # check environment variables:
+    if [ -v ${INVENIO_ELASTICSEARCH_HOST} ]; then
+        echo "[ERROR] Please set environment variable INVENIO_ELASTICSEARCH_HOST before runnning this script."
+        echo "[ERROR] Example: export INVENIO_ELASTICSEARCH_HOST=192.168.50.12"
+        exit 1
+    fi
+}
 
 # quit on unbound symbols:
 set -o nounset
@@ -118,6 +127,12 @@ enabled=1" | \
 
 }
 
+install_plugins () {
+    # sphinxdoc-install-elasticsearch-plugins-begin
+    $sudo /usr/share/elasticsearch/bin/plugin install -b mapper-attachments
+    # sphinxdoc-install-elasticsearch-plugins-end
+}
+
 cleanup_elasticsearch_ubuntu14 () {
     # sphinxdoc-install-elasticsearch-cleanup-ubuntu14-begin
     sudo apt-get -y autoremove && sudo apt-get -y clean
@@ -139,6 +154,10 @@ main () {
     elif [ -e /etc/redhat-release ]; then
         os_distribution=$(cut -d ' ' -f 1 /etc/redhat-release)
         os_release=$(grep -oE '[0-9]+\.' /etc/redhat-release | cut -d. -f1 | head -1)
+    elif [ -f /.dockerinit -o -f /.dockerenv ]; then
+        # running inside Docker
+        os_distribution="Docker"
+        os_release=""
     else
         os_distribution="UNDETECTED"
         os_release="UNDETECTED"
@@ -147,18 +166,24 @@ main () {
     # call appropriate provisioning functions:
     if [ "$os_distribution" = "Ubuntu" ]; then
         if [ "$os_release" = "14" ]; then
+            check_environment_variables
             provision_elasticsearch_ubuntu14
+            install_plugins
         else
             echo "[ERROR] Sorry, unsupported release ${os_release}."
             exit 1
         fi
     elif [ "$os_distribution" = "CentOS" ]; then
         if [ "$os_release" = "7" ]; then
+            check_environment_variables
             provision_elasticsearch_centos7
+            install_plugins
         else
             echo "[ERROR] Sorry, unsupported release ${os_release}."
             exit 1
         fi
+    elif [ "$os_distribution" = "Docker" ]; then
+        install_plugins
     else
         echo "[ERROR] Sorry, unsupported distribution ${os_distribution}."
         exit 1

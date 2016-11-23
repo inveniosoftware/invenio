@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2016 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,40 +22,8 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-
-include *.rst
-include *.sh
-include *.txt
-include .dockerignore
-include .editorconfig
-include .inveniorc
-include .lgtm
-include ABOUT-NLS
-include COPYING
-include Dockerfile
-include LICENSE
-include MAINTAINERS
-include THANKS
-include Vagrantfile
-include babel.ini
-include docker-compose.yml
-include docs/requirements.txt
-include elasticsearch/Dockerfile
-include nginx/Dockerfile
-include pytest.ini
-recursive-include docs *.bat
-recursive-include docs *.css
-recursive-include docs *.gif
-recursive-include docs *.jpeg
-recursive-include docs *.jpg
-recursive-include docs *.plantuml
-recursive-include docs *.png
-recursive-include docs *.py
-recursive-include docs *.rst
-recursive-include docs *.svg
-recursive-include docs Makefile
-recursive-include misc *.py
-recursive-include misc *.rst
-recursive-include nginx *.conf
-recursive-include scripts *.sh
-recursive-include tests *.py
+# Use Elasticsearch 2.
+FROM elasticsearch:2
+COPY scripts/provision-elasticsearch.sh /tmp/
+# Install Elasticsarch plugins:
+RUN /tmp/provision-elasticsearch.sh
