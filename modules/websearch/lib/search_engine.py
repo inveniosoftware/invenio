@@ -4184,9 +4184,9 @@ def rank_records(req, rank_method_code, rank_limit_relevance, hitset_global, pat
         rank_records_bibrank(rank_method_code=rank_method_code,
                              rank_limit_relevance=rank_limit_relevance,
                              hitset=hitset_global,
+                             related_to=related_to,
                              verbose=verbose,
                              field=field,
-                             related_to=related_to,
                              rg=rg,
                              jrec=jrec)
 
@@ -6471,7 +6471,8 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
                 if of.startswith("h"):
                     write_warning(results_final_comments, req=req)
                 if results_final_recIDs_ranked:
-                    results_final_recIDs = results_final_recIDs_ranked
+                    results_final_recIDs = slice_records(results_final_recIDs_ranked, jrec, rg)
+                    results_final_relevances = slice_records(results_final_relevances, jrec, rg)
                 else:
                     # rank_records failed and returned some error message to display:
                     write_warning(results_final_relevances_prologue, req=req)
