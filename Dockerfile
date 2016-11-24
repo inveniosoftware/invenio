@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -103,7 +103,7 @@ RUN sudo /sbin/service mysqld restart && \
     make -s clean && \
     make -s && \
     make -s install && \
-    make -s install-jquery-plugins && \
+    #make -s install-jquery-plugins && \
     make -s install-mathjax-plugin && \
     make -s install-ckeditor-plugin && \
     make -s install-pdfa-helper-files && \
