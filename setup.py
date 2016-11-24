@@ -89,8 +89,19 @@ extras_require = {
 #   pip install invenio[repository]
 #
 aliases = {
-    'minimal': ['accounts', 'theme', 'utils', ],
-    'full': ['access', 'accounts', 'records', 'search', 'theme', 'utils'],
+    'minimal': [
+        'accounts',
+        'theme',
+        'utils',
+    ],
+    'full': [
+        'access',
+        'accounts',
+        'records',
+        'search',
+        'theme',
+        'utils',
+    ],
 }
 
 for name, requires in aliases.items():

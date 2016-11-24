@@ -57,5 +57,6 @@ recursive-include docs Makefile
 recursive-include misc *.py
 recursive-include misc *.rst
 recursive-include nginx *.conf
+recursive-include scripts *.cfg
 recursive-include scripts *.sh
 recursive-include tests *.py

@@ -148,7 +148,7 @@ setup_virtualenvwrapper () {
     set +o nounset
 
     # sphinxdoc-install-virtualenvwrapper-begin
-    $sudo pip install -U virtualenvwrapper pip
+    $sudo pip install -U virtualenvwrapper setuptools pip
     if ! grep -q virtualenvwrapper ~/.bashrc; then
         mkdir -p $HOME/.virtualenvs
         echo "export WORKON_HOME=$HOME/.virtualenvs" >> $HOME/.bashrc
