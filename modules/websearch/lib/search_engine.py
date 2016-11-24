@@ -4677,8 +4677,8 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
 
                     link_ln = ''
 
-                    if ln != CFG_SITE_LANG:
-                        link_ln = '?ln=%s' % ln
+                    if 'ln' in req.form:
+                        link_ln = "?ln={0}".format(ln)
 
                     recid_to_display = recid  # Record ID used to build the URL.
                     if CFG_WEBSEARCH_USE_ALEPH_SYSNOS:
