@@ -6,8 +6,201 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+Invenio v1.2.2 -- released 2016-11-25
+-------------------------------------
+
+New features
+~~~~~~~~~~~~
+
++ installation
+
+  - Initial release of kickstart installations scripts. Ported from
+    the old `tiborsimko/invenio-devscripts` repository of helper
+    scripts and adapted to resemble Invenio 3 kickstart installation
+    scripts. Tested on Ubuntu 12.04 and CentOS 6.
+
+Improved features
+~~~~~~~~~~~~~~~~~
+
++ BibDocFile
+
+  - Escapes file name special characters including accents and spaces
+    in document URLs.
+
++ BibFormat
+
+  - Corrects subfield usage when displaying the DOI qualifying
+    information, changing subfield `y` (not valid) by `q`. (#3195)
+
++ BibIndex
+
+  - Enhances full-text indexing of external flles. (PR #3358)
+
++ BibRank
+
+  - Allows ranking external files using Solr. (PR #3358)
+
++ I18N
+
+  - Updates Slovak translation from Transifex.
+  - Updates Slovak translation from Transifex.
+  - Updates German, French, Slovak and Spanish translations from
+    Transifex.
+  - Updates Catalan, French, German, Italian, Russian, Slovak, and
+    Spanish translations from Transifex.
+  - Completes Italian translation for Invenio v1.2.
+  - Completes Italian translation.
+  - Completes French translation.
+
++ WebSession
+
+  - Changes error message depending on
+    `CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS` value as the meaning of the
+    column `note` also changes with it. (#1414) (PR #3414)
+
++ WebStyle
+
+  - Cleans the port from the user's IP preventing issues in future
+    manipulations of it. (PR #3255)
+
++ WebSubmit
+
+  - Adds subtitle file to the file converter rules. (PR #3358)
+  - Allows the stamping function to accept both files and directories.
+
++ crossrefutils
+
+  - Supports querying CrossRef with free account (without password).
+    (#3503) (#1277) (PR #3516)
+
++ installation
+
+  - Installation scripts now support Ubuntu 14.04 LTS.
+  - Uses `/usr/sbin/service foo` consistently everywhere to restart
+    daemons instead of deprecated `/etc/init.d/foo`.
+  - Pinned specific JSON-js and Mediaelement versions instead of using
+    the latest master branch commits. (#11)
+
++ urlutils
+
+  - Uses `md5` from `hashlib` when available. (#3382)
+
+Bug fixes
+~~~~~~~~~
+
++ BibCirculation
+
+  - Fixes the number of copies of an item that is displayed in the
+    circulation UI item search. (#2018) (PR #3574)
+
++ BibDocFile
+
+  - Disallows % character in filenames since it may cause some
+    problems with URL encoding/decoding leading to incorrect URLs.
+    (#1918) (PR #2788)
+  - Purges old extracted text too, when purging a BibDoc. (#3519)
+
++ BibFormat
+
+  - Casts record ID type to integer in record editor formatting
+    element. Various functions working with the record ID expect it to
+    be an integer rather than a string. (PR #2796)
+  - Fixes filtering of records not modified since the last bibreformat
+    run, which could have skipped records that were, for whatever
+    reason, not reformatted in the past. (PR #2824)
+  - Changes when the missing caches are generated during bibreformat
+    run. The missing cache is no longer generated for records if the
+    bibreformat is run with -i, --collection, --field or --pattern
+    option.
+
++ BibIndex
+
+  - Fixes possible infinite loop in beautify_range_list() that could
+    have been triggered in particular conditions. (PR #2758)
+
++ BibSched
+
+  - Makes `recid` argument optional in tasklet `bst_create_icons`.
+    (#2192)
+
++ I18N
+
+  - Fixes a typo in the German translation.
+
++ OAIHarvest
+
+  - Fixes an exception that would happen upon the initial harvest of a
+    new OAI harvest source marked to be harvested "from beginning".
+    (#2793)
+  - Fixes the parsing of resumptiontoken in incoming OAI-PMH XML which
+    could fail when the resumptiontoken was empty.
+
++ OAIRepository
+
+  - Fixes default configuration of CFG_OAI_METADATA_FORMATS, correctly
+    assigning the XSD and XML namespace to the corresponding metadata
+    prefix.
+
++ WebAccess
+
+  - Improves the WebAccess FireRole documentation by providing
+    corrected example on how to use groups in FireRole definitions.
+    (#3107) (#3225)
+
++ WebSearch
+
+  - Takes into account the sort order when searching, even if no
+    specific sort or rank method is used. (PR #3564)
+  - Adds the proper language parameter on tabs if the user has
+    selected different language from the browser preferred. (#308) (PR
+    #3395)
+  - Fixes a search regression test case that looks for records added
+    in the past 10 years. This test started to fail because some
+    records are declared with date added (see MARC tag 005) before
+    2006. Amends the test case to use safer value of last 100 years
+    instead of last 10 years.
+  - Fixes asynchronous external collection getter tests following the
+    update of the Invenio project web site.
+
++ WebSession
+
+  - Removes pending groups from user info object.  (#3526)
+
++ bibupload
+
+  - In case of replicating datasets between instances by means of OAI
+    harvesting it is plausible to check for external OAI-IDs not only
+    in the field specified by CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG but
+    also in CFG_OAI_ID_FIELD. (#2812) (PR #2816)
+
++ crossrefutils
+
+  - Correctly URL-encodes the query sent to CrossRef in order to
+    retrieve information about a given DOI.
+  - Correctly passes the noredirect flag to CrossRef API.
+
++ global
+
+  - Silences most MySQL UTF-8 warnings related to inserting into and
+    updating BLOB table columns.
+
++ installation
+
+  - Amends canonical location of py-editdist and pyRXP packages,
+    fixing the installation problem.
+  - Amends installation procedures to download necessary jQuery
+    plugins from Invenio-hosted web site, fixing problems with non-
+    existing Google Code pages. (#3620)
+  - Fixes Apache virtual host configuration generation on CentOS 6.
+
++ inveniogc
+
+  - Fixes garbage collection of temporary directories created by
+    websubmit_icon_creator and websubmit_file_stamper. (#3556) (PR
+    #3558)
+
 Invenio v1.1.7 -- released 2016-11-20
---------------------------------------
+-------------------------------------
 
 New features
 ~~~~~~~~~~~~
