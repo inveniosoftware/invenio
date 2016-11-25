@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -48,6 +48,7 @@ RUN yum update -y && \
                    redis \
                    sendmail \
                    sudo \
+                   supervisor \
                    texlive \
                    unzip \
                    w3m \
@@ -56,11 +57,7 @@ RUN yum update -y && \
 
 # Installing Python prerequisites:
 ADD requirements.txt /tmp/requirements.txt
-ADD requirements-extras.txt /tmp/requirements-extras.txt
-RUN pip install --upgrade distribute && \
-    pip install supervisor && \
-    pip install -r /tmp/requirements.txt && \
-    pip install -r /tmp/requirements-extras.txt
+RUN pip install -r /tmp/requirements.txt
 
 # Run container as `apache` user, with forced UID of 1000, which
 # should match current host user in most situations:
