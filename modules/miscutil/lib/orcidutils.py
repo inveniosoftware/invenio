@@ -153,7 +153,7 @@ def _get_extids_from_orcid(orcid_id):
     orcid_profile = None
     if orcid_id:
         try:
-            orcid_profile = ap.read_record_member(orcid_id, 'activities')
+            orcid_profile = ap.read_record_public(orcid_id, 'activities')
         except RequestException:
             register_exception(alert_admin=True)
 
