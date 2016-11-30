@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -43,6 +43,7 @@ from invenio.dbquery import run_sql
 from invenio.bibauthorid_searchinterface import get_authors_of_claimed_paper
 from invenio.bibrank_citation_searcher import get_cited_by
 
+CFG_SELFCITES_AUTHOR_LIMIT = 60
 
 def load_config_file(key):
     """Load config file containing the authors, co-authors tags #"""
@@ -62,7 +63,7 @@ def get_personids_from_record(record):
     empty set for performance reasons
     """
     ids = get_authors_of_claimed_paper(record)
-    if 0 < len(ids) <= 20:
+    if 0 < len(ids) <= CFG_SELFCITES_AUTHOR_LIMIT:
         person_ids = set(ids)
     else:
         person_ids = set()
@@ -110,7 +111,7 @@ def get_authors_from_record(recID, tags,
         authors = set()
         def add_ids(table, authors_list):
             for author in authors_list:
-                if len(authors) == 21:
+                if len(authors) == CFG_SELFCITES_AUTHOR_LIMIT + 1:
                     break
                 authors.add(get_id(table, author))
 
@@ -147,7 +148,7 @@ def compute_self_citations(recid, tags, authors_fun):
     authors = frozenset(get_authors_from_record(recid, tags))
 
     collaborations = None
-    if not authors or len(authors) > 20:
+    if not authors or len(authors) > CFG_SELFCITES_AUTHOR_LIMIT:
         collaborations = frozenset(
             get_collaborations_from_record(recid, tags))
 
@@ -162,7 +163,7 @@ def compute_self_citations(recid, tags, authors_fun):
         # Use authors names
         for cit in citers:
             cit_authors = get_authors_from_record(cit, tags)
-            if (not authors or len(cit_authors) > 20) and \
+            if (not authors or len(cit_authors) > CFG_SELFCITES_AUTHOR_LIMIT) and \
                 get_collaborations_from_record(cit, tags):
                 # Record from a collaboration that cites
                 # a record from an author, it's fine
@@ -265,7 +266,7 @@ def update_self_cites_tables(recid, config, tags):
     """For a given record update all self-cites table if needed"""
     authors = get_authors_from_record(recid, tags)
 
-    if 0 < len(authors) <= 20:
+    if 0 < len(authors) <= CFG_SELFCITES_AUTHOR_LIMIT:
         # Updated reords cache table
         deleted_authors, added_authors = store_record(recid, authors)
         if deleted_authors or added_authors:
