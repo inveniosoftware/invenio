@@ -33,6 +33,7 @@ We have 3 tables:
 from itertools import chain
 import ConfigParser
 
+from invenio.intbitset import intbitset
 from invenio.bibformat_utils import parse_tag
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibrank_citation_indexer import tagify
@@ -57,18 +58,8 @@ def load_config_file(key):
 
 
 def get_personids_from_record(record):
-    """Returns all the personids associated to a record.
-
-    We limit the result length to 20 authors, after which it returns an
-    empty set for performance reasons
-    """
-    ids = get_authors_of_claimed_paper(record)
-    if 0 < len(ids) <= CFG_SELFCITES_AUTHOR_LIMIT:
-        person_ids = set(ids)
-    else:
-        person_ids = set()
-
-    return person_ids
+    """Returns all the personids associated to a record."""
+    return intbitset(get_authors_of_claimed_paper(record))
 
 
 def get_authors_tags():
@@ -111,7 +102,7 @@ def get_authors_from_record(recID, tags,
         authors = set()
         def add_ids(table, authors_list):
             for author in authors_list:
-                if len(authors) == CFG_SELFCITES_AUTHOR_LIMIT + 1:
+                if len(authors) > CFG_SELFCITES_AUTHOR_LIMIT:
                     break
                 authors.add(get_id(table, author))
 
@@ -145,33 +136,32 @@ def compute_self_citations(recid, tags, authors_fun):
 
     self_citations = set()
 
-    authors = frozenset(get_authors_from_record(recid, tags))
+    authors = get_authors_from_record(recid, tags)
 
     collaborations = None
     if not authors or len(authors) > CFG_SELFCITES_AUTHOR_LIMIT:
         collaborations = frozenset(
             get_collaborations_from_record(recid, tags))
 
-    if collaborations:
-        # Use collaborations names
-        for cit in citers:
+    for cit in citers:
+        if collaborations:
+            # Use collaborations names
             cit_collaborations = frozenset(
                 get_collaborations_from_record(cit, tags))
             if collaborations.intersection(cit_collaborations):
                 self_citations.add(cit)
-    else:
-        # Use authors names
-        for cit in citers:
-            cit_authors = get_authors_from_record(cit, tags)
-            if (not authors or len(cit_authors) > CFG_SELFCITES_AUTHOR_LIMIT) and \
+                # It's a selfcite: no need for more info.
+                continue
+        cit_authors = get_authors_from_record(cit, tags)
+        if (not authors or len(cit_authors) >= CFG_SELFCITES_AUTHOR_LIMIT) and \
                 get_collaborations_from_record(cit, tags):
-                # Record from a collaboration that cites
-                # a record from an author, it's fine
-                pass
-            else:
-                cit_coauthors = frozenset(authors_fun(cit, tags))
-                if authors.intersection(cit_coauthors):
-                    self_citations.add(cit)
+            # Record from a collaboration that cites
+            # a record from an author, it's fine
+            pass
+        else:
+            cit_coauthors = authors_fun(cit, tags)
+            if authors.intersection(cit_coauthors):
+                self_citations.add(cit)
 
     return self_citations
 
