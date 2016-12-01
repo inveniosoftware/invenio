@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,9 +20,11 @@
 import os
 import tarfile
 
+from time import time
 from invenio.shellutils import run_shell_command, run_process_with_timeout, Timeout
-from invenio.plotextractor_output_utils import get_converted_image_name, \
-                                               write_message
+from invenio.plotextractor_output_utils import (get_converted_image_name,
+                                                write_message)
+
 
 def untar(original_tarball, sdir):
     """
@@ -44,6 +46,10 @@ def untar(original_tarball, sdir):
         return ([], [], None)
 
     tarball = tarfile.open(original_tarball)
+    # set mtime to now() for all files within the tarball
+    epochsecs = int(time())
+    for member in tarball.getmembers():
+        member.mtime = epochsecs
     tarball.extractall(sdir)
 
     tex_output_contains = 'TeX'
@@ -126,7 +132,7 @@ def check_for_gzip(tfile):
         new_dest = os.path.join(os.path.split(tfile)[0], 'tmp.tar')
         run_shell_command('touch %s', (new_dest,))
         dummy1, cmd_out, cmd_err = run_shell_command('gunzip -c %s',
-                                                            (tfile + '.tar.gz',))
+                                                     (tfile + '.tar.gz',))
         if cmd_err != '':
             write_message('Error while gunzipping ' + tfile)
             return tfile
