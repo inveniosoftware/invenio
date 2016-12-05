@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,7 +26,7 @@ def format_element(bfo):
     """
     Prints HEPData table encoded in the record
     """
-    publisher = bfo.fields("520__9")[0]
+    publisher = (bfo.fields("520__9") or [""])[0]
     if publisher == "HEPDATA":
         recid = bfo.recID
         parent_recid = int(bfo.fields("786__w")[0])
