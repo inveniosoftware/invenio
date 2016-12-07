@@ -5,7 +5,7 @@ Here is a summary of the most notable changes in Invenio
 releases.  For more information about the current release, please
 consult RELEASE-NOTES for each individual release.
 
-Invenio v3.0.0a3 -- released 2016-07-06
+Invenio v3.0.0a4 -- released 2016-12-07
 ---------------------------------------
 
 Developer preview release: no detailed changelog listed.

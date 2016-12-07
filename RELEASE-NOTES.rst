@@ -1,8 +1,8 @@
 ==================
- Invenio v3.0.0a3
+ Invenio v3.0.0a4
 ==================
 
-Invenio v3.0.0a3 was released on July 6, 2016.
+Invenio v3.0.0a4 was released on December 7, 2016.
 
 About
 -----
@@ -13,10 +13,12 @@ library or document repository on the web.
 What's new
 ----------
 
+No detailed release notes are provided for "alpha" releases.
+
 Installation
 ------------
 
-   $ pip install invenio==3.0.0a3
+   http://invenio.readthedocs.io/en/latest/installation/installation-quick.html
 
 Documentation
 -------------
