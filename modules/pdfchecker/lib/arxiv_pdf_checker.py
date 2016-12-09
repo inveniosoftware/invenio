@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2013, 2014, 2015 CERN.
+# Copyright (C) 2011, 2012, 2013, 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -63,7 +63,7 @@ from invenio.filedownloadutils import (download_external_url,
 
 
 NAME = 'arxiv-pdf-checker'
-ARXIV_VERSION_PATTERN = re.compile(ur'v\d$', re.UNICODE)
+ARXIV_VERSION_PATTERN = re.compile(ur'v\d{1,2}$', re.UNICODE)
 
 STATUS_OK = 'ok'
 STATUS_MISSING = 'missing'
@@ -113,7 +113,7 @@ def extract_arxiv_ids_from_recid(recid):
             if report_number.startswith('arXiv'):
                 report_number = report_number.split(':')[1]
             if ARXIV_VERSION_PATTERN.search(report_number):
-                report_number = report_number[:-2]
+                report_number = report_number[:report_number.rindex('v')]
             yield report_number
 
 
