@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -33,6 +33,7 @@ We have 3 tables:
 from itertools import chain
 import ConfigParser
 
+from invenio.intbitset import intbitset
 from invenio.bibformat_utils import parse_tag
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibrank_citation_indexer import tagify
@@ -43,6 +44,7 @@ from invenio.dbquery import run_sql
 from invenio.bibauthorid_searchinterface import get_authors_of_claimed_paper
 from invenio.bibrank_citation_searcher import get_cited_by
 
+CFG_SELFCITES_AUTHOR_LIMIT = 60
 
 def load_config_file(key):
     """Load config file containing the authors, co-authors tags #"""
@@ -56,18 +58,8 @@ def load_config_file(key):
 
 
 def get_personids_from_record(record):
-    """Returns all the personids associated to a record.
-
-    We limit the result length to 20 authors, after which it returns an
-    empty set for performance reasons
-    """
-    ids = get_authors_of_claimed_paper(record)
-    if 0 < len(ids) <= 20:
-        person_ids = set(ids)
-    else:
-        person_ids = set()
-
-    return person_ids
+    """Returns all the personids associated to a record."""
+    return intbitset(get_authors_of_claimed_paper(record))
 
 
 def get_authors_tags():
@@ -110,7 +102,7 @@ def get_authors_from_record(recID, tags,
         authors = set()
         def add_ids(table, authors_list):
             for author in authors_list:
-                if len(authors) == 21:
+                if len(authors) > CFG_SELFCITES_AUTHOR_LIMIT:
                     break
                 authors.add(get_id(table, author))
 
@@ -144,33 +136,32 @@ def compute_self_citations(recid, tags, authors_fun):
 
     self_citations = set()
 
-    authors = frozenset(get_authors_from_record(recid, tags))
+    authors = get_authors_from_record(recid, tags)
 
     collaborations = None
-    if not authors or len(authors) > 20:
+    if not authors or len(authors) > CFG_SELFCITES_AUTHOR_LIMIT:
         collaborations = frozenset(
             get_collaborations_from_record(recid, tags))
 
-    if collaborations:
-        # Use collaborations names
-        for cit in citers:
+    for cit in citers:
+        if collaborations:
+            # Use collaborations names
             cit_collaborations = frozenset(
                 get_collaborations_from_record(cit, tags))
             if collaborations.intersection(cit_collaborations):
                 self_citations.add(cit)
-    else:
-        # Use authors names
-        for cit in citers:
-            cit_authors = get_authors_from_record(cit, tags)
-            if (not authors or len(cit_authors) > 20) and \
+                # It's a selfcite: no need for more info.
+                continue
+        cit_authors = get_authors_from_record(cit, tags)
+        if (not authors or len(cit_authors) >= CFG_SELFCITES_AUTHOR_LIMIT) and \
                 get_collaborations_from_record(cit, tags):
-                # Record from a collaboration that cites
-                # a record from an author, it's fine
-                pass
-            else:
-                cit_coauthors = frozenset(authors_fun(cit, tags))
-                if authors.intersection(cit_coauthors):
-                    self_citations.add(cit)
+            # Record from a collaboration that cites
+            # a record from an author, it's fine
+            pass
+        else:
+            cit_coauthors = authors_fun(cit, tags)
+            if authors.intersection(cit_coauthors):
+                self_citations.add(cit)
 
     return self_citations
 
@@ -265,7 +256,7 @@ def update_self_cites_tables(recid, config, tags):
     """For a given record update all self-cites table if needed"""
     authors = get_authors_from_record(recid, tags)
 
-    if 0 < len(authors) <= 20:
+    if 0 < len(authors) <= CFG_SELFCITES_AUTHOR_LIMIT:
         # Updated reords cache table
         deleted_authors, added_authors = store_record(recid, authors)
         if deleted_authors or added_authors:
