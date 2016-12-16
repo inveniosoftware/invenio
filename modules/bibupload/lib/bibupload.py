@@ -2011,6 +2011,9 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
             for url, docformat, description, comment, flags, timestamp in urls:
                 if url:
                     try:
+                        if ' ' in url:
+                            # HACK: workaround when harvesting from CDS
+                            url = url.replace(' ', '%20')
                         downloaded_url = download_url(url, docformat)
                         if CFG_INSPIRE_SITE and docformat == '.pdf':
                             guessed_format = guess_via_magic(downloaded_url)
