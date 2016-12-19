@@ -1,5 +1,5 @@
 ..  This file is part of Invenio
-    Copyright (C) 2014 CERN.
+    Copyright (C) 2014, 2016 CERN.
 
     Invenio is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -262,7 +262,7 @@ The ``bower.json`` can be automagically generated.
 
 .. code-block:: console
 
-    $ sudo su -c "npm install -g bower less clean-css requirejs uglify-js"
+    $ sudo su -c "npm install -g bower@1.7.9 less@2.7.1 clean-css@3.4.12 uglify-js@2.6.2 requirejs@2.2.0"
     (myoverlay)$ inveniomanage bower > bower.json
     (myoverlay)$ bower install
 
