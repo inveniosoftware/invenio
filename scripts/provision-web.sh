@@ -29,7 +29,7 @@ set -o errexit
 set -o nounset
 
 # detect pathname of this script:
-scriptpathname=$(cd "$(dirname $0)" && pwd)
+scriptpathname=$(cd "$(dirname "$0")" && pwd)
 
 # sphinxdoc-install-detect-sudo-begin
 # runs as root or needs sudo?
@@ -150,12 +150,13 @@ setup_virtualenvwrapper () {
     # sphinxdoc-install-virtualenvwrapper-begin
     $sudo pip install -U virtualenvwrapper setuptools pip
     if ! grep -q virtualenvwrapper ~/.bashrc; then
-        mkdir -p $HOME/.virtualenvs
-        echo "export WORKON_HOME=$HOME/.virtualenvs" >> $HOME/.bashrc
-        echo "source $(which virtualenvwrapper.sh)" >> $HOME/.bashrc
+        mkdir -p "$HOME/.virtualenvs"
+        echo "export WORKON_HOME=$HOME/.virtualenvs" >> "$HOME/.bashrc"
+        echo "source $(which virtualenvwrapper.sh)" >> "$HOME/.bashrc"
     fi
     export WORKON_HOME=$HOME/.virtualenvs
-    source $(which virtualenvwrapper.sh)
+    # shellcheck source=/dev/null
+    source "$(which virtualenvwrapper.sh)"
     # sphinxdoc-install-virtualenvwrapper-end
 
     # enable quitting on errors back:
@@ -170,7 +171,7 @@ setup_nginx_ubuntu14 () {
     $sudo apt-get install -y nginx
 
     # configure Nginx web server:
-    $sudo cp -f $scriptpathname/../nginx/invenio3.conf /etc/nginx/sites-available/
+    $sudo cp -f "$scriptpathname/../nginx/invenio3.conf" /etc/nginx/sites-available/
     $sudo sed -i "s,/home/invenio/,/home/$(whoami)/,g" /etc/nginx/sites-available/invenio3.conf
     $sudo rm /etc/nginx/sites-enabled/default
     $sudo ln -s /etc/nginx/sites-available/invenio3.conf /etc/nginx/sites-enabled/
@@ -184,10 +185,10 @@ setup_nginx_centos7 () {
     $sudo yum install -y nginx
 
     # configure Nginx web server:
-    $sudo cp $scriptpathname/../nginx/invenio3.conf /etc/nginx/conf.d/
+    $sudo cp "$scriptpathname/../nginx/invenio3.conf" /etc/nginx/conf.d/
     $sudo sed -i "s,/home/invenio/,/home/$(whoami)/,g" /etc/nginx/conf.d/invenio3.conf
     $sudo sed -i 's,80,8888,g' /etc/nginx/nginx.conf
-    $sudo chmod go+rx /home/$(whoami)/
+    $sudo chmod go+rx "/home/$(whoami)/"
     $sudo /sbin/service nginx restart
 
     # open firewall:
@@ -224,7 +225,7 @@ main () {
     fi
 
     # call appropriate provisioning functions:
-    if [ -f /.dockerinit -o -f /.dockerenv ]; then
+    if [ -f /.dockerinit ] || [ -f /.dockerenv ]; then
         # running inside Docker
         provision_web_common_ubuntu14
         provision_web_libpostgresql_ubuntu14

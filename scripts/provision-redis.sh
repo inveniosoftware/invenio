@@ -26,7 +26,7 @@
 set -o errexit
 
 # check environment variables:
-if [ -v ${INVENIO_REDIS_HOST} ]; then
+if [ "${INVENIO_REDIS_HOST}" = "" ]; then
     echo "[ERROR] Please set environment variable INVENIO_REDIS_HOST before runnning this script."
     echo "[ERROR] Example: export INVENIO_REDIS_HOST=192.168.50.12"
     exit 1
@@ -46,7 +46,7 @@ provision_redis_ubuntu14 () {
          redis-server
 
     # allow network connections:
-    if ! grep -q ${INVENIO_REDIS_HOST} /etc/redis/redis.conf; then
+    if ! grep -q "${INVENIO_REDIS_HOST}" /etc/redis/redis.conf; then
         sudo sed -i "s/bind 127.0.0.1/bind 127.0.0.1 ${INVENIO_REDIS_HOST}/" \
              /etc/redis/redis.conf
     fi
@@ -71,7 +71,7 @@ provision_redis_centos7 () {
          redis
 
     # allow network connections:
-    if ! grep -q ${INVENIO_REDIS_HOST} /etc/redis.conf; then
+    if ! grep -q "${INVENIO_REDIS_HOST}" /etc/redis.conf; then
         sudo sed -i "s/bind 127.0.0.1/bind 127.0.0.1 ${INVENIO_REDIS_HOST}/" \
              /etc/redis.conf
     fi

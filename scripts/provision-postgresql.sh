@@ -26,27 +26,27 @@
 set -o errexit
 
 # check environment variables:
-if [ -v ${INVENIO_POSTGRESQL_HOST} ]; then
+if [ "${INVENIO_POSTGRESQL_HOST}" = "" ]; then
     echo "[ERROR] Please set environment variable INVENIO_POSTGRESQL_HOST before runnning this script."
     echo "[ERROR] Example: export INVENIO_POSTGRESQL_HOST=192.168.50.11"
     exit 1
 fi
-if [ -v ${INVENIO_POSTGRESQL_DBNAME} ]; then
+if [ "${INVENIO_POSTGRESQL_DBNAME}" = "" ]; then
     echo "[ERROR] Please set environment variable INVENIO_POSTGRESQL_DBNAME before runnning this script."
     echo "[ERROR] Example: INVENIO_POSTGRESQL_DBNAME=invenio3"
     exit 1
 fi
-if [ -v ${INVENIO_POSTGRESQL_DBUSER} ]; then
+if [ "${INVENIO_POSTGRESQL_DBUSER}" = "" ]; then
     echo "[ERROR] Please set environment variable INVENIO_POSTGRESQL_DBUSER before runnning this script."
     echo "[ERROR] Example: INVENIO_POSTGRESQL_DBUSER=invenio3"
     exit 1
 fi
-if [ -v ${INVENIO_POSTGRESQL_DBPASS} ]; then
+if [ "${INVENIO_POSTGRESQL_DBPASS}" = "" ]; then
     echo "[ERROR] Please set environment variable INVENIO_POSTGRESQL_DBPASS before runnning this script."
     echo "[ERROR] Example: INVENIO_POSTGRESQL_DBPASS=dbpass123"
     exit 1
 fi
-if [ -v ${INVENIO_WEB_HOST} ]; then
+if [ "${INVENIO_WEB_HOST}" = "" ]; then
     echo "[ERROR] Please set environment variable INVENIO_WEB_HOST before runnning this script."
     echo "[ERROR] Example: export INVENIO_WEB_HOST=192.168.50.10"
     exit 1
@@ -66,21 +66,21 @@ provision_postgresql_ubuntu14 () {
          postgresql
 
     # allow network connections:
-    if ! grep -q listen_addresses.*${INVENIO_POSTGRESQL_HOST} \
+    if ! grep -q "listen_addresses.*${INVENIO_POSTGRESQL_HOST}" \
          /etc/postgresql/9.3/main/postgresql.conf; then
         echo "listen_addresses = '${INVENIO_POSTGRESQL_HOST}'" | \
             sudo tee -a /etc/postgresql/9.3/main/postgresql.conf
     fi
 
     # grant access rights:
-    if ! sudo grep -q host.*${INVENIO_POSTGRESQL_DBNAME}.*${INVENIO_POSTGRESQL_DBUSER} \
+    if ! sudo grep -q "host.*${INVENIO_POSTGRESQL_DBNAME}.*${INVENIO_POSTGRESQL_DBUSER}" \
          /etc/postgresql/9.3/main/pg_hba.conf; then
         echo "host ${INVENIO_POSTGRESQL_DBNAME} ${INVENIO_POSTGRESQL_DBUSER} ${INVENIO_WEB_HOST}/32 md5" | \
             sudo tee -a /etc/postgresql/9.3/main/pg_hba.conf
     fi
 
     # grant database creation rights via SQLAlchemy-Utils:
-    if ! sudo grep -q host.*template1.*${INVENIO_POSTGRESQL_DBUSER} \
+    if ! sudo grep -q "host.*template1.*${INVENIO_POSTGRESQL_DBUSER}" \
          /etc/postgresql/9.3/main/pg_hba.conf; then
         echo "host template1 ${INVENIO_POSTGRESQL_DBUSER} ${INVENIO_WEB_HOST}/32 md5" | \
             sudo tee -a /etc/postgresql/9.3/main/pg_hba.conf
@@ -107,21 +107,21 @@ provision_postgresql_centos7 () {
     sudo -i -u postgres pg_ctl initdb
 
     # allow network connections:
-    if ! sudo grep -q listen_addresses.*${INVENIO_POSTGRESQL_HOST} \
+    if ! sudo grep -q "listen_addresses.*${INVENIO_POSTGRESQL_HOST}" \
          /var/lib/pgsql/data/postgresql.conf; then
         echo "listen_addresses = '${INVENIO_POSTGRESQL_HOST}'" | \
             sudo tee -a /var/lib/pgsql/data/postgresql.conf
     fi
 
     # grant access rights:
-    if ! sudo grep -q host.*${INVENIO_POSTGRESQL_DBNAME}.*${INVENIO_POSTGRESQL_DBUSER} \
+    if ! sudo grep -q "host.*${INVENIO_POSTGRESQL_DBNAME}.*${INVENIO_POSTGRESQL_DBUSER}" \
          /var/lib/pgsql/data/pg_hba.conf; then
         echo "host ${INVENIO_POSTGRESQL_DBNAME} ${INVENIO_POSTGRESQL_DBUSER} ${INVENIO_WEB_HOST}/32 md5" | \
             sudo tee -a /var/lib/pgsql/data/pg_hba.conf
     fi
 
     # grant database creation rights via SQLAlchemy-Utils:
-    if ! sudo grep -q host.*template1.*${INVENIO_POSTGRESQL_DBUSER} \
+    if ! sudo grep -q "host.*template1.*${INVENIO_POSTGRESQL_DBUSER}" \
          /var/lib/pgsql/data/pg_hba.conf; then
         echo "host template1 ${INVENIO_POSTGRESQL_DBUSER} ${INVENIO_WEB_HOST}/32 md5" | \
             sudo tee -a /var/lib/pgsql/data/pg_hba.conf
