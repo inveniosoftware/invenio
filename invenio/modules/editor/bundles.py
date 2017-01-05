@@ -22,12 +22,7 @@
 from invenio.ext.assets import Bundle
 
 js = Bundle(
-    "vendors/jquery/dist/jquery.js",
-    "vendors/bootstrap/dist/js/bootstrap.js",
     "vendors/jquery-ui/jquery-ui.js",
-    "vendors/jquery.jeditable/index.js",
-    "vendors/jquery.hotkeys/jquery.hotkeys.js",
-    "vendors/json2/json2.js",
     "js/editor/refextract.js",
     "js/editor/display.js",
     "js/editor/engine.js",
@@ -37,7 +32,17 @@ js = Bundle(
     "js/editor/marcxml.js",
     "js/editor/clipboard.js",
     output="editor.js",
+    filters="uglifyjs",
     weight=51,
+    bower={
+        "jquery-ui": "~1.11",
+        # from jquery.js
+        #"jquery":
+        #"bootstrap":
+        #"json2":
+        #"jquery.jeditable":
+        #"jquery.hotkeys"
+    }
 )
 
 styles = Bundle(
