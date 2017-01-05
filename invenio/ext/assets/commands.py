@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of Invenio.
-# Copyright (C) 2014, 2015 CERN.
+# Copyright (C) 2014, 2015, 2016, 2017 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,7 +20,6 @@
 
 import argparse
 import os
-
 import warnings
 
 from flask import current_app, json
@@ -96,7 +95,12 @@ class BowerCommand(Command):
         for pkg, bundle in bundles:
             if bundle.bower:
                 current_app.logger.debug((pkg, bundle.bower))
-            output['dependencies'].update(bundle.bower)
+                externals = list(bundle.externals)
+                for library, version in bundle.bower.items():
+                    if not isinstance(version, basestring):
+                        output['dependencies'][library] = version[1]
+                    elif version not in externals:
+                        output['dependencies'][library] = version
 
         # Remove together with override kwarg, and Option object.
         if override:

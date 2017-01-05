@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -29,7 +29,7 @@ class ParseFirstParser(DecoratorBeforeEvalBaseExtensionParser):
     """
     Handle the ``@parse_first`` decorator.
 
-    .. code-block:: ini
+    .. code-block:: none
 
         author_aggregation:
             derived:

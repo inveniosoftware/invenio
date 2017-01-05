@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014, 2015 CERN.
+# Copyright (C) 2013, 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -39,8 +39,6 @@ env:
   - REQUIREMENTS=devel REXTRAS=docs
 
 python:
-# FIXME: the build times out on Python 2.6 (inveniosoftware/invenio#1789)
-#  - "2.6"
   - "2.7"
 
 addons:
@@ -65,7 +63,7 @@ install:
   - "travis_retry pip install -e .[$REXTRAS] --process-dependency-links"
   - "python setup.py compile_catalog"
   - "npm update"
-  - "npm install --silent -g bower less clean-css uglify-js requirejs"
+  - "npm install --silent -g bower@1.7.9 less@2.7.1 clean-css@3.4.12 uglify-js@2.6.2 requirejs@2.2.0"
   # All the step below this points are solely for test purposes, don't use them
   # to setup your invenio installation. Please do RTFM instead (INSTALL.rst).
   - "./scripts/setup_devmode.sh"
@@ -76,5 +74,5 @@ before_script:
   - "inveniomanage database create --quiet || echo ':('"
 
 script:
-  - "sphinx-build -qnNW docs docs/_build/html"
+  - "travis_retry sphinx-build -qnNW docs docs/_build/html"
   - "python setup.py test"

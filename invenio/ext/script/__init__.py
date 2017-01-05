@@ -43,7 +43,7 @@ They are assigned by the following parameters, in decreasing priority:
 from __future__ import print_function
 
 import functools
-
+import mimetypes
 import re
 
 import ssl
@@ -282,6 +282,14 @@ def create_ssl_context(config):
         # that one seems to be required for werkzeug
         ssl_context.check_hostname = False
     return ssl_context
+
+
+def set_extra_mimetypes(sender, *args, **kwargs):
+    """Add extra mimetypes to the static file server."""
+    if current_app.config.get('CFG_FLASK_SERVE_STATIC_FILES', False):
+        mimetypes.add_type('text/html', '.mustache', True)
+
+pre_command.connect(set_extra_mimetypes, sender=Server)
 
 
 def register_manager(manager):

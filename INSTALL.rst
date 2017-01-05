@@ -219,13 +219,13 @@ For ``bower``, type:
 
 .. code-block:: console
 
-    $ npm install -g bower
+    $ npm install -g bower@1.7.9
 
 After the configuration section install the following(required for the assets):
 
 .. code-block:: console
 
-    $ npm install -g less clean-css requirejs uglify-js
+    $ npm install -g less@2.7.1 clean-css@3.4.12 uglify-js@2.6.2 requirejs@2.2.0
 
 See the following sections `Installation`_ , `Configuration`_ and `Development`_
 The commands for ``OS X`` are the same as in ``Linux``.

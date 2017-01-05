@@ -21,12 +21,17 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import os
+
 from flask import current_app
+
 from flask_assets import Bundle as BundleBase
+
 from flask_registry import ModuleAutoDiscoveryRegistry
-from werkzeug.utils import import_string
-from webassets.filter.requirejs import RequireJSFilter as RequireJSFilterBase
+
 from webassets.filter import ExternalTool
+from webassets.filter.requirejs import RequireJSFilter as RequireJSFilterBase
+
+from werkzeug.utils import import_string
 
 
 class Bundle(BundleBase):
@@ -37,7 +42,9 @@ class Bundle(BundleBase):
     The name is only used for the requirements from the templates and the
     weight does the bundle ordering.
 
-    The bower dependencies are used to generate a bower.json file.
+    The bower dependencies are used to generate a bower.json file. If a bower
+    dependency is a URL (formatted like this: `//code.jquery.com/jquery.js`)
+    then it won't be managed by bower but it will be used directly instead.
     """
 
     def __init__(self, *contents, **options):
@@ -65,6 +72,15 @@ class Bundle(BundleBase):
             if f.name in filters:
                 return True
         return False
+
+    @property
+    def externals(self):
+        """List of dependencies that should loaded using external URLs."""
+        for library, version in self.bower.items():
+            if not isinstance(version, basestring):
+                yield version[0]
+            elif version.startswith(r"//"):
+                yield version
 
 
 class BundlesAutoDiscoveryRegistry(ModuleAutoDiscoveryRegistry):

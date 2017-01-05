@@ -743,7 +743,7 @@ def prs_wash_arguments(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WE
               'datetext1': datetext1, 'datetext2': datetext2, 'uid': uid,
               '_': _,
               'selected_external_collections_infos': None,
-              }
+            }
 
     kwargs.update(**dummy)
     return kwargs

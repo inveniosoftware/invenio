@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2014 CERN.
+ * Copyright (C) 2014, 2015 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,9 +17,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-require(["js/records/records"], function() {
-  /*
-   * It preloads necessary scripts to give it a name so you're free to use it
-   * from any places.
-   */
-});
+require(["jquery", "js/records/records"], function($, Records) {
+    $(document).ready(function() {
+        new Records({menu: "#record-links", content: "#record_content"})
+    })
+})

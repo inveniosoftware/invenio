@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2013, 2014 CERN.
+ * Copyright (C) 2013, 2014, 2015 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -20,55 +20,71 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
+    var $ = require('jquery'),
+        hasPushState = typeof window.history.pushState === 'function'
 
-    var reloadTab = function(path) {
-        $(window).trigger('tabreload', [path]);
-        $('#record-links li.active').removeClass('active');
-        $('#record-links a[href="'+path+'"]').parent().addClass('active');
-        $.post(path, function(data) {
-            $('#record_content').html(data);
-            $(window).trigger('tabreloaded', [path]);
-        });
-    };
+    // Could be written as a jQuery plugin.
+    function Records(options) {
+        this.options = $.extend({}, {
+            menu: '#record-links',
+            content: '#record_content'
+        }, options)
 
-    $(window).on('load', function() {
-        $('#record-links li.disabled a').on('click', function(event) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            return false;
-        });
+        this.init()
+    }
 
-        $('#record-links li:not(.disabled) a').on('click', function(event) {
-            var path = $(event.target).attr('href');
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            if (typeof(window.history.pushState) === 'function') {
-                window.history.pushState({path:path}, document.title, path);
+    Records.prototype.init = function() {
+        this.element = $(this.options.menu)
+        this.currentPath = this.element.find('li.active a').attr('href')
+        this.states = []
+
+        this.element.on('click', 'li a', this, function(e) {
+            e.preventDefault()
+
+            var a = $(e.target).closest('a'),
+                path = a.attr('href'),
+                li = a.closest('li')
+
+            if (path && hasPushState && !li || !li.hasClass('disabled')) {
+                window.history.pushState({path: path}, document.title, path)
+                e.data.states.push({path: e.data.currentPath})
+                e.data.reloadTab(path)
+            }
+        })
+
+        $(window).on('popstate', this, function(e) {
+            var state;
+            if (e.state && e.state.path) {
+                state = e.state
+            } else if (e.data.states.length) {
+                state = e.data.states.pop()
             } else {
-                window.location.hash = '#!' + path;
+                // No states to go back to.
+                return
             }
-            reloadTab(path);
+
+            e.data.reloadTab(state.path)
+        })
+    }
+
+    Records.prototype.reloadTab = function(path) {
+        this.currentPath = path
+
+        var element = this.element,
+            content = $(this.options.content)
+
+        $.ajax({
+            method: "POST",
+            url: path
+        }).done(function(d) {
+            element.find('li.active').removeClass('active')
+            element.find('a[href="'+path+'"]').closest('li').addClass('active')
+
+            content.html(d)
+        }).fail(function() {
+            alert("Something horrible just happened, send us a bug report if it persists.")
         });
-
-
-    });
-
-    var initHref = $('#record-links li.active a').attr('href'),
-    initLoc = null,
-    lastLoc = window.location;
-
-    window.onpopstate = function(event) {
-        if (event.state && event.state.path) {
-            reloadTab(event.state.path);
-        } else if (event.target.location === initLoc) {
-            if (lastLoc !== initLoc) {
-                reloadTab(initHref);
-            }
-        } else {
-            initLoc = window.location;
-        }
-        lastLoc = window.location;
     };
 
+    return Records;
 });
