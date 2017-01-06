@@ -23,6 +23,7 @@ Provide API-callable functions for knowledge base management (using kb's).
 
 import os
 import re
+from cStringIO import StringIO
 
 from invenio import bibknowledge_dblayer
 from invenio.jsonutils import json
@@ -32,6 +33,10 @@ from invenio.config import CFG_WEBDIR
 processor_type = 0
 try:
     from lxml import etree
+    lxml_version = etree.LXML_VERSION
+    if lxml_version < (2, 0, 11, 0):
+        raise ImportError("Minimum lxml version supported is 2.0.11.0, available is %s" % \
+                          ('.'.join([str(v) for v in lxml_version]),))
     processor_type = 1
 except ImportError:
     try:
@@ -456,8 +461,8 @@ def get_kbt_items(taxonomyfilename, templatefilename, searchwith=""):
 
     if processor_type == 1:
         # lxml
-        doc = etree.XML(taxonomyfilename)
-        styledoc = etree.XML(templatefilename)
+        doc = etree.parse(taxonomyfilename)
+        styledoc = etree.parse(templatefilename)
         style = etree.XSLT(styledoc)
         result = style(doc)
         strres = str(result)
@@ -506,8 +511,7 @@ def get_kbt_items_for_bibedit(kbtname, tag="", searchwith=""):
     @param tag: name of tag whose content
     @param searchwith: a term to search with
     """
-    import libxml2
-    import libxslt
+
     #get the actual file based on the kbt name
     kb_id = get_kb_id(kbtname)
     if not kb_id:
@@ -516,8 +520,8 @@ def get_kbt_items_for_bibedit(kbtname, tag="", searchwith=""):
     rdfname = CFG_WEBDIR+"/kbfiles/"+str(kb_id)+".rdf"
     if not os.path.exists(rdfname):
         return []
-    #parse the doc with static xslt
-    styledoc = libxml2.parseDoc("""
+
+    styledoc_xml = """
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
@@ -541,14 +545,31 @@ def get_kbt_items_for_bibedit(kbtname, tag="", searchwith=""):
   </xsl:template>
 
 </xsl:stylesheet>
-    """)
-    style = libxslt.parseStylesheetDoc(styledoc)
-    doc = libxml2.parseFile(rdfname)
-    result = style.applyStylesheet(doc, None)
-    strres = style.saveResultToString(result)
-    style.freeStylesheet()
-    doc.freeDoc()
-    result.freeDoc()
+"""
+
+    if processor_type == 1:
+        # lxml
+        styledoc = etree.parse(StringIO(styledoc_xml))
+        style = etree.XSLT(styledoc)
+        doc = etree.parse(rdfname)
+        result = style(doc)
+        strres = str(result)
+        del result
+        del style
+        del styledoc
+        del doc
+
+    elif processor_type == 2:
+        # libxml2 & libxslt
+        styledoc = libxml2.parseDoc(styledoc_xml)
+        style = libxslt.parseStylesheetDoc(styledoc)
+        doc = libxml2.parseFile(rdfname)
+        result = style.applyStylesheet(doc, None)
+        strres = style.saveResultToString(result)
+        style.freeStylesheet()
+        doc.freeDoc()
+        result.freeDoc()
+
     ritems = []
     if len(strres) == 0:
         return []
@@ -566,7 +587,6 @@ def get_kbt_items_for_bibedit(kbtname, tag="", searchwith=""):
                 else:
                     ritems.append(line)
     return ritems
-
 
 if __name__ == "__main__":
     pass

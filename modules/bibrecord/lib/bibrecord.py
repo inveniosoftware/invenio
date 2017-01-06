@@ -64,6 +64,10 @@ except ImportError:
 
 try:
     from lxml import etree
+    lxml_version = etree.LXML_VERSION
+    if lxml_version < (2, 0, 11, 0):
+        raise ImportError("Minimum lxml version supported is 2.0.11.0, available is %s" % \
+                          ('.'.join([str(v) for v in lxml_version]),))
     if 'lxml' in CFG_BIBRECORD_PARSERS_AVAILABLE:
         AVAILABLE_PARSERS.append('lxml')
 except ImportError:
