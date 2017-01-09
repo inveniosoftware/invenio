@@ -1,5 +1,5 @@
 ..  This file is part of Invenio
-    Copyright (C) 2015, 2016 CERN.
+    Copyright (C) 2015, 2016, 2017 CERN.
 
     Invenio is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -121,11 +121,13 @@ Released versions include:
 
 Invenio v1.2:
 
+* `v1.2.2 <https://github.com/inveniosoftware/invenio/releases/tag/v1.2.2>`_ - released 2016-11-25
 * `v1.2.1 <https://github.com/inveniosoftware/invenio/releases/tag/v1.2.1>`_ - released 2015-05-21
 * `v1.2.0 <https://github.com/inveniosoftware/invenio/releases/tag/v1.2.0>`_ - released 2015-03-03
 
 Invenio v1.1:
 
+* `v1.1.7 <https://github.com/inveniosoftware/invenio/releases/tag/v1.1.7>`_ - released 2016-11-20
 * `v1.1.6 <https://github.com/inveniosoftware/invenio/releases/tag/v1.1.6>`_ - released 2015-05-21
 * `v1.1.5 <https://github.com/inveniosoftware/invenio/releases/tag/v1.1.5>`_ - released 2015-03-02
 * `v1.1.4 <https://github.com/inveniosoftware/invenio/releases/tag/v1.1.4>`_ - released 2014-08-31
@@ -136,6 +138,7 @@ Invenio v1.1:
 
 Invenio v1.0:
 
+* `v1.0.10 <https://github.com/inveniosoftware/invenio/releases/tag/v1.0.10>`_ - released 2016-11-09
 * `v1.0.9 <https://github.com/inveniosoftware/invenio/releases/tag/v1.0.9>`_ - released 2015-05-21
 * `v1.0.8 <https://github.com/inveniosoftware/invenio/releases/tag/v1.0.8>`_ - released 2015-03-02
 * `v1.0.7 <https://github.com/inveniosoftware/invenio/releases/tag/v1.0.7>`_ - released 2014-08-31
