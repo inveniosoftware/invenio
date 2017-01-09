@@ -2,7 +2,7 @@
 ##
 ## This file is part of Invenio.
 ## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013,
-##               2014, 2015, 2016 CERN.
+##               2014, 2015, 2016, 2017 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -850,13 +850,27 @@ def standardize_report_number(report_number):
     Currently we:
     * remove category for arxiv papers
     """
-    report_number = re.sub(ur'(?:arXiv:)?((\d{4}\.\d{4,5})|(\w+-\w+/\d+))(v\d+)?( \[[a-zA-Z\.-]+\])?',
-                  ur'arXiv:\g<1>',
-                  report_number,
-                  re.I | re.U)
-    if report_number.lower().startswith('arxiv:') and len(report_number) > len("arXiv:") and not report_number[len("arXiv:")].isdigit():
-        # Quick hack to strip arXiv: prefix in case of legacy arXiv IDs
-        report_number = report_number[len("arXiv:"):]
+
+    aprefix = ur'(?:arXiv:)?'
+    verandcat = ur'(?:v\d+)?(?: \[[a-zA-Z\.-]+\])?'
+    arxivre = re.compile(aprefix + ur'(?:(\d{4}\.\d{4,5})|(?<![.-/])(\w+-\w+/\d{7}))(?!\d)' + verandcat,
+                         flags=re.I|re.U)
+    csphyre = re.compile(aprefix +
+                         ur'(?:(?P<csmath>cs|math|nlin)(?:\.[A-Z]{2})?|(?P<physics>physics)(?:\.\w+-\w+)?)/(?P<number>\d{7})(?!\d)'
+                         + verandcat, flags=re.I|re.U)
+
+    hit = arxivre.search(report_number)
+    if hit:
+        if hit.group(1):
+            report_number = ur'arXiv:' + hit.group(1)
+        else:
+            report_number = hit.group(2)
+    else:
+        hit = csphyre.search(report_number)
+        if hit:
+            archive = hit.group('csmath') or hit.group('physics')
+            report_number = archive + ur'/' + hit.group('number')
+
     return report_number
 
 
