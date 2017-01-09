@@ -87,7 +87,6 @@ nginx:
   restart: "always"
   build: ./nginx
   ports:
-    - "80:80"
     - "443:443"
   volumes_from:
     - static
