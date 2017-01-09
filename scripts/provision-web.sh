@@ -206,7 +206,7 @@ provision_web_centos6 () {
     $sudo yum install -y \
          automake \
          curl \
-         cython \
+         Cython \
          file \
          freetype-devel \
          gcc \
