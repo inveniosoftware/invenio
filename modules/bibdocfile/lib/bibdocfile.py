@@ -3913,22 +3913,17 @@ def get_format_from_http_response(response):
     @return: the format of the remote resource
     @rtype: string
     """
-    def parse_content_type(text):
-        return text.split(';')[0].strip()
-
-    def parse_content_disposition(text):
-        for item in text.split(';'):
-            item = item.strip()
-            if item.strip().startswith('filename='):
-                return item[len('filename="'):-len('"')]
-
     info = response.info()
 
     docformat = ''
 
     content_disposition = info.getheader('Content-Disposition')
     if content_disposition:
-        filename = parse_content_disposition(content_disposition)
+        parsed_content_disposition = cgi.parse_header(content_disposition)
+        filename = None
+        for part in parsed_content_disposition:
+            if hasattr(part, 'has_key'):
+                filename = part.get('filename')
         if filename:
             docformat = decompose_file(filename, only_known_extensions=False)[2]
             if docformat:
@@ -3936,7 +3931,7 @@ def get_format_from_http_response(response):
 
     content_type = info.getheader('Content-Type')
     if content_type:
-        content_type = parse_content_type(content_type)
+        content_type = cgi.parse_header(content_type)[0]
         if content_type not in ('text/plain', 'application/octet-stream'):
             ## We actually ignore these mimetypes since they are the
             ## defaults often returned by Apache in case the mimetype
