@@ -54,6 +54,7 @@ Vagrant.configure("2") do |config|
     # Note: if you use ubuntu/xenial64 and you are inside CERN, you may need to uncomment the following line:
     # web.vm.provision "shell", inline: "echo 'nameserver 137.138.16.5' > /etc/resolv.conf"
     web.vm.provision "shell", inline: "source .inveniorc && /vagrant/scripts/provision-web.sh", privileged: false
+    web.vm.network "forwarded_port", guest: 80, host: 80
     web.vm.network "forwarded_port", guest: 443, host: 443
     web.vm.network "forwarded_port", guest: 5000, host: 5000
     web.vm.network "private_network", ip: ENV.fetch('INVENIO_WEB_HOST','192.168.50.10')

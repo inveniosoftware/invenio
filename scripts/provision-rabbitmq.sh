@@ -39,7 +39,7 @@ provision_rabbitmq_ubuntu () {
          rabbitmq-server
 
     # allow remote connections for guest user
-    sudo sudo chmod 777 -R /etc/rabbitmq
+    sudo chmod 777 -R /etc/rabbitmq
     echo '[{rabbit, [{loopback_users, []}]}].' > /etc/rabbitmq/rabbitmq.config
 
     # start RabbitMQ:
