@@ -1228,6 +1228,9 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
         step("DOI catchup", thisrecid, done, len(records_info['doi']))
         done += 1
 
+        # lookup info with and without doi: prefix
+        dois = dois + ['doi:' + doi for doi in dois if doi.startswith('10.')]
+
         for doi in dois:
             recids = get_recids_matching_query(p=doi,
                                                f=tags['refs_doi'],
