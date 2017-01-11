@@ -37,6 +37,14 @@ provision_rabbitmq_ubuntu () {
     # install RabbitMQ server:
     sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
          rabbitmq-server
+
+    # allow remote connections for guest user
+    sudo sudo chmod 777 -R /etc/rabbitmq
+    echo '[{rabbit, [{loopback_users, []}]}].' > /etc/rabbitmq/rabbitmq.config
+
+    # start RabbitMQ:
+    sudo service rabbitmq-server restart
+
     # sphinxdoc-install-rabbitmq-ubuntu14-end
 
 }
