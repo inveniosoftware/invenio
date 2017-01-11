@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2016 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,6 +18,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import re
+
+from urlparse import unquote
 
 from unidecode import unidecode
 
@@ -1399,7 +1401,9 @@ def identify_and_tag_DOI(line):
         start = match.start()
         end = match.end()
         # Get the actual DOI string (remove the url part of the doi string)
-        doi_phrase = match.group(6)
+        doi_phrase = match.group('doi')
+        if '%2f' in doi_phrase.lower():
+            doi_phrase = unquote(doi_phrase)
 
         # Replace the entire matched doi with a tag
         line = line[0:start] + "<cds.DOI />" + line[end:]
