@@ -4,14 +4,7 @@ node() {
         sh 'rm -rf *'
 
     stage 'Checkout SCM'
-        checkout([
-            $class: 'GitSCM',
-            branches: [[name: "refs/heads/${env.BRANCH_NAME}"]],
-            extensions: [[$class: 'LocalBranch']],
-            userRemoteConfigs: scm.userRemoteConfigs,
-            doGenerateSubmoduleConfigurations: false,
-            submoduleCfg: []
-        ])
+        checkout scm
 
     stage 'Install & Test'
         timestamps {
