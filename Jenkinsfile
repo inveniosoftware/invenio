@@ -1,11 +1,4 @@
 node() {
-    stage 'Cleanup workspace'
-        sh 'chmod 777 -R .'
-        sh 'rm -rf *'
-
-    stage 'Checkout SCM'
-        checkout scm
-
     stage 'Install & Test'
         timestamps {
             timeout(time: 30, unit: 'MINUTES') {
