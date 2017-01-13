@@ -165,42 +165,6 @@ setup_virtualenvwrapper () {
 
 }
 
-setup_nginx_ubuntu () {
-    # sphinxdoc-install-web-nginx-ubuntu14-begin
-    # create ssl files for HTTPS support
-    $sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-          -keyout /etc/ssl/private/nginx.key \
-          -out /etc/ssl/certs/nginx.crt -batch
-    # install Nginx web server:
-    $sudo apt-get install -y nginx
-
-    # configure Nginx web server:
-    $sudo cp -f "$scriptpathname/../nginx/nginx.conf" /etc/nginx/
-    $sudo cp -rf "$scriptpathname/../nginx/conf.d" /etc/nginx/
-    $sudo sed -i "s,/home/invenio/,/home/$(whoami)/,g" /etc/nginx/conf.d/default.conf
-    $sudo /usr/sbin/service nginx restart
-    # sphinxdoc-install-web-nginx-ubuntu14-end
-}
-
-setup_nginx_centos7 () {
-    # sphinxdoc-install-web-nginx-centos7-begin
-    # install Nginx web server:
-    $sudo yum install -y nginx
-
-    # configure Nginx web server:
-    $sudo cp "$scriptpathname/../nginx/invenio3.conf" /etc/nginx/conf.d/
-    $sudo sed -i "s,/home/invenio/,/home/$(whoami)/,g" /etc/nginx/conf.d/invenio3.conf
-    $sudo sed -i 's,80,8888,g' /etc/nginx/nginx.conf
-    $sudo chmod go+rx "/home/$(whoami)/"
-    $sudo /sbin/service nginx restart
-
-    # open firewall:
-    $sudo firewall-cmd --permanent --zone=public --add-service=http
-    $sudo firewall-cmd --permanent --zone=public --add-service=https
-    $sudo firewall-cmd --reload
-    # sphinxdoc-install-web-nginx-centos7-end
-}
-
 cleanup_web_ubuntu14 () {
     # sphinxdoc-install-web-cleanup-ubuntu14-begin
     $sudo apt-get -y autoremove && $sudo apt-get -y clean
@@ -241,7 +205,6 @@ main () {
             provision_web_libpostgresql_ubuntu
             setup_npm_and_css_js_filters
             setup_virtualenvwrapper
-            setup_nginx_ubuntu
         else
             echo "[ERROR] Sorry, unsupported release ${os_release}."
             exit 1

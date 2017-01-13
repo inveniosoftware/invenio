@@ -85,10 +85,15 @@ rabbitmq:
 
 nginx:
   restart: "always"
-  build: ./nginx
+  build: .
+  dockerfile: ./nginx/Dockerfile
   ports:
-    - "80":"80"
+    - "80:80"
     - "443:443"
+# uncomment for adding custom certificate
+#  volumes:
+#    - /home/rodrigdi/invenio/invenio/nginx/nginx.key:/etc/ssl/private/nginx.key
+#    - /home/rodrigdi/invenio/invenio/nginx/nginx.crt:/etc/ssl/certs/nginx.crt
   volumes_from:
     - static
   links:

@@ -54,6 +54,12 @@ Vagrant.configure("2") do |config|
     # Note: if you use ubuntu/xenial64 and you are inside CERN, you may need to uncomment the following line:
     # web.vm.provision "shell", inline: "echo 'nameserver 137.138.16.5' > /etc/resolv.conf"
     web.vm.provision "shell", inline: "source .inveniorc && /vagrant/scripts/provision-web.sh", privileged: false
+    web.vm.provision "shell", inline: "source .inveniorc && /vagrant/scripts/provision-nginx.sh", privileged: false
+    # unomment the following lines for adding custom certificate
+    # config.vm.provision "file", source: "/tmp/nginx.key", destination: "/tmp/nginx.key"
+    # config.vm.provision "file", source: "/tmp/nginx.crt", destination: "/tmp/nginx.crt"
+    # web.vm.provision "shell", inline: "mv /tmp/nginx.key /etc/ssl/private/nginx.key", privileged: true
+    # web.vm.provision "shell", inline: "mv /tmp/nginx.crt /etc/ssl/certs/nginx.crt", privileged: true
     web.vm.network "forwarded_port", guest: 80, host: 80
     web.vm.network "forwarded_port", guest: 443, host: 443
     web.vm.network "forwarded_port", guest: 5000, host: 5000
