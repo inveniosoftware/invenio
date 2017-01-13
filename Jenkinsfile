@@ -2,9 +2,8 @@ node() {
     checkout scm
 
     stage('Install & Test') {
-        sh 'mkvirtualenv test'
-        sh 'pip install -U pip setuptools twine wheel coveralls requirements-builder'
-        sh 'pip install -U -e .[all]'
+        sh 'pip install --user -U pip setuptools twine wheel coveralls requirements-builder'
+        sh 'pip install --user -U -e .[all]'
         sh './run-tests.sh'
     }
 
