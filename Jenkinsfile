@@ -1,15 +1,7 @@
 node() {
     stage('Install & Test') {
-        timestamps {
-            timeout(time: 30, unit: 'MINUTES') {
-                try {
-                    sh 'pip install -U -e .'
-                    sh 'python setup.py test'
-                } finally {
-                    step([$class: 'JUnitResultArchiver', testResults: 'nosetests.xml'])
-                }
-            }
-        }
+        sh 'pip install -U -e .[all]'
+        sh 'python setup.py test'
     }
 
     stage('Build') {
