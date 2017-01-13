@@ -1,5 +1,5 @@
 node() {
-    stage 'Install & Test'
+    stage('Install & Test') {
         timestamps {
             timeout(time: 30, unit: 'MINUTES') {
                 try {
@@ -10,15 +10,13 @@ node() {
                 }
             }
         }
+    }
 
-    stage 'Build'
+    stage('Build') {
         sh 'python setup.py bdist_wheel'
+    }
 
-    stage 'Archive'
+    stage('Archive') {
         archive 'dist/*'
-
-    stage 'Trigger downstream publish'
-        build job: 'publish-local', parameters: [
-            string(name: 'artifact_source', value: "${currentBuild.absoluteUrl}/artifact/dist/*zip*/dist.zip"),
-            string(name: 'source_branch', value: "${env.BRANCH_NAME}")]
+    }
 }
