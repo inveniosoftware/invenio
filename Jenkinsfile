@@ -1,4 +1,6 @@
 node() {
+    checkout scm
+
     stage('Install & Test') {
         sh 'pip install -U -e .[all]'
         sh 'python setup.py test'
