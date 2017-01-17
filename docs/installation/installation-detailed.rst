@@ -227,16 +227,16 @@ Seventh, we install Nginx web server and configure appropriate virtual host:
 
 * on Ubuntu 14.04 LTS (Trusty Tahr) and Ubuntu 16.04 LTS (Xenial Xerus):
 
-.. include:: ../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-web-nginx-ubuntu14-begin
-   :end-before: # sphinxdoc-install-web-nginx-ubuntu14-end
+.. include:: ../../scripts/provision-nginx.sh
+   :start-after: # sphinxdoc-install-nginx-ubuntu14-begin
+   :end-before: # sphinxdoc-install-nginx-ubuntu14-end
    :literal:
 
 * on CentOS7:
 
-.. include:: ../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-web-nginx-centos7-begin
-   :end-before: # sphinxdoc-install-web-nginx-centos7-end
+.. include:: ../../scripts/provision-nginx.sh
+   :start-after: # sphinxdoc-install-nginx-centos7-begin
+   :end-before: # sphinxdoc-install-nginx-centos7-end
    :literal:
 
 Finally, let's clean after ourselves:

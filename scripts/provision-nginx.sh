@@ -43,41 +43,40 @@ fi
 # unattended installation:
 export DEBIAN_FRONTEND=noninteractive
 
-setup_ssl_configuration () {
-    # sphinxdoc-install-web-nginx-create-certificates-begin
-
-    # create ssl files for HTTPS support
-    if ! [ -f /etc/ssl/private/nginx.key ] || ! [ -f /etc/ssl/certs/nginx.crt ]; then
-        $sudo openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 \
-              -keyout /etc/ssl/private/nginx.key \
-              -out /etc/ssl/certs/nginx.crt -batch
-    fi
-    # sphinxdoc-install-web-nginx-create-certificates-end
-}
-
 setup_nginx_ubuntu () {
-    # sphinxdoc-install-web-nginx-ubuntu14-begin
+    # sphinxdoc-install-nginx-ubuntu14-begin
 
     # install Nginx web server:
     $sudo apt-get install -y nginx
 
     # configure Nginx web server:
-    setup_ssl_configuration
+    if ! [ -f /etc/ssl/private/nginx.key ] || ! [ -f /etc/ssl/certs/nginx.crt ]; then
+        $sudo openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 \
+              -keyout /etc/ssl/private/nginx.key \
+              -out /etc/ssl/certs/nginx.crt -batch
+    fi
     $sudo cp -f "$scriptpathname/../nginx/nginx.conf" /etc/nginx/
     $sudo cp -rf "$scriptpathname/../nginx/conf.d" /etc/nginx/
     $sudo sed -i "s,/home/invenio/,/home/$(whoami)/,g" /etc/nginx/conf.d/default.conf
     $sudo /usr/sbin/service nginx restart
 
-    # sphinxdoc-install-web-nginx-ubuntu14-end
+    # sphinxdoc-install-nginx-ubuntu14-end
 }
 
 setup_nginx_centos7 () {
-    # sphinxdoc-install-web-nginx-centos7-begin
+    # sphinxdoc-install-nginx-centos7-begin
     # install Nginx web server:
     $sudo yum install -y nginx
 
     # configure Nginx web server:
-    setup_ssl_configuration
+    if ! [ -d /etc/ssl/private ]; then
+        $sudo mkdir /etc/ssl/private
+    fi
+    if ! [ -f /etc/ssl/private/nginx.key ] || ! [ -f /etc/ssl/certs/nginx.crt ]; then
+        $sudo openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 \
+              -keyout /etc/ssl/private/nginx.key \
+              -out /etc/ssl/certs/nginx.crt -batch
+    fi
     $sudo cp -f "$scriptpathname/../nginx/nginx.conf" /etc/nginx/
     $sudo cp -rf "$scriptpathname/../nginx/conf.d" /etc/nginx/
     $sudo sed -i "s,/home/invenio/,/home/$(whoami)/,g" /etc/nginx/conf.d/default.conf
@@ -89,7 +88,7 @@ setup_nginx_centos7 () {
     $sudo firewall-cmd --permanent --zone=public --add-service=http
     $sudo firewall-cmd --permanent --zone=public --add-service=https
     $sudo firewall-cmd --reload
-    # sphinxdoc-install-web-nginx-centos7-end
+    # sphinxdoc-install-nginx-centos7-end
 }
 
 main () {

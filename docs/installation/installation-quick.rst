@@ -48,6 +48,7 @@ installation scripts manually::
   vim .inveniorc
   source .inveniorc
   scripts/provision-web.sh
+  scripts/provision-nginx.sh
   scripts/provision-postgresql.sh
   scripts/provision-elasticsearch.sh
   scripts/provision-redis.sh
