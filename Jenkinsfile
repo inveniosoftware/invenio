@@ -1,17 +1,17 @@
-node() {
-    checkout scm
-
-    stage('Install & Test') {
-        sh 'pip install --user -U pip setuptools twine wheel coveralls requirements-builder'
-        sh 'pip install --user -U -e .[all]'
-        sh './run-tests.sh'
+node('docker') {
+    
+    stage('Checkout') {
+        sh 'cd /tmp'
+        checkout scm
     }
 
-    stage('Build') {
-        sh 'python setup.py bdist_wheel'
+    stage('Install') {
+        sh 'docker-compose build'
+        sh 'docker-compose up -d'
     }
 
-    stage('Archive') {
-        archive 'dist/*'
+    stage('Test') {
+        sh 'docker-compose run --rm web bash -c "./run-tests.sh"'
     }
+
 }
