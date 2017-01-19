@@ -71,6 +71,10 @@ ACTIVE_STATUS = ('SCHEDULED', 'ABOUT TO SLEEP', 'ABOUT TO STOP',
 SHIFT_RE = re.compile(r"([-\+]{0,1})([\d]+)([dhms])")
 
 
+# This is necessary to then have spawned task to be able to access EOS in INSPIRE
+os.environ['KRB5CCNAME'] = 'FILE:/tmp/krbccache.inspire'
+
+
 class RecoverableError(StandardError):
     pass
 
@@ -653,7 +657,7 @@ class BibSched(object):
                     program = os.path.join(CFG_BINDIR, procname)
                     ## Trick to log in bibsched.log the task exiting
                     exit_str = '&& echo "`date "+%%Y-%%m-%%d %%H:%%M:%%S"` --> Task #%d (%s) exited" >> %s' % (task.id, task.proc, os.path.join(CFG_LOGDIR, 'bibsched.log'))
-                    command = "%s %s %s" % (program, str(task.id), exit_str)
+                    command = "eosfusebind && %s %s %s" % (program, str(task.id), exit_str)
                     ### Set the task to scheduled and tie it to this host
                     if self.tie_task_to_host(task.id):
                         Log("Task #%d (%s) started" % (task.id, task.proc))
