@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2010, 2011, 2015 CERN.
+## Copyright (C) 2008, 2010, 2011, 2015, 2017 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -53,27 +53,27 @@ def cvify_records(recids, of, req=None, so='d'):
     elif of == 'tlcv':
         HEADER = r'''
 \documentclass{article}
-\usepackage{textcomp} % text version of symbols in TS1, e.g. \textrightarrow{}
-\usepackage{amstext} % proper support of frequently used \text{} command
+\usepackage{textcomp} %% text version of symbols in TS1, e.g. \textrightarrow{}
+\usepackage{amstext} %% proper support of frequently used \text{} command
 \newif\ifshowcitations\showcitationsfalse
 \newif\ifshowlinks\showlinksfalse
 
-%% CONFIGURATION
-%
-%% to display citation counts, uncomment the following line
-%\showcitationstrue
-%
-%% to add links to INSPIRE records, uncomment the following line
-%\showlinkstrue
-%
-%% to use the arial font, uncomment the following lines
-%\usepackage{arial}
-%\renewcommand{\familydefault}{\sfdefault} % Sans serif
+%%%% CONFIGURATION
+%%
+%%%% to display citation counts, uncomment the following line
+%%\showcitationstrue
+%%
+%%%% to add links to INSPIRE records, uncomment the following line
+%%\showlinkstrue
+%%
+%%%% to use the arial font, uncomment the following lines
+%%\usepackage{arial}
+%%\renewcommand{\familydefault}{\sfdefault} %% Sans serif
 
 \ifshowlinks
   \usepackage[
          colorlinks=true,
-         urlcolor=blue,       % \href{...}{...} external (URL)
+         urlcolor=blue,       %% \href{...}{...} external (URL)
          ]{hyperref}
 \else
   \newcommand{\href}[1]{}
@@ -98,9 +98,9 @@ def cvify_records(recids, of, req=None, so='d'):
 \maketitle
 \begin{enumerate}
 
-%%%%   LIST OF PAPERS
-%%%%   Please send any updates or corrections to the list to
-%%%%   %(email)s
+%%%%%%%%   LIST OF PAPERS
+%%%%%%%%   Please send any updates or corrections to the list to
+%%%%%%%%   %(email)s
 ''' % { 'email' : CFG_SITE_SUPPORT_EMAIL, }
         FOOTER = r'''
 \end{enumerate}
