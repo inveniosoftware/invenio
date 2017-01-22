@@ -55,8 +55,8 @@ def cvify_records(recids, of, req=None, so='d'):
 \documentclass{article}
 \usepackage{textcomp} %% text version of symbols in TS1, e.g. \textrightarrow{}
 \usepackage{amstext} %% proper support of frequently used \text{} command
-\newif\ifshowcitations\showcitationsfalse
-\newif\ifshowlinks\showlinksfalse
+\newif\ifshowcitations\showcitationsfalse%%
+\newif\ifshowlinks\showlinksfalse%%
 
 %%%% CONFIGURATION
 %%
@@ -70,18 +70,22 @@ def cvify_records(recids, of, req=None, so='d'):
 %%\usepackage{arial}
 %%\renewcommand{\familydefault}{\sfdefault} %% Sans serif
 
-\ifshowlinks
+\ifshowlinks%%
   \usepackage[
          colorlinks=true,
          urlcolor=blue,       %% \href{...}{...} external (URL)
          ]{hyperref}
 \else
-  \newcommand{\href}[1]{}
+  \makeatletter
+  \newcommand*{\href}[2]{\@bsphack\@esphack}\message{LaTeX Warning: \noexpand\href redefined on line \the\inputlineno}
+  \makeatother
 \fi
-\ifshowcitations
-  \newcommand{\citations}[1]{#1}
+\ifshowcitations%%
+  \newcommand*{\citations}[1]{#1}
 \else
-  \newcommand{\citations}[1]{}
+  \makeatletter
+  \newcommand*{\citations}[1]{\@bsphack\@esphack}
+  \makeatother
 \fi
 \renewcommand{\labelenumii}{\arabic{enumi}.\arabic{enumii}}
 
