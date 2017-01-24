@@ -75,13 +75,14 @@ def cvify_records(recids, of, req=None, so='d'):
          colorlinks=true,
          urlcolor=blue,       %% \href{...}{...} external (URL)
          ]{hyperref}
+  \newcommand*{\inspireurl}[1]{\\\href{#1}{INSPIRE-HEP entry}}
 \else
   \makeatletter
-  \newcommand*{\href}[2]{\@bsphack\@esphack}\message{LaTeX Warning: \noexpand\href redefined on line \the\inputlineno}
+  \newcommand*{\inspireurl}[1]{\@bsphack\@esphack}
   \makeatother
 \fi
 \ifshowcitations%%
-  \newcommand*{\citations}[1]{#1}
+  \newcommand*{\citations}[1]{\\* #1}
 \else
   \makeatletter
   \newcommand*{\citations}[1]{\@bsphack\@esphack}
