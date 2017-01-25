@@ -22,7 +22,7 @@
 def check_record(record, old_tag, new_tag):
     """ Changes the tag of fields with tag old_tag to new_tag"""
     if new_tag in record:
-        record.warn("Record already has tag %s, not overwriting", new_tag)
+        record.warn("Record already has tag %s, not overwriting" % new_tag)
     elif old_tag in record:
         record[new_tag] = record.pop(old_tag)
         record.set_amended("Renamed tag %s to %s" % (old_tag, new_tag))
