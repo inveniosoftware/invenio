@@ -91,6 +91,9 @@ provision_web_libpostgresql_ubuntu14 () {
 provision_web_common_centos7 () {
 
     # sphinxdoc-install-useful-system-tools-centos7-begin
+    # add EPEL external repository:
+    $sudo yum install -y epel-release
+
     # install useful system tools:
     $sudo yum install -y \
          curl \
@@ -105,8 +108,7 @@ provision_web_common_centos7 () {
     # sphinxdoc-install-useful-system-tools-centos7-end
 
     # sphinxdoc-add-nodejs-external-repository-centos7-begin
-    # add EPEL external repository:
-    $sudo yum install -y epel-release
+    # nothing needed; EPEL added already
     # sphinxdoc-add-nodejs-external-repository-centos7-end
 
     # sphinxdoc-install-web-common-centos7-begin
