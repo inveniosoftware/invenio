@@ -45,7 +45,7 @@ check.subfield_filter = ["9", "INSPIRETeX"]
 
 
 def check_record(record, source_field, new_code,
-                 pattern, subfield_filter, complement=False):
+                 pattern='', subfield_filter=(None, None), complement=False):
     """ Changes the code of a subfield to new_code """
     import re
     from invenio.bibrecord import record_modify_subfield
@@ -54,7 +54,7 @@ def check_record(record, source_field, new_code,
     assert len(subfield_filter) == 2
     subfield_filter = tuple(subfield_filter)
     for pos, val in record.iterfield(source_field, subfield_filter):
-        pattern_matches = re.search(pattern, val)
+        pattern_matches = re.search(pattern, val) if pattern else True
         if (pattern_matches and not complement) or \
            (complement and not pattern_matches):
             record_modify_subfield(record, source_field[:3], new_code, val,
