@@ -21,8 +21,5 @@
 
 def check_record(record, source_field, new_code):
     """ Changes the code of a subfield to new_code """
-    assert source_field[5] != "_"
-    for pos, val in record.iterfield(source_field):
-        record.delete_field(pos)
-        record.add_subfield(pos, new_code, val)
-
+    import invenio.bibcheck_plugins.rename_subfield_filter as p
+    p.check_record(record, source_field, new_code)
