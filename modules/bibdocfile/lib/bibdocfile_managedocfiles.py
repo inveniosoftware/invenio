@@ -1341,6 +1341,8 @@ def log_action(log_dir, action, bibdoc_name, file_path, rename,
         file_desc = open(log_file, "a+")
         # We must escape new lines from comments in some way:
         comment = str(comment).replace('\\', '\\\\').replace('\r\n', '\\n\\r')
+        # We must escape new lines from firerole restrictions too:
+        file_restriction = str(file_restriction).replace('\\', '\\\\').replace('\n', '\\n')
         msg = action                                 + '<--->' + \
               bibdoc_name.replace('---', '___')      + '<--->' + \
               file_path                              + '<--->' + \
@@ -1383,7 +1385,9 @@ def read_actions_log(log_dir):
 
             # Clean newline-escaped comment:
             comment = comment.replace('\\n\\r', '\r\n').replace('\\\\', '\\')
-
+            # Clean newline-escaped fireroles:
+            file_restriction = file_restriction.replace('\\n', '\n').replace('\\\\', '\\')
+            
             # Perform some checking
             if action not in CFG_ALLOWED_ACTIONS:
                 # Malformed action log
