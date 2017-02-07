@@ -132,8 +132,8 @@ fi
 
 # sphinxdoc-customise-instance-begin
 mkdir -p "../../var/${INVENIO_WEB_INSTANCE}-instance/"
-pip install jinja2-cli
-echo '{}' | jinja2 "$scriptpathname/instance.cfg" > "../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg"
+pip install "jinja2-cli>=0.6.0"
+jinja2 "$scriptpathname/instance.cfg" > "../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg"
 # sphinxdoc-customise-instance-end
 
 # sphinxdoc-run-npm-begin
