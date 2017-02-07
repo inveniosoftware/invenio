@@ -1298,7 +1298,8 @@ def log_action(log_dir, action, bibdoc_name, file_path, rename,
 
     Newlines are also reserved, and are escaped from the input values
     (necessary for the 'comment' field, which is the only one allowing
-    newlines from the browser)
+    newlines from the browser and for the 'file_restriction' field, which
+    allows multiline rules)
 
     Each line starts with the time of the action in the following
     format: '2008-06-20 08:02:04 --> '
@@ -1341,6 +1342,8 @@ def log_action(log_dir, action, bibdoc_name, file_path, rename,
         file_desc = open(log_file, "a+")
         # We must escape new lines from comments in some way:
         comment = str(comment).replace('\\', '\\\\').replace('\r\n', '\\n\\r')
+        # We must escape new lines from firerole restrictions too:
+        file_restriction = str(file_restriction).replace('\\', '\\\\').replace('\n', '\\n')
         msg = action                                 + '<--->' + \
               bibdoc_name.replace('---', '___')      + '<--->' + \
               file_path                              + '<--->' + \
@@ -1383,7 +1386,9 @@ def read_actions_log(log_dir):
 
             # Clean newline-escaped comment:
             comment = comment.replace('\\n\\r', '\r\n').replace('\\\\', '\\')
-
+            # Clean newline-escaped fireroles:
+            file_restriction = file_restriction.replace('\\n', '\n').replace('\\\\', '\\')
+            
             # Perform some checking
             if action not in CFG_ALLOWED_ACTIONS:
                 # Malformed action log
