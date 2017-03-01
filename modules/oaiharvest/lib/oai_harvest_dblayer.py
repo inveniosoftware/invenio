@@ -227,7 +227,7 @@ def get_oai_src(params={}):
     if res:
         for result in res:
             for key, value in result.iteritems():
-                if value is None:
+                if value is None and key !="lastrun":
                     if key == "arguments":
                         value = {}
                     else:
