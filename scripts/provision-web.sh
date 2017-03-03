@@ -90,6 +90,11 @@ provision_web_libpostgresql_ubuntu14 () {
 
 provision_web_common_centos7 () {
 
+    # sphinxdoc-add-nodejs-external-repository-centos7-begin
+    # add EPEL external repository:
+    $sudo yum install -y epel-release
+    # sphinxdoc-add-nodejs-external-repository-centos7-end
+
     # sphinxdoc-install-useful-system-tools-centos7-begin
     # install useful system tools:
     $sudo yum install -y \
@@ -103,11 +108,6 @@ provision_web_common_centos7 () {
     $sudo yum install -y \
          uuid
     # sphinxdoc-install-useful-system-tools-centos7-end
-
-    # sphinxdoc-add-nodejs-external-repository-centos7-begin
-    # add EPEL external repository:
-    $sudo yum install -y epel-release
-    # sphinxdoc-add-nodejs-external-repository-centos7-end
 
     # sphinxdoc-install-web-common-centos7-begin
     # install development tools:
@@ -187,6 +187,13 @@ setup_nginx_centos7 () {
     # configure Nginx web server:
     $sudo cp "$scriptpathname/../nginx/invenio3.conf" /etc/nginx/conf.d/
     $sudo sed -i "s,/home/invenio/,/home/$(whoami)/,g" /etc/nginx/conf.d/invenio3.conf
+
+    if $sudo getenforce | grep -q 'Enforcing'; then
+        if ! $sudo semanage port -l | tail -n +1 | grep -q '8888'; then
+            $sudo semanage port -a -t http_port_t  -p tcp 8888
+        fi
+    fi
+
     $sudo sed -i 's,80,8888,g' /etc/nginx/nginx.conf
     $sudo chmod go+rx "/home/$(whoami)/"
     $sudo /sbin/service nginx restart
