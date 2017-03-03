@@ -23,21 +23,79 @@
 
 .. include:: ../README.rst
 
-=========
- Invenio
-=========
+Overview
+--------
 
 .. toctree::
-   :numbered:
-   :maxdepth: 2
+    :maxdepth: 2
 
-   introduction/index
-   installation/index
-   configuration/index
-   architecture/index
-   modules/index
-   technology/index
-   processes/index
-   community/index
-   authors
-   license
+    introduction/index
+    introduction/digitalrepositories
+    introduction/usecases
+    introduction/history
+
+User's Guide
+------------
+This part of the documentation will show you how to get started using Invenio.
+
+.. toctree::
+    :maxdepth: 2
+
+    usersguide/tutorial/index
+    usersguide/running
+    usersguide/loading
+    usersguide/accessing
+    usersguide/orcid-login
+    usersguide/migrating
+
+Deployment Guide
+----------------
+This part of the documentation will show you how to setup a production system
+for running Invenio.
+
+.. toctree::
+    :maxdepth: 2
+
+    deploymentguide/overview
+    deploymentguide/services
+    deploymentguide/configuring
+    deploymentguide/daemons
+    deploymentguide/monitoring
+    deploymentguide/highavailability
+    deploymentguide/fabric
+    deploymentguide/docker
+
+
+Developer's Guide
+-----------------
+This part of the documentation will show you how to get started developing for
+Inveno.
+
+.. toctree::
+    :maxdepth: 2
+
+    developersguide/tutorial/index
+    developersguide/development-environment
+    developersguide/architecture
+    developersguide/invenio-modules
+    developersguide/create-a-model
+
+
+Community
+---------
+Notes on getting involved, contributing, legal information and release notes
+are here for the interested.
+
+.. toctree::
+    :maxdepth: 2
+
+    community/getting-involved
+    community/code-of-conduct
+    community/translation-guide
+    community/contribution-guide
+    community/style-guide
+    community/maintainers-guide/index.rst
+    community/releases
+    community/license
+    community/authors
+    todo

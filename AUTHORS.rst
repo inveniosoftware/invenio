@@ -24,9 +24,6 @@
 
 Authors
 =======
-Invenio is being co-developed by an international collaboration
-comprising institutes such as CERN, DESY, EPFL, FNAL, SLAC.
-
 You can contact us at <info@inveniosoftware.org>.
 
 Active contributors:
