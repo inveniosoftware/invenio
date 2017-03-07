@@ -1,5 +1,5 @@
 ..  This file is part of Invenio
-    Copyright (C) 2014, 2015, 2016 CERN.
+    Copyright (C) 2014, 2015, 2016, 2017 CERN.
 
     Invenio is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -521,8 +521,8 @@ following scripts:
 
    source .inveniorc
    ./scripts/create-instance.sh
-   ./scripts/start-instance.sh
    ./scripts/populate-instance.sh
+   ./scripts/start-instance.sh
 
 .. note::
 
@@ -595,23 +595,6 @@ We can now collect and build CSS/JS assets of our Invenio instance:
 Our first new Invenio instance is created and ready for loading some example
 records.
 
-Start instance
-~~~~~~~~~~~~~~
-
-Let's now start the web application:
-
-.. include:: ../../scripts/start-instance.sh
-   :start-after: # sphinxdoc-start-application-begin
-   :end-before: # sphinxdoc-start-application-end
-   :literal:
-
-and the web server:
-
-.. include:: ../../scripts/start-instance.sh
-   :start-after: # sphinxdoc-start-nginx-begin
-   :end-before: # sphinxdoc-start-nginx-end
-   :literal:
-
 Populate instance
 ~~~~~~~~~~~~~~~~~
 
@@ -644,6 +627,23 @@ Let's index all the uploaded records:
 .. include:: ../../scripts/populate-instance.sh
    :start-after: # sphinxdoc-index-all-records-begin
    :end-before: # sphinxdoc-index-all-records-end
+   :literal:
+
+Start instance
+~~~~~~~~~~~~~~
+
+Let's now start the web application:
+
+.. include:: ../../scripts/start-instance.sh
+   :start-after: # sphinxdoc-start-application-begin
+   :end-before: # sphinxdoc-start-application-end
+   :literal:
+
+and the web server:
+
+.. include:: ../../scripts/start-instance.sh
+   :start-after: # sphinxdoc-start-nginx-begin
+   :end-before: # sphinxdoc-start-nginx-end
    :literal:
 
 We should now see our demo records on the web:

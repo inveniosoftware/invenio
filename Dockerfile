@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -25,21 +25,6 @@
 # Use Python-2.7:
 FROM python:2.7-slim
 
-COPY scripts/provision-web.sh /tmp/
-
-# Install Invenio web node pre-requisites:
-RUN /tmp/provision-web.sh
-
-# Add Invenio sources to `code` and work there:
-WORKDIR /code
-ADD . /code
-
-# Run container as user `invenio` with UID `1000`, which should match
-# current host user in most situations:
-RUN adduser --uid 1000 --disabled-password --gecos '' invenio && \
-    chown -R invenio:invenio /code
-USER invenio
-
 # Configure Invenio instance:
 ENV INVENIO_WEB_HOST=127.0.0.1
 ENV INVENIO_WEB_INSTANCE=invenio3
@@ -54,6 +39,20 @@ ENV INVENIO_REDIS_HOST=redis
 ENV INVENIO_ELASTICSEARCH_HOST=elasticsearch
 ENV INVENIO_RABBITMQ_HOST=rabbitmq
 ENV INVENIO_WORKER_HOST=127.0.0.1
+
+# Install Invenio web node pre-requisites:
+COPY scripts/provision-web.sh /tmp/
+RUN /tmp/provision-web.sh
+
+# Add Invenio sources to `code` and work there:
+WORKDIR /code
+ADD . /code
+
+# Run container as user `invenio` with UID `1000`, which should match
+# current host user in most situations:
+RUN adduser --uid 1000 --disabled-password --gecos '' invenio && \
+    chown -R invenio:invenio /code
+USER invenio
 
 # Create Invenio instance:
 RUN /code/scripts/create-instance.sh

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -33,11 +33,11 @@
 #
 # $ vagrant up
 # $ vagrant ssh web -c 'source .inveniorc && /vagrant/scripts/create-instance.sh'
-# $ vagrant ssh web -c 'source .inveniorc && nohup /vagrant/scripts/start-instance.sh'
 # $ vagrant ssh web -c 'source .inveniorc && /vagrant/scripts/populate-instance.sh'
+# $ vagrant ssh web -c 'source .inveniorc && nohup /vagrant/scripts/start-instance.sh'
 # $ firefox http://192.168.50.10/records/1
 
-#OS = 'hfm4/centos7'
+#OS = 'centos/7'
 OS = 'ubuntu/trusty64'
 
 Vagrant.configure("2") do |config|
