@@ -2,7 +2,7 @@
 # shellcheck disable=SC2103,SC2102
 #
 # This file is part of Invenio.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -111,6 +111,9 @@ set -o nounset
 if [[ "$@" != *"--devel"* ]]; then
 # sphinxdoc-install-invenio-full-begin
 # now we can install full Invenio:
+# FIXME upgrade to dojson 1.3.0 WRT mappings and unpin
+pip install dojson==1.2.1
+pip install invenio-marc21==1.0.0a3
 pip install invenio[full,postgresql] --pre
 # sphinxdoc-install-invenio-full-end
 else
