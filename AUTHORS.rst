@@ -1,6 +1,6 @@
 ..
     This file is part of Invenio.
-    Copyright (C) 2015 CERN.
+    Copyright (C) 2015, 2017 CERN.
 
     Invenio is free software; you can redistribute it
     and/or modify it under the terms of the GNU General Public License as
@@ -31,50 +31,35 @@ You can contact us at <info@inveniosoftware.org>.
 
 Active contributors:
 
-* Adrian Pawel Baran <adrian.pawel.baran@cern.ch>
 * Alexander Wagner <alexander.wagner@desy.de>
 * Annette Holtkamp <annette.holtkamp@cern.ch>
 * Cornelia Plott <c.plott@fz-juelich.de>
 * Cristian Bacchi <cristian.bacchi@gmail.com>
 * Dan Michael O. Heggø <danmichaelo@gmail.com>
-* Daniel Lovasko <daniel.lovasko@cern.ch>
-* Dimitrios Semitsoglou-Tsiapos <dsemitso@cern.ch>
-* Eamonn Maguire <eamonnmag@gmail.com>
 * Esteban J. G. Gabancho <esteban.jose.garcia.gabancho@cern.ch>
+* Evelthon Prodromou <epro@prodromou.eu>
 * Ferran Jorba <Ferran.Jorba@uab.cat>
 * Flavio Costa <flavio.costa@cern.ch>
-* Gilles Louppe <g.louppe@gmail.com>
 * Guillaume Lastecoueres <PX9e@gmx.fr>
 * Harris Tzovanakis <me@drjova.com>
 * Ivan Masár <helix84@centrum.sk>
 * Jacopo Notarstefano <jacopo.notarstefano@cern.ch>
-* Jan Aage Lavik <jan.age.lavik@cern.ch>
-* Jan Stypka <jan.stypka@cern.ch>
 * Javier Martin <javier.martin.montull@cern.ch>
 * Jiri Kuncar <jiri.kuncar@cern.ch>
 * Jocelyne Jerdelet <jocelyne.jerdelet@cern.ch>
-* Joe MacMahon <joe.macmahon@cern.ch>
-* Jochen Klein <klein.jochen@gmail.com>
 * Johnny Mariéthoz <johnny.mariethoz@rero.ch>
 * Kenneth Hole <kenneth@tind.io>
 * Kirsten Sachs <kirsten.sachs@desy.de>
 * Lars Holm Nielsen <lars.holm.nielsen@cern.ch>
-* Laura Rueda <laura.rueda@cern.ch>
 * Leonardo Rossi <leonardo.r@cern.ch>
 * Ludmila Marian <ludmila.marian@gmail.com>
-* Marco Neumann <marco@crepererum.net>
-* Marios Kogias <marioskogias@gmail.com>
-* Mateusz Susik <mateusz.susik@cern.ch>
 * Miguel Martín <miguelm@unizar.es>
 * Nicolas Harraudeau <nicolas.harraudeau@cern.ch>
 * Nikolaos Kasioumis <nikolaos.kasioumis@cern.ch>
 * Øystein Blixhavn <oystein@blixhavn.no>
 * Pamfilos Fokianos <pamfilos.fokianos@cern.ch>
-* Pedro Gaudencio <pmgaudencio@gmail.com>
 * Petr Brož <petr.broz@heaven-industries.com>
-* Petros Ioannidis <petros.ioannidis@cern.ch>
 * Roman Chyla <roman.chyla@cern.ch>
-* Sami Hiltunen <sami.mikael.hiltunen@cern.ch>
 * Samuele Kaplun <samuele.kaplun@cern.ch>
 * Sebastian Witowski <sebastian.witowski@cern.ch>
 * Stefan Hesselbach <s.hesselbach@gsi.de>
@@ -85,6 +70,7 @@ Active contributors:
 
 Past contributors:
 
+* Adrian Pawel Baran <adrian.pawel.baran@cern.ch>
 * Adrian-Tudor Panescu <adrian.tudor.panescu@cern.ch>
 * Alberto Pepe <alberto.pepe@cern.ch>
 * Alessio Deiana <alessio.deiana@cern.ch>
@@ -101,10 +87,13 @@ Past contributors:
 * Christopher Dickinson <christopher.dickinson@cern.ch>
 * Christopher Hayward <christopher.james.hayward@cern.ch>
 * Christopher Parker <chris.parker.za@gmail.com>
+* Daniel Lovasko <daniel.lovasko@cern.ch>
 * Daniel Stanculescu <daniel.stanculescu@cern.ch>
 * David Bengoa <david.bengoa.rocandio@cern.ch>
 * Diane Berkovits <diane.berkovits@cern.ch>
+* Dimitrios Semitsoglou-Tsiapos <dsemitso@cern.ch>
 * Dinos Kousidis <konstantinos.kousidis@cern.ch>
+* Eamonn Maguire <eamonnmag@gmail.com>
 * Eduardo Margallo <eduardo.margallo@cern.ch>
 * Eirini Psallida <eirini.psallida@cern.ch>
 * Erik Simon <erik.simon@unine.ch>
@@ -119,6 +108,7 @@ Past contributors:
 * Georgios Papoutsakis <georgios.papoutsakis@cern.ch>
 * Gerrit Rindermann <Gerrit.Rindermann@cern.ch>
 * giannistsan <tsanakts.10@gmail.com>
+* Gilles Louppe <g.louppe@gmail.com>
 * Giovanni Di Milia <gdimilia@cfa.harvard.edu>
 * Glenn Gard <glenng4@aol.com>
 * Graham R. Armstrong <graham.richard.armstrong@cern.ch>
@@ -131,13 +121,17 @@ Past contributors:
 * Ivan Masár <helix84@centrum.sk>
 * Jaime Garcia Llopis <jaime.garcia.llopis@cern.ch>
 * Jake Cowton <jake.calum.cowton@cern.ch>
+* Jan Aage Lavik <jan.age.lavik@cern.ch>
 * Jan Brice Krause <jan.brice.krause@cern.ch>
 * Jan Iwaszkiewicz <jan.iwaszkiewicz@cern.ch>
+* Jan Stypka <jan.stypka@cern.ch>
 * Jay Luker <lbjay@reallywow.com>
 * Jerome Caffaro <jerome.caffaro@cern.ch>
 * João Batista <jnfbatista@gmail.com>
 * Joaquim Rodrigues Silvestre <joaquim.rodrigues.silvestre@cern.ch>
+* Jochen Klein <klein.jochen@gmail.com>
 * Joe Blaylock <jrbl@slac.stanford.edu>
+* Joe MacMahon <joe.macmahon@cern.ch>
 * Joël Vogt <joel.vogt@unifr.ch>
 * Johann C. Rocholl <johann@browsershots.org>
 * Jorge Aranda Sumarroca <jorge.aranda.sumarroca@cern.ch>
@@ -155,14 +149,18 @@ Past contributors:
 * Krzysztof Jedrzejek <krzysztof.jedrzejek@cern.ch>
 * Krzysztof Lis <krzysztof.lis@cern.ch>
 * Kyriakos Liakopoulos <kyriakos.liakopoulos@cern.ch>
+* Laura Rueda <laura.rueda@cern.ch>
 * Lars Christian Raae <lars.christian.raae@cern.ch>
 * Lewis Barnes <lewis.barnes@cern.ch>
 * Luke Andrew Smith <smithey_72@hotmail.com>
 * Maja Gracco <maja.gracco@cern.ch>
+* Marco Neumann <marco@crepererum.net>
+* Marios Kogias <marioskogias@gmail.com>
 * Markus Goetz <murxman@gmail.com>
 * Marcus Johansson <marcus.johansson@cern.ch>
 * Marko Niinimaki <manzikki@gmail.com>
 * Martin Vesely <martin.vesely@cern.ch>
+* Mateusz Susik <mateusz.susik@cern.ch>
 * Mathieu Barras <mbarras@gmail.com>
 * Miguel Martinez Pedreira <miguel.martinez.pedreira@cern.ch>
 * Mikael Karlsson <i8myshoes@gmail.com>
@@ -181,7 +179,9 @@ Past contributors:
 * Pablo Vázquez Caderno <pcaderno@cern.ch>
 * Patrick Glauner <patrick.oliver.glauner@cern.ch>
 * Paulo Cabral <paulo.cabral@cern.ch>
+* Pedro Gaudencio <pmgaudencio@gmail.com>
 * Peter Halliday <phalliday@cornell.edu>
+* Petros Ioannidis <petros.ioannidis@cern.ch>
 * Piotr Praczyk <piotr.praczyk@piotr.praczyk@gmail.com>
 * Radoslav Ivanov <radoslav.ivanov@cern.ch>
 * Raja Sripada <raja.sripada@cern.ch>
@@ -189,6 +189,7 @@ Past contributors:
 * Richard Owen <ro@tes.la>
 * Roberta Faggian <roberta.faggian@cern.ch>
 * Ruben Pollan <ruben.pollan@cern.ch>
+* Sami Hiltunen <sami.mikael.hiltunen@cern.ch>
 * Samuele Carli <samuele.carli@cern.ch>
 * Stamen Todorov Peev <stamen.peev@cern.ch>
 * Stephane Martin <stephane.martin@epfl.ch>
