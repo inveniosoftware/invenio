@@ -119,7 +119,7 @@ import pkg_resources; \
 print(pkg_resources.resource_filename('invenio_records', \
   'data/marc21/bibliographic.xml'))" | python)
 # define the schema for the records
-SCHEMA="http://${INVENIO_WEB_HOST}/schema/marc21/bibliographic/bd-v1.0.0.json"
+SCHEMA="http://${INVENIO_WEB_HOST}/schema/marc21/bibliographic/bd-v1.0.2.json"
 # convert demo records from MARC21 to JSON and load them:
 dojson -i "$demomarc21pathname" -l marcxml "do" marc21 schema "${SCHEMA}" | \
     "${INVENIO_WEB_INSTANCE}" records create --pid-minter recid --pid-minter oaiid
