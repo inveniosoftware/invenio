@@ -77,8 +77,9 @@ Inveno.
     developersguide/tutorial/index
     developersguide/development-environment
     developersguide/architecture
+    developersguide/entrypoints
     developersguide/invenio-modules
-    developersguide/create-a-model
+    developersguide/create-a-datamodel
 
 
 Community
