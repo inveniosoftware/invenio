@@ -434,7 +434,7 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids, orcid):
             continue
 
         # There always will be some external identifiers.
-        work_dict['work_external_identifiers'] = external_ids
+        work_dict['work_external_identifiers'] = list(external_ids)
 
         work_dict['work_title']['title'] = \
             encode_for_jinja_and_xml(record_get_field_value(
@@ -650,7 +650,7 @@ def _get_external_ids(recid, url, recstruct, old_external_ids, orcid):
         # No such file
         pass
 
-    external_ids = []
+    external_ids = set()
     doi = get_doi_for_paper(recid, recstruct)
     # There are two different fields in MARC records responsiple for ISBN id.
     isbn = record_get_field_value(recstruct, '020', '', '', 'a')
@@ -671,15 +671,15 @@ def _get_external_ids(recid, url, recstruct, old_external_ids, orcid):
                                        " doi %s twice." %
                                        (recid, encoded), alert_admin=True)
             else:
-                external_ids.append(('doi', encoded))
+                external_ids.add(('doi', encoded))
     if isbn:
         if isbn in old_external_ids['isbn']:
             raise OrcidRecordExisting
-        external_ids.append(('isbn', encode_for_jinja_and_xml(isbn)))
+        external_ids.add(('isbn', encode_for_jinja_and_xml(isbn)))
     if isbn2:
         if isbn2 in old_external_ids['isbn']:
             raise OrcidRecordExisting
-        external_ids.append(('isbn', encode_for_jinja_and_xml(isbn2)))
+        external_ids.add(('isbn', encode_for_jinja_and_xml(isbn2)))
 
     for rec in record_ext_ids:
         arxiv = False
@@ -702,12 +702,12 @@ def _get_external_ids(recid, url, recstruct, old_external_ids, orcid):
                                        % (recid, encoded),
                                        alert_admin=True)
             else:
-                external_ids.append(('arxiv', encoded))
+                external_ids.add(('arxiv', encoded))
 
     if url in old_external_ids['other-id']:
         raise OrcidRecordExisting
     if len(external_ids) == 0:
-        external_ids.append(('other-id', url))
+        external_ids.add(('other-id', url))
     return external_ids
 
 
