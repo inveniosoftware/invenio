@@ -41,6 +41,7 @@ This part of the documentation will show you how to get started using Invenio.
 .. toctree::
     :maxdepth: 2
 
+    usersguide/quickstart
     usersguide/tutorial/index
     usersguide/running
     usersguide/loading
