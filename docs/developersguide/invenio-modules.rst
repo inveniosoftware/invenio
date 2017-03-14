@@ -1,68 +1,125 @@
+.. _invenio-module-layout:
+
 Invenio module layout
 =====================
 
 This page summarizes the standard structure and naming conventions of a
-module in Invenio v2.0.0. It serves as a reference point when developing
-a new module, enhancing an existing one or porting a module from
-older versions of Invenio.
-
-The previous pages explained briefly what a module usually consists of, here
-we will go deeper into what goes where inside the module.
+module in Invenio v3.0. It serves as a reference point when developing
+a new module or enhancing an existing one.
 
 A simple module may have the following folder structure::
 
-    invenio/modules/
-        mymodule/
+    invenio-foo/
+        docs/
+        examples/
+        invenio_foo/
+            templates/invenio_foo/
             __init__.py
-            api.py
-            models.py
             config.py
+            ext.py
+            version.py
             views.py
+        tests/
+        *.rst
+        run-tests.sh
+        setup.py
 
-These files are:
+These files are described in the sections below.
 
-``___init__.py``
-    (usually) an empty file that tells Python that this directory should be considered a Python package.
-    Module level documentation are sometimes located here.
+Description of the files
+------------------------
 
-``models.py``
-    contains the data model for the modules (written as SQLAlchemy models). See how (link here)
+\*.rst files
+++++++++++++
 
-``config.py``
-    contains module-wide configuration with prefix ``MYMODULE_*``. See how to import (link here)
+All these files are used by people that wants to know more about your module (mainly developers).
 
-``views.py``
-    contains Flask blueprints if the module requires a web-interface. Multiple views? (link here)
+- ``README.rst`` is used to describe your module. You can see the short description written in the Cookiecutter here. You should update it with deeper details
+- ``AUTHORS.rst`` should list all contributors to this module
+- ``CHANGES.rst`` should be updated at every release and store the list of versions with the list of changes (changelog)
+- ``CONTRIBUTING.rst`` presents the rules to contribute to your module
+- ``INSTALL.rst`` describes how to install your module
+- ``RELEASE-NOTES.rst`` should contain the most important notes about the current version
 
-``api.py``
-    contains the API for other modules to access features of this module.
 
+setup.py
+++++++++
 
-Additional files:
+First, there is the ``setup.py`` file, one of the most important: this file is executed when you install your module with *pip*. If you open it, you can see different parts.
 
-``signals.py``
-    define custom signals here. See signals module.
+On the top, the list of the requirements:
 
-``receivers.py``
-    define your custom signal receivers here. See signals module.
+- for normal use
+- for development
+- for tests
 
-``errors.py``
-    contains any custom module-specific exceptions. For example::
+Depending on your needs, you can install only part of the requirements, or everything (``pip install invenio-foo[all]``).
 
-        class MyException(Exception): pass
+Then, in the ``setup()`` function, you have the description of your module with the values entered in the Cookiecutter. At the end, you can find the ``entrypoints`` section. For the moment, there is only the registration in the Invenio application, and the translations.
 
-``user_settings.py``
-    TODO
+MANIFEST.in
++++++++++++
 
-``forms.py``
-    TODO
+This file lists all the interested files in the sub-folders. This file should be updated before the first commit. See the :ref:`install-run-and-test` section.
 
-``tasks.py``
-    TODO
+run-tests.sh
+++++++++++++
 
-``restful.py``
-    TODO
+This is used to run a list of tests locally, to be sure that your module works as you wish. It will generate the documentation, run *pytest* and do other checks.
 
+This script should be run before every commits.
+
+docs folder
++++++++++++
+
+This folder contains the settings to generate documentation for your module, along with files where you can write the documentation. When you run the ``run-tests.sh`` script, it will create the documentation in HTML files in a sub-folder.
+
+examples folder
++++++++++++++++
+
+Here you can find a small example of how to use your module. You can test it, follow the steps described in the :ref:`run-the-example-app` section
+
+tests folder
+++++++++++++
+
+Here are described all the tests for your application, that will be run when you execute the ``run-tests.sh`` script. If all these tests pass, you can safely commit your work.
+
+invenio_foo folder
+++++++++++++++++++
+
+This folder has the name of your module, in lower case with the dash changed into an underscore. Here is the code of your module. You can add any code files here, organized as you wish.
+
+The files that already exist are kind of a standard, we are going through them in the following sections. The rule of thumbs here is that if you need multiple files for one action (for instance, 2 ``views``: one for the API and a standard one), create a folder having the name of the file you want to split (here, a ``views`` folder with ``ui.py`` and ``api.py`` inside).
+
+config.py
+>>>>>>>>>
+
+All your config variables should be declared in this file. Thus, if we look for how to customize your module, we just need to open this file.
+
+ext.py
+>>>>>>
+
+This is a specific file that you shouldn't touch except if you want to have advanced features. It contains a class that registers your module into the Invenio application, and load your default config variables.
+
+version.py
+>>>>>>>>>>
+
+Very basic file containing the version of your module.
+
+views.py
+>>>>>>>>
+
+Here you declare the views or end points you want to expose. By default, it creates a simple view on the root end point that fills a template.
+
+templates
+>>>>>>>>>
+
+All your Jinja templates should be stored in this folder. A Jinja template is an HTML file that can be modified thanks to some parameters.
+
+static
+>>>>>>
+
+If your module needs JavaScript or CSS files, they should go in a folder called ``static``. Also, if you want to group them in bundles, you should add a ``bundles.py`` file next to the ``static`` folder.
 
 Module naming conventions
 -------------------------
