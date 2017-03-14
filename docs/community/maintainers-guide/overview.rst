@@ -1,6 +1,6 @@
 Overview
 ========
- 
+
 What is a maintainer?
 ---------------------
 
@@ -9,7 +9,7 @@ What is a maintainer?
 
 
 There are different types of maintainers in the Invenio project, with
-different responsibilities, but all of them have this **rights and 
+different responsibilities, but all of them have this **rights and
 responsibilities** in common:
 
 1. Have merge rights in the repositories they are maintainers of, but no pull
@@ -26,14 +26,14 @@ responsibilities** in common:
 5. Will prepare releases following the Invenio standards.
 6. Will answer questions and help users in the `Invenio Gitter chat room
    <https://gitter.im/inveniosoftware/invenio>`_.
-7. 
+7.
 
 Core maintainers
 ----------------
 
 The core maintainers are the architectural team who shapes and drives the
 Invenio project and, as a consequence, they are the ultimate reponsible of
-the success of it. 
+the success of it.
 
 They are ghostbusters of the project: when there's a problem others can't
 solve, they show up and fix it with bizarre devices and weaponry.
@@ -44,7 +44,7 @@ For each release (including minor releases), a "release captain" is assigned
 by the core maintainers from the pool of module maintainers. Rotation is
 encouraged across all maintainers, to ensure the release process is clear
 and up-to-date. The release can't be done without a core maintainer
-approvals. 
+approvals.
 
 Any of the core maintainers can propose new module maintainers at any time,
 see `Becoming a maintainer`_ for more information.
@@ -95,7 +95,7 @@ Stepping down as a maintainer is done also via pull request to the
 opensource GitHub repository.
 It can be the maintainer himself who makes the pull request and, as before,
 this type of pull requests need to be approved by one core maintainer and at
-least one of the module maintainers (if any). 
+least one of the module maintainers (if any).
 
 Exceptionally the core maintainers can propose another maintainer, core or
 module maintainer, to stepdown. All core maintainers must unanimously agree

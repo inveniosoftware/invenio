@@ -19,13 +19,6 @@
  Integrating
 =============
 
-::
-
-    Covered with tests
-    Instantly I’d like to merge
-    In this dream of ours!
-       -—after Ochi Etsujin (1656?-1739?)
-
 Integrating principles
 ======================
 
@@ -44,16 +37,6 @@ Integrating principles
 
 3. **Beware of inter-service relations.** Changing pre-existing tests? Perhaps
    this pull request does not fit the needs of other Invenio services.
-
-.. _check-the-signature-karma:
-
-4. **Check the signature karma.** If it ain’t signed, it ain’t finished.
-
-.. _check-the-counter-signature-karma:
-
-5. **Check the counter-signature karma.** If it ain’t counter-signed, it ain’t
-   finished. Check for "Reviewed-by" commit signatures. Check for "LGTM" or
-   ":shipit:" pull request signatures.
 
 .. _avoid-self-merges:
 

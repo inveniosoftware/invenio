@@ -18,70 +18,13 @@
 Releases
 ========
 
-.. todo::
-
-    Move to versioning scheme to maintainers guide. Keep list of
-    releases.
-
-Release numbering scheme
-------------------------
-
-Invenio stable releases use the classical major.minor.patchlevel
-release version numbering scheme that is commonly used in the
-GNU/Linux world and elsewhere.  Each release is labelled by::
-
-     major.minor.patchlevel
-
-release version number.  For example, a release version 4.0.1 means::
-
-       4 - 4th major version, i.e. the whole system has been already
-           4th times either fully rewritten or at least in its very
-           essential components.  The upgrade from one major version
-           to another may be rather hard, may require new prerequisite
-           technologies, full data dump, reload and reindexing, as
-           well as other major configuration adapatations, possibly
-           with an important manual intervention.
-
-       0 - 0th minor version, i.e. the first minor release of the 4th
-           major rewrite.  (Increments go usually 4.1, 4.2, ... 4.9,
-           4.10, 4.11, 4.12, ... until some important rewrite is done,
-           e.g. the database philosophy dramatically changes, leading
-           to a non-trivial upgrade, and then we have either higher
-           4.x in the series or directly 5.0.0.)  The upgrade from one
-           minor version to another may be laborious but is relatively
-           painless, in that some table changes and data manipulations
-           may be necessary but they are somewhat smaller in nature,
-           easier to grasp, and possibly done by a fully automated
-           script.
-
-       1 - 1st patch level release to 4.0 series, fixing bugs in 4.0.0
-           but not adding any substantially new functionality.  That
-           is, the only new functionality that is added is that of a
-           bug fix nature.  The upgrade from one patch level to
-           another is usually very straightforward.
-
-           (Packages often seem to break this last rule, e.g. Linux
-           kernel adopting new important functionality (such as
-           ReiserFS) within the stable 2.4.x branch.  It can be easily
-           seen that it is somewhat subjective to judge what is
-           qualitatively more like a minor new functionality and what
-           is more like a patch to the existing behaviour.  We have
-           tried to distinguish this with respect to whether the table
-           structure and/or the technology change require small or
-           large upgrade jobs and eventual manual efforts.)
-
-So, if we have a version 4.3.0, a bug fix would mean to release 4.3.1,
-some minor new functionality and upgrade would mean to release 4.4.0,
-some important database structure rewrite or an imaginary exchange of
-Python for Common Lisp would mean to release 5.0.0, etc.
-
 We follow `semantic versioning <http://semver.org/>`_ and `PEP-0440
 <https://www.python.org/dev/peps/pep-0440/>`_ release numbering practices.
 
 Invenio v3.x
 ------------
 
-*Not released yet; however a developer preview is available on GitHub.*
+*Unreleased*
 
 Invenio v3.0 will be released when the Invenio code base is fully split into a
 set of standalone independent Python packages.
@@ -89,13 +32,15 @@ set of standalone independent Python packages.
 Invenio v2.x
 ------------
 
-*Semi-stable codebase.*
+*Semi-stable*
 
-Invenio v2.x code base is our new code base architecture that uses Flask web
-development framework. The most important modules take fully profit from the new
-architecture (e.g. search, deposit), however some modules still rely on previous
-v1.x legacy code base (e.g. baskets). Therefore its production suitability
-depends on your use case.
+Invenio v2.x code base is a hybrid architecture that uses Flask web
+development framework combined with Invenio v1.x framework.
+
+.. note::
+
+    The 2.x code base is not suitable for production systems, and will not
+    receive any further development nor security fixes.
 
 Released versions include:
 
@@ -117,10 +62,15 @@ Invenio v2.0:
 Invenio v1.x
 ------------
 
-*Stable codebase.*
+*Stable*
 
 Invenio v1.x code base is suitable for stable production. It uses legacy
 technology and custom web development framework.
+
+.. note::
+
+    Invenio v1.x is in feature freeze and will only receive important bug and
+    security fixes.
 
 Released versions include:
 
@@ -158,8 +108,6 @@ Invenio v1.0:
 
 Invenio v0.x
 ------------
-
-*Old codebase.*
 
 Invenio v0.x code base was developed and used in production instances
 since 2002. The code base is interesting only for archaeological purposes.
