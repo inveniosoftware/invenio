@@ -23,6 +23,8 @@
 
 .. include:: ../README.rst
 
+.. _overview:
+
 Overview
 --------
 
@@ -33,6 +35,8 @@ Overview
     introduction/digitalrepositories
     introduction/usecases
     introduction/history
+
+.. _users-guide:
 
 User's Guide
 ------------
@@ -48,6 +52,8 @@ This part of the documentation will show you how to get started using Invenio.
     usersguide/accessing
     usersguide/orcid-login
     usersguide/migrating
+
+.. _deployment-guide:
 
 Deployment Guide
 ----------------
@@ -66,6 +72,7 @@ for running Invenio.
     deploymentguide/fabric
     deploymentguide/docker
 
+.. _developers-guide:
 
 Developer's Guide
 -----------------
@@ -91,13 +98,14 @@ are here for the interested.
 .. toctree::
     :maxdepth: 2
 
-    community/getting-involved
-    community/code-of-conduct
-    community/translation-guide
+    community/getting-help
+    community/channels
     community/contribution-guide
     community/style-guide
+    community/translation-guide
     community/maintainers-guide/index.rst
     community/releases
+    community/code-of-conduct
     community/license
     community/authors
     todo

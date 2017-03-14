@@ -1,5 +1,5 @@
-Maintainer's guide
-==================
+Maintainer's guide TODO
+=======================
 
 .. todo:: Fill with new proposal
 

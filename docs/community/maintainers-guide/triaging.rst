@@ -19,13 +19,6 @@
  Triaging
 ==========
 
-::
-
-    No milestone
-    No assignee
-    A lonely feeling
-       —-after Yosa Buson (1716-1784)
-
 Triaging principles
 ===================
 
@@ -60,11 +53,6 @@ them.
    utmost importance to which services. Helps to keep a service-oriented
    dashboard overview.
 
-.. _silent-since-a-month-ping-responsible:
-
-5. **Silent since a month? Ping responsible.** An issue shouldn't be opened
-   without update for more than a month.
-
 .. _nobody-in-sight-to-work-on-this-discuss-and-triage:
 
 6. **Nobody in sight to work on this? Discuss and triage.** The triage team
@@ -75,11 +63,6 @@ them.
 7. **No time to realistically tackle this? Use "Someday" or close.** We don't
    want to have thousands of open issues. Issues from the someday open or closed
    pool can be revived later, should realistic manpower be found.
-
-.. _no-reply-ping-inveniosoftware-triagers:
-
-8. **No reply? Ping @inveniosoftware/triagers** The triage team should take
-   action if there is no update on an issues for more than a month.
 
 Triaging team
 =============
