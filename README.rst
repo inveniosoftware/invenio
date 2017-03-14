@@ -21,9 +21,9 @@
     waive the privileges and immunities granted to it by virtue of its status
     as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-===================================
- Invenio Digital Library Framework
-===================================
+======================================
+ Invenio v3 Digital Library Framework
+======================================
 
 .. image:: https://img.shields.io/travis/inveniosoftware/invenio.svg
         :target: https://travis-ci.org/inveniosoftware/invenio
@@ -40,19 +40,23 @@
 Invenio is a digital library framework that enables you to build and run your
 own large scale digital repository.
 
-Invenio comes in four pre-packaged flavours which are ready to run
-out-of-the-box:
+Invenio can be used either as an underlying framework or via the currently one
+pre-packaged flavour which is ready to run out-of-the-box:
 
-- Invenio Integrated Library System (ILS)
-- Invenio Institutional Repository (IR)
-- Invenio Research Data Management (RDM)
-- Invenio Media Archive (MA)
+- Invenio v3 Integrated Library System (ILS)
+
+Three further pre-packaged flavous is planned:
+
+- Invenio v3 Research Data Management (RDM)
+- Invenio v3 Media Archive (MA)
+- Invenio v3 Institutional Repository (IR)
 
 Invenio is currently powering some of the largest digital repositories in the
 world such as:
 
-- CERN Document Server and Open Data Repository
-- INSPIRE High-Energy Physics Repository
-- Caltech Library Catalog
-- DESY Publication Database
-- Zenodo research data repository
+- `CERN Document Server <http://cds.cern.ch>`_  (v1)
+- `CERN Open Data Repository <http://opendata.cern.ch>`_  (v2)
+- `INSPIRE High-Energy Physics Repository <http://inspirehep.net>`_  (v1)
+- `Caltech Library Catalog <http://caltech.tind.io>`_  (v1)
+- `DESY Publication Database <https://pubdb.desy.de/>`_  (v1)
+- `Zenodo research data repository <https://www.zenodo.org>`_ (v3)
