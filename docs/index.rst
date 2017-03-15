@@ -84,9 +84,11 @@ Inveno.
 
     developersguide/tutorial/index
     developersguide/development-environment
-    developersguide/architecture
-    developersguide/entrypoints
+    developersguide/system-architecture
+    developersguide/application-architecture
+    developersguide/extending-invenio
     developersguide/invenio-modules
+    developersguide/bundles
     developersguide/create-a-datamodel
 
 
