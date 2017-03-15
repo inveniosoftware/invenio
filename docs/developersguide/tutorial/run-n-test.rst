@@ -45,7 +45,7 @@ What we have done:
 - add all the files to this repository
 - update the file ``MANIFEST.in``
 
-Now, we are able to run the tests: 
+Now, we are able to run the tests:
 
 .. code-block:: bash
 
@@ -83,7 +83,7 @@ The documentation can be built with the ``run-tests.sh`` script, but you need th
 Before going further
 --------------------
 
-Before going further in the tutorial, we need to push our repository to GitHub. The details about GitHub are explained in :ref:`set-up-environment`.
+Before going further in the tutorial, we need to push our repository to GitHub. The details about GitHub are explained in :ref:`setting-up-environment`.
 
 The first thing is to create a repo on GitHub, we will globally follow the GitHub documentation: https://help.github.com/articles/adding-an-existing-project-to-github-using-the-command-line/.
 
