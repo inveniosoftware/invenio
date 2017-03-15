@@ -149,6 +149,8 @@ def remove_duplicates(harvested_file_list):
 
         # build up new xml structure
         newroot = etree.Element('OAI-PMH')
+        responseDate   = etree.SubElement(newroot, 'responseDate')
+        request = etree.SubElement(newroot, 'request')
         newListRecords = etree.SubElement(newroot, 'ListRecords')
 
         for rec in root.xpath("//*[local-name() = 'record']"):
