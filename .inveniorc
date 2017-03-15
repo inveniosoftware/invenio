@@ -4,13 +4,13 @@
 
 # sphinxdoc-kickstart-configuration-variables-begin
 export INVENIO_WEB_HOST=192.168.50.10
-export INVENIO_WEB_INSTANCE=invenio3
-export INVENIO_WEB_VENV=invenio3
+export INVENIO_WEB_INSTANCE=invenio
+export INVENIO_WEB_VENV=invenio
 export INVENIO_USER_EMAIL=info@inveniosoftware.org
 export INVENIO_USER_PASS=uspass123
 export INVENIO_POSTGRESQL_HOST=192.168.50.11
-export INVENIO_POSTGRESQL_DBNAME=invenio3
-export INVENIO_POSTGRESQL_DBUSER=invenio3
+export INVENIO_POSTGRESQL_DBNAME=invenio
+export INVENIO_POSTGRESQL_DBUSER=invenio
 export INVENIO_POSTGRESQL_DBPASS=dbpass123
 export INVENIO_REDIS_HOST=192.168.50.12
 export INVENIO_ELASTICSEARCH_HOST=192.168.50.13

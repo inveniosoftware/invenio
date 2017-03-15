@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016, 2017 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -24,4 +24,4 @@
 
 FROM nginx
 RUN rm /etc/nginx/conf.d/default.conf
-ADD invenio3.conf /etc/nginx/conf.d/
+ADD invenio.conf /etc/nginx/conf.d/

@@ -54,8 +54,8 @@ installation scripts manually::
   scripts/provision-rabbitmq.sh
   scripts/provision-worker.sh
   scripts/create-instance.sh
-  scripts/start-instance.sh
   scripts/populate-instance.sh
+  scripts/start-instance.sh
   firefox http://192.168.50.10/records/1
 
 See :ref:`installation_detailed` for more information.

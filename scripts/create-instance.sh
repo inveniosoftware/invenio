@@ -31,12 +31,12 @@ if [ "${INVENIO_WEB_HOST}" = "" ]; then
 fi
 if [ "${INVENIO_WEB_INSTANCE}" = "" ]; then
     echo "[ERROR] Please set environment variable INVENIO_WEB_INSTANCE before runnning this script."
-    echo "[ERROR] Example: export INVENIO_WEB_INSTANCE=invenio3"
+    echo "[ERROR] Example: export INVENIO_WEB_INSTANCE=invenio"
     exit 1
 fi
 if [ "${INVENIO_WEB_VENV}" = "" ]; then
     echo "[ERROR] Please set environment variable INVENIO_WEB_VENV before runnning this script."
-    echo "[ERROR] Example: export INVENIO_WEB_VENV=invenio3"
+    echo "[ERROR] Example: export INVENIO_WEB_VENV=invenio"
     exit 1
 fi
 if [ "${INVENIO_USER_EMAIL}" = "" ]; then
@@ -56,12 +56,12 @@ if [ "${INVENIO_POSTGRESQL_HOST}" = "" ]; then
 fi
 if [ "${INVENIO_POSTGRESQL_DBNAME}" = "" ]; then
     echo "[ERROR] Please set environment variable INVENIO_POSTGRESQL_DBNAME before runnning this script."
-    echo "[ERROR] Example: INVENIO_POSTGRESQL_DBNAME=invenio3"
+    echo "[ERROR] Example: INVENIO_POSTGRESQL_DBNAME=invenio"
     exit 1
 fi
 if [ "${INVENIO_POSTGRESQL_DBUSER}" = "" ]; then
     echo "[ERROR] Please set environment variable INVENIO_POSTGRESQL_DBUSER before runnning this script."
-    echo "[ERROR] Example: INVENIO_POSTGRESQL_DBUSER=invenio3"
+    echo "[ERROR] Example: INVENIO_POSTGRESQL_DBUSER=invenio"
     exit 1
 fi
 if [ "${INVENIO_POSTGRESQL_DBPASS}" = "" ]; then
@@ -100,8 +100,6 @@ scriptpathname=$(cd "$(dirname "$0")" && pwd)
 # sphinxdoc-create-virtual-environment-begin
 mkvirtualenv "${INVENIO_WEB_VENV}"
 cdvirtualenv
-mkdir -p src
-cd src
 # sphinxdoc-create-virtual-environment-end
 
 # quit on errors and unbound symbols:
@@ -110,41 +108,22 @@ set -o nounset
 
 if [[ "$@" != *"--devel"* ]]; then
 # sphinxdoc-install-invenio-full-begin
-# now we can install full Invenio:
-# FIXME upgrade to dojson 1.3.0 WRT mappings and unpin
-pip install dojson==1.2.1
-pip install invenio-marc21==1.0.0a3
-pip install invenio[full,postgresql] --pre
+pip install invenio-app-ils[postgresql,elasticsearch2]
 # sphinxdoc-install-invenio-full-end
 else
     pip install -r "$scriptpathname/../requirements-devel.txt"
 fi
 
-# sphinxdoc-create-instance-begin
-inveniomanage instance create "${INVENIO_WEB_INSTANCE}"
-# sphinxdoc-create-instance-end
-
-if [[ "$@" != *"--devel"* ]]; then
-# sphinxdoc-install-instance-begin
-cd "${INVENIO_WEB_INSTANCE}"
-pip install -e .
-# sphinxdoc-install-instance-end
-else
-    pip install -r requirements-devel.txt
-fi
-
 # sphinxdoc-customise-instance-begin
-mkdir -p "../../var/${INVENIO_WEB_INSTANCE}-instance/"
+mkdir -p "var/instance/"
 pip install "jinja2-cli>=0.6.0"
-jinja2 "$scriptpathname/instance.cfg" > "../../var/${INVENIO_WEB_INSTANCE}-instance/${INVENIO_WEB_INSTANCE}.cfg"
+jinja2 "$scriptpathname/instance.cfg" > "var/instance/${INVENIO_WEB_INSTANCE}.cfg"
 # sphinxdoc-customise-instance-end
 
 # sphinxdoc-run-npm-begin
-cd "${INVENIO_WEB_INSTANCE}"
 ${INVENIO_WEB_INSTANCE} npm
-cdvirtualenv "var/${INVENIO_WEB_INSTANCE}-instance/static"
+cdvirtualenv "var/instance/static"
 CI=true npm install
-cd -
 # sphinxdoc-run-npm-end
 
 # sphinxdoc-collect-and-build-assets-begin

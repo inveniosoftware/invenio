@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -25,6 +25,7 @@
 -e git+https://github.com/inveniosoftware/dojson.git#egg=dojson
 -e git+https://github.com/inveniosoftware/invenio-access.git#egg=invenio-access
 -e git+https://github.com/inveniosoftware/invenio-accounts.git#egg=invenio-accounts
+-e git+https://github.com/inveniosoftware/invenio-app-ils.git#egg=invenio-app-ils[postgresql,elasticsearch2]
 -e git+https://github.com/inveniosoftware/invenio-assets.git#egg=invenio-assets
 -e git+https://github.com/inveniosoftware/invenio-base.git#egg=invenio-base
 -e git+https://github.com/inveniosoftware/invenio-celery.git#egg=invenio-celery

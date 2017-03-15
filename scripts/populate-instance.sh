@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # This file is part of Invenio.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -30,12 +30,12 @@ if [ "${INVENIO_WEB_HOST}" = "" ]; then
 fi
 if [ "${INVENIO_WEB_INSTANCE}" = "" ]; then
     echo "[ERROR] Please set environment variable INVENIO_WEB_INSTANCE before runnning this script."
-    echo "[ERROR] Example: export INVENIO_WEB_INSTANCE=invenio3"
+    echo "[ERROR] Example: export INVENIO_WEB_INSTANCE=invenio"
     exit 1
 fi
 if [ "${INVENIO_WEB_VENV}" = "" ]; then
     echo "[ERROR] Please set environment variable INVENIO_WEB_VENV before runnning this script."
-    echo "[ERROR] Example: export INVENIO_WEB_VENV=invenio3"
+    echo "[ERROR] Example: export INVENIO_WEB_VENV=invenio"
     exit 1
 fi
 if [ "${INVENIO_USER_EMAIL}" = "" ]; then
@@ -55,12 +55,12 @@ if [ "${INVENIO_POSTGRESQL_HOST}" = "" ]; then
 fi
 if [ "${INVENIO_POSTGRESQL_DBNAME}" = "" ]; then
     echo "[ERROR] Please set environment variable INVENIO_POSTGRESQL_DBNAME before runnning this script."
-    echo "[ERROR] Example: INVENIO_POSTGRESQL_DBNAME=invenio3"
+    echo "[ERROR] Example: INVENIO_POSTGRESQL_DBNAME=invenio"
     exit 1
 fi
 if [ "${INVENIO_POSTGRESQL_DBUSER}" = "" ]; then
     echo "[ERROR] Please set environment variable INVENIO_POSTGRESQL_DBUSER before runnning this script."
-    echo "[ERROR] Example: INVENIO_POSTGRESQL_DBUSER=invenio3"
+    echo "[ERROR] Example: INVENIO_POSTGRESQL_DBUSER=invenio"
     exit 1
 fi
 if [ "${INVENIO_POSTGRESQL_DBPASS}" = "" ]; then
@@ -112,25 +112,12 @@ ${INVENIO_WEB_INSTANCE} users create \
        --active
 # sphinxdoc-create-user-account-end
 
-# sphinxdoc-populate-with-demo-records-begin
-# discover the location of demo MARC21 record file:
-demomarc21pathname=$(echo "from __future__ import print_function; \
-import pkg_resources; \
-print(pkg_resources.resource_filename('invenio_records', \
-  'data/marc21/bibliographic.xml'))" | python)
-# define the schema for the records
-SCHEMA="http://${INVENIO_WEB_HOST}/schema/marc21/bibliographic/bd-v1.0.0.json"
-# convert demo records from MARC21 to JSON and load them:
-dojson -i "$demomarc21pathname" -l marcxml "do" marc21 schema "${SCHEMA}" | \
-    "${INVENIO_WEB_INSTANCE}" records create --pid-minter recid --pid-minter oaiid
-# sphinxdoc-populate-with-demo-records-end
-
-# sphinxdoc-index-all-records-begin
-# indexing
+# sphinxdoc-index-initialisation-begin
 ${INVENIO_WEB_INSTANCE} index init
 sleep 20
 ${INVENIO_WEB_INSTANCE} index queue init
-${INVENIO_WEB_INSTANCE} index reindex --yes-i-know
-${INVENIO_WEB_INSTANCE} index run
-sleep 25
-# sphinxdoc-index-all-records-end
+# sphinxdoc-index-initialisation-end
+
+# sphinxdoc-populate-with-demo-records-begin
+${INVENIO_WEB_INSTANCE} demo init
+# sphinxdoc-populate-with-demo-records-end

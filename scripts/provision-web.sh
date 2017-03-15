@@ -28,7 +28,7 @@ set -o errexit
 # check environment variables:
 if [ "${INVENIO_WEB_VENV}" = "" ]; then
     echo "[ERROR] Please set environment variable INVENIO_WEB_VENV before runnning this script."
-    echo "[ERROR] Example: export INVENIO_WEB_VENV=invenio3"
+    echo "[ERROR] Example: export INVENIO_WEB_VENV=invenio"
     exit 1
 fi
 
@@ -182,10 +182,10 @@ setup_nginx_ubuntu14 () {
     $sudo apt-get install -y nginx
 
     # configure Nginx web server:
-    $sudo cp -f "$scriptpathname/../nginx/invenio3.conf" /etc/nginx/sites-available/
-    $sudo sed -i "s,/home/invenio/,/home/$(whoami)/,g" /etc/nginx/sites-available/invenio3.conf
+    $sudo cp -f "$scriptpathname/../nginx/invenio.conf" /etc/nginx/sites-available/
+    $sudo sed -i "s,/home/invenio/,/home/$(whoami)/,g" /etc/nginx/sites-available/invenio.conf
     $sudo rm /etc/nginx/sites-enabled/default
-    $sudo ln -s /etc/nginx/sites-available/invenio3.conf /etc/nginx/sites-enabled/
+    $sudo ln -s /etc/nginx/sites-available/invenio.conf /etc/nginx/sites-enabled/
     $sudo /usr/sbin/service nginx restart
     # sphinxdoc-install-web-nginx-ubuntu14-end
 }
@@ -196,8 +196,8 @@ setup_nginx_centos7 () {
     $sudo yum install -y nginx
 
     # configure Nginx web server:
-    $sudo cp "$scriptpathname/../nginx/invenio3.conf" /etc/nginx/conf.d/
-    $sudo sed -i "s,/home/invenio/,/home/$(whoami)/,g" /etc/nginx/conf.d/invenio3.conf
+    $sudo cp "$scriptpathname/../nginx/invenio.conf" /etc/nginx/conf.d/
+    $sudo sed -i "s,/home/invenio/,/home/$(whoami)/,g" /etc/nginx/conf.d/invenio.conf
 
     # add SELinux permissions if necessary:
     if $sudo getenforce | grep -q 'Enforcing'; then
@@ -209,8 +209,8 @@ setup_nginx_centos7 () {
         fi
         if ! $sudo getsebool -a | grep httpd | grep httpd_enable_homedirs | grep -q on; then
             $sudo setsebool -P httpd_enable_homedirs 1
-            mkdir -p "/home/$(whoami)/.virtualenvs/${INVENIO_WEB_VENV}/var/${INVENIO_WEB_VENV}-instance/static"
-            $sudo chcon -R -t httpd_sys_content_t "/home/$(whoami)/.virtualenvs/${INVENIO_WEB_VENV}/var/${INVENIO_WEB_VENV}-instance/static"
+            mkdir -p "/home/$(whoami)/.virtualenvs/${INVENIO_WEB_VENV}/var/instance/static"
+            $sudo chcon -R -t httpd_sys_content_t "/home/$(whoami)/.virtualenvs/${INVENIO_WEB_VENV}/var/instance/static"
         fi
     fi
 

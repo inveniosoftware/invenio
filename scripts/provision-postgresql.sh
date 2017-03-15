@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # This file is part of Invenio.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -33,12 +33,12 @@ if [ "${INVENIO_POSTGRESQL_HOST}" = "" ]; then
 fi
 if [ "${INVENIO_POSTGRESQL_DBNAME}" = "" ]; then
     echo "[ERROR] Please set environment variable INVENIO_POSTGRESQL_DBNAME before runnning this script."
-    echo "[ERROR] Example: INVENIO_POSTGRESQL_DBNAME=invenio3"
+    echo "[ERROR] Example: INVENIO_POSTGRESQL_DBNAME=invenio"
     exit 1
 fi
 if [ "${INVENIO_POSTGRESQL_DBUSER}" = "" ]; then
     echo "[ERROR] Please set environment variable INVENIO_POSTGRESQL_DBUSER before runnning this script."
-    echo "[ERROR] Example: INVENIO_POSTGRESQL_DBUSER=invenio3"
+    echo "[ERROR] Example: INVENIO_POSTGRESQL_DBUSER=invenio"
     exit 1
 fi
 if [ "${INVENIO_POSTGRESQL_DBPASS}" = "" ]; then

@@ -27,13 +27,13 @@ FROM python:2.7-slim
 
 # Configure Invenio instance:
 ENV INVENIO_WEB_HOST=127.0.0.1
-ENV INVENIO_WEB_INSTANCE=invenio3
-ENV INVENIO_WEB_VENV=invenio3
+ENV INVENIO_WEB_INSTANCE=invenio
+ENV INVENIO_WEB_VENV=invenio
 ENV INVENIO_USER_EMAIL=info@inveniosoftware.org
 ENV INVENIO_USER_PASS=uspass123
 ENV INVENIO_POSTGRESQL_HOST=postgresql
-ENV INVENIO_POSTGRESQL_DBNAME=invenio3
-ENV INVENIO_POSTGRESQL_DBUSER=invenio3
+ENV INVENIO_POSTGRESQL_DBNAME=invenio
+ENV INVENIO_POSTGRESQL_DBUSER=invenio
 ENV INVENIO_POSTGRESQL_DBPASS=dbpass123
 ENV INVENIO_REDIS_HOST=redis
 ENV INVENIO_ELASTICSEARCH_HOST=elasticsearch
@@ -58,10 +58,10 @@ USER invenio
 RUN /code/scripts/create-instance.sh
 
 # Make given VENV default:
-ENV PATH=/home/invenio/.virtualenvs/invenio3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV PATH=/home/invenio/.virtualenvs/invenio/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ENV VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python
 RUN echo "source /usr/local/bin/virtualenvwrapper.sh" >> ~/.bashrc
-RUN echo "workon invenio3" >> ~/.bashrc
+RUN echo "workon invenio" >> ~/.bashrc
 
 # Start the Invenio application:
-CMD ["/bin/bash", "-c", "invenio3 run -h 0.0.0.0"]
+CMD ["/bin/bash", "-c", "invenio run -h 0.0.0.0"]

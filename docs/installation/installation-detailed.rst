@@ -544,28 +544,12 @@ brand new Invenio v3.0 instance:
    :end-before: # sphinxdoc-create-virtual-environment-end
    :literal:
 
-We continue by installing Invenio v3.0 base package and most of its available
-modules (by using option ``full`` as opposed to using option ``minimal``) from
-PyPI:
+We continue by installing Invenio v3.0 Integrated Library System flavour demo
+site from PyPI:
 
 .. include:: ../../scripts/create-instance.sh
    :start-after: # sphinxdoc-install-invenio-full-begin
    :end-before: # sphinxdoc-install-invenio-full-end
-   :literal:
-
-We can now create a new Invenio instance:
-
-.. include:: ../../scripts/create-instance.sh
-   :start-after: # sphinxdoc-create-instance-begin
-   :end-before: # sphinxdoc-create-instance-end
-   :literal:
-
-We can now install the newly created instance by means of provided ``setup.py``
-script:
-
-.. include:: ../../scripts/create-instance.sh
-   :start-after: # sphinxdoc-install-instance-begin
-   :end-before: # sphinxdoc-install-instance-end
    :literal:
 
 Let's briefly customise our instance with respect to the location of the
@@ -614,19 +598,19 @@ We continue by creating a user account:
    :end-before: # sphinxdoc-create-user-account-end
    :literal:
 
-We proceed by populating our Invenio instance with demo MARCXML records that are
-taken from the ``invenio-records`` package:
+We can now create the Elasticsearch indexes and initialise the indexing queue:
+
+.. include:: ../../scripts/populate-instance.sh
+   :start-after: # sphinxdoc-index-initialisation-begin
+   :end-before: # sphinxdoc-index-initialisation-end
+   :literal:
+
+We proceed by populating our Invenio demo instance with some example demo
+MARCXML records:
 
 .. include:: ../../scripts/populate-instance.sh
    :start-after: # sphinxdoc-populate-with-demo-records-begin
    :end-before: # sphinxdoc-populate-with-demo-records-end
-   :literal:
-
-Let's index all the uploaded records:
-
-.. include:: ../../scripts/populate-instance.sh
-   :start-after: # sphinxdoc-index-all-records-begin
-   :end-before: # sphinxdoc-index-all-records-end
    :literal:
 
 Start instance
@@ -650,13 +634,13 @@ We should now see our demo records on the web:
 
 .. code-block:: shell
 
-   firefox http://localhost/records/1
+   firefox http://${INVENIO_WEB_HOST}/records/1
 
 and we can access them via REST API:
 
 .. code-block:: shell
 
    curl -i -H "Accept: application/json" \
-        http://localhost/api/records/1
+        http://${INVENIO_WEB_HOST}/api/records/1
 
 We are done! Our first Invenio v3.0 demo instance is fully up and running.
