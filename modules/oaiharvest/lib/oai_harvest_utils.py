@@ -149,6 +149,10 @@ def remove_duplicates(harvested_file_list):
 
         # build up new xml structure
         newroot = etree.Element('OAI-PMH')
+        request=root.xpath("//*[local-name() = 'request']")[0]
+        responseDate=root.xpath("//*[local-name() = 'responseDate']")[0]
+        newroot.append(deepcopy(responseDate))
+        newroot.append(deepcopy(request))
         newListRecords = etree.SubElement(newroot, 'ListRecords')
 
         for rec in root.xpath("//*[local-name() = 'record']"):
@@ -158,7 +162,7 @@ def remove_duplicates(harvested_file_list):
                     newListRecords.append(deepcopy(rec))
                     harvested_identifiers.append(i.text)
 
-        updated_harvested_file.write(etree.tostring(newroot))
+        updated_harvested_file.write(etree.tostring(newroot, encoding='UTF-8', xml_declaration=True))
         updated_harvested_file.close()
 
 def add_timestamp_and_timelag(timestamp,
