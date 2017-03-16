@@ -88,7 +88,6 @@ following:
   least one maintainer approves it.
 
 
------------
 Maintainers
 -----------
 
@@ -98,7 +97,5 @@ know more about it or take part, you can read our `Maintainer's guide
 <http://invenio.readthedocs.io/en/feature-ils/community/maintainers-guide/index.html>`_.
 
 
-
 FAQ
 ---
--

@@ -60,3 +60,9 @@ world such as:
 - `Caltech Library Catalog <http://caltech.tind.io>`_  (v1)
 - `DESY Publication Database <https://pubdb.desy.de/>`_  (v1)
 - `Zenodo research data repository <https://www.zenodo.org>`_ (v3)
+
+
+.. warning::
+
+    Invenio v3 is still under development. We expect the first stable release
+    by end-April 2017.

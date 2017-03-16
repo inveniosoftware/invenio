@@ -10,3 +10,5 @@ Maintainer's guide TODO
    releasing
    setup-repository
    branches
+   integrating
+   triaging
