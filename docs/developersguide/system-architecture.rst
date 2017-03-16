@@ -292,6 +292,3 @@ dependencies: (*work in progress*)
      }
 
    }
-
-For further information, see :ref:`module_anatomy` and :ref:`module_list`
-sections.

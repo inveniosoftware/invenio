@@ -65,6 +65,7 @@ for running Invenio.
 
     deploymentguide/overview
     deploymentguide/services
+    deploymentguide/installation-detailed
     deploymentguide/configuring
     deploymentguide/daemons
     deploymentguide/monitoring
@@ -90,7 +91,9 @@ Inveno.
     developersguide/invenio-modules
     developersguide/bundles
     developersguide/create-a-datamodel
-
+    developersguide/docker
+    developersguide/git
+    developersguide/python
 
 Community
 ---------

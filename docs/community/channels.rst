@@ -80,23 +80,23 @@ for historical reasons.
 
 - ``project-invenio-announce@cern.ch``: Read-only moderated mailing
   list to announce new Invenio releases and other major news concerning the
-  project. `(un)subscribe <https://simba3.web.cern.ch/simba3/SelfSubscription.aspx?groupName=project-invenio-announce>`_,
+  project. `subscribe to announce <https://simba3.web.cern.ch/simba3/SelfSubscription.aspx?groupName=project-invenio-announce>`_,
   `archive <https://groups.cern.ch/group/project-invenio-announce/Lists/Archive/100.aspx>`_
 - ``project-invenio-general@cern.ch``: Originally used for discussion among
   users and administrators of Invenio instances. The mailing list has mostly
   been replaced by our public chatroom.
-  `(un)subscribe <https://simba3.web.cern.ch/simba3/SelfSubscription.aspx?groupName=project-invenio-general>`_,
-  `new archive <https://groups.cern.ch/group/project-invenio-general/Lists/Archive/100.aspx>`_,
-  `old archive <https://groups.cern.ch/group/project-cdsware-users/Lists/Archive/100.aspx>`_
+  `subscribe to general <https://simba3.web.cern.ch/simba3/SelfSubscription.aspx?groupName=project-invenio-general>`_,
+  `new general archive <https://groups.cern.ch/group/project-invenio-general/Lists/Archive/100.aspx>`_,
+  `old general archive <https://groups.cern.ch/group/project-cdsware-users/Lists/Archive/100.aspx>`_
 - ``project-invenio-devel@cern.ch``: Originally used for discussion among
   Invenio developers. The mailing list has mostly been replaced by our
   developer chatroom.
-  `(un)subscribe <https://simba3.web.cern.ch/simba3/SelfSubscription.aspx?groupName=project-invenio-devel>`_,
-  `new archive <https://groups.cern.ch/group/project-invenio-devel/Lists/Archive/100.aspx>`_,
-  `old archive <https://groups.cern.ch/group/project-cdsware-developers/Lists/Archive/100.aspx>`_
+  `subscribe to devel <https://simba3.web.cern.ch/simba3/SelfSubscription.aspx?groupName=project-invenio-devel>`_,
+  `new devel archive <https://groups.cern.ch/group/project-invenio-devel/Lists/Archive/100.aspx>`_,
+  `old devel archive <https://groups.cern.ch/group/project-cdsware-developers/Lists/Archive/100.aspx>`_
 
 Note that all the mailing lists are also archived (as of the 20th of
-July, 2011) on `The Mail Archive <http://www.mail-archive.com/>`__.
+July, 2011) on `The Mail Archive <http://www.mail-archive.com/>`_.
 
 
 .. todo::

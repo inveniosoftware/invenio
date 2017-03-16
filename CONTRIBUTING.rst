@@ -68,7 +68,7 @@ Write code
   your contributor life easier.
 
 - **Bootstrapping a new awesome module?** Use our `Invenio cookiecutter
-template <http://github.com/inveniosoftware/cookiecutter-invenio-module>`_.
+  template <http://github.com/inveniosoftware/cookiecutter-invenio-module>`_.
 
 Style guide (TL;DR)
 -------------------
@@ -92,14 +92,14 @@ with fellow developers, so be clear and brief.
    <https://chris.beams.io/posts/git-commit/#separate>`_
 2. `Limit the subject line to 50 characters
    <https://chris.beams.io/posts/git-commit/#limit-50>`_
-3. `Indicate the component follow by a short description <>`_
+3. Indicate the component follow by a short description
 4. `Do not end the subject line with a period
    <https://chris.beams.io/posts/git-commit/#end>`_
 5. `Use the imperative mood in the subject line
    <https://chris.beams.io/posts/git-commit/#imperative>`_
 6. `Wrap the body at 72 characters
    <https://chris.beams.io/posts/git-commit/#wrap-72>`_
-7. `Use the body to explain what and why vs. how, using bullet points <>`_
+7. `Use the body to explain what and why vs. how, using bullet points <https://chris.beams.io/posts/git-commit/#why-not-how>`_
 
 **ProTip**: Really! Spend some time to ensure your editor is top tuned. It will
 pay off many-fold in the long run. See :ref:`setting-up-your-environment`.
