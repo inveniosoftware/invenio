@@ -45,7 +45,7 @@ pre-packaged flavour which is ready to run out-of-the-box:
 
 - Invenio v3 Integrated Library System (ILS)
 
-Three further pre-packaged flavous is planned:
+Three further pre-packaged flavours are planned:
 
 - Invenio v3 Research Data Management (RDM)
 - Invenio v3 Media Archive (MA)
