@@ -2733,8 +2733,9 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
                     'cname': webapi.get_canonical_id_from_person_id(person_id),
                     'link_to_record': ulevel == "admin",
                     'hepnames_link': "%s/%s/" % (CFG_BASE_URL, "record"),
-                    'new_record_link': 'https://labs.inspirehep.net/author/new',
-                    'update_link': "http://labs.inspirehep.net/author/update?recid=",
+                    'new_record_link': 'https://labs.inspirehep.net/authors/new',
+                    'update_link_prefix': "http://labs.inspirehep.net/authors/",
+                    'update_link_suffix': "/update",
                     'profile_link': "%s/%s" % (CFG_BASE_URL, "author/profile/")
                 })
                 html_hepnames = WebProfilePage.render_template('personal_details_box', hepnames_data)
@@ -3729,7 +3730,7 @@ class WebInterfacePerson(WebInterfaceDirectory):
             hepname_bibrec = get_bibrecord(recids[0])
 
         redirect_to_url(req,
-                        "https://labs.inspirehep.net/author/update?recid=%s" %
+                        "https://labs.inspirehep.net/authors/%s/update" %
                         hepname_bibrec,
                         redirection_type=apache.HTTP_MOVED_PERMANENTLY)
 

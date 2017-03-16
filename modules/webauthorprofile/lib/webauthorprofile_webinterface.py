@@ -685,8 +685,9 @@ class WebAuthorPages(WebInterfaceDirectory):
                     'cname': webapi.get_canonical_id_from_person_id(person_id),
                     'link_to_record': ulevel == "admin",
                     'hepnames_link': "%s/%s/" % (CFG_BASE_URL, "record"),
-                    'new_record_link': 'http://labs.inspirehep.net/author/new?bai=%s' % (webapi.get_canonical_id_from_person_id(person_id)),
-                    'update_link': "http://labs.inspirehep.net/author/update?recid=",
+                    'new_record_link': 'http://labs.inspirehep.net/authors/new?bai=%s' % (webapi.get_canonical_id_from_person_id(person_id)),
+                    'update_link_prefix': "http://labs.inspirehep.net/authors/",
+                    'update_link_suffix': "/update",
                     'profile_link': "%s/%s" % (CFG_BASE_URL, "author/profile/")
                 })
 
