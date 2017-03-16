@@ -5,6 +5,8 @@ Part 2: Install, run and test
 
 As soon as you have run the Cookiecutter, you have a valid module that can be installed. In this section, we are going to see how to install the module, run the tests, run the example application and build the documentation.
 
+Before that, we need to **stop** any running Invenio instance.
+
 Install the module
 ------------------
 
@@ -83,7 +85,7 @@ The documentation can be built with the ``run-tests.sh`` script, but you need th
 Before going further
 --------------------
 
-Before going further in the tutorial, we need to push our repository to GitHub. The details about GitHub are explained in :ref:`setting-up-environment`.
+Before going further in the tutorial, we need to push our repository to GitHub. The details about GitHub are explained in :ref:`setting-up-your-environment`.
 
 The first thing is to create a repo on GitHub, we will globally follow the GitHub documentation: https://help.github.com/articles/adding-an-existing-project-to-github-using-the-command-line/.
 
