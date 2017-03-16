@@ -53,7 +53,10 @@ Now, we are able to run the tests:
 
     ./run-tests.sh
 
-Everything should pass as we didn't change any files yet.
+Everything should pass as we didn't change any files yet. If you have any trouble at this point, you should:
+
+- first kill any running flask application: ``killall flask``
+- if you still have trouble, edit the file ``tests/test_examples_app.py`` and replace the line 56 with a bigger number: ``time.sleep(10)``
 
 .. _run-the-example-app:
 
