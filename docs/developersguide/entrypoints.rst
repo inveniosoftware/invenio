@@ -1,3 +1,5 @@
+.. _entrypoints:
+
 Entry-points
 ============
 
