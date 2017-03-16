@@ -1,3 +1,26 @@
+..
+    This file is part of Invenio.
+    Copyright (C) 2017 CERN.
+
+    Invenio is free software; you can redistribute it
+    and/or modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation; either version 2 of the
+    License, or (at your option) any later version.
+
+    Invenio is distributed in the hope that it will be
+    useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Invenio; if not, write to the
+    Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+    MA 02111-1307, USA.
+
+    In applying this license, CERN does not
+    waive the privileges and immunities granted to it by virtue of its status
+    as an Intergovernmental Organization or submit itself to any jurisdiction.
+
 Part 3: Develop a module
 ========================
 
@@ -11,8 +34,28 @@ part of the development process such as:
 - How to add new templates
 - How to use Jinja2
 
-Let's create a module that contains the forms of our project, we will use
+Requirements
+------------
+
+Before starting let's make sure we have ``custom-data-module`` installed on
+your environment. We need that to ensure that we have the data model.
+
+How to do that?
+
+.. code-block:: console
+
+  $ cd custom-data-module
+  $ pip install .
+  $ invenio custom_demo init
+
+And restart your server
+
+1. Create the form
+^^^^^^^^^^^^^^^^^^
+
+Ok, let's create a module that contains the forms of our project, we will use
 Flask-WTF.
+
 
 in ``invenio_unicorn/forms.py``
 
@@ -30,6 +73,9 @@ in ``invenio_unicorn/forms.py``
         description = TextAreaField(
             'Description', [validators.DataRequired()]
         )
+
+2. Create the views
+^^^^^^^^^^^^^^^^^^^
 
 in ``invenio_unicorn/views.py`` we'll create the endpoints for
 
@@ -79,46 +125,20 @@ The ``views.py`` registers all the views of our application
         """The success view."""
         return render_template('invenio_unicorn/success.html')
 
-
-in ``invenio_unicorn/utils.py``
-
-On the ``utils.py`` module will create a helper function that creates a record.
-
-.. code-block:: python
-
-    from __future__ import absolute_import, print_function
-
-    import uuid
-
-    from invenio_db import db
-    from invenio_indexer.api import RecordIndexer
-    from invenio_pidstore import current_pidstore
-    from invenio_records.api import Record
-
-
-    def create_record(data):
-        """Create a record.
-
-        :param dict data: The record data.
-        """
-        indexer = RecordIndexer()
-        with db.session.begin_nested():
-            # create uuid
-            rec_uuid = uuid.uuid4()
-            # create PID
-            current_pidstore.minters['recid'](
-              rec_uuid, data
-            )
-            # create record
-            created_record = Record.create(data, id_=rec_uuid)
-            # index the record
-            indexer.index(created_record)
-        db.session.commit()
-
+3. Create the templates
+^^^^^^^^^^^^^^^^^^^^^^^
 
 And now, let's create the templates
 
-in ``invenio_unicorn/templates/invenio_unicorn/create.html``
+in ``invenio_unicorn/templates/invenio_unicorn/create.html`` we override
+two ``blocks`` from the invenio ``BASE_TEMPLATE`` and those are:
+
+- javascript
+- page_body
+
+In the ``javascript`` block we will right a small fetcher, to get the
+created records from the API, and in the ``page_body`` we will add the
+form and the placeholder for the records list.
 
 .. code-block:: html
 
@@ -136,10 +156,40 @@ in ``invenio_unicorn/templates/invenio_unicorn/create.html``
       </span>
     {% endmacro %}
 
+    {% block javascript %}
+      {{ super() }}
+      <script>
+        $(document).ready(function() {
+          $.get('/api/custom_records')
+            .then(
+              function(response) {
+                $('#custom-records').html('');
+                $.each(response.hits.hits, function(index, record) {
+                  $('#custom-records').append(
+                    '<li>' +
+                      '<h4>' + record.metadata.title + '</h4>' +
+                      '<p>' + record.metadata.description + '</p>' +
+                     '</li>'
+                  );
+                })
+              }, function() {
+                $('#custom-records').html('');
+              }
+            );
+        });
+      </script>
+    {% endblock javascript %}
+
     {% block page_body %}
       <div class="container">
         <div class="row">
-          <div class="col-md-offset-3 col-md-6">
+          <div class="col-md-12">
+            <div class="alert alert-warning">
+              <b>Heads up!</b> This example is for demo proposes only
+            </div>
+            <h2>Create record</h2>
+          </div>
+          <div class="col-md-offset-3 col-md-6 well">
             <form action="{{ url_for('invenio_unicorn.create') }}" method="POST">
                 <div class="form-group {{ 'has-error' if form.title.errors }}">
                   <label for="title">{{ form.title.label }}</label>
@@ -156,9 +206,19 @@ in ``invenio_unicorn/templates/invenio_unicorn/create.html``
             </form>
           </div>
         </div>
+        <hr />
+        <div class="row">
+          <div class="col-md-12">
+            <h2>Records created</h2>
+            <ol id="custom-records">
+              <div class="text-center">
+                Loading records...
+              </div>
+            </ol>
+          </div>
+        </div>
       </div>
     {% endblock page_body %}
-
 
 in ``invenio_unicorn/templates/invenio_unicorn/success.html``
 
@@ -182,3 +242,47 @@ in ``invenio_unicorn/templates/invenio_unicorn/success.html``
         </div>
       </div>
     {% endblock page_body %}
+
+4. Create the record creation function
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+in ``invenio_unicorn/utils.py``
+
+On the ``utils.py`` module will create a helper function that creates a record.
+
+.. code-block:: python
+
+    def create_record(data):
+        """Create a record.
+
+        :param dict data: The record data.
+        """
+        indexer = RecordIndexer()
+        with db.session.begin_nested():
+            # create uuid
+            rec_uuid = uuid.uuid4()
+            # add the schema
+            host = current_app.config.get('JSONSCHEMAS_HOST')
+            data["$schema"] = \
+                current_app.extensions['invenio-jsonschemas'].path_to_url(
+                'custom_record/custom-record-v1.0.0.json')
+            # create PID
+            current_pidstore.minters['custid'](
+              rec_uuid, data, pid_value='custom_pid_{}'.format(rec_uuid)
+            )
+            # create record
+            created_record = Record.create(data, id_=rec_uuid)
+            # index the record
+            indexer.index(created_record)
+        db.session.commit()
+
+5. Demo time
+^^^^^^^^^^^^
+Make sure you have restarted your server.
+
+Then go to ``http://localhost:5000/create`` and you will see the form we just
+created. There are two fields ``Title`` and ``Description``.
+
+Let's try the form, add something to the ``Title`` and click submit, you will
+see the validation errors on the form, fill in the ``Description`` and click
+submit. The form is now valid and it navigates you to the ``/success`` page.
