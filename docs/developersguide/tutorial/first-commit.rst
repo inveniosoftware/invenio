@@ -21,6 +21,8 @@ Let's test our changes before we publish them. See :ref:`run-the-tests` for more
 
     ./run-tests.sh
 
+It might complain about PEP8 formatting. Generally, it is because of a lack of new line at the end of your files. The error message will help you find how to fix it.
+
 If it complains about the manifest, it is because we added new files, but we didn't register them into the ``MANIFEST.in`` file, so let's do so:
 
 .. code-block:: bash

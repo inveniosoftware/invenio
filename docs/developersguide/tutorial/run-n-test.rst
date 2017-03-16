@@ -53,7 +53,7 @@ Now, we are able to run the tests:
 
     ./run-tests.sh
 
-Everything should pass as we didn't change any files yet.
+Everything should pass as we didn't change any files yet. If you have any trouble at this point, you can try to kill all flask applications: ``killall flask``.
 
 .. _run-the-example-app:
 
@@ -76,7 +76,7 @@ To clean the server, run the ``./app-teardown.sh`` script after killing the serv
 Build the documentation
 -----------------------
 
-The documentation can be built with the ``run-tests.sh`` script, but you need the *tests* requirements, and run the tests. If you just want to build the documentation, you will only need the *docs* requirements (see the install section above) and run:
+The documentation can be built with the ``run-tests.sh`` script, but you would have to install the *tests* requirements and run the tests. If you just want to build the documentation, you only need to install the *docs* requirements (see the install section above) and run:
 
 .. code-block:: bash
 
