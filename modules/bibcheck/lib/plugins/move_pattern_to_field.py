@@ -23,8 +23,10 @@ Bibcheck plugin to move values of fields matching some pattern to a new field.
 The new value is taken from the 'value' named group of 'pattern' (with the
 '(?P<value>regexp)' construct), if it matches the value of source_field and put
 into new_field. A subfield_filter can be specified to further restrict the
-source field and additional_subfields can optionally be set to a list of
-constant subfield (code, value) pairs to add.
+source field. 'additional_subfields' can optionally be set to a list of
+constant subfield (code, value) pairs to add, and 'keep_subfields' can
+be set to a list of subfield codes to port over to the new field or True to
+keep all of them (including the one being matched).
 
 If there is a match, the original field is deleted. By default, the new field
 is only created if it does not result in a duplicate value. This behavior can
@@ -41,6 +43,7 @@ Example rules:
     check.subfield_filter = ["y", "KEKSCAN"]
     check.additional_subfields = [["9", "KEKSCAN"]]
     check.allow_duplicates = false
+    check.keep_subfields = []
     filter_collection = HEP
     filter_pattern = 8564_u:'kek.jp/cgi-bin' - 035__9:KEKSCAN
 
@@ -49,24 +52,17 @@ Example rules:
 
 import re
 
-from invenio.bibrecord import record_add_field, record_get_field_values
 
-def check_record(record, source_field, new_field, pattern, 
-                 subfield_filter=(None, None), additional_subfields=[], 
-                 allow_duplicates=False):
+def check_record(record, source_field, new_field, pattern,
+                 subfield_filter=(None, None), additional_subfields=[],
+                 allow_duplicates=False, keep_subfields=[]):
 
     assert len(source_field) == 6
     assert len(new_field) == 6
 
-    new_code = new_field[5]
-    new_field = {
-        'tag': new_field[:3],
-        'ind1': new_field[3],
-        'ind2': new_field[4],
-    }
     delcount = 0
     regex = re.compile(pattern)
-    existing_values = set(record_get_field_values(record, code=new_code, **new_field))
+    existing_values = set(val for _, val in record.iterfield(new_field))
 
     for pos, val in record.iterfield(source_field,
                                      subfield_filter=subfield_filter):
@@ -79,11 +75,15 @@ def check_record(record, source_field, new_field, pattern,
 
                 if allow_duplicates or (
                         new_value != '' and new_value not in existing_values):
+                    kept_subfields = (
+                        (code, value) for code, value in record.get_subfields(pos)
+                        if keep_subfields == True or code in keep_subfields
+                    )
                     existing_values.add(new_value)
                     new_subfields.extend(additional_subfields)
-                    new_subfields.append((new_code, new_value),)
-                    record_add_field(record, subfields=new_subfields,
-                                     **new_field)
+                    new_subfields.extend(kept_subfields)
+                    new_subfields.append((new_field[5], new_value),)
+                    record.add_field(new_field[:5], '', new_subfields)
 
                 record.delete_field((pos[0][0:3], pos[1] - delcount, None))
                 delcount += 1
