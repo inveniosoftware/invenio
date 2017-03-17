@@ -59,7 +59,10 @@ from invenio.search_engine import \
     search_unit_in_bibxxx, \
     search_pattern
 from invenio.bibedit_utils import get_bibrecord
-from invenio.bibrecord import record_xml_output, record_add_field, record_modify_subfield
+from invenio.bibrecord import (record_xml_output,
+                               record_add_field,
+                               record_modify_subfield,
+                               record_get_subfields)
 from invenio.pluginutils import PluginContainer
 from invenio.intbitset import intbitset
 from invenio.dbquery import run_sql
@@ -465,6 +468,14 @@ class AmendableRecord(dict):
         self._query(position[:2] + (None,))[0].append((code, value))
         self.set_amended("Added subfield %s='%s' to field %s" % (code, value,
             position[0][:5]))
+
+    def get_subfields(self, position):
+        """
+        Returns a list of all subfields of the field at position (as returned
+        by ``iterfield``)
+        """
+        return record_get_subfields(self, position[0][:3],
+                                    field_position_local=position[1])
 
     def set_amended(self, message):
         """ Mark the record as amended """
