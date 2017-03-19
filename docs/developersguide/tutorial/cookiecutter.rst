@@ -37,4 +37,4 @@ This will first clone the template from git to your current directory. Then, Coo
     config_prefix [UNICORN]:
 
 
-A folder ``invenio-foo`` has been created, you can go inside an have a look at all the generated files. If you want further information about the created files, you can read the :ref:`invenio-module-layout` section.
+A folder ``invenio-unicorn`` has been created, you can go inside and have a look at all the generated files. If you want further information about the created files, you can read the :ref:`invenio-module-layout` section.
