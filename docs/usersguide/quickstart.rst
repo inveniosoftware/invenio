@@ -15,6 +15,8 @@
     along with Invenio; if not, write to the Free Software Foundation, Inc.,
     59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+.. _quickstart:
+
 Quickstart
 ==========
 
@@ -58,4 +60,4 @@ installation scripts manually::
   scripts/start-instance.sh
   firefox http://192.168.50.10/records/1
 
-See :ref:`installation_detailed` for more information.
+See :ref:`install_prerequisites` for more information.

@@ -21,13 +21,17 @@
     waive the privileges and immunities granted to it by virtue of its status
     as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-Customization
-=============
+.. _customise_invenio:
 
-The goal of this tutorial is to customize Invenio v3.
+Customise Invenio
+=================
 
-Install
--------
+The goal of this tutorial is to demonstrate basic Invenio customisation. We
+shall modify the size logo, the page templates, the search facets, the sort
+options, and more.
+
+Install "beauty" module
+-----------------------
 
 First go in the virtual machine:
 
@@ -46,8 +50,8 @@ Install the module ``invenio-beauty``:
     vagrant> invenio collect
     vagrant> invenio run -h 0.0.0.0
 
-Customize
----------
+Customize logo and templates
+----------------------------
 
 If you go to ``http://192.168.50.10/``, you will see the default Invenio,
 but how we can customize it? Let's first stop invenio server.
