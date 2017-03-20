@@ -1,5 +1,5 @@
-Part 1: Bootstrapping with cookiecutter
-=======================================
+Bootstrapping with cookiecutter
+===============================
 
 Invenio 3 has a tool to create a module from scratch, which allows you to have all the files needed for your new module. It is a template for Cookiecutter.
 
@@ -22,18 +22,18 @@ This will first clone the template from git to your current directory. Then, Coo
 .. code-block:: bash
 
     project_name [Invenio-FunGenerator]: Invenio-Unicorn
-    project_shortname [invenio-unicorn]: 
-    package_name [invenio_unicorn]: 
-    github_repo [inveniosoftware/invenio-unicorn]: 
-    description [Invenio module that adds more fun to the platform.]: 
+    project_shortname [invenio-unicorn]:
+    package_name [invenio_unicorn]:
+    github_repo [inveniosoftware/invenio-unicorn]:
+    description [Invenio module that adds more fun to the platform.]:
     author_name [CERN]: Nice Unicorn
     author_email [info@inveniosoftware.org]: nice@unicorn.com
-    year [2017]: 
-    copyright_holder [Nice Unicorn]: 
+    year [2017]:
+    copyright_holder [Nice Unicorn]:
     copyright_by_intergovernmental [True]: False
-    superproject [Invenio]: 
-    transifex_project [invenio-unicorn]: 
-    extension_class [InvenioUnicorn]: 
+    superproject [Invenio]:
+    transifex_project [invenio-unicorn]:
+    extension_class [InvenioUnicorn]:
     config_prefix [UNICORN]:
 
 

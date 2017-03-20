@@ -1,5 +1,5 @@
-Part 5: Enable travis-cli and publish to GitHub
-===============================================
+Enable travis-cli and publish to GitHub
+=======================================
 
 Configure travis-cli.org
 ------------------------
