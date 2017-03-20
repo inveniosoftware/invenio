@@ -7,5 +7,5 @@ First steps
    cookiecutter
    run-n-test
    develop
-   submit-pr
-   github-travis-pypi
+   first-commit
+   travis-github

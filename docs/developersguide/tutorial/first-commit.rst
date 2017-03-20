@@ -1,5 +1,5 @@
-Part 4: Submit a pull-request
-=============================
+Part 4: Make your first commit
+==============================
 
 Now that we finished the development, we want to publish it on GitHub.
 
@@ -33,19 +33,3 @@ Once all the tests are passing, we can push our code. As we were developing on a
 
     git commit -am "basic development"
     git push --set-upstream origin dev
-
-Create a Pull Request (PR)
---------------------------
-
-We want that our changes get merged into the main branch (master) of the repository. So, let's go to the GitHub repository. From here, you can click on the *branch* button.
-
-.. image:: resources/branch.png
-    :align: center
-
-Then, click on *New pull request*
-
-.. image:: resources/pr.png
-    :align: center
-
-Now, you can check the differences that you will add to the main branch. Fill a description and create the pull request.
-
