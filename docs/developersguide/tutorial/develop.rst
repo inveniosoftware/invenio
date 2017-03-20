@@ -21,8 +21,8 @@
     waive the privileges and immunities granted to it by virtue of its status
     as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-Part 3: Develop a module
-========================
+Develop a module
+================
 
 The goal of this tutorial is to add data to Invenio v3. We'll create a
 form that inserts the data in the database. Also we will touch different
@@ -40,16 +40,6 @@ Requirements
 Before starting let's make sure we have ``custom-data-module`` installed on
 your environment. We need that to ensure that we have the data model.
 
-How to do that?
-
-.. code-block:: console
-
-  $ cd custom-data-module
-  $ pip install .
-  $ invenio custom_demo init
-
-And restart your server
-
 1. Create the form
 ^^^^^^^^^^^^^^^^^^
 
@@ -61,11 +51,16 @@ in ``invenio_unicorn/forms.py``
 
 .. code-block:: python
 
+    """Forms module."""
+
+    from __future__ import absolute_import, print_function
+
     from flask_wtf import FlaskForm
     from wtforms import StringField, TextAreaField, validators
 
 
     class RecordForm(FlaskForm):
+        """Custom record form."""
 
         title = StringField(
             'Title', [validators.DataRequired()]
@@ -86,9 +81,11 @@ The ``views.py`` registers all the views of our application
 
 .. code-block:: python
 
+    """Invenio module that adds more fun to the platform."""
+
     from __future__ import absolute_import, print_function
 
-    from flask import Blueprint, render_template, redirect, request, url_for
+    from flask import Blueprint, redirect, render_template, request, url_for
     from flask_babelex import gettext as _
 
     from .forms import RecordForm
@@ -102,20 +99,28 @@ The ``views.py`` registers all the views of our application
     )
 
 
+    @blueprint.route("/")
+    def index():
+        """Basic view."""
+        return render_template(
+            "invenio_unicorn/index.html",
+            module_name=_('Invenio-Unicorn'))
+
+
     @blueprint.route('/create', methods=['GET', 'POST'])
     def create():
-        """The index view."""
+        """The create view."""
         form = RecordForm()
-        # If the form is valid
+        # if the form is valid
         if form.validate_on_submit():
-            # Create the record
+            # create the record
             create_record(
               dict(
                 title=form.title.data,
                 description=form.description.data
               )
             )
-            # Redirect to the success page
+            # redirect to the success page
             return redirect(url_for('invenio_unicorn.success'))
         return render_template('invenio_unicorn/create.html', form=form)
 
@@ -124,6 +129,7 @@ The ``views.py`` registers all the views of our application
     def success():
         """The success view."""
         return render_template('invenio_unicorn/success.html')
+
 
 3. Create the templates
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -167,7 +173,7 @@ form and the placeholder for the records list.
                 $.each(response.hits.hits, function(index, record) {
                   $('#custom-records').append(
                     '<li>' +
-                      '<h4>' + record.metadata.title + '</h4>' +
+                      '<h4><a href="/custom_records/' + record.metadata.custom_pid + '">' + record.metadata.title + '</a></h4>' +
                       '<p>' + record.metadata.description + '</p>' +
                      '</li>'
                   );
@@ -252,6 +258,20 @@ On the ``utils.py`` module will create a helper function that creates a record.
 
 .. code-block:: python
 
+    """Utils module."""
+
+    from __future__ import absolute_import, print_function
+
+    import uuid
+
+    from flask import current_app
+
+    from invenio_db import db
+    from invenio_indexer.api import RecordIndexer
+    from invenio_pidstore import current_pidstore
+    from invenio_records.api import Record
+
+
     def create_record(data):
         """Create a record.
 
@@ -276,11 +296,16 @@ On the ``utils.py`` module will create a helper function that creates a record.
             indexer.index(created_record)
         db.session.commit()
 
-5. Demo time
-^^^^^^^^^^^^
-Make sure you have restarted your server.
+Demo time
+---------
 
-Then go to ``http://localhost:5000/create`` and you will see the form we just
+Let's start our server again.
+
+.. code-block:: console
+
+    vagrant> invenio run -h 0.0.0.0
+
+Then go to ``http://192.168.50.10/create`` and you will see the form we just
 created. There are two fields ``Title`` and ``Description``.
 
 Let's try the form, add something to the ``Title`` and click submit, you will

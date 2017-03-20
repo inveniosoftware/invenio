@@ -25,5 +25,4 @@ First steps
    prerequisites
    install
    records
-   customize-logo
-   customize-templates
+   customize
