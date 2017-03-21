@@ -143,7 +143,7 @@
 		{% if link_to_record %}
 		<a href="{{ hepnames_link }}{{ record.record_id }}"type="button" class="btn btn-danger">HepNames Record</a>
 		{% endif %}
-		<a href="{{ update_link }}{{ record.record_id }}"type="button" class="btn btn-default">Update Details</a>
+		<a href="{{ update_link_prefix }}{{ record.record_id }}{{ update_link_suffix }} "type="button" class="btn btn-default">Update Details</a>
 	</div>
 </div>
 {% endif %}
