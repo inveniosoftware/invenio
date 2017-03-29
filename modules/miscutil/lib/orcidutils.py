@@ -654,7 +654,6 @@ def _get_external_ids(recid, url, recstruct, old_external_ids, orcid):
     doi = get_doi_for_paper(recid, recstruct)
     # There are two different fields in MARC records responsiple for ISBN id.
     isbn = record_get_field_value(recstruct, '020', '', '', 'a')
-    isbn2 = record_get_field_value(recstruct, '773', '', '', 'z')
     record_ext_ids = record_get_field_instances(recstruct, '037')
     if doi:
         for single_doi in doi:
@@ -676,10 +675,6 @@ def _get_external_ids(recid, url, recstruct, old_external_ids, orcid):
         if isbn in old_external_ids['isbn']:
             raise OrcidRecordExisting
         external_ids.add(('isbn', encode_for_jinja_and_xml(isbn)))
-    if isbn2:
-        if isbn2 in old_external_ids['isbn']:
-            raise OrcidRecordExisting
-        external_ids.add(('isbn', encode_for_jinja_and_xml(isbn2)))
 
     for rec in record_ext_ids:
         arxiv = False
