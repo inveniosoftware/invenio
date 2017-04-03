@@ -44,7 +44,7 @@ independent components that are `released independently on PyPI
 This ensures strict separation of components that talk among themselves over API
 and permits rapid development of independent components by independent teams.
 
-Invenio compontents, named *modules*, can be roughly split in three categories:
+Invenio components, named *modules*, can be roughly split in three categories:
 
 1. **base modules** provide interfaces to the Flask ecosystem, the Database, and
    other system tools and technologies that the Invenio ecosystem uses. Example:
