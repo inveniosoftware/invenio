@@ -13,13 +13,14 @@ suffix='</div><hr/>'/>
 <BFE_AUTHORS_PARENT suffix="<br />" limit="25" interactive="yes" print_affiliations="yes" affiliation_prefix="<small> (" affiliation_suffix=")</small>"/>
  </p>
 
-<p style="background-color: #ececec;" align="center" > 
+<p style="background-color: #ececec;" align="center" >
 <BFE_CITATION_SUGGESTION_HEPDATA prefix="" suffix="<br />" default="" escape="" />
-</p> 
+<br/>
+<strong>Description: </strong><BFE_FIELD tag="520__h" />
+<br/>
+</p>
 
 </div>
-
-<BFE_HEPDATA_TABLE prefix="" suffix="" default="" escape="" />
 
 <div style="padding-left:30px;padding-right:10px">
 

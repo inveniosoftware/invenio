@@ -3994,7 +3994,7 @@ class Template:
         if flag_hepdata == 1 or flag_dataverse == 1:
             c.append("<h3> This data comes from ")
             if flag_hepdata == 1:
-                c.append('<a href="http://hepdata.cedar.ac.uk/view/ins%s" target="_blank"> Durham HepData project </a>' % (recid))
+                c.append('<a href="https://hepdata.net/record/ins%s" target="_blank"> Durham HepData project </a>' % (recid))
             if flag_hepdata == 1 and flag_dataverse == 1:
                 c.append(' and ')
             if flag_dataverse == 1:
