@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2017 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -337,7 +337,7 @@ class RevisionVerifier:
 
     def retrieve_affected_tags_with_ind(self, patch):
         """
-        Generates a dictionary of all the tags added/modified/romoved from
+        Generates a dictionary of all the tags added/modified/removed from
         record1 w.r.t record2 (record1 is upload record and record2 the existing one)
 
         Returns dictionary containing tag and corresponding ind pairs
@@ -351,7 +351,7 @@ class RevisionVerifier:
             item = patch[key]
             for tag in item:
                 #each tag will have LIST of TUPLES (data)
-                affected_tags[tag] = [(data_tuple[1], data_tuple[2]) for data_tuple in item[tag]]
+                affected_tags[tag] = set((data_tuple[1], data_tuple[2]) for data_tuple in item[tag])
 
         return affected_tags
 

@@ -2,7 +2,7 @@
 ##
 ## This file is part of Invenio.
 ## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015,
-##               2016 CERN.
+##               2016, 2017 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@ BibUpload: Receive MARC XML file and update the appropriate database
 tables according to options.
 """
 
-__revision__ = "$Id$"
+__revision__ = "6a4b1d3"
 
 import os
 import re
@@ -38,6 +38,8 @@ import tempfile
 import urlparse
 import urllib2
 import urllib
+
+from collections import defaultdict
 
 from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
@@ -226,7 +228,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
         return (1, -1, msg)
 
     error = None
-    affected_tags = {}
+    affected_tags = defaultdict(set)
     original_record = {}
     rec_old = {}
     now = datetime.now()  # will hold record creation/modification date
@@ -324,7 +326,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
                 if rev_res:
                     opt_mode = rev_res[0]
                     record = rev_res[1]
-                    affected_tags = rev_res[2]
+                    affected_tags.update(rev_res[2])
                     revision_verified = True
                     write_message(lambda: "     -Patch record generated. Changing opt_mode to correct.\nPatch:\n%s " % record_xml_output(record), verbose=2)
                 else:
@@ -369,7 +371,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
             # Identify affected tags
             if opt_mode == 'correct' or opt_mode == 'replace' or opt_mode == 'replace_or_insert':
                 rec_diff = rev_verifier.compare_records(record, original_record, opt_mode)
-                affected_tags = rev_verifier.retrieve_affected_tags_with_ind(rec_diff)
+                affected_tags.update(rev_verifier.retrieve_affected_tags_with_ind(rec_diff))
             elif opt_mode == 'delete':
                 # populate an intermediate dictionary
                 # used in upcoming step related to 'delete' mode
@@ -379,7 +381,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
             elif opt_mode == 'append':
                 for tag, fields in record.iteritems():
                     if tag not in CFG_BIBUPLOAD_CONTROLFIELD_TAGS:
-                        affected_tags[tag] = [(field[1], field[2]) for field in fields]
+                        affected_tags[tag] = set((field[1], field[2]) for field in fields)
 
         # In Replace mode, take over old strong tags if applicable:
         if opt_mode in ('replace', 'replace_or_insert'):
@@ -393,28 +395,11 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
 
         # Delete tags specified if in delete mode
         if opt_mode == 'delete':
-            record = delete_tags(record, rec_old)
+            record, deleted_tags = delete_tags(record, rec_old)
             for tag, fields in record.iteritems():
                 retained_tags[tag] = [tag + (field[1] != ' ' and field[1] or '_') + (field[2] != ' ' and field[2] or '_') for field in fields]
             #identify the tags that have been deleted
-            for tag in existing_tags.keys():
-                if tag not in retained_tags:
-                    for item in existing_tags[tag]:
-                        tag_to_add = item[0:3]
-                        ind1, ind2 = item[3], item[4]
-                        if tag_to_add in affected_tags and (ind1, ind2) not in affected_tags[tag_to_add]:
-                            affected_tags[tag_to_add].append((ind1, ind2))
-                        else:
-                            affected_tags[tag_to_add] = [(ind1, ind2)]
-                else:
-                    deleted = list(set(existing_tags[tag]) - set(retained_tags[tag]))
-                    for item in deleted:
-                        tag_to_add = item[0:3]
-                        ind1, ind2 = item[3], item[4]
-                        if tag_to_add in affected_tags and (ind1, ind2) not in affected_tags[tag_to_add]:
-                            affected_tags[tag_to_add].append((ind1, ind2))
-                        else:
-                            affected_tags[tag_to_add] = [(ind1, ind2)]
+            affected_tags.update(deleted_tags)
 
             write_message("   -Delete specified tags in the old record: DONE", verbose=2)
 
@@ -447,8 +432,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
 
         # adding 005 to affected tags will delete the existing 005 entry
         # and update with the latest timestamp.
-        if '005' not in affected_tags:
-            affected_tags['005'] = [(' ', ' ')]
+        affected_tags['005'].add((' ', ' '))
 
     write_message("   -Stage COMPLETED", verbose=2)
 
@@ -497,11 +481,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
                 record = synchronize_8564(rec_id, record, record_had_FFT, bibrecdocs, pretend=pretend)
                 # in case if FFT is in affected list make appropriate changes
                 if not insert_mode_p:  # because for insert, all tags are affected
-                    if ('4', ' ') not in affected_tags.get('856', []):
-                        if '856' not in affected_tags:
-                            affected_tags['856'] = [('4', ' ')]
-                        elif ('4', ' ') not in affected_tags['856']:
-                            affected_tags['856'].append(('4', ' '))
+                    affected_tags['856'].add(('4', ' '))
                     write_message("     -Modified field list updated with FFT details: %s" % str(affected_tags), verbose=2)
             except Exception, e:
                 register_exception(alert_admin=True)
@@ -549,11 +529,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
                         if code == CFG_OAI_PROVENANCE_ALTERED_SUBFIELD:
                             oai_provenance_field[0][i] = (code, 'true')
                             tmp_indicators = (CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3] == '_' and ' ' or CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4] == '_' and ' ' or CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4])
-                            if tmp_indicators not in affected_tags.get(CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:3], []):
-                                if CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:3] not in affected_tags:
-                                    affected_tags[CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:3]] = [tmp_indicators]
-                                else:
-                                    affected_tags[CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:3]].append(tmp_indicators)
+                            affected_tags[CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:3]].add(tmp_indicators)
 
             write_message(lambda: "  Updates exists:\n%s\n!=\n%s" % (record, original_record), verbose=9)
             # format the single record as xml
@@ -616,7 +592,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
             if is_opt_mode_delete:
                 tmp_affected_tags = copy.deepcopy(affected_tags)
                 for tag in tmp_affected_tags:
-                    if tag != '005':
+                    if tag != '005' and tag not in record:
                         affected_tags.pop(tag)
             write_message("   -Clean bibrec_bibxxx: DONE", verbose=2)
             update_database_with_metadata(record, rec_id, oai_rec_id, affected_tags, pretend=pretend)
@@ -2381,7 +2357,7 @@ def update_database_with_metadata(record, rec_id, oai_rec_id="oai", affected_tag
     if affected_tags:
         for tag in record.keys():
             if tag in affected_tags.keys():
-                write_message("     -Tag %s found to be modified.Setting up for update" % tag, verbose=9)
+                write_message("     -Tag %s found to be modified. Setting up for update" % tag, verbose=9)
                 # initialize new list to hold affected field
                 new_data_tuple_list = []
                 for data_tuple in record[tag]:
@@ -2537,6 +2513,7 @@ def delete_tags(record, rec_old):
     @rtype: record structure
     """
     returned_record = copy.deepcopy(rec_old)
+    deleted_tags = defaultdict(set)
     for tag, fields in record.iteritems():
         if tag in ('001', ):
             continue
@@ -2544,7 +2521,9 @@ def delete_tags(record, rec_old):
             local_position = record_find_field(returned_record, tag, field)[1]
             if local_position is not None:
                 record_delete_field(returned_record, tag, field_position_local=local_position)
-    return returned_record
+                deleted_tags[tag].add((field[1], field[2]))
+
+    return returned_record, deleted_tags
 
 def delete_tags_to_correct(record, rec_old):
     """
