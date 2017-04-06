@@ -76,7 +76,8 @@ def check_record(record, source_field, new_field, pattern,
                 if allow_duplicates or (
                         new_value != '' and new_value not in existing_values):
                     kept_subfields = (
-                        (code, value) for code, value in record.get_subfields(pos)
+                        (code, value) for code, value in record.get_subfields(
+                            pos - delcount)
                         if keep_subfields == True or code in keep_subfields
                     )
                     existing_values.add(new_value)
