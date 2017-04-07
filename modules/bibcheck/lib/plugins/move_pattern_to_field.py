@@ -60,12 +60,11 @@ def check_record(record, source_field, new_field, pattern,
     assert len(source_field) == 6
     assert len(new_field) == 6
 
-    delcount = 0
     regex = re.compile(pattern)
     existing_values = set(val for _, val in record.iterfield(new_field))
 
-    for pos, val in record.iterfield(source_field,
-                                     subfield_filter=subfield_filter):
+    for pos, val in reversed(list(record.iterfield(source_field,
+                                     subfield_filter=subfield_filter))):
         if val:
             match = regex.match(val)
 
@@ -76,8 +75,7 @@ def check_record(record, source_field, new_field, pattern,
                 if allow_duplicates or (
                         new_value != '' and new_value not in existing_values):
                     kept_subfields = (
-                        (code, value) for code, value in record.get_subfields(
-                            pos - delcount)
+                        (code, value) for code, value in record.get_subfields(pos)
                         if keep_subfields == True or code in keep_subfields
                     )
                     existing_values.add(new_value)
@@ -86,8 +84,7 @@ def check_record(record, source_field, new_field, pattern,
                     new_subfields.append((new_field[5], new_value),)
                     record.add_field(new_field[:5], '', new_subfields)
 
-                record.delete_field((pos[0][0:3], pos[1] - delcount, None))
-                delcount += 1
+                record.delete_field((pos[0][0:3], pos[1], None))
 
                 record.set_amended(
                     "%s field '%s' containing '%s'"
