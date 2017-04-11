@@ -270,9 +270,6 @@ re_identify_bf_before_vol = \
 
 # Patterns used for creating institutional preprint report-number
 # recognition patterns (used by function "institute_num_pattern_to_regex"):
-# Recognise any character that isn't a->z, A->Z, 0->9, /, [, ], ' ', '"':
-re_report_num_chars_to_escape = \
-                re.compile(ur'([^\]A-Za-z0-9\/\[ "])', re.UNICODE)
 # Replace "hello" with hello:
 re_extract_quoted_text = (re.compile(ur'\"([^"]+)\"', re.UNICODE), ur'\g<1>',)
 # Replace / [abcd ]/ with /( [abcd])?/ :

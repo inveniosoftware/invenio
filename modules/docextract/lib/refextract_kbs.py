@@ -32,7 +32,6 @@ from invenio.bibknowledge import get_kbr_items
 from invenio.config import CFG_REFEXTRACT_KBS_OVERRIDE
 from invenio.refextract_re import re_kb_line, \
                                   re_regexp_character_class, \
-                                  re_report_num_chars_to_escape, \
                                   re_extract_quoted_text, \
                                   re_extract_char_class, \
                                   re_punctuation
@@ -194,7 +193,6 @@ def institute_num_pattern_to_regex(pattern):
     """
     simple_replacements = [
                             ('9',    r'\d'),
-                            ('9+',   r'\d+'),
                             ('w+',   r'\w+'),
                             ('a',    r'[A-Za-z]'),
                             ('v',    r'[Vv]'),
@@ -203,8 +201,6 @@ def institute_num_pattern_to_regex(pattern):
                             ('yy',   r'\d\d'),
                             ('s',    r'\s*'),
                             (r'/',   r'\/')]
-    # first, escape certain characters that could be sensitive to a regexp:
-    pattern = re_report_num_chars_to_escape.sub(r'\\\g<1>', pattern)
 
     # now loop through and carry out the simple replacements:
     for repl in simple_replacements:
