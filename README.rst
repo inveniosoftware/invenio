@@ -1,3 +1,6 @@
+.. image:: https://badge.waffle.io/inveniosoftware/invenio.png?label=ready&title=Ready 
+ :target: https://waffle.io/inveniosoftware/invenio
+ :alt: 'Stories in Ready'
 ..
     This file is part of Invenio.
     Copyright (C) 2015, 2016 CERN.
