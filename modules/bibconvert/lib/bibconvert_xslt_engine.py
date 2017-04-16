@@ -42,6 +42,7 @@ __revision__ = "$Id$"
 
 import sys
 import os
+from cStringIO import StringIO
 
 from warnings import warn
 
@@ -66,6 +67,10 @@ processor_type = 0
 try:
     # lxml
     from lxml import etree
+    lxml_version = etree.LXML_VERSION
+    if lxml_version < (2, 0, 11, 0):
+        raise ImportError("Minimum lxml version supported is 2.0.11.0, available is %s" % \
+                          ('.'.join([str(v) for v in lxml_version]),))
     processor_type = 1
 except ImportError:
     pass
@@ -305,7 +310,7 @@ def convert(xmltext, template_filename=None, template_source=None):
         # lxml
 
         try:
-            xml = etree.XML(xmltext)
+            xml = etree.parse(StringIO(xmltext))
         except etree.XMLSyntaxError, e:
             error = 'The XML code given is invalid. [%s]' % (e,)
             sys.stderr.write(error)
@@ -316,7 +321,7 @@ def convert(xmltext, template_filename=None, template_source=None):
             return None
 
         try:
-            xsl = etree.XML(template)
+            xsl = etree.parse(StringIO(template))
         except etree.XMLSyntaxError, e:
             error = 'The XSL code given is invalid. [%s]' % (e,)
             sys.stderr.write(error)
