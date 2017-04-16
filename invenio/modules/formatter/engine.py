@@ -2018,14 +2018,17 @@ class BibFormatObject(object):
             # If record is given as parameter
             self.xml_record = xml_record
             self.record = create_record(xml_record)[0]
-            recID = record_get_field_value(self.record, "001") or None
 
-        try:
-            assert isinstance(recID, (int, long, type(None))), 'Argument of wrong type!'
-        except AssertionError:
-            register_exception(prefix="recid needs to be an integer in BibFormatObject",
-                               alert_admin=True)
-            recID = int(recID)
+            try:
+                # isinstance check is as slow as directly casting a int in int
+                recID = int(record_get_field_value(self.record, "001"))
+            except ValueError:
+                # in the worst case record_get_field_value returns ''
+                # casting '' to int is triggering ValueError Exception
+                register_exception("Couldn't find recID in record")
+                # NB: because int conversion crash before affectation recID has the
+                # recID parameter value.
+
         self.recID = recID
         self.lang = wash_language(ln)
         if search_pattern is None:
