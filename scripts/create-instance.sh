@@ -89,6 +89,9 @@ if [ "${INVENIO_WORKER_HOST}" = "" ]; then
     echo "[ERROR] Example: export INVENIO_WORKER_HOST=192.168.50.15"
     exit 1
 fi
+if [ -z "$DEBUG" ]; then
+    DEBUG=0
+fi
 
 # load virtualenvrapper:
 # shellcheck source=/dev/null
@@ -106,12 +109,18 @@ cdvirtualenv
 set -o errexit
 set -o nounset
 
-if [[ "$@" != *"--devel"* ]]; then
+# ideally, when we'll have refactored the setup.py:
+#if [ "$FLASK_DEBUG" != 1 ]; then
+#    pip install invenio[ils]
+#else
+#    pip install invenio[ils,extra]
+#fi
+# For the moment, we use an extra requirements file:
 # sphinxdoc-install-invenio-full-begin
 pip install invenio-app-ils[postgresql,elasticsearch2]
 # sphinxdoc-install-invenio-full-end
-else
-    pip install -r "$scriptpathname/../requirements-devel.txt"
+if [ "$DEBUG" == 1 ]; then
+    pip install -r "$scriptpathname/../requirements-extra.txt"
 fi
 
 # sphinxdoc-customise-instance-begin

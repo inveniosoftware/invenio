@@ -22,6 +22,27 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+# README
+# ======
+#
+# This docker setup will create a demo site which will be run in debug mode.
+# It authorizes you to develop code locally, and it will automatically update
+# the demo site with your changes.
+#
+# To do so, you need to have a folder named `../modules` (at the same level
+# as the `invenio` directory containing this file). This folder will be
+# in the containers in `/modules`. You can develop a module here and pip
+# install it in your web container
+# (`pip install -Ue /modules/invenio-thingy[all]`).
+#
+# To start this setup, you need to run the following commands:
+# $ docker-compose -f docker-compose-dev.yml build
+# $ docker-compose -f docker-compose-dev.yml up [-d]
+# $ docker-compose -f docker-compose-dev.yml run --rm web /code/scripts/populate-instance.sh
+#
+# Then you can access to containers with
+# $ docker exec -it invenio_web_1 bash
+
 version: "3"
 services:
   web:
@@ -29,7 +50,7 @@ services:
     build:
       context: .
       args:
-        DEBUG: 0
+        DEBUG: 1
     command: /bin/bash -c "invenio run -h 0.0.0.0"
     environment:
       PATH: "/home/invenio/.virtualenvs/invenio/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
@@ -48,6 +69,7 @@ services:
       INVENIO_RABBITMQ_HOST: "rabbitmq"
       INVENIO_WORKER_HOST: "127.0.0.1"
     volumes:
+      - ../modules:/modules
       - static:/home/invenio/.virtualenvs/invenio/var/instance/static
     links:
       - postgresql
@@ -56,6 +78,7 @@ services:
       - rabbitmq
     ports:
       - "5000:5000"
+    working_dir: "/modules"
 
   postgresql:
     restart: "always"
@@ -104,7 +127,7 @@ services:
     build:
       context: .
       args:
-        DEBUG: 0
+        DEBUG: 1
     volumes:
       - static:/home/invenio/.virtualenvs/invenio/var/instance/static
     user: invenio

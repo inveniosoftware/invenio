@@ -38,6 +38,7 @@ include MAINTAINERS
 include THANKS
 include Vagrantfile
 include docker-compose.yml
+include docker-compose-dev.yml
 include docs/requirements.txt
 include elasticsearch/Dockerfile
 include nginx/Dockerfile

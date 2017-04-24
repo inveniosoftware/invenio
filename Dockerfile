@@ -25,6 +25,9 @@
 # Use Python-2.7:
 FROM python:2.7-slim
 
+# Args coming from docker-compose
+ARG DEBUG
+
 # Configure Invenio instance:
 ENV INVENIO_WEB_HOST=127.0.0.1
 ENV INVENIO_WEB_INSTANCE=invenio
@@ -39,6 +42,7 @@ ENV INVENIO_REDIS_HOST=redis
 ENV INVENIO_ELASTICSEARCH_HOST=elasticsearch
 ENV INVENIO_RABBITMQ_HOST=rabbitmq
 ENV INVENIO_WORKER_HOST=127.0.0.1
+ENV FLASK_DEBUG=$DEBUG
 
 # Install Invenio web node pre-requisites:
 COPY scripts/provision-web.sh /tmp/
