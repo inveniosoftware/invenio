@@ -47,39 +47,53 @@ tests_require = [
 invenio_db_version = '>=1.0.0b3,<1.1.0'
 
 extras_require = {
-    'access': [
+    # Flavours
+    'ils': [
+        'invenio-app-ils>=1.0.0.dev0,<1.1.0',
+    ],
+    # Bundles
+    'base': [
+        'invenio-admin>=1.0.0b1,<1.1.0',
+        'invenio-assets>=1.0.0b6,<1.1.0',
+        'invenio-formatter>=1.0.0b1,<1.1.0',
+        'invenio-logging>=1.0.0b1,<1.1.0',
+        'invenio-mail>=1.0.0b1,<1.1.0',
+        'invenio-rest>=1.0.0a10,<1.1.0',
+        'invenio-theme>=1.0.0b1,<1.1.0',
+    ],
+    'auth': [
         'invenio-access>=1.0.0a11,<1.1.0',
-    ],
-    'accounts': [
         'invenio-accounts>=1.0.0b1,<1.1.0',
+        'invenio-oauth2server>=1.0.0a14,<1.1.0',
+        'invenio-oauthclient>=1.0.0a12,<1.1.0',
+        'invenio-userprofiles>=1.0.0a9,<1.1.0',
     ],
-    'records': [
-        'dojson>=1.2.1',
+    'metadata': [
+        'invenio-indexer>=1.0.0a9,<1.1.0',
+        'invenio-jsonschemas>=1.0.0a3,<1.1.0',
+        'invenio-oaiserver>=1.0.0a12,<1.1.0',
         'invenio-pidstore>=1.0.0b1,<1.1.0',
-        'invenio-records>=1.0.0b1,<1.1.0',
+        'invenio-records-rest>=1.0.0a18,<1.1.0',
         'invenio-records-ui>=1.0.0a8,<1.1.0',
-        'invenio-records-rest>=1.0.0a17,<1.1.0',
-    ],
-    'search': [
+        'invenio-records>=1.0.0b1,<1.1.0',
+        'invenio-search-ui>=1.0.0a6,<1.1.0',
         'invenio-search>=1.0.0a9,<1.1.0',
     ],
-    'theme': [
-        'invenio-assets>=1.0.0b4,<1.1.0',
-        'invenio-theme>=1.0.0a14,<1.1.0',
-    ],
-    'utils': [
-        'invenio-mail>=1.0.0a5,<1.1.0',
-        'invenio-rest>=1.0.0a10,<1.1.0',
-        'invenio-logging>=1.0.0a3,<1.1.0',
-    ],
+    # Databases
     'mysql': [
         'invenio-db[mysql]' + invenio_db_version,
     ],
     'postgresql': [
         'invenio-db[postgresql]' + invenio_db_version,
     ],
+    # Elasticsearch versions
+    'elasticsearch2': [
+        'elasticsearch>=2.0.0,<3.0.0',
+        'elasticsearch-dsl>=2.0.0,<3.0.0',
+    ],
+    # Docs and test dependencies
     'docs': [
-        'Sphinx>=1.4.2',
+        'Sphinx>=1.5.1',
     ],
     'tests': tests_require,
 }
@@ -89,25 +103,15 @@ extras_require = {
 #   pip install invenio[repository]
 #
 aliases = {
-    'minimal': [
-        'accounts',
-        'theme',
-        'utils',
-    ],
-    'full': [
-        'access',
-        'accounts',
-        'records',
-        'search',
-        'theme',
-        'utils',
-    ],
+
 }
 
 for name, requires in aliases.items():
     extras_require[name] = []
     for r in requires:
-        extras_require[name].extend(extras_require[r])
+        extras_require[name].extend(
+            extras_require[r] if r in extras_require else [r]
+        )
 
 # All alias to install every possible dependency.
 extras_require['all'] = []
@@ -126,12 +130,10 @@ setup_requires = [
 
 install_requires = [
     'Flask>=0.11.1',
-    'elasticsearch>=2.0.0,<3.0.0',
-    'elasticsearch-dsl>=2.0.0,<3.0.0',
-    'invenio-base>=1.0.0a6,<1.1.0',
-    'invenio-celery>=1.0.0a2,<1.1.0',
-    'invenio-config>=1.0.0a1,<1.1.0',
-    'invenio-i18n>=1.0.0a1,<1.1.0',
+    'invenio-base>=1.0.0a14,<1.1.0',
+    'invenio-celery>=1.0.0b2,<1.1.0',
+    'invenio-config>=1.0.0b2,<1.1.0',
+    'invenio-i18n>=1.0.0b3,<1.1.0',
 ]
 
 packages = find_packages()

@@ -17,9 +17,8 @@
 
 .. _code-of-conduct:
 
-=================
- Code of Conduct
-=================
+Code of Conduct
+===============
 
 We endorse the `Python Community Code of Conduct
 <https://www.python.org/psf/codeofconduct/>`_:
