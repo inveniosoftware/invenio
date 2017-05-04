@@ -42,10 +42,11 @@ suppress_warnings = ['image.nonlocal_uri']
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
+    'sphinx.ext.doctest',
     'sphinx.ext.graphviz',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.todo',
     'sphinx.ext.viewcode',
 ]
 
@@ -127,7 +128,7 @@ pygments_style = 'sphinx'
 #keep_warnings = False
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
-todo_include_todos = False
+todo_include_todos = True
 
 
 # -- Options for HTML output ----------------------------------------------
