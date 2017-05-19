@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -262,11 +262,11 @@ install-mediaelement:
 	@echo "***********************************************************"
 	rm -rf /tmp/mediaelement
 	mkdir /tmp/mediaelement
-	wget 'http://github.com/johndyer/mediaelement/zipball/2.18.1' -O '/tmp/mediaelement/mediaelement.zip' --no-check-certificate
+	wget 'https://github.com/mediaelement/mediaelement/archive/2.18.1.zip' -O '/tmp/mediaelement/mediaelement.zip' --no-check-certificate
 	unzip -u -d '/tmp/mediaelement' '/tmp/mediaelement/mediaelement.zip'
 	rm -rf ${prefix}/var/www/mediaelement
 	mkdir ${prefix}/var/www/mediaelement
-	mv /tmp/mediaelement/johndyer-mediaelement-*/build/* ${prefix}/var/www/mediaelement
+	mv /tmp/mediaelement/mediaelement-*/build/* ${prefix}/var/www/mediaelement
 	rm -rf /tmp/mediaelement
 	@echo "***********************************************************"
 	@echo "** MediaElement.js was successfully installed.           **"
