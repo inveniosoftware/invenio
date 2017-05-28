@@ -34,6 +34,7 @@ import datetime
 from itertools import groupby, count, ifilter, chain, imap, repeat, izip
 from operator import itemgetter
 
+from invenio.search_engine import deserialize_via_marshal
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_SITE_URL
@@ -62,7 +63,7 @@ from invenio.bibauthorid_general_utils import memoized
 from invenio.bibauthorid_general_utils import monitored
 from invenio.bibauthorid_logutils import Logger
 import time
-from intbitset import intbitset
+from invenio.intbitset import intbitset
 import re
 
 
@@ -2952,7 +2953,18 @@ def get_papers_info_of_author(pid, flag,  # get_person_papers
                       'where personid=%s '
                       'and flag >= %s', (pid, flag))
 
-    def format_record(record):
+    # total HACK to speed up claiming for Atlas/CMS authors
+    use_recstruct = True
+    if len(records) > 100:
+        aurecs = [recdata[2] for recdata in records]
+
+        aucounts = run_sql('select termlist from idxWORD20R where id_bibrec in (%s)' % ','.join([str(r) for r in aurecs]))
+        aucounts = sorted([int(deserialize_via_marshal(val[0])[0]) for val in aucounts])
+        # at least 5 records with over 500 authors
+        if aucounts[-5] > 500:
+            use_recstruct = False
+
+    def format_record(record, use_recstruct=True):
         '''
         Gets information for the paper that the record is associated with.
 
@@ -2972,13 +2984,22 @@ def get_papers_info_of_author(pid, flag,  # get_person_papers
         record_info = {'data': sig_str,
                        'flag': flag}
 
-        recstruct = get_record(rec)
+        if use_recstruct:
+            recstruct = get_record(rec)
 
         if show_author_name:
             record_info['authorname'] = name
 
         if show_title:
-            record_info['title'] = (record_get_field_value(recstruct, '245', '', '', 'a'),)
+            if use_recstruct:
+                record_info['title'] = (record_get_field_value(recstruct, '245', '', '', 'a'),)
+            else:
+                try:
+                    title = get_fieldvalues(rec, '245__a')[0]
+                except IndexError:
+                    title = ""
+
+                record_info['title'] = (title,)
 
         if show_rt_status:
             record_info['rt_status'] = False
@@ -2995,7 +3016,15 @@ def get_papers_info_of_author(pid, flag,  # get_person_papers
             record_info['affiliation'] = get_grouped_records((table, ref, rec), tag)[tag]
 
         if show_date:
-            record_info['date'] = (record_get_field_value(recstruct, '269', '', '', 'c'),)
+            if use_recstruct:
+                record_info['date'] = (record_get_field_value(recstruct, '269', '', '', 'c'),)
+            else:
+                try:
+                    date = get_fieldvalues(rec, '269__c')[0]
+                except IndexError:
+                    date = ""
+
+                record_info['date'] = (date,)
 
         try:
             record_info['earliest_date'] = run_sql("SELECT earliest_date FROM bibrec WHERE id=%s", (rec, ))[0][0].strftime("%Y-%m-%d")
@@ -3004,12 +3033,20 @@ def get_papers_info_of_author(pid, flag,  # get_person_papers
             pass
 
         if show_experiment:
-            record_info['experiment'] = (record_get_field_value(recstruct, '693', '', '', 'e'),)
+            if use_recstruct:
+                record_info['experiment'] = (record_get_field_value(recstruct, '693', '', '', 'e'),)
+            else:
+                try:
+                    experiment = get_fieldvalues(rec, '693__e')[0]
+                except IndexError:
+                    experiment = ''
+
+                record_info['experiment'] = (experiment,)
 
         return record_info
 
     request_tickets = get_request_tickets_for_author(pid)
-    return [format_record(record) for record in records]
+    return [format_record(record, use_recstruct) for record in records]
 
 
 def get_names_of_author(pid, sort_by_count=True):  # get_person_db_names_count
