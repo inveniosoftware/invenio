@@ -29,6 +29,8 @@ import time
 import calendar
 import traceback
 
+from lxml import etree as ET
+
 from invenio.config import CFG_ETCDIR, CFG_SITE_URL, \
                            CFG_SITE_ADMIN_EMAIL, \
                            CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
@@ -135,58 +137,44 @@ def remove_duplicates(harvested_file_list):
 
     Saves a backup of original harvested file in: filename~
     """
-    harvested_identifiers = []
+    harvested_identifiers = set()
     for harvested_file in harvested_file_list:
+        try:
+            tree = ET.parse(harvested_file)
+        except ET.ParseError as err:
+            write_message("Error parsing the harvested file: %s" % err)
+            continue
+        root = tree.getroot()
+        namespace = {'oaipmh': 'http://www.openarchives.org/OAI/2.0/'}
+        ids = [oaiid.text for oaiid in
+               root.findall('.//oaipmh:ListRecords/oaipmh:record/oaipmh:header/oaipmh:identifier',
+                            namespace)]
+
+        dups = [oaiid for oaiid in ids if oaiid in harvested_identifiers
+                or harvested_identifiers.add(oaiid)]
+
+        if not dups:
+            continue
+
         # Firstly, rename original file to temporary name
         try:
             os.rename(harvested_file, "%s~" % (harvested_file,))
         except IOError:
             write_message("Error renaming harvested file '%s': %s" % \
-                         (harvested_file, traceback.print_exc()))
+                          (harvested_file, traceback.print_exc()))
             continue
-        # Secondly, open files for writing and reading
-        original_harvested_file = None
-        try:
-            try:
-                original_harvested_file = open("%s~" % (harvested_file,))
-                data = original_harvested_file.read()
-            except IOError:
-                write_message("Error opening harvested file '%s': %s" % \
-                             (harvested_file, traceback.print_exc()))
-                continue
-        finally:
-            if original_harvested_file:
-                original_harvested_file.close()
+        reclist = root.find('.//oaipmh:ListRecords', namespace)
+        removelist = []
+        for record in reclist:
+            oaiid = record.find('oaipmh:header/oaipmh:identifier', namespace).text
+            if oaiid in dups:
+                dups.remove(oaiid)
+                removelist.append(record)
 
-        if '<ListRecords>' not in data:
-            # We do not need to de-duplicate in non-ListRecords requests
-            continue
+        for record in removelist:
+            reclist.remove(record)
 
-        updated_file_content = []
-        # Get and write OAI-PMH XML header data to updated file
-        header_index_end = data.find("<ListRecords>") + len("<ListRecords>")
-        updated_file_content.append("%s" % (data[:header_index_end],))
-
-        # By checking the OAI ID we write all records not written previously (in any file)
-        harvested_records = REGEXP_RECORD.findall(data)
-        for record in harvested_records:
-            oai_identifier = REGEXP_OAI_ID.search(record)
-            if oai_identifier != None and oai_identifier.group(1) not in harvested_identifiers:
-                updated_file_content.append("<record>%s</record>" % (record,))
-                harvested_identifiers.append(oai_identifier.group(1))
-        updated_file_content.append("</ListRecords>\n</OAI-PMH>")
-        updated_harvested_file = None
-        try:
-            try:
-                updated_harvested_file = open(harvested_file, 'w')
-                updated_harvested_file.write("\n".join(updated_file_content))
-            except IOError:
-                write_message("Error saving updated harvest-file '%s': %s" % \
-                             (harvested_file, traceback.print_exc()))
-                continue
-        finally:
-            if updated_harvested_file:
-                updated_harvested_file.close()
+        tree.write(harvested_file, xml_declaration=True, encoding='utf-8', method='xml')
 
 
 def add_timestamp_and_timelag(timestamp,
