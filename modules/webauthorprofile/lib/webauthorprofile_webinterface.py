@@ -619,7 +619,11 @@ class WebAuthorPages(WebInterfaceDirectory):
 
                 citation_data, cache_status = get_summarize_records(person_id)
                 records, records_cache_status = get_pubs(person_id)
-                datasets = len(get_datasets(person_id)[0])
+                datasets = get_datasets(person_id)
+                if datasets and datasets[0]:
+                    datasets = len(datasets[0])
+                else:
+                    datasets = 0
 
                 citations = {'breakdown_categories': ['Renowned papers (500+)', 'Famous papers (250-499)',
                                                       'Very well-known papers (100-249)',
