@@ -26,6 +26,8 @@
 # from cgi import escape
 # from urllib import quote
 #
+import urllib
+
 import invenio.bibauthorid_config as bconfig
 from invenio.config import CFG_SITE_LANG, CFG_ETCDIR
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_BASE_URL, CFG_INSPIRE_SITE
@@ -269,7 +271,7 @@ class WebProfilePage():
         return loaded_template.render(content)
 
     @staticmethod
-    def render_citations_summary_content(citations, canonical_name):
+    def render_citations_summary_content(citations, canonical_name, datasets):
 
         def _get_breakdown_categories_bounds(pid):
             """
@@ -286,6 +288,11 @@ class WebProfilePage():
                     return (int(bounds_str.strip('+')), 1000000)
                 else:
                     return map(int, bounds_str.split('-'))
+
+        dataset_query = "/search?" + urllib.urlencode({
+            'cc': 'Data',
+            'p': 'author:"%s"' % canonical_name,
+        })
 
         citeable_breakdown_queries = dict()
         published_breakdown_queries = dict()
@@ -324,6 +331,8 @@ class WebProfilePage():
                               'breakdown': citations['data']['Published only']['breakdown'],
                               'breakdown_queries': published_breakdown_queries},
                 'breakdown_categories': citations['breakdown_categories'],
+                'datasets': datasets,
+                'dataset_query': dataset_query,
                 'hindex_fine_print_link': "%s/help/citation-metrics" % CFG_BASE_URL,
                 'citation_fine_print_link': "%s/help/citation-metrics" % CFG_BASE_URL,
                 'citeable_papers_link': tmpl_citesummary_get_link(canonical_name, 'author', 'collection:citeable'),

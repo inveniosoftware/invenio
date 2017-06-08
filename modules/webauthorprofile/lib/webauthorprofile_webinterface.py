@@ -619,6 +619,7 @@ class WebAuthorPages(WebInterfaceDirectory):
 
                 citation_data, cache_status = get_summarize_records(person_id)
                 records, records_cache_status = get_pubs(person_id)
+                datasets = len(get_datasets(person_id)[0])
 
                 citations = {'breakdown_categories': ['Renowned papers (500+)', 'Famous papers (250-499)',
                                                       'Very well-known papers (100-249)',
@@ -639,7 +640,7 @@ class WebAuthorPages(WebInterfaceDirectory):
                         canonical_name = result[0][0]
                     else:
                         canonical_name = ""
-                    content = WebProfilePage.render_citations_summary_content(citations, canonical_name)
+                    content = WebProfilePage.render_citations_summary_content(citations, canonical_name, datasets)
                 elif not citation_data and not records:
                     content = "No citations data."
 

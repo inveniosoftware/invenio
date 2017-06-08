@@ -51,19 +51,37 @@
         <tr>
             <td>{{ key }}</td>
             {% if citeable.breakdown[key] == 0 %}
-        <td>{{ citeable.breakdown[key]|groupformat }}</td> 
-            {% else %}  
+        <td>{{ citeable.breakdown[key]|groupformat }}</td>
+            {% else %}
 	    <td><a href=" {{ citeable.breakdown_queries[key]  }} "> {{ citeable.breakdown[key]|groupformat }}</a></td>
             {% endif %}
 
             {% if published.breakdown[key] == 0 %}
         <td>{{ published.breakdown[key]|groupformat }}</td>
-            {% else %}     
+            {% else %}
 	    <td><a href=" {{ published.breakdown_queries[key] }}"> {{ published.breakdown[key]|groupformat }}</a></td>
             {% endif %}
         </tr>{% endfor %}
     </tbody>
-
+</table>
+<table class="table table-hover table-condensed">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Citeable datasets</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Number of datasets</td>
+            {% if datasets == 0 %}
+            <td>{{ datasets }}</td>
+            {% else %}
+	        <td><a href="{{ dataset_query }}"> {{ datasets }}</a></td>
+            {% endif %}
+        </tr>
+    </tbody>
 </table>
 <p class="text-center"><a href="{{ selfcite_link }}">Click here to view statistics without self-citations or RPP</a></p>
 <p><strong>Warning</strong>: The citations count should be interpreted with great care. <a href="{{ citation_fine_print_link }}">Read the fine print</a></p>
