@@ -519,7 +519,7 @@ class Template:
                         second_author = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(canonical)
                     else:
                         second_author = 'exactauthor:"%s"' % name
-                    rec_query = baid_query + second_author + " -cn:'Collaboration' "
+                    rec_query = baid_query + second_author + " -cn:** "
                     lnk = " <a href='%s/author/profile/%s'> %s </a> (" % (CFG_SITE_URL, canonical, name) + create_html_link(websearch_templates.build_search_url(p=rec_query), {}, "%s" % (frequency,),) + ')'
                     content.append("%s" % lnk)
                 return "<br>\n".join(content)
