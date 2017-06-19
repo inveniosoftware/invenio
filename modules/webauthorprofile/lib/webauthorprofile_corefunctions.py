@@ -29,6 +29,7 @@ from time import time, sleep
 from datetime import timedelta, datetime
 from re import split as re_split
 from re import compile as re_compile
+from retrying import retry, RetryError
 from urllib import urlopen
 from collections import deque
 # NB: For future reference, elementtree.ElementTree is depreciated after
@@ -91,6 +92,22 @@ def set_force_expired_cache(val=True):
 year_pattern = re_compile(r'(\d{4})')
 
 
+class PreCacheError(Exception):
+    """ Exception raised when a cache value is queried while being computed """
+    pass
+
+
+def retry_if_precache_error(exception):
+    """ return True if exception is a PreCacheError """
+    return isinstance(exception, PreCacheError)
+
+
+@retry(
+    wait_exponential_multiplier=500,
+    wait_exponential_max=20000,
+    retry_on_exception=retry_if_precache_error,
+    wrap_exception=True
+)
 def update_cache(cached, name, key, target, *args):
     '''
     Actual update of cached value of (name, key). Updates to the result of target(args).
@@ -103,7 +120,7 @@ def update_cache(cached, name, key, target, *args):
         delay = datetime.now() - cached['last_updated']
         if delay < RECOMPUTE_PRECACHED_ELEMENT_DELAY and cached['precached']:
             #print '--!!!Udating cache skip precached!'
-            return [False, None]
+            raise PreCacheError
     precache_element(name, key)
     el = target(*args)
     cache_element(name, key, serialize(el))
@@ -123,11 +140,16 @@ def retrieve_update_cache(name, key, target, *args):
             delay = datetime.now() - cached['last_updated']
             if delay < CACHE_IS_OUTDATED_DELAY:
                 return [deserialize(cached['value']), True]
-    val = update_cache(cached, name, str(key), target, *args)
+
+    try:
+        val = update_cache(cached, name, str(key), target, *args)
+    except RetryError:
+        return [None, False]
     if val[0]:
         return [val[1], True]
     else:
         return [None, False]
+
 
 def foo(x, y, z, t):
     ''' foo to test the caching mechanism. '''
