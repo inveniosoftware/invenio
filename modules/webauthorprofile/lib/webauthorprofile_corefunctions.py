@@ -106,7 +106,8 @@ def retry_if_precache_error(exception):
     wait_exponential_multiplier=500,
     wait_exponential_max=20000,
     retry_on_exception=retry_if_precache_error,
-    wrap_exception=True
+    wrap_exception=True,
+    stop_max_attempt_number=9
 )
 def update_cache(cached, name, key, target, *args):
     '''
@@ -419,7 +420,7 @@ def _get_external_publications(person_id):
                 arxiv_pubs[arxiv_pubid] = get_title_of_arxiv_pubid(arxiv_pubid)
 
             if IS_BATCH_PROCESS:
-                time.sleep(CONNECTION_WAITTIME)
+                sleep(CONNECTION_WAITTIME)
 
         return arxiv_pubs
 
@@ -443,7 +444,7 @@ def _get_external_publications(person_id):
                 orcid_pubs[doi] = title
 
             if IS_BATCH_PROCESS:
-                time.sleep(CONNECTION_WAITTIME)
+                sleep(CONNECTION_WAITTIME)
 
         return orcid_pubs
 
