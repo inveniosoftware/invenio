@@ -1929,7 +1929,7 @@ $(document).ready(function() {
       this.hooks = {};
 
       this.minTime = minTime || 5000; // Default to 5 seconds.
-      this.concurrentRequests = num || 8; // Default to 8.
+      this.concurrentRequests = num || 6; // Default to 6.
       this.baseUrl = "/author/profile/";
 
       displayLoading = function showLoadingSpinner( box ) {
