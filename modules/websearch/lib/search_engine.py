@@ -2370,7 +2370,7 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
         for p_synonym in get_synonym_terms(p,
                              CFG_WEBSEARCH_SYNONYM_KBRS[f or 'anyfield'][0],
                              CFG_WEBSEARCH_SYNONYM_KBRS[f or 'anyfield'][1]):
-            if p_synonym != p and \
+            if p_synonym.lower() != p.lower() and \
                    not p_synonym in ignore_synonyms:
                 hitset_synonyms |= search_unit(p_synonym, f, m, wl,
                                                ignore_synonyms)
