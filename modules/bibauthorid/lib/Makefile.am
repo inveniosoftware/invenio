@@ -71,6 +71,7 @@ jsdir=$(localstatedir)/www/js
 js_DATA =	bibauthorid.js \
 			bootstrap.min.js \
 			underscore-min.js \
+			underscore-min.map \
 			backbone.js \
 			handlebars.js \
 			hepname_update.js \

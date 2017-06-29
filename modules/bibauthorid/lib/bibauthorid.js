@@ -2022,7 +2022,6 @@ $(document).ready(function() {
 
               $box.data( "boxLoaded", false );
 
-
           },
 
           "complete": function ( jqXHR, textStatus ) {
@@ -2052,10 +2051,10 @@ $(document).ready(function() {
 
       };
 
-      requestAllowed = function checkIfRequestAllowed( box, time ) {
+      requestAllowed = function checkIfRequestAllowed( box, time, now ) {
 
         var $box = $( box ),
-            delta = ( new Date() ).getTime() - $box.data( "boxDispatchTimestamp" );
+            delta = now - $box.data( "boxDispatchTimestamp" );
 
         return delta > time;
 
@@ -2063,7 +2062,8 @@ $(document).ready(function() {
 
       this.loadingState = function getLoadingState( obj ) {
 
-        var inProgress = 0, queue, delayed = null;
+        var inProgress = 0, queue, delayed = null,
+	    checktime = ( new Date() ).getTime();
 
         // Generate list of boxes to load
         queue = _.filter( obj.boxes, function( box ) {
@@ -2079,7 +2079,7 @@ $(document).ready(function() {
 
           toLoad = ! $box.data( "boxLoaded" ); // Boxes that aren't loaded.
           toLoad &= ! $box.data( "boxDispatched" ); // And boxes that aren't dispatched already.
-          toLoad &= requestAllowed( box, obj.minTime ); // And if enough time has passed.
+          toLoad &= requestAllowed( box, obj.minTime, checktime ); // And if enough time has passed.
 
           return toLoad;
 
@@ -2090,16 +2090,9 @@ $(document).ready(function() {
           var toLoad = false,
               $box = $( box );
 
-          // Count number requests currently in progress.
-          if ( $( box ).data( "boxDispatched" ) && ! $( box ).data( "boxLoaded" ) ) {
-
-            inProgress ++;
-
-          }
-
           toLoad = ! $box.data( "boxLoaded" ); // Boxes that aren't loaded.
           toLoad &= ! $box.data( "boxDispatched" ); // And boxes that aren't dispatched already.
-          toLoad &= ! requestAllowed( box, obj.minTime );
+          toLoad &= ! requestAllowed( box, obj.minTime, checktime );
 
           return toLoad;
 
@@ -2151,7 +2144,7 @@ $(document).ready(function() {
 
 
         if ( canLoad ) {
-          var randSample = _.sample( queue, qtyToLoad );
+            var randSample = _.sample( queue, qtyToLoad );
 
           _.map( randSample, function(item) {
             dispatch( item, loader );
@@ -2161,7 +2154,6 @@ $(document).ready(function() {
       };
 
       init( this );
-
 
     };
 
