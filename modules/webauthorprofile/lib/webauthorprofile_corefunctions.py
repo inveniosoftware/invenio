@@ -109,7 +109,7 @@ def retry_if_precache_error(exception):
     wrap_exception=True,
     stop_max_attempt_number=14
 )
-def update_cache(cached, name, key, target, *args):
+def update_cache(name, key, target, *args):
     '''
     Actual update of cached value of (name, key). Updates to the result of target(args).
     If value present in cache, not up to date but last_updated less than a threshold it does nothing,
@@ -117,6 +117,7 @@ def update_cache(cached, name, key, target, *args):
     precaches it, computes its value and stores it in cache returning its value.
     '''
     #print '--Updating cache: ', name,' ',key
+    cached = get_cached_element(name, key)
     if cached['present']:
         delay = datetime.now() - cached['last_updated']
         if delay < RECOMPUTE_PRECACHED_ELEMENT_DELAY and cached['precached']:
@@ -143,7 +144,7 @@ def retrieve_update_cache(name, key, target, *args):
                 return [deserialize(cached['value']), True]
 
     try:
-        val = update_cache(cached, name, str(key), target, *args)
+        val = update_cache(name, str(key), target, *args)
     except RetryError:
         return [None, False]
     if val[0]:
