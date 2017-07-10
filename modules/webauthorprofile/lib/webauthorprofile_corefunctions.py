@@ -576,16 +576,16 @@ def _get_institute_pubs_dict(recids, namesdict):
     names_list = namesdict['db_names_dict'].keys()
     names_to_records = namesdict['names_to_records']
     a = format_records(recids, 'WAPAFF')
-    gcd = False
-    if version_info[0] < 3 and version_info[1] < 7:
+    gcfix = version_info[0] < 3 and version_info[1] < 7
+    if gcfix:
         # workaround for known problem with python 2.6 garbage collection
         # causing massive slowdown
         import gc
-        gcd = True
         gc.disable()
     a = [deserialize(p) for p in a.strip().split('!---THEDELIMITER---!') if p]
-    if gcd:
+    if gcfix:
         gc.enable()
+        gc.collect()
     affdict = {}
     for rec, affs in a:
         keys = affs.keys()
