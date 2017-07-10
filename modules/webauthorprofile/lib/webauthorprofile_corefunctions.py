@@ -25,6 +25,7 @@ WebAuthorProfile web interface logic and URL handler
 # pylint: disable=C0301
 # pylint: disable=W0613
 
+from sys import version_info
 from time import time, sleep
 from datetime import timedelta, datetime
 from re import split as re_split
@@ -575,7 +576,16 @@ def _get_institute_pubs_dict(recids, namesdict):
     names_list = namesdict['db_names_dict'].keys()
     names_to_records = namesdict['names_to_records']
     a = format_records(recids, 'WAPAFF')
+    gcd = False
+    if version_info[0] < 3 and version_info[1] < 7:
+        # workaround for known problem with python 2.6 garbage collection
+        # causing massive slowdown
+        import gc
+        gcd = True
+        gc.disable()
     a = [deserialize(p) for p in a.strip().split('!---THEDELIMITER---!') if p]
+    if gcd:
+        gc.enable()
     affdict = {}
     for rec, affs in a:
         keys = affs.keys()
