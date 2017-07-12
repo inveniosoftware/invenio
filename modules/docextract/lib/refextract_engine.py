@@ -1358,7 +1358,11 @@ def get_plaintext_document_body(fpath, keep_layout=False):
         elif (res_gfile.lower().find("pdf") != -1) or \
             (res_gfile.lower().find("pdfa") != -1):
             # convert from PDF
-            (textbody, status) = convert_PDF_to_plaintext(fpath, keep_layout)
+            try:
+                (textbody, status) = convert_PDF_to_plaintext(fpath, keep_layout)
+            except Exception:
+                # Error when extracting
+                status = 1
         else:
             # invalid format
             status = 1
