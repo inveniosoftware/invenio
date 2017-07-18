@@ -110,6 +110,7 @@ are here for the interested.
     community/translation-guide
     community/maintainers-guide/index.rst
     community/releases
+    community/governance
     community/code-of-conduct
     community/license
     community/authors
