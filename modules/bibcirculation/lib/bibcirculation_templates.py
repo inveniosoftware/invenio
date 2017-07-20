@@ -3973,37 +3973,42 @@ class Template:
 
                 out += """
             <tr>
-              <td>%s</td>
-              <td>%s</td>
-              <td>%s</td>
-              <td>%s</td>
-              <td>%s</td>
-              <td>%s - %s</td>
-              <td>%s</td>
-              <td>%s</td>
-              <td>%s</td>
+              <td>%(title_link)s</td>
+              <td>%(barcode)s</td>
+              <td>%(loaned_on)s</td>
+              <td>%(due_date)s</td>
+              <td>%(nb_renewall)s</td>
+              <td>%(nb_overdue)s - %(date_overdue)s</td>
+              <td>%(loan_type)s</td>
+              <td>%(check_notes)s</td>
+              <td>%(status)s</td>
               <td align="center">
                 <SELECT style='border: 1px solid #cfcfcf' ONCHANGE="location = this.options[this.selectedIndex].value;">
                   <OPTION VALUE="">Select an action
-                  <OPTION VALUE="get_borrower_loans_details?borrower_id=%s&barcode=%s&loan_id=%s&recid=%s">Renew
-                  <OPTION VALUE="loan_return_confirm?barcode=%s">Return
-                  <OPTION VALUE="change_due_date_step1?loan_id=%s&borrower_id=%s">Change due date
-                  <OPTION VALUE="claim_book_return?borrower_id=%s&recid=%s&loan_id=%s&template=claim_return">Send recall
+                  <OPTION VALUE="get_borrower_loans_details?borrower_id=%(borrower_id)s&barcode=%(barcode)s&loan_id=%(loan_id)s&recid=%(recid)s">Renew
+                  <OPTION VALUE="loan_return_confirm?barcode=%(barcode)s">Return
+                  <OPTION VALUE="change_due_date_step1?loan_id=%(loan_id)s&borrower_id=%(borrower_id)s">Change due date
+                  <OPTION VALUE="claim_book_return?borrower_id=%(borrower_id)s&recid=%(recid)s&loan_id=%(loan_id)s&template=claim_return">Send recall
                 </SELECT>
               </td>
-                <input type=hidden name=barcode value=%s>
-                <input type=hidden name=loan_id value=%s>
+                <input type=hidden name=barcode value=%(barcode)s>
+                <input type=hidden name=loan_id value=%(loan_id)s>
             </tr>
-
-            """ % (title_link, barcode, loaned_on,
-                   due_date, nb_renewall,
-                   nb_overdue, date_overdue, loan_type,
-                   check_notes, status,
-                   borrower_id, barcode,
-                   loan_id, recid,
-                   barcode, loan_id, borrower_id,
-                   borrower_id, recid, loan_id,
-                   barcode, loan_id)
+            """ % {
+                "barcode"      : barcode,
+                "borrower_id"  : borrower_id,
+                "check_notes"  : check_notes,
+                "date_overdue" : date_overdue,
+                "due_date"     : due_date,
+                "loaned_on"    : loaned_on,
+                "loan_id"      : loan_id,
+                "loan_type"    : loan_type,
+                "nb_overdue"   : nb_overdue,
+                "nb_renewall"  : nb_renewall,
+                "recid"        : recid,
+                "status"       : status,
+                "title_link"   : title_link,
+            }
 
             out += """
         </tbody>
@@ -4708,34 +4713,39 @@ class Template:
 
                 out += """
             <tr>
-                 <td>%s</td>
-                 <td>%s</td>
-                 <td>%s</td>
-                 <td>%s</td>
-                 <td>%s</td>
-                 <td>%s - %s</td>
-                 <td>%s</td>
-                 <td>%s</td>
+                 <td>%(borrower_link)s</td>
+                 <td>%(barcode)s</td>
+                 <td>%(loaned_on)s</td>
+                 <td>%(due_date)s</td>
+                 <td>%(nb_renewall)s</td>
+                 <td>%(nb_overdue)s - %(date_overdue)s</td>
+                 <td>%(status)s</td>
+                 <td>%(check_notes)s</td>
                  <td align="center">
                    <SELECT style='border: 1px solid #cfcfcf' ONCHANGE="location = this.options[this.selectedIndex].value;">
                       <OPTION VALUE="">Select an action
-                      <OPTION VALUE="get_item_loans_details?barcode=%s&loan_id=%s&recid=%s">Renew
-                      <OPTION VALUE="loan_return_confirm?barcode=%s">Return
-                      <OPTION VALUE="change_due_date_step1?loan_id=%s">Change due date
-                      <OPTION VALUE="claim_book_return?recid=%s&template=claim_return">Send recall
+                      <OPTION VALUE="get_item_loans_details?barcode=%(barcode)s&loan_id=%(loan_id)s&recid=%(recid)s">Renew
+                      <OPTION VALUE="loan_return_confirm?barcode=%(barcode)s">Return
+                      <OPTION VALUE="change_due_date_step1?loan_id=%(loan_id)s">Change due date
+                      <OPTION VALUE="claim_book_return?recid=%(recid)s&template=claim_return">Send recall
                     </SELECT>
                  </td>
              </tr>
-             <input type=hidden name=loan_id value=%s>
-             <input type=hidden name=loan_id value=%s>
-
-            """ % (borrower_link, barcode,
-                   loaned_on, due_date,
-                   nb_renewall, nb_overdue,
-                   date_overdue, status, check_notes,
-                   borrower_id, barcode, loan_id, recid,
-                   barcode, loan_id, recid,
-                   loan_id)
+             <input type=hidden name=loan_id value=%(loan_id)s>
+            """ % {
+                "barcode"       : barcode,
+                "borrower_id"   : borrower_id,
+                "borrower_link" : borrower_link,
+                "check_notes"   : check_notes,
+                "date_overdue"  : date_overdue,
+                "due_date"      : due_date,
+                "loaned_on"     : loaned_on,
+                "loan_id"       : loan_id,
+                "nb_overdue"    : nb_overdue,
+                "nb_renewall"   : nb_renewall,
+                "recid"         : recid,
+                "status"        : status,
+            }
 
         out += """
         <tbody>
@@ -7933,7 +7943,7 @@ class Template:
                             $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
                         });
                     </script>
-                    <input type="text" size="12" id="date_picker1" name="period_from" value="%s" style='border: 1px solid #cfcfcf'>
+                    <input type="text" size="12" id="date_picker1" name="due_date" value="%s" style='border: 1px solid #cfcfcf'>
                 </td>
               </tr>
             </table>

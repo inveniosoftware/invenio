@@ -1913,7 +1913,7 @@ def get_loan_infos(loan_id):
                              l.status,
                              it.loan_period,
                              it.status
-                        from crcLOAN l, crcITEM it, crcLOANREQUEST lr
+                        from crcLOAN l, crcITEM it
                         where l.barcode=it.barcode and
                               l.id=%s""",
                    (loan_id, ))
