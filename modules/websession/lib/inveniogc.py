@@ -317,6 +317,9 @@ def check_tables():
     res = run_sql("SHOW TABLES")
     for row in res:
         table_name = row[0]
+        if table_name == 'bibfmt':
+        # inspire production: requires ~30G of temp space and 4 hours
+            continue
         write_message("checking table %s" % table_name)
         run_sql("CHECK TABLE %s" % wash_table_column_name(table_name)) # kwalitee: disable=sql
 
