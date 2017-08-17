@@ -128,6 +128,9 @@ def format_element(bfo, name, tag_name='', tag='', kb='', kb_default_output='', 
         else:
             out.append(value)
 
+    if name == 'citation_title':
+        out = [' : '.join(out)]
+
     if name == 'citation_date':
         for idx in range(len(out)):
             out[idx] = out[idx].replace('-', '/')
