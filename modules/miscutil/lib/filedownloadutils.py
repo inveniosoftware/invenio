@@ -61,7 +61,7 @@ class InvenioFileCopyError(Exception):
 
 def download_url(url, content_type=None, download_to_file=None,
                  retry_count=10, timeout=10.0, suffix=".tmp",
-                 prefix="filedownloadutils_"):
+                 prefix="filedownloadutils_", accept=None):
     """
     Will download a file from given URL (either local or external) to the
     desired path (or generate one if none is given). Local files are copied
@@ -113,7 +113,8 @@ def download_url(url, content_type=None, download_to_file=None,
                                                     download_to_file,
                                                     content_type=content_type,
                                                     retry_count=retry_count,
-                                                    timeout=timeout)
+                                                    timeout=timeout,
+                                                    accept=accept)
     except InvenioFileDownloadError:
         raise
 
@@ -121,7 +122,8 @@ def download_url(url, content_type=None, download_to_file=None,
 
 
 def download_external_url(url, download_to_file, content_type=None,
-                          retry_count=10, timeout=10.0, verbose=False):
+                          retry_count=10, timeout=10.0, verbose=False,
+                          accept=None):
     """
     Download a url (if it corresponds to a remote file) and return a
     local url to it. If format is specified, a check will be performed
@@ -154,7 +156,10 @@ def download_external_url(url, download_to_file, content_type=None,
     while retry_attempt < retry_count:
         try:
             # Attempt to download the external file
-            request = open_url(url)
+            headers = None
+            if accept:
+                headers = {'Accept': accept}
+            request = open_url(url, headers)
             if request.code == 200 and "Refresh" in request.headers:
                 # PDF is being generated, they ask us to wait for
                 # n seconds.
