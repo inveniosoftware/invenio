@@ -16,7 +16,7 @@ suffix='</div><hr/>'/>
 <p style="background-color: #ececec;" align="center" >
 <BFE_CITATION_SUGGESTION_HEPDATA prefix="" suffix="<br />" default="" escape="" />
 <br/>
-<strong>Description: </strong><BFE_FIELD tag="520__h" />
+<strong>Description: </strong><BFE_FIELD tag="520__h" escape="2" />
 <br/>
 </p>
 
