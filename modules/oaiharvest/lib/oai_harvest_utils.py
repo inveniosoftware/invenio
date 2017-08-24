@@ -166,7 +166,12 @@ def remove_duplicates(harvested_file_list):
         reclist = root.find('.//oaipmh:ListRecords', namespace)
         removelist = []
         for record in reclist:
-            oaiid = record.find('oaipmh:header/oaipmh:identifier', namespace).text
+            oaiid = record.find('oaipmh:header/oaipmh:identifier', namespace)
+            if oaiid is not None:
+                oaiid = oaiid.text
+            else:
+                # resumptiontoken as last element of list has no oaiid
+                continue
             if oaiid in dups:
                 dups.remove(oaiid)
                 removelist.append(record)
