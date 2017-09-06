@@ -136,7 +136,7 @@ context so that you can work with the instance:
    Instance: /home/vagrant/.virtualenvs/invenio/var/instance
    >>> app.config['BABEL_DEFAULT_LANGUAGE']
    'en'
-   >>> app.config['BROKER_URL']
+   >>> app.config['CELERY_BROKER_URL']  # BROKER_URL for Celery 3
    'amqp://guest:guest@192.168.50.10:5672//'
 
 Using administrative interface
@@ -152,11 +152,11 @@ For example, let us look at the record ID 117 that we have uploaded in
 :ref:`create_and_search_your_first_record`. Looking at the administrative
 interface, we can see that this record has been attributed an internal UUID:
 
-  ======== ===================== ========== =========== ====================================
-  PID_Type PID                   Status     Object Type Object UUID
-  ======== ===================== ========== =========== ====================================
-  oai      oai:invenio:recid/117 REGISTERED rec         a11dad76-5bd9-471c-975a-0b2b01d74831
-  recid    117                   REGISTERED rec         a11dad76-5bd9-471c-975a-0b2b01d74831
-  ======== ===================== ========== =========== ====================================
+======== ===================== ========== =========== ====================================
+PID_Type PID                   Status     Object Type Object UUID
+======== ===================== ========== =========== ====================================
+oai      oai:invenio:recid/117 REGISTERED rec         a11dad76-5bd9-471c-975a-0b2b01d74831
+recid    117                   REGISTERED rec         a11dad76-5bd9-471c-975a-0b2b01d74831
+======== ===================== ========== =========== ====================================
 
 See :ref:`loading_content` for more information about object UUIDs and PIDs.

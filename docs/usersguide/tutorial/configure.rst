@@ -29,7 +29,8 @@ file. Here is an example:
    ACCOUNTS_SESSION_REDIS_URL='redis://192.168.50.10:6379/1'
 
    # Celery
-   BROKER_URL='amqp://guest:guest@192.168.50.10:5672//'
+   BROKER_URL='amqp://guest:guest@192.168.50.10:5672//'  # Celery 3
+   CELERY_BROKER_URL='amqp://guest:guest@192.168.50.10:5672//'  # Celery 4
    CELERY_RESULT_BACKEND='redis://192.168.50.10:6379/2'
 
    # Elasticsearch
