@@ -1354,7 +1354,20 @@ class BibRecDocs(object):
         else:
             # we create the corresponding storage directory
             old_umask = os.umask(022)
-            os.makedirs(bibdoc.basedir)
+            try:
+                os.makedirs(bibdoc.basedir)
+            except OSError, e:
+                # possible AFS timeout
+                if e.errno == 110:
+                    time.sleep(1)
+                    # AFS directory may have been created
+                    if os.path.exists(bibdoc.basedir):
+                        pass
+                    # otherwise try again
+                    else:
+                        os.makedirs(bibdoc.basedir)
+                else:
+                    raise
             # and save the father record id if it exists
             try:
                 if self.id != "":
