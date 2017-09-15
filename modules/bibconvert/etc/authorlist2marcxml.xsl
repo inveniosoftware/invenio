@@ -84,11 +84,11 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
     </xsl:if>
   </xsl:template>
 
-  <!-- FUNCTION  print-h-authorid: prints the authors ID inside xxx__h subfield -->
-  <xsl:template name="print-h-authorid">
+  <!-- FUNCTION  print-j-authorid: prints the authors ID inside xxx__j subfield -->
+  <xsl:template name="print-j-authorid">
     <xsl:param name="authorid"/>
     <xsl:if test="not(contains($authorid, 'UNDEFINED')) and not(contains($authorid, 'undefined'))">
-      <subfield code="h"><xsl:value-of select="normalize-space(@source)" />-<xsl:value-of select="normalize-space($authorid)"/></subfield>
+      <subfield code="j"><xsl:value-of select="normalize-space(@source)" />-<xsl:value-of select="normalize-space($authorid)"/></subfield>
     </xsl:if>
   </xsl:template>
 
@@ -144,7 +144,7 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:call-template name="print-h-authorid">
+                <xsl:call-template name="print-j-authorid">
                     <xsl:with-param name="authorid" select="."/>
                 </xsl:call-template>
             </xsl:otherwise>
@@ -165,7 +165,7 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:call-template name="print-h-authorid">
+                <xsl:call-template name="print-j-authorid">
                     <xsl:with-param name="authorid" select="."/>
                 </xsl:call-template>
             </xsl:otherwise>
