@@ -3556,7 +3556,7 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
 def record_has_data_attached(recID):
     """returns True or False depending if there is Data attached or not"""
     from invenio.search_engine import search_pattern
-    return len(search_pattern(p="786__w:%s" % (str(recID)))) > 0
+    return len(search_pattern(p="786__w:%s -980:DELETED" % (str(recID)))) > 0
 
 def get_detailed_page_tabs_counts(recID):
     """
