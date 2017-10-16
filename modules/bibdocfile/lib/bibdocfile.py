@@ -55,6 +55,8 @@ import urllib
 import tempfile
 import cPickle
 import base64
+import bs4
+import requests
 import binascii
 import cgi
 import sys
@@ -4845,6 +4847,14 @@ def read_cookie(cookiefile):
     return cookie_data
 
 
+def _load_inspire_legacy_credentials():
+    with open("/afs/cern.ch/project/inspire/private/legacy_credentials.txt") as fp:
+        row = fp.readline()
+    user, password = row.split(':', 1)
+    password = base64.b64decode(password)
+    return user, password
+
+
 def open_url(url, headers=None, head_request=False):
     """
     Opens a URL. If headers are passed as argument, no check is performed and
@@ -4861,6 +4871,23 @@ def open_url(url, headers=None, head_request=False):
     @type head_request: boolean
     @return: a file-like object as returned by urllib2.urlopen.
     """
+    # HACK: In order to support fetching files from Labs
+    if url.startswith('http://labs.inspirehep.net/') or url.startswith('https://labs.inspirehep.net/'):
+        user, password = _load_inspire_legacy_credentials()
+        s = requests.Session()
+        s.headers['User-Agent'] = make_user_agent_string('bibdocfile')
+        login_page = s.get("https://labs.inspirehep.net/login/?local=1")
+        soup = bs4.BeautifulSoup(login_page.text)
+        csrf_token = soup.find(id='csrf_token').get('value')
+        dummy = s.post("https://labs.inspirehep.net/login/?local=1", data={
+            'email': user,
+            'password': password,
+            'csrf_token': csrf_token,
+        })
+        req = s.get(url, stream=True)
+        req.raw.decode_content = True
+        return req.raw
+
     headers_to_use = None
 
     if headers is None:
