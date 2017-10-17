@@ -3931,11 +3931,17 @@ def get_format_from_http_response(response):
     @return: the format of the remote resource
     @rtype: string
     """
-    info = response.info()
+    if hasattr(response, 'info'):
+        info = response.info()
+        content_disposition = info.getheader('Content-Disposition')
+        content_type = info.getheader('Content-Type')
+    else:
+        # HACK: INSPIRE Hack for Labs: we are using requests
+        content_disposition = response.headers.get('Content-Disposition')
+        content_type = response.headers.get('Content-Type')
 
     docformat = ''
 
-    content_disposition = info.getheader('Content-Disposition')
     if content_disposition:
         parsed_content_disposition = cgi.parse_header(content_disposition)
         filename = None
@@ -3947,7 +3953,6 @@ def get_format_from_http_response(response):
             if docformat:
                 return docformat
 
-    content_type = info.getheader('Content-Type')
     if content_type:
         content_type = cgi.parse_header(content_type)[0]
         if content_type not in ('text/plain', 'application/octet-stream'):
