@@ -87,15 +87,19 @@ class Template:
           - 'verbose_files' - A string representing in a verbose way the
           file information.
         """
+        from invenio.config import CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_DOCTYPES
 
         # load the right message language
         _ = gettext_set_language(ln)
 
         out = ""
         for mytype in types:
+            dspname = mytype['name']
+            if mytype['name'] in dict(CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_DOCTYPES):
+                dspname = dict(CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_DOCTYPES)[mytype['name']]
             if mytype['name']:
                 if not (CFG_INSPIRE_SITE and mytype['name'] == 'INSPIRE-PUBLIC'):
-                    out += "<small><b>%s</b> %s:</small>" % (mytype['name'], _("file(s)"))
+                    out += "<small><b>%s</b> %s:</small>" % (dspname, _("file(s)"))
             out += "<ul>"
             for content in mytype['content']:
                 out += content
