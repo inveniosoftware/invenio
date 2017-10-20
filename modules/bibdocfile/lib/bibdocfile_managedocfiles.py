@@ -998,6 +998,8 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
     @return: an HTML formatted "file" row
     @rtype: string
     """
+    from invenio.config import CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_DOCTYPES
+
     _ = gettext_set_language(ln)
 
     # Try to retrieve "main format", to display as link for the
@@ -1019,6 +1021,11 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
 
     # Main file row
     out = '<tr%s>' % (even and ' class="even"' or '')
+    if main_bibdocfile.get_type():
+        dspname = main_bibdocfile.get_type()
+        if dspname in dict(CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_DOCTYPES):
+            dspname = dict(CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_DOCTYPES)[dspname]
+	out += '<td><em>' + cgi.escape(dspname) + '<em></td>'
     out += '<td class="reviseControlFileColumn"%s>' % (hidden_p and ' style="color:#99F"' or '')
     if not updated and show_links and not hidden_p:
         out += '<a target="_blank" href="' + main_bibdocfile.get_url() \
@@ -1079,7 +1086,7 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
 
     # Format row
     out += '''<tr%s>
-    <td class="reviseControlFormatColumn"%s>
+    <td colspan="2" class="reviseControlFormatColumn"%s>
         <img src="%s/img/tree_branch.gif" alt="">
     ''' % (even and ' class="even"' or '', hidden_p and ' style="color:#999"' or '', CFG_SITE_URL)
     for bibdocfile in abstract_bibdoc['list_latest_files']:
