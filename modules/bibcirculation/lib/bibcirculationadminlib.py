@@ -31,7 +31,8 @@ import datetime, time, cgi
 from invenio.config import \
     CFG_SITE_LANG, \
     CFG_SITE_SECURE_URL, \
-    CFG_CERN_SITE
+    CFG_CERN_SITE, \
+    CFG_BIBCIRCULATION_MAIN_COLLECTION
 import invenio.access_control_engine as acce
 from invenio.webpage import page
 from invenio.webuser import getUid, page_not_authorized
@@ -140,7 +141,7 @@ def borrower_search(req, empty_barcode, redirect='no', ln=CFG_SITE_LANG):
                 lastupdated=__lastupdated__)
 
 
-def item_search_result(req, p, f, ln=CFG_SITE_LANG):
+def item_search_result(req, p, f, ln=CFG_SITE_LANG, cc=CFG_BIBCIRCULATION_MAIN_COLLECTION):
     """
     Search an item and return a list with all the possible results. To retrieve
     the information desired, we use the method 'perform_request_search' (from
@@ -152,6 +153,9 @@ def item_search_result(req, p, f, ln=CFG_SITE_LANG):
 
     @type f:   string
     @param f:  search field
+
+    @type cc:   string
+    @param cc:  collection to use in searches
 
     @return:   list of recids
     """
@@ -166,7 +170,7 @@ def item_search_result(req, p, f, ln=CFG_SITE_LANG):
         else:
             body = bibcirculation_templates.tmpl_item_search_result(result=has_recid, ln=ln)
     else:
-        result = perform_request_search(cc="Books", sc="1", p=p, f=f)
+        result = perform_request_search(cc=cc, sc="1", p=p, f=f)
         body = bibcirculation_templates.tmpl_item_search_result(result=result, ln=ln)
 
     navtrail_previous_links = '<a class="navtrail" ' \
@@ -2706,12 +2710,12 @@ def add_new_copy_step1(req):
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def add_new_copy_step2(req, p, f, ln=CFG_SITE_LANG):
+def add_new_copy_step2(req, p, f, ln=CFG_SITE_LANG, cc=CFG_BIBCIRCULATION_MAIN_COLLECTION):
     """
     Add a new copy.
     """
 
-    result = perform_request_search(cc="Books", sc="1", p=p, f=f)
+    result = perform_request_search(cc=cc, sc="1", p=p, f=f)
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -2870,12 +2874,12 @@ def update_item_info_step1(req, ln=CFG_SITE_LANG):
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def update_item_info_step2(req, p, f, ln=CFG_SITE_LANG):
+def update_item_info_step2(req, p, f, ln=CFG_SITE_LANG, cc=CFG_BIBCIRCULATION_MAIN_COLLECTION):
     """
     Update the item's information.
     """
 
-    result = perform_request_search(cc="Books", sc="1", p=p, f=f)
+    result = perform_request_search(cc=cc, sc="1", p=p, f=f)
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -3391,7 +3395,8 @@ def create_new_loan_step2(req, borrower_id, barcode, notes, ln=CFG_SITE_LANG):
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def create_new_request_step1(req, borrower_id, p="", f="", search=None, ln=CFG_SITE_LANG):
+def create_new_request_step1(req, borrower_id, p="", f="", search=None,
+                             ln=CFG_SITE_LANG, cc=CFG_BIBCIRCULATION_MAIN_COLLECTION):
     """
     Create a new request from the borrower's page, step1.
 
@@ -3401,6 +3406,8 @@ def create_new_request_step1(req, borrower_id, p="", f="", search=None, ln=CFG_S
     p: search pattern.
 
     f: field
+
+    cc:  collection to use in searches
 
     search: search an item.
     """
@@ -3417,7 +3424,7 @@ def create_new_request_step1(req, borrower_id, p="", f="", search=None, ln=CFG_S
             result = has_recid
 
     elif search:
-        result = perform_request_search(cc="Books", sc="1", p=p, f=f)
+        result = perform_request_search(cc=cc, sc="1", p=p, f=f)
 
     else:
         result = ''
@@ -5638,7 +5645,8 @@ def register_ill_book_request(req, ln=CFG_SITE_LANG):
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def register_ill_book_request_result(req, p, f, ln=CFG_SITE_LANG):
+def register_ill_book_request_result(req, p, f, ln=CFG_SITE_LANG,
+                                     cc=CFG_BIBCIRCULATION_MAIN_COLLECTION):
     """
     Search an item and return a list with all the possible results. To retrieve
     the information desired, we use the method 'perform_request_search' (from
@@ -5650,6 +5658,9 @@ def register_ill_book_request_result(req, p, f, ln=CFG_SITE_LANG):
 
     @type f:   string
     @param f:  search field
+
+    @type cc:   string
+    @param cc:  collection to use in searches
 
     @return:   list of recids
     """
@@ -5664,7 +5675,7 @@ def register_ill_book_request_result(req, p, f, ln=CFG_SITE_LANG):
         else:
             body = bibcirculation_templates.tmpl_register_ill_book_request_result(result=has_recid, ln=ln)
     else:
-        result = perform_request_search(cc="Books", sc="1", p=p, f=f)
+        result = perform_request_search(cc=cc, sc="1", p=p, f=f)
         if len(result) == 0:
             return register_ill_request_with_no_recid_step1(req, ln)
         else:
@@ -5716,7 +5727,7 @@ def register_ill_book_request_from_borrower_page(req, borrower_id, ln=CFG_SITE_L
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def register_ill_book_request_from_borrower_page_result(req, borrower_id, p, f, ln=CFG_SITE_LANG):
+def register_ill_book_request_from_borrower_page_result(req, borrower_id, p, f, ln=CFG_SITE_LANG, cc=CFG_BIBCIRCULATION_MAIN_COLLECTION):
     """
     Search an item and return a list with all the possible results. To retrieve
     the information desired, we use the method 'perform_request_search' (from
@@ -5728,6 +5739,9 @@ def register_ill_book_request_from_borrower_page_result(req, borrower_id, p, f, 
 
     @type f:   string
     @param f:  search field
+
+    @type cc:   string
+    @param cc:  collection to use in searches
 
     @return:   list of recids
     """
@@ -5744,7 +5758,7 @@ def register_ill_book_request_from_borrower_page_result(req, borrower_id, p, f, 
                                                                                                      borrower_id=borrower_id,
                                                                                                      ln=ln)
     else:
-        result = perform_request_search(cc="Books", sc="1", p=p, f=f)
+        result = perform_request_search(cc=cc, sc="1", p=p, f=f)
         if len(result) == 0:
             return register_ill_request_from_borrower_page_step1(req, borrower_id, ln)
         else:
