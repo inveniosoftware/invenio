@@ -263,7 +263,7 @@ class SimulatedModPythonRequest(object):
                self.__headers_in.get('X-FORWARDED-HOST', '') == \
                urlparse(CFG_SITE_URL)[1]:
             # we are using proxy setup
-            if self.__environ.get('REMOTE_ADDR') in CFG_WEBSTYLE_REVERSE_PROXY_IPS:
+            if not CFG_WEBSTYLE_REVERSE_PROXY_IPS or self.__environ.get('REMOTE_ADDR') in CFG_WEBSTYLE_REVERSE_PROXY_IPS:
                 # we trust this proxy
                 ip_list = self.__headers_in['X-FORWARDED-FOR'].split(',')
                 for ip in ip_list:
