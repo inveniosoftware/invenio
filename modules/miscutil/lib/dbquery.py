@@ -40,13 +40,13 @@ import time
 import marshal
 import re
 import atexit
-import os
 
 from zlib import compress, decompress
 from thread import get_ident
 from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE, \
     CFG_MISCUTIL_SQL_USE_SQLALCHEMY, \
     CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT
+from invenio.gc_workaround import gcfix
 
 if CFG_MISCUTIL_SQL_USE_SQLALCHEMY:
     try:
@@ -469,6 +469,7 @@ def serialize_via_marshal(obj):
     """Serialize Python object via marshal into a compressed string."""
     return compress(marshal.dumps(obj))
 
+@gcfix
 def deserialize_via_marshal(astring):
     """Decompress and deserialize string into a Python object via marshal."""
     return marshal.loads(decompress(astring))

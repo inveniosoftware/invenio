@@ -70,6 +70,7 @@ from invenio.crossrefutils import get_marcxml_for_doi, CrossrefError
 from invenio.orcidutils import get_dois_from_orcid
 from invenio.errorlib import register_exception
 from invenio.dbquery import run_sql
+from invenio.gc_workaround import gcfix
 
 
 # After this delay, we assume that a process computing an empty claimed cache is dead
@@ -572,20 +573,12 @@ def _get_institute_pubs_bai(names_list, person_id):
     recids = perform_request_search(rg=0, p='author:%s' % str(cid))
     return _get_institute_pubs_dict(recids, names_list)
 
+@gcfix
 def _get_institute_pubs_dict(recids, namesdict):
     names_list = namesdict['db_names_dict'].keys()
     names_to_records = namesdict['names_to_records']
     a = format_records(recids, 'WAPAFF')
-    gcfix = version_info[0] < 3 and version_info[1] < 7
-    if gcfix:
-        # workaround for known problem with python 2.6 garbage collection
-        # causing massive slowdown
-        import gc
-        gc.disable()
     a = [deserialize(p) for p in a.strip().split('!---THEDELIMITER---!') if p]
-    if gcfix:
-        gc.enable()
-        gc.collect()
     affdict = {}
     for rec, affs in a:
         keys = affs.keys()
@@ -601,6 +594,7 @@ def _get_institute_pubs_dict(recids, namesdict):
         affdict[key] = list(affdict[key])
     return affdict
 
+@gcfix
 def _get_pubs_per_year_bai(person_id):
     '''
     Returns a dict consisting of: year -> number of publications in that year (given a personID).
@@ -706,6 +700,7 @@ def _get_kwtuples_bai(pubs, person_id):
 def _get_fieldtuples_bai(pubs, person_id):
     return _get_fieldtuples_bai_tup(pubs, person_id)
 
+@gcfix
 def _get_fieldtuples_bai_tup(pubs, person_id):
     '''
     Returns the fieldcode tuples for given personid.
@@ -822,6 +817,7 @@ def _get_institute_pubs_fallback(names_list, person_id):
     recids = perform_request_search(rg=0, p='exactauthor:"%s"' % str(person_id))
     return _get_institute_pubs_dict(recids, names_list)
 
+@gcfix
 def _get_pubs_per_year_fallback(person_id):
     '''
     Returns a dict consisting of: year -> number of publications in that year (given a personID).
@@ -886,6 +882,7 @@ def _get_collabtuples_fallback(pubs, person_id):
                             CFG_WEBAUTHORPROFILE_COLLABORATION_TAG, count_repetitive_values=True)
     return tup
 
+@gcfix
 def _get_coauthors_fallback(collabs, person_id):
     exclude_recs = []
     if collabs:
