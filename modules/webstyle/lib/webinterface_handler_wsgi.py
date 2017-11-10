@@ -83,6 +83,12 @@ def https_replace(html):
     return _RE_HTTPS_REPLACES.sub(_http_replace_func, html)
 
 
+def initilize_bibsort_cache():
+    from invenio.search_engine import CACHE_SORTED_DATA, BibSortDataCacher
+    for sorting_method in CACHE_SORTED_DATA:
+        CACHE_SORTED_DATA[sorting_method] = BibSortDataCacher(sorting_method)
+initilize_bibsort_cache()
+
 class InputProcessed(object):
     """
     Auxiliary class used when reading input.

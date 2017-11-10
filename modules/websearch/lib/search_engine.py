@@ -4127,10 +4127,7 @@ def get_sorting_methods():
 SORTING_METHODS = get_sorting_methods()
 CACHE_SORTED_DATA = {}
 for sorting_method in SORTING_METHODS:
-    try:
-        CACHE_SORTED_DATA[sorting_method].is_ok_p
-    except KeyError:
-        CACHE_SORTED_DATA[sorting_method] = BibSortDataCacher(sorting_method)
+    CACHE_SORTED_DATA[sorting_method] = None
 
 
 def get_tags_from_sort_fields(sort_fields):
@@ -4280,6 +4277,8 @@ def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d'
     dummy, irec_max = get_interval_for_records_to_sort(len(recIDs), jrec, rg)
     solution = intbitset()
     input_recids = intbitset(recIDs)
+    if CACHE_SORTED_DATA[sort_method] is None:
+         CACHE_SORTED_DATA[sort_method] = BibSortDataCacher(sort_method)
     CACHE_SORTED_DATA[sort_method].recreate_cache_if_needed()
     sort_cache = CACHE_SORTED_DATA[sort_method].cache
     bucket_numbers = sort_cache['bucket_data'].keys()
