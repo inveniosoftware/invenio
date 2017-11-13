@@ -2797,7 +2797,7 @@ def get_copies_status(recid):
                   (recid, ))
 
     if res:
-        return res[0]
+        return tuple([element for tupl in res for element in tupl])
     else:
         return None
 
