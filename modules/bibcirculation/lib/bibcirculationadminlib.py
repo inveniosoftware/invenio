@@ -297,6 +297,8 @@ def load_template(template):
 
     @return:         template(string)
     """
+    if template is None:
+        return CFG_BIBCIRCULATION_TEMPLATES['EMPTY']
 
     if template == "overdue_letter":
         output = CFG_BIBCIRCULATION_TEMPLATES['OVERDUE']
@@ -309,6 +311,12 @@ def load_template(template):
 
     elif template == "claim_return":
         output = CFG_BIBCIRCULATION_TEMPLATES['SEND_RECALL']
+
+    elif template.upper() in CFG_BIBCIRCULATION_TEMPLATES:
+        # Also resolve all templates in CFG_BIBCIRULATION_TEMPLATES. This is
+        # redundant to the one above, however, names may be different, thus
+        # keep the lines above for compatibility.
+        output = CFG_BIBCIRCULATION_TEMPLATES[template.upper()]
 
     else:
         output = CFG_BIBCIRCULATION_TEMPLATES['EMPTY']
