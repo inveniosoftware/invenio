@@ -4298,7 +4298,7 @@ class Template:
   <td>%s</td>
 </tr>""" % (action_type, action_date.strftime('%Y-%m-%d'), record_str))
             out.append('</table>')
-            out.append('</td></tr>')
+        out.append('</td></tr>')
 
         return '\n'.join(out)
 
