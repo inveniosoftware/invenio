@@ -47,6 +47,7 @@ import inspect
 import traceback
 import cgi
 
+from functools import wraps
 from invenio.errorlib import register_exception
 from invenio.config import \
      CFG_SITE_LANG, \
@@ -1632,6 +1633,20 @@ def get_output_formats(with_attributes=False):
 
     return output_formats
 
+
+def memoize(obj):
+    cache = obj.cache = {}
+
+    @wraps(obj)
+    def memoizer(*args, **kwargs):
+        key = str(args) + str(kwargs)
+        if key not in cache:
+            cache[key] = obj(*args, **kwargs)
+        return cache[key]
+    return memoizer
+
+
+@memoize
 def resolve_format_element_filename(element_name):
     """
     Returns the filename of element corresponding to x{element_name}
@@ -1652,8 +1667,8 @@ def resolve_format_element_filename(element_name):
         name = element_name.replace(" ", "_").upper() +".PY"
     else:
         name = element_name.replace(" ", "_").upper()
-
     files = os.listdir(CFG_BIBFORMAT_ELEMENTS_PATH)
+
     for filename in files:
         test_filename = filename.replace(" ", "_").upper()
 
@@ -1667,6 +1682,7 @@ def resolve_format_element_filename(element_name):
     # element can be in database
     return None
 
+@memoize
 def resolve_output_format_filename(code, verbose=0):
     """
     Returns the filename of output corresponding to code
