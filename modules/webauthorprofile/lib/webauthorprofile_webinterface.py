@@ -36,7 +36,7 @@ from invenio.bibauthorid_webauthorprofileinterface import is_valid_canonical_id,
     author_has_papers, get_authors_by_name
 from invenio.bibauthorid_webapi import history_log_visit
 
-from invenio.config import CFG_BASE_URL
+from invenio.config import CFG_BASE_URL, CFG_LABS_HOSTNAME
 
 from invenio.webauthorprofile_corefunctions import get_pubs, get_person_names_dicts, \
     get_institute_pubs, get_pubs_per_year, get_coauthors, get_summarize_records, \
@@ -690,8 +690,8 @@ class WebAuthorPages(WebInterfaceDirectory):
                     'cname': webapi.get_canonical_id_from_person_id(person_id),
                     'link_to_record': ulevel == "admin",
                     'hepnames_link': "%s/%s/" % (CFG_BASE_URL, "record"),
-                    'new_record_link': 'http://labs.inspirehep.net/authors/new?bai=%s' % (webapi.get_canonical_id_from_person_id(person_id)),
-                    'update_link_prefix': "http://labs.inspirehep.net/authors/",
+                    'new_record_link': 'http://%s/authors/new?bai=%s' % (CFG_LABS_HOSTNAME, webapi.get_canonical_id_from_person_id(person_id)),
+                    'update_link_prefix': "http://%s/authors/" % CFG_LABS_HOSTNAME,
                     'update_link_suffix': "/update",
                     'profile_link': "%s/%s" % (CFG_BASE_URL, "author/profile/")
                 })

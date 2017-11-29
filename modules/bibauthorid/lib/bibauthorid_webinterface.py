@@ -43,7 +43,7 @@ from invenio.bibauthorid_config import AID_ENABLED, PERSON_SEARCH_RESULTS_SHOW_P
     BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE, VALID_EXPORT_FILTERS, PERSONS_PER_PAGE, \
     MAX_NUM_SHOW_PAPERS, BIBAUTHORID_CFG_SITE_NAME, CFG_BIBAUTHORID_ENABLED
 
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_INSPIRE_SITE, CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_INSPIRE_SITE, CFG_SITE_SECURE_URL, CFG_LABS_HOSTNAME
 
 from invenio.bibauthorid_name_utils import most_relevant_name, clean_string
 from invenio.webpage import page, pageheaderonly, pagefooteronly
@@ -2733,8 +2733,8 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
                     'cname': webapi.get_canonical_id_from_person_id(person_id),
                     'link_to_record': ulevel == "admin",
                     'hepnames_link': "%s/%s/" % (CFG_BASE_URL, "record"),
-                    'new_record_link': 'https://labs.inspirehep.net/authors/new',
-                    'update_link_prefix': "http://labs.inspirehep.net/authors/",
+                    'new_record_link': 'https://%s/authors/new' % CFG_LABS_HOSTNAME,
+                    'update_link_prefix': "http://%s/authors/" % CFG_LABS_HOSTNAME,
                     'update_link_suffix': "/update",
                     'profile_link': "%s/%s" % (CFG_BASE_URL, "author/profile/")
                 })
@@ -3730,8 +3730,8 @@ class WebInterfacePerson(WebInterfaceDirectory):
             hepname_bibrec = get_bibrecord(recids[0])
 
         redirect_to_url(req,
-                        "https://labs.inspirehep.net/authors/%s/update" %
-                        hepname_bibrec,
+                        "https://%s/authors/%s/update" %
+                        (CFG_LABS_HOSTNAME, hepname_bibrec),
                         redirection_type=apache.HTTP_MOVED_PERMANENTLY)
 
 
