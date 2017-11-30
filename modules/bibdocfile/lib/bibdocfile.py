@@ -120,7 +120,8 @@ from invenio.config import CFG_SITE_URL, \
     CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE, \
     CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES, \
     CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING, \
-    CFG_BIBCATALOG_SYSTEM
+    CFG_BIBCATALOG_SYSTEM, \
+    CFG_LABS_HOSTNAME
 from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
     CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
@@ -4877,14 +4878,14 @@ def open_url(url, headers=None, head_request=False):
     @return: a file-like object as returned by urllib2.urlopen.
     """
     # HACK: In order to support fetching files from Labs
-    if url.startswith('http://labs.inspirehep.net/') or url.startswith('https://labs.inspirehep.net/'):
+    if url.startswith('http://%s/' % CFG_LABS_HOSTNAME) or url.startswith('https://%s/' % CFG_LABS_HOSTNAME):
         user, password = _load_inspire_legacy_credentials()
         s = requests.Session()
         s.headers['User-Agent'] = make_user_agent_string('bibdocfile')
-        login_page = s.get("https://labs.inspirehep.net/login/?local=1")
+        login_page = s.get("https://%s/login/?local=1" % CFG_LABS_HOSTNAME)
         soup = bs4.BeautifulSoup(login_page.text)
         csrf_token = soup.find(id='csrf_token').get('value')
-        dummy = s.post("https://labs.inspirehep.net/login/?local=1", data={
+        dummy = s.post("https://%s/login/?local=1" % CFG_LABS_HOSTNAME, data={
             'email': user,
             'password': password,
             'csrf_token': csrf_token,
