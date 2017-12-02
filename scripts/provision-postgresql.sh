@@ -57,31 +57,36 @@ set -o nounset
 
 provision_postgresql_ubuntu14 () {
 
+    # install postgresql repo:
+    echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" | sudo tee -a /etc/apt/sources.list.d/pgdg.list
+    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    sudo DEBIAN_FRONTEND=noninteractive apt-get -y update
+
     # sphinxdoc-install-postgresql-ubuntu14-begin
     # update list of available packages:
     sudo DEBIAN_FRONTEND=noninteractive apt-get -y update
 
     # install PostgreSQL:
     sudo DEBIAN_FRONTEND=noninteractive apt-get -y install \
-         postgresql
+         postgresql-9.4
 
     # allow network connections:
     if ! grep -q "listen_addresses.*${INVENIO_POSTGRESQL_HOST}" \
-         /etc/postgresql/9.3/main/postgresql.conf; then
+         /etc/postgresql/9.4/main/postgresql.conf; then
         echo "listen_addresses = '${INVENIO_POSTGRESQL_HOST}'" | \
             sudo tee -a /etc/postgresql/9.3/main/postgresql.conf
     fi
 
     # grant access rights:
     if ! sudo grep -q "host.*${INVENIO_POSTGRESQL_DBNAME}.*${INVENIO_POSTGRESQL_DBUSER}" \
-         /etc/postgresql/9.3/main/pg_hba.conf; then
+         /etc/postgresql/9.4/main/pg_hba.conf; then
         echo "host ${INVENIO_POSTGRESQL_DBNAME} ${INVENIO_POSTGRESQL_DBUSER} ${INVENIO_WEB_HOST}/32 md5" | \
             sudo tee -a /etc/postgresql/9.3/main/pg_hba.conf
     fi
 
     # grant database creation rights via SQLAlchemy-Utils:
     if ! sudo grep -q "host.*template1.*${INVENIO_POSTGRESQL_DBUSER}" \
-         /etc/postgresql/9.3/main/pg_hba.conf; then
+         /etc/postgresql/9.4/main/pg_hba.conf; then
         echo "host template1 ${INVENIO_POSTGRESQL_DBUSER} ${INVENIO_WEB_HOST}/32 md5" | \
             sudo tee -a /etc/postgresql/9.3/main/pg_hba.conf
     fi
