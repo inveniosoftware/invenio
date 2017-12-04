@@ -121,7 +121,8 @@ from invenio.config import CFG_SITE_URL, \
     CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES, \
     CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING, \
     CFG_BIBCATALOG_SYSTEM, \
-    CFG_LABS_HOSTNAME
+    CFG_LABS_HOSTNAME, \
+    CFG_LABS_CREDENTIALS_FILE
 from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
     CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
@@ -4854,7 +4855,9 @@ def read_cookie(cookiefile):
 
 
 def _load_inspire_legacy_credentials():
-    with open("/afs/cern.ch/project/inspire/private/legacy_credentials.txt") as fp:
+    if CFG_LABS_CREDENTIALS_FILE is None:
+        return None, None
+    with open(CFG_LABS_CREDENTIALS_FILE) as fp:
         row = fp.readline()
     user, password = row.split(':', 1)
     password = base64.b64decode(password)
