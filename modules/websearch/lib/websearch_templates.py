@@ -4287,7 +4287,11 @@ class Template:
         if log_entries:
             out.append('<table><tr><td class="blocknote">Citation Log: </td></tr><tr><td><a id="citationlogshow" class="moreinfo" style="text-decoration: underline; " onclick="$(\'#citationlog\').show(); $(\'#citationlogshow\').hide();">show</a></td></tr></table>')
             out.append('<table id="citationlog" style="display: none;">')
-            for recid, action_type, action_date in log_entries:
+            num_entries = len(log_entries)
+            shortliststart = 200
+            if num_entries < shortliststart + 25:
+                shortliststart = num_entries
+            for recid, action_type, action_date in log_entries[:shortliststart]:
                 if record_exists(recid) == 1:
                     record_str = format_record(recid, 'HS2')
                 else:
@@ -4297,6 +4301,14 @@ class Template:
   <td class="citationlogdate" style="width: 5.4em;">%s</td>
   <td>%s</td>
 </tr>""" % (action_type, action_date.strftime('%Y-%m-%d'), record_str))
+            if num_entries > shortliststart:
+                out.append("""<tr><td colspan="3" align="left" style="font-size=120%;"><strong> subsequent entries abbreviated: </strong></td></tr>""")
+            for recid, action_type, action_date in log_entries[shortliststart:]:
+                out.append("""<tr>
+  <td>%s</td>
+  <td class="citationlogdate" style="width: 5.4em;">%s</td>
+  <td><a href="%s/record/%s"> record/%s </a></td>
+</tr>""" % (action_type, action_date.strftime('%Y-%m-%d'), CFG_SITE_URL, recid, recid))
             out.append('</table>')
         out.append('</td></tr>')
 
