@@ -19,16 +19,15 @@
 
 __revision__ = "$Id$"
 
-import gc
 import re
 
-from sys import version_info
 
 from invenio.dbquery import run_sql
 from invenio.intbitset import intbitset
 from invenio.data_cacher import DataCacher
 from invenio.redisutils import get_redis
 from invenio.dbquery import deserialize_via_marshal
+from invenio.gc_workaround import gcfix
 from operator import itemgetter
 
 
@@ -39,8 +38,8 @@ class CitationDictsDataCacher(DataCacher):
     """
     def __init__(self):
 
+        @gcfix
         def fill():
-            gcfix = version_info[0] < 3 and version_info[1] < 7
             alldicts = {}
             from invenio.bibrank_tag_based_indexer import fromDB
             redis = get_redis()
@@ -56,12 +55,7 @@ class CitationDictsDataCacher(DataCacher):
             alldicts['citations_keys'] = intbitset(weights.keys())
 
             # Citation counts
-            if gcfix:
-                gc.disable()
             alldicts['citations_counts'] = [t for t in weights.iteritems()]
-            if gcfix:
-                gc.enable()
-                gc.collect()
             alldicts['citations_counts'].sort(key=itemgetter(1), reverse=True)
 
             # Self-cites
@@ -74,12 +68,7 @@ class CitationDictsDataCacher(DataCacher):
             for recid, counts in alldicts['citations_counts']:
                 selfcites_weights[recid] = counts - selfcites.get(recid, 0)
             alldicts['selfcites_weights'] = selfcites_weights
-            if gcfix:
-                gc.disable()
             alldicts['selfcites_counts'] = [(recid, selfcites_weights.get(recid, cites)) for recid, cites in alldicts['citations_counts']]
-            if gcfix:
-                gc.enable()
-                gc.collect()
             alldicts['selfcites_counts'].sort(key=itemgetter(1), reverse=True)
 
             return alldicts

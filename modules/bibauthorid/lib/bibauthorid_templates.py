@@ -336,7 +336,7 @@ class WebProfilePage():
                 'hindex_fine_print_link': "%s/help/citation-metrics" % CFG_BASE_URL,
                 'citation_fine_print_link': "%s/help/citation-metrics" % CFG_BASE_URL,
                 'citeable_papers_link': tmpl_citesummary_get_link(canonical_name, 'author', 'collection:citeable'),
-                'selfcite_link': '%s/search?ln=en&p=author:%s&of=hcs2' % (CFG_BASE_URL, canonical_name),
+                'selfcite_link': '%s/search?ln=en&amp;p=author:%s&amp;of=hcs2' % (CFG_BASE_URL, canonical_name),
                 'published_only_papers_link': tmpl_citesummary_get_link(canonical_name, 'author', 'collection:published'),
             })
         except:
@@ -600,14 +600,14 @@ class Template:
                 '%(confirm_text)s <br>')
         if show_reset_button:
             stri = stri + (
-                '<a rel="nofollow" id="aid_reset_gr" class="aid_grey op_action" href="%(url)s/author/claim/action?reset=True&selection=%(ref)s&pid=%(pid)s">'
+                '<a rel="nofollow" id="aid_reset_gr" class="aid_grey op_action" href="%(url)s/author/claim/action?reset=True&amp;selection=%(ref)s&amp;pid=%(pid)s">'
                 '<img src="%(url)s/img/aid_reset_gray.png" alt="%(alt_forget)s" style="margin-left:22px;" />'
                 '%(forget_text)s</a><br>')
         stri = stri + (
-            '<a rel="nofollow" id="aid_repeal" class="aid_grey op_action" href="%(url)s/author/claim/action?repeal=True&selection=%(ref)s&pid=%(pid)s">'
+            '<a rel="nofollow" id="aid_repeal" class="aid_grey op_action" href="%(url)s/author/claim/action?repeal=True&amp;selection=%(ref)s&amp;pid=%(pid)s">'
             '<img src="%(url)s/img/aid_reject_gray.png" alt="%(alt_repeal)s" style="margin-left:22px;"/>'
             '%(repeal_text)s</a><br>'
-            '<a rel="nofollow" id="aid_to_other" class="aid_grey op_action" href="%(url)s/author/claim/action?to_other_person=True&selection=%(ref)s">'
+            '<a rel="nofollow" id="aid_to_other" class="aid_grey op_action" href="%(url)s/author/claim/action?to_other_person=True&amp;selection=%(ref)s">'
             '<img src="%(url)s/img/aid_to_other_gray.png" alt="%(alt_to_other)s" style="margin-left:22px;"/>'
             '%(to_other_text)s</a> </span>')
         return (stri
@@ -644,10 +644,10 @@ class Template:
         stri = ('<!---2!--><span id="aid_status_details"> '
                 '<img src="%(url)s/img/aid_reject.png" alt="%(alt_repeal)s" />'
                 '%(repeal_text)s <br>'
-                '<a rel="nofollow" id="aid_confirm" class="aid_grey op_action" href="%(url)s/author/claim/action?confirm=True&selection=%(ref)s&pid=%(pid)s">'
+                '<a rel="nofollow" id="aid_confirm" class="aid_grey op_action" href="%(url)s/author/claim/action?confirm=True&amp;selection=%(ref)s&amp;pid=%(pid)s">'
                 '<img src="%(url)s/img/aid_check_gray.png" alt="%(alt_confirm)s" style="margin-left: 22px;" />'
                 '%(confirm_text)s</a><br>'
-                '<a rel="nofollow" id="aid_to_other" class="aid_grey op_action" href="%(url)s/author/claim/action?to_other_person=True&selection=%(ref)s">'
+                '<a rel="nofollow" id="aid_to_other" class="aid_grey op_action" href="%(url)s/author/claim/action?to_other_person=True&amp;selection=%(ref)s">'
                 '<img src="%(url)s/img/aid_to_other_gray.png" alt="%(alt_to_other)s" style="margin-left:22px;"/>'
                 '%(to_other_text)s</a> </span>')
 
@@ -682,13 +682,13 @@ class Template:
         '''
         # batchprocess?mconfirm=True&bibrefs=['100:17,16']&pid=1
         string = ('<!--0!--><span id="aid_status_details"> '
-                  '<a rel="nofollow" id="aid_confirm" class="op_action" href="%(url)s/author/claim/action?confirm=True&selection=%(ref)s&pid=%(pid)s">'
+                  '<a rel="nofollow" id="aid_confirm" class="op_action" href="%(url)s/author/claim/action?confirm=True&amp;selection=%(ref)s&amp;pid=%(pid)s">'
                   '<img src="%(url)s/img/aid_check.png" alt="%(alt_confirm)s" />'
                   '%(confirm_text)s</a><br />'
-                  '<a rel="nofollow" id="aid_repeal" class="op_action" href="%(url)s/author/claim/action?repeal=True&selection=%(ref)s&pid=%(pid)s">'
+                  '<a rel="nofollow" id="aid_repeal" class="op_action" href="%(url)s/author/claim/action?repeal=True&amp;selection=%(ref)s&amp;pid=%(pid)s">'
                   '<img src="%(url)s/img/aid_reject.png" alt="%(alt_repeal)s" />'
                   '%(repeal_text)s</a> <br />'
-                  '<a rel="nofollow" id="aid_to_other" class="op_action" href="%(url)s/author/claim/action?to_other_person=True&selection=%(ref)s">'
+                  '<a rel="nofollow" id="aid_to_other" class="op_action" href="%(url)s/author/claim/action?to_other_person=True&amp;selection=%(ref)s">'
                   '<img src="%(url)s/img/aid_to_other.png" alt="%(alt_to_other)s" />'
                   '%(to_other_text)s</a> </span>')
         return (string
@@ -930,7 +930,7 @@ class Template:
                 rec_info = rec_info.replace("person/search?q=", "author/")
 
             h("    <td>%s</td>" % (rec_info))
-            h('    <td><a rel="nofollow" href="%s/author/claim/batchprocess?selected_bibrecs=%s&mfind_bibref=claim">' % (CFG_SITE_URL, paper) +
+            h('    <td><a rel="nofollow" href="%s/author/claim/batchprocess?selected_bibrecs=%s&amp;mfind_bibref=claim">' % (CFG_SITE_URL, paper) +
                 self._('Review Transaction') + '</a></td>')
             h("  </tr>")
 
@@ -1122,11 +1122,11 @@ class Template:
 
 
                 if 'delete' in ticket_links:
-                    h(('<strong>Ticket number: %(tnum)s </strong> <a rel="nofollow" id="cancel" href=%(url)s/author/claim/action?cancel_rt_ticket=True&selection=%(tnum)s&pid=%(pid)s>' + self._(' Delete this ticket') + ' </a>')
+                    h(('<strong>Ticket number: %(tnum)s </strong> <a rel="nofollow" id="cancel" href=%(url)s/author/claim/action?cancel_rt_ticket=True&amp;selection=%(tnum)s&amp;pid=%(pid)s>' + self._(' Delete this ticket') + ' </a>')
                       % ({'tnum': t[1], 'url': CFG_SITE_URL, 'pid': str(person_id)}))
 
                 if 'commit' in ticket_links:
-                    h((' or <a rel="nofollow" id="commit" href=%(url)s/author/claim/action?commit_rt_ticket=True&selection=%(tnum)s&pid=%(pid)s>' + self._(' Commit this entire ticket') + ' </a> <br>')
+                    h((' or <a rel="nofollow" id="commit" href=%(url)s/author/claim/action?commit_rt_ticket=True&amp;selection=%(tnum)s&amp;pid=%(pid)s>' + self._(' Commit this entire ticket') + ' </a> <br>')
                       % ({'tnum': t[1], 'url': CFG_SITE_URL, 'pid': str(person_id)}))
 
                 h('<dd>')
@@ -1150,7 +1150,7 @@ class Template:
                     title = escape_html(title)
 
                     if 'commit_entry' in ticket_links:
-                        h('<a rel="nofollow" id="action" href="%(url)s/author/claim/action?%(action)s=True&pid=%(pid)s&selection=%(bib)s&rt_id=%(rt)s">%(action)s - %(name)s on %(title)s </a>'
+                        h('<a rel="nofollow" id="action" href="%(url)s/author/claim/action?%(action)s=True&amp;pid=%(pid)s&amp;selection=%(bib)s&amp;rt_id=%(rt)s">%(action)s - %(name)s on %(title)s </a>'
                           % ({'action': a[0], 'url': CFG_SITE_URL,
                               'pid': str(person_id), 'bib': a[1],
                               'name': pname, 'title': title, 'rt': t[1]}))
@@ -1159,14 +1159,14 @@ class Template:
                           % ({'action': a[0], 'name': pname, 'title': title}))
 
                     if 'del_entry' in ticket_links:
-                        h(' - <a rel="nofollow" id="action" href="%(url)s/author/claim/action?cancel_rt_ticket=True&pid=%(pid)s&selection=%(bib)s&rt_id=%(rt)s&rt_action=%(action)s"> Delete this entry </a>'
+                        h(' - <a rel="nofollow" id="action" href="%(url)s/author/claim/action?cancel_rt_ticket=True&amp;pid=%(pid)s&amp;selection=%(bib)s&amp;rt_id=%(rt)s&amp;rt_action=%(action)s"> Delete this entry </a>'
                           % ({'action': a[0], 'url': CFG_SITE_URL,
                               'pid': str(person_id), 'bib': a[1], 'rt': t[1]}))
 
                     h(' - <a rel="nofollow" id="show_paper" target="_blank" href="%(url)s/record/%(record)s"> View record </a><br>' %
                       ({'url': CFG_SITE_URL, 'record': str(bibrec)}))
                 if rtid:
-                    h('<a rel="nofollow" id="closert" href="%(url)s/author/claim/action?close_rt_ticket=True&rtid=%(rtid)s&pid=%(pid)s">Close this ticket in RT</a>'
+                    h('<a rel="nofollow" id="closert" href="%(url)s/author/claim/action?close_rt_ticket=True&amp;rtid=%(rtid)s&amp;pid=%(pid)s">Close this ticket in RT</a>'
                       % ({'url': CFG_SITE_URL, 'rtid': rtid,
                           'pid': str(person_id)}))
                 h('</dd>')
@@ -1234,7 +1234,7 @@ class Template:
     def tmpl_choose_profile_search_new_person_generator(self, free_id):
         def stub():
             text = self._("Create new profile")
-            link = "%s/author/claim/action?associate_profile=True&pid=%s" % (CFG_SITE_URL, free_id)
+            link = "%s/author/claim/action?associate_profile=True&amp;pid=%s" % (CFG_SITE_URL, free_id)
             return text, link
 
         return stub
@@ -1242,10 +1242,10 @@ class Template:
     def tmpl_assigning_search_new_person_generator(self, bibrefs):
         def stub():
             text = self._("Create a new Person")
-            link = "%s/author/claim/action?confirm=True&pid=%s" % (CFG_SITE_URL, str(CREATE_NEW_PERSON))
+            link = "%s/author/claim/action?confirm=True&amp;pid=%s" % (CFG_SITE_URL, str(CREATE_NEW_PERSON))
 
             for r in bibrefs:
-                link = link + '&selection=%s' % str(r)
+                link = link + '&amp;selection=%s' % str(r)
 
             return text, link
 
@@ -1585,7 +1585,7 @@ class Template:
         # if the user has searched then his choice should be remembered in case the chosen profile is not available
         param = ''
         if search_param:
-            param = '&search_param=' + search_param
+            param = '&amp;search_param=' + search_param
 
         h('<ul>')
         if probable_profile_suggestion_info:
@@ -1596,7 +1596,7 @@ class Template:
             h('%s %s ' % (probable_profile_message, probable_profile_suggestion_info['name_string']))
             h('<a href="%s/author/profile/%s" target="_blank"> %s </a>' % (CFG_SITE_URL, probable_profile_suggestion_info['canonical_id'],
                                                                            probable_profile_suggestion_info['canonical_name_string']))
-            h('<a rel="nofollow" href="%s/author/claim/action?associate_profile=True&pid=%s%s" class="confirmlink"><button type="button">%s</a>' % (CFG_SITE_URL,
+            h('<a rel="nofollow" href="%s/author/claim/action?associate_profile=True&amp;pid=%s%s" class="confirmlink"><button type="button">%s</a>' % (CFG_SITE_URL,
                                                                                                                                                     str(probable_profile_suggestion_info['pid']), param, 'This is my profile'))
             h('</li>')
         if last_viewed_profile_suggestion_info:
@@ -1604,7 +1604,7 @@ class Template:
             h('%s %s ' % (last_viewed_profile_message, last_viewed_profile_suggestion_info['name_string']))
             h('<a href="%s/author/profile/%s" target="_blank"> %s </a>' % (CFG_SITE_URL, last_viewed_profile_suggestion_info['canonical_id'],
                                                                            last_viewed_profile_suggestion_info['canonical_name_string']))
-            h('<a rel="nofollow" href="%s/author/claim/action?associate_profile=True&pid=%s%s" class="confirmlink"><button type="button">%s</a>' % (CFG_SITE_URL,
+            h('<a rel="nofollow" href="%s/author/claim/action?associate_profile=True&amp;pid=%s%s" class="confirmlink"><button type="button">%s</a>' % (CFG_SITE_URL,
                                                                                                                                                     str(last_viewed_profile_suggestion_info['pid']), param, 'This is my profile'))
             h('</li>')
         h("</ul>")
@@ -2426,7 +2426,7 @@ After the merging only the primary profile will exist in the system and all othe
             "If your or somebody else's publications in %s exist in multiple profiles, you can fix that here. </br>" %
             BIBAUTHORID_CFG_SITE_NAME)
 
-        merge_link = "%s/author/merge_profiles?search_param=%s&primary_profile=%s" % (
+        merge_link = "%s/author/merge_profiles?search_param=%s&amp;primary_profile=%s" % (
             CFG_SITE_URL, merge_data['search_param'], merge_data['canonical_id'])
         merge_text = _("Merge profiles")
         html_merge += '<br><a rel="nofollow" href="%s" class="btn btn-default">%s</a>' % (merge_link, merge_text)
