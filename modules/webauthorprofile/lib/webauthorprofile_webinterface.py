@@ -664,8 +664,8 @@ class WebAuthorPages(WebInterfaceDirectory):
                 pubs_per_year, pubs_per_yearStatus = get_pubs_per_year(person_id)
                 if not pubs_per_year:
                     pubs_per_year = dict()
-
-                json_response = {'status': pubs_per_yearStatus, 'html': webauthorprofile_templates.tmpl_graph_box(pubs_per_year, ln='en', loading=not pubs_per_yearStatus)}
+                securelinks = req.is_https()
+                json_response = {'status': pubs_per_yearStatus, 'html': webauthorprofile_templates.tmpl_graph_box(pubs_per_year, ln='en', loading=not pubs_per_yearStatus, https=securelinks)}
                 req.content_type = 'application/json'
                 return json.dumps(json_response)
 
