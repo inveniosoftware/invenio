@@ -533,7 +533,7 @@ class Template:
 
         return content
 
-    def tmpl_graph_box(self, pubs_per_year, ln, loading=False):
+    def tmpl_graph_box(self, pubs_per_year, ln, loading=False, https=False):
         """ Creates a graph image (if it doesn't exist) with publication history over the years for
             the specific author and returns the image tag in HTML.
         """
@@ -552,7 +552,7 @@ class Template:
                         graph_data.append((year, 0))
 
                 graph_file_name = '%s' % (md5(str(graph_data)).hexdigest())
-                graph = get_graph_code(graph_file_name, graph_data)
+                graph = get_graph_code(graph_file_name, graph_data, https=https)
                 if graph:
                     graph_html = graph
         else:

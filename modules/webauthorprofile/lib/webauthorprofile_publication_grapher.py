@@ -21,7 +21,7 @@ import os
 import time
 import tempfile
 
-from invenio.config import CFG_SITE_URL, CFG_WEBDIR
+from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_WEBDIR
 
 cfg_gnuplot_available = 1
 try:
@@ -127,18 +127,19 @@ def create_graph_image(graph_file_name, graph_data, image_size=None):
 
     return graph_path
 
-def html_image(normal_image_path, icon_image_path):
+def html_image(normal_image_path, icon_image_path, https=False):
     """
     Returns html code for showing publication graph image (with lightbox js effect)
     @param normal_image_path: str (normal sized image name)
     @param icon_image_path: str (icon sized image name)
     @return: str (html code)
     """
+    siteurl = CFG_SITE_SECURE_URL if https else CFG_SITE_URL
     html = """<a href='%s/img/%s' rel="lightbox"> <img src='%s/img/%s' alt="">
-        </a>""" % (CFG_SITE_URL, normal_image_path, CFG_SITE_URL, icon_image_path)
+        </a>""" % (siteurl, normal_image_path, siteurl, icon_image_path)
     return html
 
-def get_graph_code(graph_file_name, graph_data):
+def get_graph_code(graph_file_name, graph_data, https=False):
     """
     Creates HTML code referring to the 'publications per year' graph image.
     If the image does not exist in the filesystem, it creates a new one.
@@ -159,5 +160,5 @@ def get_graph_code(graph_file_name, graph_data):
     normal_graph_path = get_graph_path(graph_file_name, graph_data)
     icon_graph_path = get_graph_path(graph_file_name + '_icon', graph_data, [350, 200])
 
-    html_graph_code = html_image(normal_graph_path, icon_graph_path)
+    html_graph_code = html_image(normal_graph_path, icon_graph_path, https=https)
     return html_graph_code
