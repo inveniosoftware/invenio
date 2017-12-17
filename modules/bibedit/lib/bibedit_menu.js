@@ -729,7 +729,7 @@ function onCreateTicketSuccess(dialog) {
       var title = "";
       var message = "";
       if (resultCode == 126) {
-          title = "Ticket was succesfully submitted";
+          title = "Ticket was successfully submitted";
           message = 'You can view ticket <a href="' + gBIBCATALOG_SYSTEM_RT_URL +
           '/Ticket/Display.html?id=' + resultMessage + '" target="_blank">here</a>';
       }

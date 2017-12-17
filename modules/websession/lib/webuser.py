@@ -570,8 +570,8 @@ def merge_usera_into_userb(id_usera, id_userb):
                 }, (id_userb, id_usera, id_usera))
         except Exception, err:
             msg = "Error when merging id_user=%s into id_userb=%s for table %s: %s\n" % (id_usera, id_userb, table, err)
-            msg += "users where succesfully already merged for tables: %s\n" % ', '.join([table[0] for table in CFG_WEBUSER_USER_TABLES[:index]])
-            msg += "users where not succesfully already merged for tables: %s\n" % ', '.join([table[0] for table in CFG_WEBUSER_USER_TABLES[index:]])
+            msg += "users where successfully already merged for tables: %s\n" % ', '.join([table[0] for table in CFG_WEBUSER_USER_TABLES[:index]])
+            msg += "users where not successfully already merged for tables: %s\n" % ', '.join([table[0] for table in CFG_WEBUSER_USER_TABLES[index:]])
             register_exception(alert_admin=True, prefix=msg)
             raise
     finally:
@@ -848,7 +848,7 @@ def nicknameUnique(p_nickname):
     return -1
 
 def update_Uid(req, p_email, remember_me=False):
-    """It updates the userId of the session. It is used when a guest user is logged in succesfully in the system with a given email and password.
+    """It updates the userId of the session. It is used when a guest user is logged in successfully in the system with a given email and password.
     As a side effect it will discover all the restricted collection to which the user has right to
     """
     query_ID = int(run_sql("select id from user where email=%s",

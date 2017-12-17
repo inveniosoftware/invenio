@@ -2197,7 +2197,7 @@ $(document).ready(function() {
 		};
 
 		var successCallback = function () {
-			alert("Your suggestion was succesfully sent!");
+			alert("Your suggestion was successfully sent!");
 		};
 
 		var errorCallback = function () {

@@ -2098,17 +2098,17 @@ You may also continue as a guest. In this case your input will be processed by o
 
         if arxiv_data['login']:
             if arxiv_data['view_own_profile']:
-                html_arxiv = _("You have succesfully logged in via arXiv.<br> You can now manage your profile.<br>")
+                html_arxiv = _("You have successfully logged in via arXiv.<br> You can now manage your profile.<br>")
             elif arxiv_data['user_has_pid']:
                 html_arxiv = _(
-                    "You have succesfully logged in via arXiv.<br><font color='red'>However the profile you are viewing is not your profile.<br><br></font>")
+                    "You have successfully logged in via arXiv.<br><font color='red'>However the profile you are viewing is not your profile.<br><br></font>")
                 own_profile_link = "%s/author/manage_profile/%s" % (CFG_SITE_URL, arxiv_data['user_pid'])
                 own_profile_text = _("Manage your profile")
                 html_arxiv += '<a rel="nofollow" href="%s" class="btn btn-default">%s</a>' % (
                     own_profile_link, own_profile_text)
             else:
                 html_arxiv = _(
-                    "You have succesfully logged in, but<font color='red'> you are not associated to a person yet.<br>Please use the button below to choose your profile<br></font>")
+                    "You have successfully logged in, but<font color='red'> you are not associated to a person yet.<br>Please use the button below to choose your profile<br></font>")
                 login_link = '%s/author/choose_profile' % CFG_SITE_URL
                 login_text = _("Choose your profile")
                 html_arxiv += '<br><a rel="nofollow" href="%s" class="btn btn-default">%s</a>' % (

@@ -243,7 +243,7 @@ def task_run_core():
             webstat.cache_customevent_trend(customevents)
             task_update_progress("Part 2/2: done %d/%d" % (i + 1, len(customevents)))
 
-    write_message("Finished rawdata caching succesfully")
-    task_update_progress("Finished rawdata caching succesfully")
+    write_message("Finished rawdata caching successfully")
+    task_update_progress("Finished rawdata caching successfully")
 
     return True

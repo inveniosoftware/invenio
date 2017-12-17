@@ -150,7 +150,7 @@ def set_processed_external_recids(pid, recid_list_str):
 def assign_person_to_uid(uid, pid):
     '''
     Assigns a person to a userid. If person already assigned to someone else, create new person.
-    Returns two value. Firstly the person id assigned and secondly if uid was succesfully assigned to given pid.
+    Returns two value. Firstly the person id assigned and secondly if uid was successfully assigned to given pid.
     If parameter pid equals to -1 then we assign the uid to a new person
     @param uid: user id, int
     @param pid: person id, int, if -1 creates new person.
