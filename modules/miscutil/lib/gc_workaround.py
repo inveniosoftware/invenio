@@ -33,8 +33,9 @@ def gcfix(f):
         gcfix = version_info[0] < 3 and version_info[1] < 7
         if gcfix:
             gc.disable()
-        return f(*args, **kwargs)
+        retval = f(*args, **kwargs)
         if gcfix:
             gc.enable()
             gc.collect()
+        return retval
     return gcwrapper

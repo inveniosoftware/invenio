@@ -46,6 +46,7 @@ from invenio.bibrank_word_searcher import find_similar
 from invenio.bibrank_word_searcher import word_similarity  # pylint: disable-msg=W0611
 from invenio.solrutils_bibrank_searcher import word_similarity_solr
 from invenio.xapianutils_bibrank_searcher import word_similarity_xapian
+from invenio.gc_workaround import gcfix
 
 
 METHODS = {}
@@ -432,20 +433,21 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance, verbo
     return (reclist_addend + reclist, METHODS[rank_method_code]["prefix"], METHODS[rank_method_code]["postfix"], voutput)
 
 
+@gcfix
 def rank_by_citations(hitset, verbose):
     """Rank by the amount of citations.
 
     Calculate the cited-by values for all the members of the hitset
-    Rreturns: ((recordid,weight),prefix,postfix,message)
+    Returns: ((recordid,weight),prefix,postfix,message)
     """
     voutput = ""
 
     if len(hitset) > CFG_WEBSEARCH_CITESUMMARY_SCAN_THRESHOLD:
         cites_counts = get_citation_dict('citations_counts')
-        ret = [(recid, weight) for recid, weight in cites_counts
-                                                        if recid in hitset]
-        recids_without_cites = hitset - get_citation_dict('citations_keys')
-        ret.extend([(recid, 0) for recid in recids_without_cites])
+        citedhitset = hitset & get_citation_dict('citations_keys')
+        ret = [recweight for recweight in cites_counts if recweight[0] in citedhitset]
+        hitset_without_cites = hitset - citedhitset
+        ret.extend([(recid, 0) for recid in hitset_without_cites])
         ret = list(reversed(ret))
     else:
         ret = get_cited_by_weight(hitset)
