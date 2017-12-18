@@ -30,12 +30,12 @@ def gcfix(f):
     """
     @wraps(f)
     def gcwrapper(*args, **kwargs):
-        gcfix = version_info[0] < 3 and version_info[1] < 7
-        if gcfix:
+        gcfixme = version_info[0] < 3 and version_info[1] < 7 \
+                  and gc.isenabled()
+        if gcfixme:
             gc.disable()
         retval = f(*args, **kwargs)
-        if gcfix:
+        if gcfixme:
             gc.enable()
-            gc.collect()
         return retval
     return gcwrapper
