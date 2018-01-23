@@ -1,7 +1,7 @@
 ## -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011 CERN.
+# Copyright (C) 2011, 2018 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -2149,7 +2149,9 @@ It holds a record of all your research activities. You can add your ORCID to all
                     _("Please note that only the publications that are verified as yours on INSPIRE will be exported to ORCID.")
                 html_orcid += '</button></div>'
             else:
-                html_orcid += 'Your works will be pushed automatically.<br><br>'
+                html_orcid += 'Your <a href="%s/author/claim/%s">claimed</a> works will be pushed automatically.<br><br>' % \
+                                             (CFG_SITE_SECURE_URL,
+                                              get_canonical_id_from_person_id(orcid_data.get('pid', '')) or '')
             if orcid_data['arxiv_login'] and orcid_data['own_profile']:
                 if orcid_data['push']:
                     html_orcid += '<br/><br/>'
