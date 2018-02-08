@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2018 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -566,7 +566,7 @@ def task_init(authorization_action="",
         ## Python level, so there's no point in having a not
         ## exploited SQL cache.
         try:
-            run_sql("SET SESSION query_cache_type = OFF;")
+            run_sql("SET SESSION query_cache_type = 0")
         except Exception:
             ## Very likely query_cache_type is already disabled globally.
             ## See: http://bugs.mysql.com/bug.php?id=69396
