@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2018 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1601,11 +1601,6 @@ def perform_request_preview_record(request_type, recid, uid, data):
             dummy1, dummy2, record, dummy3, dummy4, dummy5, dummy6 = get_cache_contents(recid, uid)
         else:
             record = get_bibrecord(recid)
-
-    # clean the record from unfilled volatile fields
-    record_strip_empty_volatile_subfields(record)
-    record_strip_empty_fields(record)
-    response['html_preview'] = _get_formated_record(record, data['new_window'])
 
     # clean the record from unfilled volatile fields
     record_strip_empty_volatile_subfields(record)
