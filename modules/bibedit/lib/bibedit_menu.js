@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2009, 2010, 2011 CERN.
+ * Copyright (C) 2009, 2010, 2011, 2018 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -21,6 +21,15 @@
  * This is the BibEdit Javascript for all functionality directly related to the
  * left hand side menu, including event handlers for most of the buttons.
  */
+
+
+function escapeHtml(str) {
+    // Use the browser's built-in functionality to quickly and safely escape a string
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+}
+
 
 function initMenu(){
   /*
@@ -326,8 +335,8 @@ function ticketToHtml(ticket, index) {
                           <div id=previewBoxTriangle ></div>\
                           <a class=closePreviewBox href="#" >close</a>\
                           <p>\
-                              <h2>Title</h2><hr>'+ ticket.subject +'<br/><br/>\
-                              <h2>Description</h2><hr>'+ ticket.text +'</br>\
+                              <h2>Title</h2><hr>'+ escapeHTML(ticket.subject) +'<br/><br/>\
+                              <h2>Description</h2><hr>'+ escapeHTML(ticket.text) +'</br>\
                           </p>\
                       </div>\
                   </div>\
