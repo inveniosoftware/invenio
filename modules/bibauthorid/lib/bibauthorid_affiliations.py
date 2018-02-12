@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2018 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -85,10 +85,11 @@ def process_affiliations(record_ids=None, all_records=False):
     records_iter = iter(records)
     processed_records_count = 0
     while True:
-        task_sleep_now_if_required()
         chunk = list(islice(records_iter, CHUNK_SIZE))
         if not chunk:
             break
+        if len(chunk) > 200:
+            task_sleep_now_if_required()
         process_and_store(chunk)
         processed_records_count += len(chunk)
         task_update_progress('processed %s out of %s records' % (processed_records_count, len(records)))
