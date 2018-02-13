@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2018 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -942,7 +942,7 @@ order to let this task run. The current priority is %s. New value:"
     def put_line(self, row, header=False, motd=False):
         ## ROW: (id,proc,user,runtime,sleeptime,status,progress,arguments,priority,host)
         ##       0  1    2    3       4         5      6        7         8        9
-        col_w = [8 , 25, 15, 21, 7, 12, 21, 60]
+        col_w = [9 , 25, 15, 21, 7, 12, 21, 60]
         maxx = self.width
         if self.y == self.selected_line - self.first_visible_line and self.y > 1:
             self.item_status = row[5]
