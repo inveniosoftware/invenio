@@ -47,7 +47,7 @@ M_NAME_FUNCTIONS = [create_matchable_name]
 
 def populate_mnames_pids_cache():
     global M_NAME_PIDS_CACHE
-    mnames_pids = run_sql("select distinct(m_name), personid from aidPERSONIDPAPERS")
+    mnames_pids = run_sql("select distinct(m_name), personid from aidPERSONIDPAPERS where flag>-2")
     M_NAME_PIDS_CACHE = dict(mnames_pids)
 
 
