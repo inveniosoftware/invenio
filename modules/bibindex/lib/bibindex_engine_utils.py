@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012, 2013, 2014, 2015 CERN.
+## Copyright (C) 2010, 2011, 2012, 2013, 2014, 2015, 2018 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -490,12 +490,7 @@ class UnknownTokenizer(Exception):
 
 def list_union(list1, list2):
     "Returns union of the two lists."
-    union_dict = {}
-    for e in list1:
-        union_dict[e] = 1
-    for e in list2:
-        union_dict[e] = 1
-    return union_dict.keys()
+    return list(set().union(list1, list2))
 
 
 def get_index_fields(index_id):
