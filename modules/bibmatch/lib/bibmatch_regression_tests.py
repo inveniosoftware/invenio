@@ -612,7 +612,7 @@ class BibMatchTest(InvenioTestCase):
     <subfield code="y">2010</subfield>
   </datafield>
   <datafield tag="856" ind1="7" ind2=" ">
-    <subfield code="u">http://dx.doi.org/10.4028/www.scientific.net/MSF.638-642.1098</subfield>
+    <subfield code="u">https://doi.org/10.4028/www.scientific.net/MSF.638-642.1098</subfield>
   </datafield>
   <datafield tag="913" ind1=" " ind2=" ">
     <subfield code="0">GRANT:402</subfield>

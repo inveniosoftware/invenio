@@ -1165,7 +1165,7 @@ class RefextractTest(InvenioXmlTestCase):
 </record>""")
 
     def test_doi2(self):
-        ref_line = u"""[1] http://dx.doi.org/10.1175/1520-0442(2000)013<2671:TAORTT>2.0.CO;2"""
+        ref_line = u"""[1] https://doi.org/10.1175/1520-0442(2000)013<2671:TAORTT>2.0.CO;2"""
         _reference_test(self, ref_line, u"""<record>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">1</subfield>
@@ -1174,7 +1174,7 @@ class RefextractTest(InvenioXmlTestCase):
 </record>""")
 
     def test_misc3(self):
-        ref_line = u"""[49] M. I. Trofimov, N. De Filippis and E. A. Smolenskii. Application of the electronegativity indices of organic molecules to tasks of chemical informatics. Russ. Chem. Bull., 54:2235-2246, 2005. http://dx.doi.org/10.1007/s11172-006-0105-6."""
+        ref_line = u"""[49] M. I. Trofimov, N. De Filippis and E. A. Smolenskii. Application of the electronegativity indices of organic molecules to tasks of chemical informatics. Russ. Chem. Bull., 54:2235-2246, 2005. https://doi.org/10.1007/s11172-006-0105-6."""
         _reference_test(self, ref_line, u"""<record>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">49</subfield>
