@@ -122,7 +122,7 @@ def get_doi_url(doi):
     @param doi: DOI string
     @return: Resolvable DOI URL
     """
-    return "http://dx.doi.org/%s" % doi
+    return "https://doi.org/%s" % doi
 
 
 def get_arxiv_url(arxiv):

@@ -56,7 +56,7 @@ def format_element(bfo, tag="909C4", label="", separator="<br/> ", description_l
             doi_list.append((field['a'], front, end, label))
 
     if doi_list:
-        doi_link = """%s<a href="http://dx.doi.org/%s" title="DOI" target="_blank">%s</a>%s"""
+        doi_link = """%s<a href="https://doi.org/%s" title="DOI" target="_blank">%s</a>%s"""
         return separator.join([doi_link % (escape(front), escape(doi, True), label and escape(label) or escape(doi), end) for (doi, front, end, label) in doi_list])
     else:
         return ""

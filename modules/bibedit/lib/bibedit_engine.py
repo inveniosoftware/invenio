@@ -1773,7 +1773,7 @@ def perform_doi_search(doi):
     """Search for DOI on the dx.doi.org page
     @return: the url returned by this page"""
     response = {}
-    url = "http://dx.doi.org/"
+    url = "https://doi.org/"
     val = {'hdl': doi}
     url_data = urllib.urlencode(val)
     cj = cookielib.CookieJar()
