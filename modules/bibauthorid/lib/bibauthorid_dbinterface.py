@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2013, 2015 CERN.
+# Copyright (C) 2011, 2012, 2013, 2015, 2018 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -4365,7 +4365,7 @@ def _get_author_refs_from_marc_caches_of_paper(rec):  # _get_authors_from_paper_
         if rec in MARC_100_700_CACHE['records']:
             refs = tuple()
         else:
-            refs = _get_author_refs_from_db_of_paper(rec)
+            return _get_author_refs_from_db_of_paper(rec)
 
     return tuple(zip(refs))
 
@@ -4403,7 +4403,8 @@ def _get_coauthor_refs_from_marc_caches_of_paper(rec):  # _get_coauthors_from_pa
         if rec in MARC_100_700_CACHE['records']:
             refs = tuple()
         else:
-            refs = _get_coauthor_refs_from_db_of_paper(rec)
+            return _get_coauthor_refs_from_db_of_paper(rec)
+
     return tuple(zip(refs))
 
 
