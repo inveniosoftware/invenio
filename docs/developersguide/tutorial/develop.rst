@@ -87,6 +87,8 @@ The ``views.py`` registers all the views of our application
 
     from flask import Blueprint, redirect, render_template, request, url_for
     from flask_babelex import gettext as _
+    from invenio_records import Record
+    from invenio_records.models import RecordMetadata
 
     from .forms import RecordForm
     from .utils import create_record
@@ -122,7 +124,14 @@ The ``views.py`` registers all the views of our application
             )
             # redirect to the success page
             return redirect(url_for('invenio_unicorn.success'))
-        return render_template('invenio_unicorn/create.html', form=form)
+
+        records = _get_all()
+        return render_template('invenio_unicorn/create.html', form=form, records=records)
+
+
+    def _get_all():
+        """Return all records."""
+        return [Record(obj.json, model=obj) for obj in RecordMetadata.query.all()]
 
 
     @blueprint.route("/success")
@@ -162,30 +171,6 @@ form and the placeholder for the records list.
       </span>
     {% endmacro %}
 
-    {% block javascript %}
-      {{ super() }}
-      <script>
-        $(document).ready(function() {
-          $.get('/api/custom_records')
-            .then(
-              function(response) {
-                $('#custom-records').html('');
-                $.each(response.hits.hits, function(index, record) {
-                  $('#custom-records').append(
-                    '<li>' +
-                      '<h4><a href="/custom_records/' + record.metadata.custom_pid + '">' + record.metadata.title + '</a></h4>' +
-                      '<p>' + record.metadata.description + '</p>' +
-                     '</li>'
-                  );
-                })
-              }, function() {
-                $('#custom-records').html('');
-              }
-            );
-        });
-      </script>
-    {% endblock javascript %}
-
     {% block page_body %}
       <div class="container">
         <div class="row">
@@ -215,12 +200,14 @@ form and the placeholder for the records list.
         <hr />
         <div class="row">
           <div class="col-md-12">
+            {% if records %}
             <h2>Records created</h2>
             <ol id="custom-records">
-              <div class="text-center">
-                Loading records...
-              </div>
+                {% for record in records %}
+                <li>{{record.title}}</li>
+                {% endfor %}
             </ol>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -278,23 +265,23 @@ On the ``utils.py`` module will create a helper function that creates a record.
         :param dict data: The record data.
         """
         indexer = RecordIndexer()
-        with db.session.begin_nested():
-            # create uuid
-            rec_uuid = uuid.uuid4()
-            # add the schema
-            host = current_app.config.get('JSONSCHEMAS_HOST')
-            data["$schema"] = \
-                current_app.extensions['invenio-jsonschemas'].path_to_url(
-                'custom_record/custom-record-v1.0.0.json')
-            # create PID
-            current_pidstore.minters['custid'](
-              rec_uuid, data, pid_value='custom_pid_{}'.format(rec_uuid)
-            )
-            # create record
-            created_record = Record.create(data, id_=rec_uuid)
-            # index the record
-            indexer.index(created_record)
+        # create uuid
+        rec_uuid = uuid.uuid4()
+        # add the schema
+        host = current_app.config.get('JSONSCHEMAS_HOST')
+        data["$schema"] = \
+            current_app.extensions['invenio-jsonschemas'].path_to_url(
+            'custom_record/custom-record-v1.0.0.json')
+        # create PID
+        current_pidstore.minters['custid'](
+          rec_uuid, data, pid_value='custom_pid_{}'.format(rec_uuid)
+        )
+        # create record
+        created_record = Record.create(data, id_=rec_uuid)
         db.session.commit()
+
+        # index the record
+        indexer.index(created_record)
 
 Demo time
 ---------
