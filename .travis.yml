@@ -52,7 +52,7 @@ before_install:
 
 install:
   - "travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt"
-  - "travis_retry pip install -e .[all]"
+  - "travis_retry pip install -e .[all,sqlite,elasticsearch6]"
 
 script:
   - "./run-tests.sh"

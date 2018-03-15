@@ -25,71 +25,74 @@
 """Invenio Digital Library Framework."""
 
 import os
-import sys
 
 from setuptools import find_packages, setup
-from setuptools.command.test import test as TestCommand
 
 readme = open('README.rst').read()
 history = open('CHANGES.rst').read()
 
 tests_require = [
-    'check-manifest>=0.25',
-    'coverage>=4.0',
-    'isort>=4.2.2',
-    'pydocstyle>=1.0.0',
+    'check-manifest>=0.35',
+    'coverage>=4.4.1',
+    'isort>=4.3',
+    'pydocstyle>=2.0.0',
     'pytest-cache>=1.0',
-    'pytest-cov>=1.8.0',
+    'pytest-cov>=2.5.1',
     'pytest-pep8>=1.0.6',
-    'pytest>=2.8.0',
+    'pytest>=3.3.1',
+    'pytest-invenio>=1.0.0a1,<1.1.0',
 ]
 
-invenio_db_version = '>=1.0.0b3,<1.1.0'
+db_version = '>=1.0.0b9,<1.1.0'
+search_version = '>=1.0.0b5,<1.1.0'
 
 extras_require = {
-    # Flavours
-    'ils': [
-        'invenio-app-ils>=1.0.0.dev0,<1.1.0',
-    ],
     # Bundles
     'base': [
-        'invenio-admin>=1.0.0b1,<1.1.0',
-        'invenio-assets>=1.0.0b6,<1.1.0',
-        'invenio-formatter>=1.0.0b1,<1.1.0',
-        'invenio-logging>=1.0.0b1,<1.1.0',
+        'invenio-admin>=1.0.0b4,<1.1.0',
+        'invenio-assets>=1.0.0b7,<1.1.0',
+        'invenio-formatter>=1.0.0b3,<1.1.0',
+        'invenio-logging>=1.0.0b3,<1.1.0',
         'invenio-mail>=1.0.0b1,<1.1.0',
-        'invenio-rest>=1.0.0a10,<1.1.0',
-        'invenio-theme>=1.0.0b1,<1.1.0',
+        'invenio-rest>=1.0.0b2,<1.1.0',
+        'invenio-theme>=1.0.0b4,<1.1.0',
     ],
     'auth': [
-        'invenio-access>=1.0.0a11,<1.1.0',
-        'invenio-accounts>=1.0.0b1,<1.1.0',
-        'invenio-oauth2server>=1.0.0a14,<1.1.0',
-        'invenio-oauthclient>=1.0.0a12,<1.1.0',
-        'invenio-userprofiles>=1.0.0a9,<1.1.0',
+        'invenio-access>=1.0.0b1,<1.1.0',
+        'invenio-accounts>=1.0.0b12,<1.1.0',
+        'invenio-oauth2server>=1.0.0b4,<1.1.0',
+        'invenio-oauthclient>=1.0.0b5,<1.1.0',
+        'invenio-userprofiles>=1.0.0b2,<1.1.0',
     ],
     'metadata': [
-        'invenio-indexer>=1.0.0a9,<1.1.0',
-        'invenio-jsonschemas>=1.0.0a3,<1.1.0',
-        'invenio-oaiserver>=1.0.0a12,<1.1.0',
-        'invenio-pidstore>=1.0.0b1,<1.1.0',
-        'invenio-records-rest>=1.0.0a18,<1.1.0',
-        'invenio-records-ui>=1.0.0a8,<1.1.0',
-        'invenio-records>=1.0.0b1,<1.1.0',
-        'invenio-search-ui>=1.0.0a6,<1.1.0',
-        'invenio-search>=1.0.0a9,<1.1.0',
+        'invenio-indexer>=1.0.0b2,<1.1.0',
+        'invenio-jsonschemas>=1.0.0a7,<1.1.0',
+        'invenio-oaiserver>=1.0.0b2,<1.1.0',
+        'invenio-pidstore>=1.0.0b2,<1.1.0',
+        'invenio-records-rest>=1.0.0b6,<1.1.0',
+        'invenio-records-ui>=1.0.0b2,<1.1.0',
+        'invenio-records>=1.0.0b4,<1.1.0',
+        'invenio-search-ui>=1.0.0a9,<1.1.0',
     ],
-    # Databases
-    'mysql': [
-        'invenio-db[mysql]' + invenio_db_version,
-    ],
+    # Database version
     'postgresql': [
-        'invenio-db[postgresql]' + invenio_db_version,
+        'invenio-db[postgresql,versioning]{}'.format(db_version),
     ],
-    # Elasticsearch versions
+    'mysql': [
+        'invenio-db[mysql,versioning]{}'.format(db_version),
+    ],
+    'sqlite': [
+        'invenio-db[versioning]{}'.format(db_version),
+    ],
+    # Elasticsearch version
     'elasticsearch2': [
-        'elasticsearch>=2.0.0,<3.0.0',
-        'elasticsearch-dsl>=2.0.0,<3.0.0',
+        'invenio-search[elasticsearch2]{}'.format(search_version),
+    ],
+    'elasticsearch5': [
+        'invenio-search[elasticsearch5]{}'.format(search_version),
+    ],
+    'elasticsearch6': [
+        'invenio-search[elasticsearch6]{}'.format(search_version),
     ],
     # Docs and test dependencies
     'docs': [
@@ -98,42 +101,25 @@ extras_require = {
     'tests': tests_require,
 }
 
-#
-# Aliases allow for easy installation of a specific type of Invenio instances.
-#   pip install invenio[repository]
-#
-aliases = {
-
-}
-
-for name, requires in aliases.items():
-    extras_require[name] = []
-    for r in requires:
-        extras_require[name].extend(
-            extras_require[r] if r in extras_require else [r]
-        )
-
-# All alias to install every possible dependency.
 extras_require['all'] = []
 for name, reqs in extras_require.items():
-    if name in {'mysql', 'postgresql'}:
+    if name in ('sqlite', 'mysql', 'postgresql') \
+            or name.startswith('elasticsearch'):
         continue
     extras_require['all'].extend(reqs)
 
-#
-# Minimal required packages for an Invenio instance (basically just the
-# Flask application loading).
-#
+
 setup_requires = [
-    'pytest-runner>=2.6.2',
+    'pytest-runner>=3.0.0,<5',
 ]
 
 install_requires = [
     'Flask>=0.11.1',
-    'invenio-base>=1.0.0a14,<1.1.0',
-    'invenio-celery>=1.0.0b2,<1.1.0',
-    'invenio-config>=1.0.0b2,<1.1.0',
-    'invenio-i18n>=1.0.0b3,<1.1.0',
+    'invenio-app>=1.0.0b2,<1.1.0'
+    'invenio-base>=1.0.0b1,<1.1.0',
+    'invenio-celery>=1.0.0b3,<1.1.0',
+    'invenio-config>=1.0.0b4,<1.1.0',
+    'invenio-i18n>=1.0.0b4,<1.1.0',
 ]
 
 packages = find_packages()
