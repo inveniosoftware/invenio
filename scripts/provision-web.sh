@@ -25,13 +25,6 @@
 # quit on errors:
 set -o errexit
 
-# check environment variables:
-if [ "${INVENIO_WEB_VENV}" = "" ]; then
-    echo "[ERROR] Please set environment variable INVENIO_WEB_VENV before runnning this script."
-    echo "[ERROR] Example: export INVENIO_WEB_VENV=invenio"
-    exit 1
-fi
-
 # quit on unbound symbols:
 set -o nounset
 
@@ -98,9 +91,6 @@ provision_web_libpostgresql_ubuntu14 () {
 provision_web_common_centos7 () {
 
     # sphinxdoc-install-useful-system-tools-centos7-begin
-    # add EPEL external repository:
-    $sudo yum install -y epel-release
-
     # install useful system tools:
     $sudo yum install -y \
          curl \
@@ -108,12 +98,15 @@ provision_web_common_centos7 () {
          rlwrap \
          screen \
          vim
+
+    # install uuid generator (useful for loading demo records):
+    $sudo yum install -y \
+         uuid
     # sphinxdoc-install-useful-system-tools-centos7-end
 
     # sphinxdoc-add-nodejs-external-repository-centos7-begin
-    if [[ ! -f /etc/yum.repos.d/nodesource-el.repo ]]; then
-        curl -sL https://rpm.nodesource.com/setup_4.x | $sudo bash -
-    fi
+    # add EPEL external repository:
+    $sudo yum install -y epel-release
     # sphinxdoc-add-nodejs-external-repository-centos7-end
 
     # sphinxdoc-install-web-common-centos7-begin
@@ -124,12 +117,9 @@ provision_web_common_centos7 () {
          libffi-devel \
          libxml2-devel \
          libxslt-devel \
-         openssl-devel \
-         policycoreutils-python \
+         npm \
          python-devel \
          python-pip
-    $sudo yum install -y --disablerepo=epel \
-         nodejs
     # sphinxdoc-install-web-common-centos7-end
 
 }
@@ -145,7 +135,7 @@ provision_web_libpostgresql_centos7 () {
 setup_npm_and_css_js_filters () {
 
     # sphinxdoc-install-npm-and-css-js-filters-begin
-    # $sudo su -c "npm install -g npm"
+    $sudo su -c "npm install -g npm"
     $sudo su -c "npm install -g node-sass@3.8.0 clean-css@3.4.12 requirejs uglify-js"
     # sphinxdoc-install-npm-and-css-js-filters-end
 
@@ -158,8 +148,7 @@ setup_virtualenvwrapper () {
     set +o nounset
 
     # sphinxdoc-install-virtualenvwrapper-begin
-    $sudo pip install -U setuptools pip
-    $sudo pip install -U virtualenvwrapper
+    $sudo pip install -U virtualenvwrapper setuptools pip
     if ! grep -q virtualenvwrapper ~/.bashrc; then
         mkdir -p "$HOME/.virtualenvs"
         echo "export WORKON_HOME=$HOME/.virtualenvs" >> "$HOME/.bashrc"
@@ -182,10 +171,10 @@ setup_nginx_ubuntu14 () {
     $sudo apt-get install -y nginx
 
     # configure Nginx web server:
-    $sudo cp -f "$scriptpathname/../nginx/invenio.conf" /etc/nginx/sites-available/
-    $sudo sed -i "s,/home/invenio/,/home/$(whoami)/,g" /etc/nginx/sites-available/invenio.conf
+    $sudo cp -f "$scriptpathname/../nginx/invenio3.conf" /etc/nginx/sites-available/
+    $sudo sed -i "s,/home/invenio/,/home/$(whoami)/,g" /etc/nginx/sites-available/invenio3.conf
     $sudo rm /etc/nginx/sites-enabled/default
-    $sudo ln -s /etc/nginx/sites-available/invenio.conf /etc/nginx/sites-enabled/
+    $sudo ln -s /etc/nginx/sites-available/invenio3.conf /etc/nginx/sites-enabled/
     $sudo /usr/sbin/service nginx restart
     # sphinxdoc-install-web-nginx-ubuntu14-end
 }
@@ -196,21 +185,12 @@ setup_nginx_centos7 () {
     $sudo yum install -y nginx
 
     # configure Nginx web server:
-    $sudo cp "$scriptpathname/../nginx/invenio.conf" /etc/nginx/conf.d/
-    $sudo sed -i "s,/home/invenio/,/home/$(whoami)/,g" /etc/nginx/conf.d/invenio.conf
+    $sudo cp "$scriptpathname/../nginx/invenio3.conf" /etc/nginx/conf.d/
+    $sudo sed -i "s,/home/invenio/,/home/$(whoami)/,g" /etc/nginx/conf.d/invenio3.conf
 
-    # add SELinux permissions if necessary:
     if $sudo getenforce | grep -q 'Enforcing'; then
         if ! $sudo semanage port -l | tail -n +1 | grep -q '8888'; then
-            $sudo semanage port -a -t http_port_t -p tcp 8888
-        fi
-        if ! $sudo semanage port -l | grep ^http_port_t | grep -q 5000; then
-            $sudo semanage port -m -t http_port_t -p tcp 5000
-        fi
-        if ! $sudo getsebool -a | grep httpd | grep httpd_enable_homedirs | grep -q on; then
-            $sudo setsebool -P httpd_enable_homedirs 1
-            mkdir -p "/home/$(whoami)/.virtualenvs/${INVENIO_WEB_VENV}/var/instance/static"
-            $sudo chcon -R -t httpd_sys_content_t "/home/$(whoami)/.virtualenvs/${INVENIO_WEB_VENV}/var/instance/static"
+            $sudo semanage port -a -t http_port_t  -p tcp 8888
         fi
     fi
 
@@ -218,12 +198,10 @@ setup_nginx_centos7 () {
     $sudo chmod go+rx "/home/$(whoami)/"
     $sudo /sbin/service nginx restart
 
-    # open firewall ports:
-    if firewall-cmd --state | grep -q running; then
-        $sudo firewall-cmd --permanent --zone=public --add-service=http
-        $sudo firewall-cmd --permanent --zone=public --add-service=https
-        $sudo firewall-cmd --reload
-    fi
+    # open firewall:
+    $sudo firewall-cmd --permanent --zone=public --add-service=http
+    $sudo firewall-cmd --permanent --zone=public --add-service=https
+    $sudo firewall-cmd --reload
     # sphinxdoc-install-web-nginx-centos7-end
 }
 
