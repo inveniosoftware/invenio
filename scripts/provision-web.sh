@@ -187,13 +187,6 @@ setup_nginx_centos7 () {
     # configure Nginx web server:
     $sudo cp "$scriptpathname/../nginx/invenio3.conf" /etc/nginx/conf.d/
     $sudo sed -i "s,/home/invenio/,/home/$(whoami)/,g" /etc/nginx/conf.d/invenio3.conf
-
-    if $sudo getenforce | grep -q 'Enforcing'; then
-        if ! $sudo semanage port -l | tail -n +1 | grep -q '8888'; then
-            $sudo semanage port -a -t http_port_t  -p tcp 8888
-        fi
-    fi
-
     $sudo sed -i 's,80,8888,g' /etc/nginx/nginx.conf
     $sudo chmod go+rx "/home/$(whoami)/"
     $sudo /sbin/service nginx restart
