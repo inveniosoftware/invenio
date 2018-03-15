@@ -106,405 +106,52 @@ instance setup:
    INVENIO_WORKER_HOST
      The IP address of the Celery worker node.
 
-In our example setup, we shall use:
-
-.. include:: ../../../.inveniorc
-   :start-after: # sphinxdoc-kickstart-configuration-variables-begin
-   :end-before: # sphinxdoc-kickstart-configuration-variables-end
-   :literal:
-
-Let us save this configuration in a file called ``.inveniorc`` for future use.
-
 Web
 ~~~
+
+TODO: rewrite this part.
 
 The web application node (192.168.50.10) is where the main Invenio application
 will be running. We need to provision it with some system dependencies in order
 to be able to install various underlying Python and JavaScript libraries.
 
-The web application node can be set up in an automated unattended way by running
-the following script:
-
-.. code-block:: shell
-
-   source .inveniorc
-   ./scripts/provision-web.sh
-
-Let's see in detail what the web provisioning script does.
-
-First, let's see if using ``sudo`` will be required:
-
-.. include:: ../../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-detect-sudo-begin
-   :end-before: # sphinxdoc-install-detect-sudo-end
-   :literal:
-
-Second, some useful system tools are installed:
-
-* on Ubuntu 14.04 LTS (Trusty Tahr):
-
-.. include:: ../../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-useful-system-tools-ubuntu14-begin
-   :end-before: # sphinxdoc-install-useful-system-tools-ubuntu14-end
-   :literal:
-
-* on CentOS 7:
-
-.. include:: ../../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-useful-system-tools-centos7-begin
-   :end-before: # sphinxdoc-install-useful-system-tools-centos7-end
-   :literal:
-
-Third, an external Node.js package repository is enabled. We'll be needing to
-install and run Npm on the web node later. The Node.js repository is enabled as
-follows:
-
-* on Ubuntu 14.04 LTS (Trusty Tahr):
-
-.. include:: ../../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-add-nodejs-external-repository-ubuntu14-begin
-   :end-before: # sphinxdoc-add-nodejs-external-repository-ubuntu14-end
-   :literal:
-
-* on CentOS 7:
-
-.. include:: ../../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-add-nodejs-external-repository-centos7-begin
-   :end-before: # sphinxdoc-add-nodejs-external-repository-centos7-end
-   :literal:
-
-Fourth, all the common prerequisite software libraries and packages that Invenio
-needs are installed:
-
-* on Ubuntu 14.04 LTS (Trusty Tahr):
-
-.. include:: ../../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-web-common-ubuntu14-begin
-   :end-before: # sphinxdoc-install-web-common-ubuntu14-end
-   :literal:
-
-* on CentOS7:
-
-.. include:: ../../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-web-common-centos7-begin
-   :end-before: # sphinxdoc-install-web-common-centos7-end
-   :literal:
-
-We want to use PostgreSQL database in this installation example, so we need to
-install corresponding libraries too:
-
-* on Ubuntu 14.04 LTS (Trusty Tahr):
-
-.. include:: ../../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-web-libpostgresql-ubuntu14-begin
-   :end-before: # sphinxdoc-install-web-libpostgresql-ubuntu14-end
-   :literal:
-
-* on CentOS7:
-
-.. include:: ../../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-web-libpostgresql-centos7-begin
-   :end-before: # sphinxdoc-install-web-libpostgresql-centos7-end
-   :literal:
-
-Fifth, now that Node.js is installed, we can proceed with installing Npm and
-associated CSS/JS filter tools. Let's do it globally:
-
-* on either of the operating systems:
-
-.. include:: ../../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-npm-and-css-js-filters-begin
-   :end-before: # sphinxdoc-install-npm-and-css-js-filters-end
-   :literal:
-
-Sixth, we'll install Python virtual environment wrapper tools and activate them
-in the current user shell process:
-
-* on either of the operating systems:
-
-.. include:: ../../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-virtualenvwrapper-begin
-   :end-before: # sphinxdoc-install-virtualenvwrapper-end
-   :literal:
-
-Seventh, we install Nginx web server and configure appropriate virtual host:
-
-* on Ubuntu 14.04 LTS (Trusty Tahr):
-
-.. include:: ../../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-web-nginx-ubuntu14-begin
-   :end-before: # sphinxdoc-install-web-nginx-ubuntu14-end
-   :literal:
-
-* on CentOS7:
-
-.. include:: ../../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-web-nginx-centos7-begin
-   :end-before: # sphinxdoc-install-web-nginx-centos7-end
-   :literal:
-
-Finally, let's clean after ourselves:
-
-* on Ubuntu 14.04 LTS (Trusty Tahr):
-
-.. include:: ../../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-web-cleanup-ubuntu14-begin
-   :end-before: # sphinxdoc-install-web-cleanup-ubuntu14-end
-   :literal:
-
-* on CentOS7:
-
-.. include:: ../../../scripts/provision-web.sh
-   :start-after: # sphinxdoc-install-web-cleanup-centos7-begin
-   :end-before: # sphinxdoc-install-web-cleanup-centos7-end
-   :literal:
-
 Database
 ~~~~~~~~
+
+TODO: rewrite this part.
 
 The database server (192.168.50.11) will hold persistent data of our Invenio
 installation, such as bibliographic records or user accounts. Invenio supports
 MySQL, PostgreSQL, and SQLite databases. In this tutorial, we shall use
 PostgreSQL that is the recommended database platform for Invenio.
 
-The database server node can be set up in an automated unattended way by running
-the following script:
-
-.. code-block:: shell
-
-   source .inveniorc
-   ./scripts/provision-postgresql.sh
-
-Let's see in detail what the database provisioning script does.
-
-First, we install and configure the database software:
-
-* on Ubuntu 14.04 LTS (Trusty Tahr):
-
-.. include:: ../../../scripts/provision-postgresql.sh
-   :start-after: # sphinxdoc-install-postgresql-ubuntu14-begin
-   :end-before: # sphinxdoc-install-postgresql-ubuntu14-end
-   :literal:
-
-* on CentOS 7:
-
-.. include:: ../../../scripts/provision-postgresql.sh
-   :start-after: # sphinxdoc-install-postgresql-centos7-begin
-   :end-before: # sphinxdoc-install-postgresql-centos7-end
-   :literal:
-
-We can now create a new database user with the necessary access permissions on
-the new database:
-
-* on either of the operating systems:
-
-.. include:: ../../../scripts/provision-postgresql.sh
-   :start-after: # sphinxdoc-setup-postgresql-access-begin
-   :end-before: # sphinxdoc-setup-postgresql-access-end
-   :literal:
-
-Finally, let's clean after ourselves:
-
-* on Ubuntu 14.04 LTS (Trusty Tahr):
-
-.. include:: ../../../scripts/provision-postgresql.sh
-   :start-after: # sphinxdoc-install-postgresql-cleanup-ubuntu14-begin
-   :end-before: # sphinxdoc-install-postgresql-cleanup-ubuntu14-end
-   :literal:
-
-* on CentOS7:
-
-.. include:: ../../../scripts/provision-postgresql.sh
-   :start-after: # sphinxdoc-install-postgresql-cleanup-centos7-begin
-   :end-before: # sphinxdoc-install-postgresql-cleanup-centos7-end
-   :literal:
-
 Redis
 ~~~~~
 
+TODO: rewrite this part.
+
 The Redis server (192.168.50.12) is used for various caching needs.
-
-The Redis server can be set up in an automated unattended way by running the
-following script:
-
-.. code-block:: shell
-
-   source .inveniorc
-   ./scripts/provision-redis.sh
-
-Let's see in detail what the Redis provisioning script does.
-
-* on Ubuntu 14.04 LTS (Trusty Tahr):
-
-.. include:: ../../../scripts/provision-redis.sh
-   :start-after: # sphinxdoc-install-redis-ubuntu14-begin
-   :end-before: # sphinxdoc-install-redis-ubuntu14-end
-   :literal:
-
-* on CentOS 7:
-
-.. include:: ../../../scripts/provision-redis.sh
-   :start-after: # sphinxdoc-install-redis-centos7-begin
-   :end-before: # sphinxdoc-install-redis-centos7-end
-   :literal:
-
-Finally, let's clean after ourselves:
-
-* on Ubuntu 14.04 LTS (Trusty Tahr):
-
-.. include:: ../../../scripts/provision-redis.sh
-   :start-after: # sphinxdoc-install-redis-cleanup-ubuntu14-begin
-   :end-before: # sphinxdoc-install-redis-cleanup-ubuntu14-end
-   :literal:
-
-* on CentOS7:
-
-.. include:: ../../../scripts/provision-redis.sh
-   :start-after: # sphinxdoc-install-redis-cleanup-centos7-begin
-   :end-before: # sphinxdoc-install-redis-cleanup-centos7-end
-   :literal:
 
 Elasticsearch
 ~~~~~~~~~~~~~
+
+TODO: rewrite this part.
 
 The Elasticsearch server (192.168.50.13) is used to index and search
 bibliographic records, fulltext documents, and other various interesting
 information managed by our Invenio digital library instance.
 
-The Elasticsearch server can be set up in an automated unattended way by running
-the following script:
-
-.. code-block:: shell
-
-   source .inveniorc
-   ./scripts/provision-elasticsearch.sh
-
-Let's see in detail what the Elasticsearch provisioning script does.
-
-* on Ubuntu 14.04 LTS (Trusty Tahr):
-
-.. include:: ../../../scripts/provision-elasticsearch.sh
-   :start-after: # sphinxdoc-install-elasticsearch-ubuntu14-begin
-   :end-before: # sphinxdoc-install-elasticsearch-ubuntu14-end
-   :literal:
-
-* on CentOS 7:
-
-.. include:: ../../../scripts/provision-elasticsearch.sh
-   :start-after: # sphinxdoc-install-elasticsearch-centos7-begin
-   :end-before: # sphinxdoc-install-elasticsearch-centos7-end
-   :literal:
-
-Some packages require extra plugins to be installed.
-
-.. include:: ../../../scripts/provision-elasticsearch.sh
-   :start-after: # sphinxdoc-install-elasticsearch-plugins-begin
-   :end-before: # sphinxdoc-install-elasticsearch-plugins-end
-   :literal:
-
-Finally, let's clean after ourselves:
-
-* on Ubuntu 14.04 LTS (Trusty Tahr):
-
-.. include:: ../../../scripts/provision-elasticsearch.sh
-   :start-after: # sphinxdoc-install-elasticsearch-cleanup-ubuntu14-begin
-   :end-before: # sphinxdoc-install-elasticsearch-cleanup-ubuntu14-end
-   :literal:
-
-* on CentOS7:
-
-.. include:: ../../../scripts/provision-elasticsearch.sh
-   :start-after: # sphinxdoc-install-elasticsearch-cleanup-centos7-begin
-   :end-before: # sphinxdoc-install-elasticsearch-cleanup-centos7-end
-   :literal:
-
 RabbitMQ
 ~~~~~~~~
 
+TODO: rewrite this part.
+
 The RabbitMQ server (192.168.50.14) is used as a messaging middleware broker.
-
-The RabbitMQ server can be set up in an automated unattended way by running the
-following script:
-
-.. code-block:: shell
-
-   source .inveniorc
-   ./scripts/provision-rabbitmq.sh
-
-Let's see in detail what the RabbitMQ provisioning script does.
-
-* on Ubuntu 14.04 LTS (Trusty Tahr):
-
-.. include:: ../../../scripts/provision-rabbitmq.sh
-   :start-after: # sphinxdoc-install-rabbitmq-ubuntu14-begin
-   :end-before: # sphinxdoc-install-rabbitmq-ubuntu14-end
-   :literal:
-
-* on CentOS 7:
-
-.. include:: ../../../scripts/provision-rabbitmq.sh
-   :start-after: # sphinxdoc-install-rabbitmq-centos7-begin
-   :end-before: # sphinxdoc-install-rabbitmq-centos7-end
-   :literal:
-
-Finally, let's clean after ourselves:
-
-* on Ubuntu 14.04 LTS (Trusty Tahr):
-
-.. include:: ../../../scripts/provision-rabbitmq.sh
-   :start-after: # sphinxdoc-install-rabbitmq-cleanup-ubuntu14-begin
-   :end-before: # sphinxdoc-install-rabbitmq-cleanup-ubuntu14-end
-   :literal:
-
-* on CentOS7:
-
-.. include:: ../../../scripts/provision-rabbitmq.sh
-   :start-after: # sphinxdoc-install-rabbitmq-cleanup-centos7-begin
-   :end-before: # sphinxdoc-install-rabbitmq-cleanup-centos7-end
-   :literal:
 
 Worker
 ~~~~~~
 
+TODO: rewrite this part.
+
 The Celery worker node (192.168.50.15) is used to execute potentially long tasks
 in asynchronous manner.
-
-The worker node can be set up in an automated unattended way by running the
-following script:
-
-.. code-block:: shell
-
-   source .inveniorc
-   ./scripts/provision-worker.sh
-
-Let's see in detail what the worker provisioning script does.
-
-* on Ubuntu 14.04 LTS (Trusty Tahr):
-
-.. include:: ../../../scripts/provision-worker.sh
-   :start-after: # sphinxdoc-install-worker-ubuntu14-begin
-   :end-before: # sphinxdoc-install-worker-ubuntu14-end
-   :literal:
-
-* on CentOS 7:
-
-.. include:: ../../../scripts/provision-worker.sh
-   :start-after: # sphinxdoc-install-worker-centos7-begin
-   :end-before: # sphinxdoc-install-worker-centos7-end
-   :literal:
-
-Finally, let's clean after ourselves:
-
-* on Ubuntu 14.04 LTS (Trusty Tahr):
-
-.. include:: ../../../scripts/provision-worker.sh
-   :start-after: # sphinxdoc-install-worker-cleanup-ubuntu14-begin
-   :end-before: # sphinxdoc-install-worker-cleanup-ubuntu14-end
-   :literal:
-
-* on CentOS7:
-
-.. include:: ../../../scripts/provision-worker.sh
-   :start-after: # sphinxdoc-install-worker-cleanup-centos7-begin
-   :end-before: # sphinxdoc-install-worker-cleanup-centos7-end
-   :literal:

@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
