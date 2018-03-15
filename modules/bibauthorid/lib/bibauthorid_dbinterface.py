@@ -3027,7 +3027,8 @@ def get_papers_info_of_author(pid, flag,  # get_person_papers
                 record_info['date'] = (date,)
 
         try:
-            record_info['earliest_date'] = run_sql("SELECT earliest_date FROM bibrec WHERE id=%s", (rec, ))[0][0].strftime("%Y-%m-%d")
+            ead = run_sql("SELECT earliest_date FROM bibrec WHERE id=%s", (rec, ))[0][0]
+            record_info['earliest_date'] = "{0}-{1:02d}-{2:02d}".format(ead.year, ead.month, ead.day)
         except:
             # Too bad
             pass
