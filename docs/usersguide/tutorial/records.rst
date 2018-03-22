@@ -1,3 +1,10 @@
+..
+    This file is part of Invenio.
+    Copyright (C) 2017-2018 CERN.
+
+    Invenio is free software; you can redistribute it and/or modify it
+    under the terms of the MIT License; see LICENSE file for more details.
+
 .. _create_and_search_your_first_record:
 
 Create and search your first record
