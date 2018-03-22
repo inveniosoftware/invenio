@@ -6,11 +6,19 @@
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-
 notifications:
   email: false
 
-sudo: true
+sudo: false
+
+addons:
+  postgresql: 9.4
+
+services:
+  - mysql
+  - postgresql
+  - redis
+  - rabbitmq
 
 language: python
 
@@ -18,27 +26,53 @@ cache:
   - pip
 
 env:
-  - REQUIREMENTS=lowest
-  - REQUIREMENTS=release
-  - REQUIREMENTS=devel
+  global:
+    - ES2_DOWNLOAD_URL="https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.4.2/elasticsearch-2.4.2.tar.gz"
+    - ES5_DOWNLOAD_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.4.tar.gz"
+    - ES6_DOWNLOAD_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.2.2.tar.gz"
+    - ES_HOST=127.0.0.1
+  matrix:
+    # ES2 + SQLite
+    - REQUIREMENTS=lowest EXTRAS=all,sqlite,elasticsearch2 SQLALCHEMY_DATABASE_URI="sqlite:///test.db" ES_URL=$ES2_DOWNLOAD_URL
+    # ES5 + MySQL
+    - REQUIREMENTS=lowest EXTRAS=all,mysql,elasticsearch5 SQLALCHEMY_DATABASE_URI="mysql+pymysql://travis@localhost:3306/invenio" ES_URL=$ES5_DOWNLOAD_URL
+    # ES5 + PostgreSQL
+    - REQUIREMENTS=release EXTRAS=all,postgresql,elasticsearch5 SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/invenio" ES_URL=$ES5_DOWNLOAD_URL DEPLOY=true
+    # ES6 + MySQL
+    - REQUIREMENTS=release EXTRAS=all,mysql,elasticsearch6 SQLALCHEMY_DATABASE_URI="mysql+pymysql://travis@localhost:3306/invenio" ES_URL=$ES6_DOWNLOAD_URL
+    # ES6 + PostgreSQL
+    - REQUIREMENTS=devel EXTRAS=all,postgresql,elasticsearch6 SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/invenio" ES_URL=$ES6_DOWNLOAD_URL
 
 python:
   - "2.7"
   - "3.5"
 
+matrix:
+  fast_finish: true
+  allow_failures:
+    - env: REQUIREMENTS=devel EXTRAS=all,postgresql,elasticsearch6 SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/invenio" ES_URL=$ES6_DOWNLOAD_URL
+
 before_install:
   - "sudo apt-get install graphviz"
+  - "nvm install 6; nvm use 6"
+  - "mkdir /tmp/elasticsearch"
+  - "wget -O - ${ES_URL} | tar xz --directory=/tmp/elasticsearch --strip-components=1"
+  - "/tmp/elasticsearch/bin/elasticsearch > /tmp/local-es.log &"
   - "travis_retry pip install --upgrade pip setuptools py"
   - "travis_retry pip install twine wheel coveralls requirements-builder"
-  - "requirements-builder --level=min setup.py > .travis-lowest-requirements.txt"
-  - "requirements-builder --level=pypi setup.py > .travis-release-requirements.txt"
-  - "requirements-builder --level=dev --req requirements-devel.txt setup.py > .travis-devel-requirements.txt"
+  - "requirements-builder -e $EXTRAS --level=min setup.py > .travis-lowest-requirements.txt"
+  - "requirements-builder -e $EXTRAS --level=pypi setup.py > .travis-release-requirements.txt"
+  - "requirements-builder -e $EXTRAS --level=dev --req requirements-devel.txt setup.py > .travis-devel-requirements.txt"
+  - "mysql -e 'CREATE DATABASE IF NOT EXISTS invenio;' -uroot"
+  - "psql -c 'CREATE DATABASE invenio;' -U postgres"
 
 install:
   - "travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt"
-  - "travis_retry pip install -e .[all,sqlite,elasticsearch6]"
+  - "travis_retry pip install -e .[${EXTRAS}]"
 
 script:
+  - /tmp/elasticsearch/bin/elasticsearch --version
+  - wget -q --waitretry=1 --retry-connrefused -T 10 -O - http://127.0.0.1:9200 || cat /tmp/local-es.log
   - "./run-tests.sh"
 
 after_success:
@@ -46,11 +80,11 @@ after_success:
 
 deploy:
   provider: pypi
-  user: lnielsen
+  user: inveniosoftware
   password:
-    secure: VR963pGTKJlFMhiQq/eerCDfciJeEKxxWlBK5qsnnVssxwoBwjGeiWABf/U/4il/64TgmShauc1g2GPGYNgZvdZXuOtPRW5rLMEU8lDb1KSe0kpJnPgj7NAMVKbLPYF7orBY8eU1UKvP3t2rWqLBpGJ5k2ia+Hrtp3Ki3u0gAeI=
+    secure: "LnOMPTAl/ANHMY+yGhLoLM8v/kzsNlpCX77zwGHMdoaUIEYopNFEzHc7u3/G5wqRFPy2Oy1gaqQIiWbdOmH1q85LeLkMp5jf5w8qzIvkN/ltnpxazbQ5d7uZjvHUSVYLnEa64hucUQ3l/2PEM02ijZdgt9N25YIwpuW/HNyYzzY="
   distributions: "sdist bdist_wheel"
   on:
     tags: true
     python: "2.7"
-    condition: $REQUIREMENTS = release
+    condition: $DEPLOY = true
