@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2015 CERN.
+# Copyright (C) 2011, 2012, 2015, 2018 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -36,14 +36,16 @@ except ImportError:
     CFG_JSON_AVAILABLE = False
     json = None
 
-from invenio.bibauthorid_webapi import add_cname_to_hepname_record
-from invenio.bibauthorid_webapi import create_new_person
-from invenio.config import CFG_SITE_URL, CFG_BASE_URL
+from invenio.bibauthorid_webapi import add_cname_to_hepname_record, create_new_person
+
 from invenio.bibauthorid_config import AID_ENABLED, PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT, \
     BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE, VALID_EXPORT_FILTERS, PERSONS_PER_PAGE, \
     MAX_NUM_SHOW_PAPERS, BIBAUTHORID_CFG_SITE_NAME, CFG_BIBAUTHORID_ENABLED
 
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_INSPIRE_SITE, CFG_SITE_SECURE_URL, CFG_LABS_HOSTNAME
+from invenio.config import (CFG_SITE_LANG,
+                            CFG_BASE_URL, CFG_SITE_URL, CFG_SITE_SECURE_URL,
+                            CFG_INSPIRE_SITE,
+                            CFG_LABS_HOSTNAME)
 
 from invenio.bibauthorid_name_utils import most_relevant_name, clean_string
 from invenio.webpage import page, pageheaderonly, pagefooteronly
@@ -2642,7 +2644,8 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         webapi.history_log_visit(req, 'manage_profile', pid=person_id)
 
         # store the arxiv papers the user owns
-        if uid > 0 and not pinfo['arxiv_status']:
+        if uid > 0 and uid == webapi.get_uid_from_personid(person_id) \
+           and not pinfo['arxiv_status']:
             uinfo = collect_user_info(req)
             arxiv_papers = list()
 
