@@ -33,7 +33,8 @@ from invenio.ext.sqlalchemy import db
 import six
 
 from sqlalchemy_utils.types import URLType
-from sqlalchemy_utils.types.encrypted import AesEngine, EncryptedType
+from sqlalchemy_utils import EncryptedType
+from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 
 from werkzeug.security import gen_salt
 
