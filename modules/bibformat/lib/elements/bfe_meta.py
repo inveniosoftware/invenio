@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2013 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2013, 2018 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -232,7 +232,9 @@ def parse_date_for_googlescholar(datetime_string):
                 pass
 
     if parsed_datetime:
-        return datetime(*(parsed_datetime[0:6])).strftime('%Y/%m/%d')
+        # avoid strftime because of its limitations for dates < 1900
+        dt = datetime(*(parsed_datetime[0:6]))
+        return "{0}/{1:02d}/{2:02d}".format(dt.year, dt.month, dt.day)
     else:
         # Look for a year inside the string:
         try:
