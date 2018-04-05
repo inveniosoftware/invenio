@@ -46,6 +46,10 @@ world such as:
 
 .. warning::
 
-    **WORK IN PROGRESS** This documentation and Invenio v3 is still under
-    development. We expect the first stable release of Invenio v3 and this
-    documentation by end-June 2017.
+    **WORK IN PROGRESS** Invenio v3.0 Release Candidate 1 was released on
+    April 23, 2018. We expect a final release of Invenio v3.0 by end-May 
+    2018 after the next Invenio sprint (May 14-25). The missing parts 
+    include this general documentation, site templates and an update of 
+    the main website. All the indivdual packages (code and documentation) 
+    that make up Invenio v3.0 have already been released in stable v1.0 
+    versions.
