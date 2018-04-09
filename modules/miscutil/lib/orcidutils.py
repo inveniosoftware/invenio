@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014, 2015, 2016 CERN.
+# Copyright (C) 2014, 2015, 2016, 2018 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -353,7 +353,7 @@ def _push_few_works(doid, short_list, number, pid, token):
                                               'w'))
                 if len(shorter_list) == 0:
                     return True
-                return _push_few_works(doid, shorter_list, number, pid, token)
+                return shorter_list
             else:
                 bibtask.write_message(exc)
                 bibtask.write_message(response.text)
@@ -389,9 +389,12 @@ def _orcid_push_with_bibtask():
                  number) in _orcid_fetch_works(int(pid)):
 
                 bibtask.write_message("Running pushing")
-                success = _push_few_works(doid, orcid_small_list, number, pid,
-                                          token)
-                if not success:
+                result = orcid_small_list
+                while isinstance(result, list):
+                    result = _push_few_works(doid, result, number, pid,
+                                             token)
+                if not result:
+                    success = False
                     break
 
             trigger_aidtoken_change(pid, 0)
@@ -656,21 +659,12 @@ def _get_external_ids(recid, url, recstruct, old_external_ids, orcid):
     isbn = record_get_field_value(recstruct, '020', '', '', 'a')
     record_ext_ids = record_get_field_instances(recstruct, '037')
     if doi:
-        for single_doi in doi:
+        for single_doi in set(doi):
             if single_doi in old_external_ids['doi'] or \
                     single_doi in blacklist.get(orcid, []):
                 raise OrcidRecordExisting
             encoded = encode_for_jinja_and_xml(single_doi)
-            # This is parsed firstly, so no check for id name done.
-            if encoded in [x for (_, x) in external_ids]:
-                try:
-                    _stub_method()
-                except DoubledIds:
-                    register_exception(subject="The paper %s contains the same"
-                                       " doi %s twice." %
-                                       (recid, encoded), alert_admin=True)
-            else:
-                external_ids.add(('doi', encoded))
+            external_ids.add(('doi', encoded))
     if isbn:
         if isbn in old_external_ids['isbn']:
             raise OrcidRecordExisting
