@@ -4488,7 +4488,7 @@ def get_inspire_id_of_signature(sig):  # get_inspire_id
 def get_orcid_id_of_signature(sig):
     """
     Gets the external identifier of ORCID system for the given signature.
-    The field to check is either '100__j' or '700__j'
+    The fields to check are either '100__j' and '100__k' or '700__j' and '700__k'
     and the prefix is 'ORCID:'
 
     @param sig: signature (bibref_table, bibref_value, bibrec)
@@ -4498,13 +4498,13 @@ def get_orcid_id_of_signature(sig):
     @rtype: str
     """
     table, ref, rec = sig
-    ext_ids_field = (str(table), ref, rec), str(table) + '__j'
+    ext_ids_field = (str(table), ref, rec), str(table) + '__j', str(table) + '__k'
 
-    ext_ids = get_grouped_records(*ext_ids_field).values()[0]
+    ext_ids = chain(*get_grouped_records(*ext_ids_field).values())
     for ext_id in ext_ids:
         if ext_id.startswith('ORCID:'):
             try:
-                return [re.search(r"(\d{4}\-){3}\d{4}", ext_id).group()]
+                return [re.search(r"0000-000\d-\d{4}-\d{3}[\dX]", ext_id).group()]
             except AttributeError:
                 pass
 
