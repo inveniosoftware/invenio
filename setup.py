@@ -26,7 +26,7 @@ tests_require = [
     'pytest-invenio>=1.0.0,<1.1.0',
 ]
 
-db_version = '>=1.0.0,<1.1.0'
+db_version = '>=1.0.1,<1.1.0'
 search_version = '>=1.0.0,<1.1.0'
 
 extras_require = {
