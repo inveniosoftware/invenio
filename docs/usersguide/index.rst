@@ -9,6 +9,7 @@
 
 User's Guide
 ------------
+
 This part of the documentation will show you how to get started using Invenio.
 
 .. toctree::
