@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2013, 2014, 2015, 2016 CERN.
+# Copyright (C) 2011, 2012, 2013, 2014, 2015, 2016, 2018 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -118,7 +118,7 @@ def get_canonical_id_from_person_id(person_id):
     @return: result from the request or person_id on failure
     @rtype: int
     '''
-    if not person_id:
+    if person_id is None or person_id < 0:
         return None
 
     canonical_name = person_id
