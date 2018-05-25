@@ -356,19 +356,19 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
         '''
         def generate_title_guest():
             title = 'Assign papers'
-            if self.person_id:
+            if self.person_id is not None and self.person_id > -1:
                 title = 'Assign papers for: ' + str(webapi.get_person_redirect_link(self.person_id))
             return title
 
         def generate_title_user():
             title = 'Assign papers'
-            if self.person_id:
+            if self.person_id is not None and self.person_id > -1:
                 title = 'Assign papers (user interface) for: ' + str(webapi.get_person_redirect_link(self.person_id))
             return title
 
         def generate_title_admin():
             title = 'Assign papers'
-            if self.person_id:
+            if self.person_id is not None and self_person_id > -1:
                 title = 'Assign papers (administrator interface) for: ' + str(
                     webapi.get_person_redirect_link(self.person_id))
             return title

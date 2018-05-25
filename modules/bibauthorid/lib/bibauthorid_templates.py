@@ -762,7 +762,7 @@ class Template:
         no_papers_html.append('%s' % self._(verbiage_dict['no_doc_string']))
         no_papers_html.append('</strong></div>')
 
-        if not bibrecids or not person_id:
+        if not bibrecids or person_id is None:
             return "\n".join(no_papers_html)
 
         pp_html = []
@@ -904,7 +904,7 @@ class Template:
         no_papers_html.append(self._('Sorry, there are currently no records to be found in this category.'))
         no_papers_html.append('</strong></div>')
 
-        if not bibrecids or not person_id:
+        if not bibrecids or person_id is None:
             return "\n".join(no_papers_html)
 
         pp_html = []

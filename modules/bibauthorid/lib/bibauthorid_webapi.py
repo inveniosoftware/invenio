@@ -118,7 +118,7 @@ def get_canonical_id_from_person_id(person_id):
     @return: result from the request or person_id on failure
     @rtype: int
     '''
-    if person_id is None or person_id < 0:
+    if person_id is None:
         return None
 
     canonical_name = person_id
@@ -141,7 +141,7 @@ def get_external_ids_from_person_id(pid):
     @return: dictionary of external ids
     @rtype: dict()
     '''
-    if not pid or not (isinstance(pid, str) or isinstance(pid, (int, long))):
+    if pid is None or not (isinstance(pid, str) or isinstance(pid, (int, long))):
         return dict()
 
     if isinstance(pid, str):
@@ -161,7 +161,7 @@ def get_internal_user_id_from_person_id(pid):
     @return: dictionary of external ids
     @rtype: dict()
     '''
-    if not pid or not (isinstance(pid, str) or isinstance(pid, (int, long))):
+    if pid is None or not (isinstance(pid, str) or isinstance(pid, (int, long))):
         return dict()
 
     if isinstance(pid, str):
@@ -509,7 +509,7 @@ def get_pid_from_uid(uid):
             "AAAAARGH problem in get_pid_from_uid webapi. Got uid as a tuple instead of int.Uid = %s" %
             str(uid))
     pid = dbapi.get_author_by_uid(uid)
-    if not pid:
+    if pid is None:
         return -1
     return pid
 
