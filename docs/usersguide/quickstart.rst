@@ -19,268 +19,120 @@ To be able to develop and run Invenio you will need the following installed and
 configured on your system:
 
 - `Docker <https://docs.docker.com/install>`_ and `Docker Compose <https://docs.docker.com/compose/install/>`_
-- `Cookiecutter <https://cookiecutter.readthedocs.io/en/latest/installation.html>`_
-- `Enough virtual memory configured to run Elasticsearch
-  <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-prod-mode>`_
-- `Virtualenv <https://virtualenv.pypa.io/en/stable/installation/>`_ and `Virtualenvwrapper <https://virtualenvwrapper.readthedocs.io/en/latest/install.html>`_
 - `NodeJS v6.x and NPM v4.x <https://nodejs.org/en/download/package-manager>`_
 
-Minimal instance
-----------------
+Overview
+--------
 
-To setup a minimal preview of Invenio you can run the following commands:
+Creating your own Invenio instance requires scaffolding two code repositories
+using `Cookiecutter <https://cookiecutter.readthedocs.io/en/latest/installation.html>`_,
+one for the main website and one for the data model. These repositories will be
+where you customize and develop the features of your instance.
+
+Bootstrap
+---------
+
+First, let's create a `virtualenv <https://virtualenv.pypa.io/en/stable/installation/>`_
+using `virtualenvwrapper <https://virtualenvwrapper.readthedocs.io/en/latest/install.html>`_
+in order to sandbox our Python environment for development:
 
 .. code-block:: shell
 
-  $ cokiecutter gh:inveniosoftware/cookiecutter-invenio-instance -c v3.0
-  $ cd my-site
-  $ docker-compose -f docker-compose.full.yml up -d
-  $ docker-compose -f docker-compose.full.yml run --rm web-ui ./scripts/setup
-  $ firefox https://localhost
+  $ mkvirtualenv my-repository
 
-.. note::
+Now, let's scaffold the instance using the `official cookiecutter template
+<https://github.com/inveniosoftware/cookiecutter-invenio-instance>`_.
 
-    Because we are using a self-signed SSL certificate to enable HTTPS, your
-    web browser will probably display a warning when you access the website.
-    You can usuaslly get around this by following the browser's instructions in
-    the warning message.
+.. code-block:: shell
+
+  $ pip install --user cookiecutter  # or "sudo apt install python-cookiecutter"
+  $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance -c v3.0
+  # ...fill in the fields...
+
+Now that we have our instance's source code ready we can proceed with the
+initial setup of the services and dependencies of the project:
+
+.. code-block:: shell
+
+  # Increase virtual memory settings for Elasticsearch
+  $ sudo sysctl -w vm.max_map_count=262144
+  # Fire up the database, Elasticsearch, Redis and RabbitMQ
+  $ docker-compose up -d
+  Creating network "myrepository_default" with the default driver
+  Creating myrepository_cache_1 ... done
+  Creating myrepository_db_1    ... done
+  Creating myrepository_es_1    ... done
+  Creating myrepository_mq_1    ... done
+  $ ./scripts/bootstrap  # Install dependencies and generate static assets
+
+Customize
+---------
 
 This instance doesn't have a data model defined, and thus it doesn't include
-any records you can search and display. Creating a data model and loading
-records is described in detail throughout the following sections.
-
-Full instance
--------------
-
-Overview
-^^^^^^^^
-
-Bootstrapping a complete Invenio instance involves two parts:
-
-1. Creating and configuring the main instance.
-2. Creating, configure the data model and integrating it into the instance.
-
-Creating the instance
-^^^^^^^^^^^^^^^^^^^^^
-
-First, let's scaffold the instance using the `official cookiecutter template
-<https://github.com/inveniosoftware/cookiecutter-invenio-instance>`_.
-Cookiecutter will prompt you to fill in some information:
+any records you can search and display. To scaffold a data model for the
+instance we will use the `official data model cookiecutter template
+<https://github.com/inveniosoftware/cookiecutter-invenio-datamodel>`_:
 
 .. code-block:: shell
 
-  $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance -c v3.0
-  project_name [My site]: Foo Library
-  project_shortname [foo-library]: <enter>
-  project_site [foo-library.com]: <enter>
-  package_name [foo_library]: <enter>
-  github_repo [foo-library/foo-library]: <enter>
-  description [Invenio digital library framework.]: <enter>
-  author_name [CERN]: Foo
-  author_email [info@inveniosoftware.org]: info@foo.org
-  year [2018]: <enter>
-  copyright_holder [Foo]: <enter>
-  transifex_project [foo-library]: <enter>
-  Select database:
-  1 - postgresql
-  2 - mysql
-  Choose from 1, 2 [1]: <enter>
-  Select elasticsearch:
-  1 - 6
-  2 - 5
-  Choose from 1, 2 [1]: <enter>
-  # Some automatic setup will run now. Keep this output,
-  # since it will include some TODOs for later.
+  $ cd ..  # switch back to the parent directory
+  $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-datamodel -c v3.0
+  # ...fill in the fields...
 
-The next step is to create a ``virtualenv`` in order to sandbox our Python
-environment for development:
+Let's also install the data model in our virtualenv:
 
 .. code-block:: shell
 
-  $ cd foo-library
-  $ mkvirtualenv foo-library
-
-Now we can proceed with fixing the TODOs mentioned in the cookiecutter output:
-
-requirements.txt
-""""""""""""""""
-
-This file is used for pinning the Python dependencies of your instance to
-specific versions in order to achieve reproducible builds when deploying your
-instance. You can generate this file in the following fashion:
-
-.. code-block:: shell
-
+  $ workon my-repository
+  $ cd my-datamodel
   $ pip install -e .
-  $ pip install pip-tools
-  $ pip-compile
 
-.. _manifest-in:
+Now that we have a data model installed we can create database tables and
+Elasticsearch indices:
 
-MANIFEST.in
-"""""""""""
-
-Python packages require a ``MANIFEST.in`` which specifies what files are part
-of the distributed package. You can update the existing file by running the
-following commands:
-
-.. code-block:: shell
-
-  $ git init
-  $ git add -A
-  $ pip install -e .[all]
-  $ check-manifest -u
-
-Translations configuration (.tx/config)
-"""""""""""""""""""""""""""""""""""""""
-
-You might also want to generate the necessary files to allow localization of
-the instance in different languages via the `Transifex platform
-<https://www.transifex.com/>`_:
-
-.. code-block:: shell
-
-  $ python setup.py extract_messages
-  $ python setup.py init_catalog -l en
-  $ python setup.py compile_catalog
-  # Ensure project has been created on Transifex under the foo-library organisation
-  # Install the transifex-client
-  $ pip install transifex-client
-  # Push source (.pot) and translations (.po) to Transifex
-  $ tx push -s -t
-  # Pull translations for a single language from Transifex
-  $ tx pull -l en
-  # Pull translations for all languages from Transifex
-  $ tx pull -a
-
-Setup and Bootstrapping
-"""""""""""""""""""""""
-
-Now that the you're done with the initial configuration of the project's source
-code you can proceed with the initial setup of services and fixtures. You can
-then bootstrap the instance by building the necessary static assets:
-
-.. code-block:: shell
-
-  # First start the services that Invenio depends on via docker-compose
-  $ docker-compose up -d
   $ ./scripts/setup
-  $ ./scripts/bootstrap
 
-Running the instance
-""""""""""""""""""""
+Currently, the system doesn't have any users, but more important, it doesn't
+have an administrator. Let's create one:
+
+.. code-block:: shell
+
+  $ my-repository users create admin@my-repository.com -a --password=<secret>
+  $ my-repository roles add admin@my-repository.com admin
+
+Run
+---
 
 You can now run the necessary processes for the instance:
 
 .. code-block:: shell
 
   # ...in a new terminal, start the celery worker
-  $ workon foo-library
+  $ workon my-repository
   $ celery -A invenio_app.celery -l INFO
 
   # ...in a new terminal, start the flask development server
-  $ workon foo-library
+  $ workon my-repository
   $ ./scripts/server
   * Environment: development
   * Debug mode: on
   * Running on https://127.0.0.1:5000/ (Press CTRL+C to quit)
+  $ firefox https://127.0.0.1:5000/
 
-Currently the system doesn't have any users, but more important, it doesn't
-have an administrator. Let's create one:
+.. note::
 
-.. code-block:: shell
+    Because we are using a self-signed SSL certificate to enable HTTPS, your
+    web browser will probably display a warning when you access the website.
+    You can usually get around this by following the browser's instructions in
+    the warning message. For CLI tools like ``curl`` tou can ignore the SSL
+    verification via the ``-k/--insecure`` option.
 
-  $ foo-library users create admin@foo-library.com -a --password=<secret>
-  $ foo-library roles add admin@foo-library.com admin
+Create a record
+^^^^^^^^^^^^^^^
 
-Testing
-"""""""
-
-In order to run the default test that were generated ofr the instance you can
-run the following:
-
-.. code-block:: shell
-
-  $ pip install -e .[tests]
-  $ ./run-tests.sh  # will run all the tests...
-  # ...or to run individual tests
-  $ py.test tests/ui/test_views.py::test_ping
-
-Documentation
-"""""""""""""
-
-In order to build and preview the instance's documentation you can run the
-following commands:
-
-.. code-block:: shell
-
-  $ cd docs
-  $ make html
-  $ firefox _build/html/index.html
-
-Upgrading
-"""""""""
-
-If there are any new changes (e.g. new tables, indices, etc) you apply them by
-running:
-
-.. code-block:: shell
-
-  $ ./scripts/update
-
-Creating the data model
-^^^^^^^^^^^^^^^^^^^^^^^
-
-To scaffold a data model for the instance you can use the `official data model
-cookiecutter template
-<https://github.com/inveniosoftware/cookiecutter-invenio-datamodel>`_.
-Cookiecutter will prompt you to fill in some information:
-
-.. code-block:: shell
-
-  $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-datamodel -c v3.0
-  project_name [My datamodel]: foo-datamodel
-  project_shortname [foo-datamodel]:
-  package_name [foo_datamodel]:
-  github_repo [foo-datamodel/foo-datamodel]:
-  description [Invenio data model.]:
-  author_name [CERN]: Foo
-  author_email [info@inveniosoftware.org]:
-  year [2018]:
-  copyright_holder [Foo]:
-  extension_class [foodatamodel]:
-  pid_name [id]:
-  # Some automatic setup will run now. Keep this output,
-  # since it will include some TODOs for later.
-
-Let's install the datamodel as a Python package in our virtualenv:
-
-.. code-block:: shell
-
-  $ workon foo-library
-  $ cd foo-datamodel
-  $ pip install -e .
-
-In order to continue we'll have to address some of the TODOs, as we did for the
-instance. One of them is :ref:`updating MANIFEST.in <manifest-in>`. The other
-one is adding the datamodel's configuration in our instance:
-
-.. code-block:: python
-
-  # foo_library/config.py
-  ...
-  from foo_datamodel.config import FOO_DATAMODEL_RECORDS_REST_ENDPOINTS
-  RECORDS_REST_ENDPOINTS = {
-      **FOO_DATAMODEL_RECORDS_REST_ENDPOINTS,
-  }
-  ...
-
-Creating a record
-"""""""""""""""""
-
-By default the datamodel has an Invenio-Records-REST API endpoint configured,
-which allows accessing a record and retrieving
-
+By default, the data model has an records REST API endpoint configured, which
+allows performing CRUD and search operations over records. Let's create a
+simple record via ``curl``:
 
 .. code-block:: shell
 
@@ -301,20 +153,22 @@ which allows accessing a record and retrieving
           "name": "Doe, John"
         }
       ],
+      "id": 1,
       "title": "Some title"
     },
     "revision": 0,
     "updated": "2018-05-23T13:28:19.426213+00:00"
   }
 
-Showing a record
-""""""""""""""""
+Display a record
+^^^^^^^^^^^^^^^^
 
-Now you can fetch a single record by accessing the "self" link from the
-previous response:
+You can now visit the record's page at https://localhost:5000/records/1, or
+fetch it via the REST API:
 
 .. code-block:: shell
 
+  # You can find this URL under the "links.self" key of the previous response
   $ curl -k --header "Content-Type: application/json" \
       https://localhost:5000/api/records/1?prettyprint=1
 
@@ -330,19 +184,20 @@ previous response:
           "name": "Doe, John"
         }
       ],
+      "id": 1,
       "title": "Some title"
     },
     "revision": 0,
     "updated": "2018-05-23T13:28:19.426213+00:00"
   }
 
-You can also visit the record's page at https://localhost:5000/records/1.
+Search for records
+^^^^^^^^^^^^^^^^^^
 
-Searching records
-"""""""""""""""""
-
-The record you created before, besides being inserted to the database, are also
-indexed in Elasticsearch and become available for searching via the REST API:
+The record you created before, besides being inserted into the database, is
+also indexed in Elasticsearch and available for searching. You can search for
+it via the Search UI page at https://localhost:5000/search, or via the REST
+API:
 
 .. code-block:: shell
 
@@ -371,6 +226,7 @@ indexed in Elasticsearch and become available for searching via the REST API:
                 "name": "Doe, John"
               }
             ],
+            "id": 1,
             "title": "Some title"
           },
           "revision": 0,
@@ -384,4 +240,85 @@ indexed in Elasticsearch and become available for searching via the REST API:
     }
   }
 
-You can also search via the UI page at https://localhost:5000/search.
+Preparing for production
+------------------------
+
+Although we can run and interact with the instance, we're not quite there yet
+in terms of having a proper Python package that's ready to be tested and
+deployed to a production environment. You may have noticed that after running
+the ``cookiecutter`` command for the instance and data model, there was a note
+for checking out some of the TODOs. As you may noticed then, you can run the
+following command in each of the generated folders to see a summary of the
+TODOs:
+
+.. code-block:: shell
+
+  $ grep --color=always --recursive --context=3 --line-number TODO .
+
+Let's have a look at some of them one-by-one and explain what they are for:
+
+1. Creating a ``requirements.txt``: This file is used for pinning the Python
+   dependencies of your instance to specific versions in order to achieve
+   reproducible builds when deploying your instance. You can generate this file
+   in the following fashion:
+
+   .. code-block:: shell
+
+      $ pip install -e .
+      $ pip install pip-tools
+      $ pip-compile
+
+2. Python packages require a ``MANIFEST.in`` which specifies what files are
+   part of the distributed package. You can update the existing file by running
+   the following commands:
+
+   .. code-block:: shell
+
+      $ git init
+      $ git add -A
+      $ pip install -e .[all]
+      $ check-manifest -u
+
+3. Translations configuration (.tx/config): You might also want to generate the
+   necessary files to allow localization of the instance in different languages
+   via the `Transifex platform <https://www.transifex.com/>`_:
+
+   .. code-block:: shell
+
+      $ python setup.py extract_messages
+      $ python setup.py init_catalog -l en
+      $ python setup.py compile_catalog
+      # Ensure project has been created on Transifex under the my-repository organisation
+      # Install the transifex-client
+      $ pip install transifex-client
+      # Push source (.pot) and translations (.po) to Transifex
+      $ tx push -s -t
+      # Pull translations for a single language from Transifex
+      $ tx pull -l en
+      # Pull translations for all languages from Transifex
+      $ tx pull -a
+
+Testing
+^^^^^^^
+
+In order to run tests for the instance, you can run:
+
+.. code-block:: shell
+
+  # Install testing dependencies
+  $ pip install -e .[tests]
+  $ ./run-tests.sh  # will run all the tests...
+  # ...or to run individual tests
+  $ py.test tests/ui/test_views.py::test_ping
+
+Documentation
+^^^^^^^^^^^^^
+
+In order to build and preview the instance's documentation, you can run the
+following commands:
+
+.. code-block:: shell
+
+  $ cd docs
+  $ make html
+  $ firefox _build/html/index.html
