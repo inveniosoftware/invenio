@@ -390,12 +390,12 @@ def author_has_claimed_signature(pid, sig, negative=False):
     @return: A boolean indicating whether the person has claimed a signature.
     """
     try:
-        return bool(run_sql("""select * from aidPERSONIDPAPERS
-                               where personid = %s and bibref_table = %s
-                               and bibref_value = %s and bibrec = %s
-                               and flag = %s""",
-                            (pid, str(sig[0]), sig[1], sig[2],
-                            -2 if negative else 2))[0][0])
+        return run_sql("""select * from aidPERSONIDPAPERS
+                          where personid = %s and bibref_table = %s
+                          and bibref_value = %s and bibrec = %s
+                          and flag = %s""",
+                       (pid, str(sig[0]), sig[1], sig[2],
+                        -2 if negative else 2))[0][0] > -1
     except IndexError:
         return False
 
