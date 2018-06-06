@@ -16,10 +16,6 @@ for maintaining one or more repositories.
 
    overview
    repositories
-   branches
-   triaging
-   reviewing
-   merging
-   releasing
-   deprecating
-   faq
+
+
+.. todo: branches, reviewing, merging, releasing, deprecating, faq

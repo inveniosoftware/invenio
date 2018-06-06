@@ -14,15 +14,16 @@ We follow `semantic versioning <http://semver.org/>`_ and `PEP-0440
 Invenio v3.x
 ------------
 
-*Unreleased*
+**Stable**
 
-Invenio v3.0 will be released when the Invenio code base is fully split into a
-set of standalone independent Python packages.
+Invenio v3.0:
+
+* `v3.0.0 <https://github.com/inveniosoftware/invenio/releases/tag/v3.0.0>`_ - released 2018-06-07
 
 Invenio v2.x
 ------------
 
-*Semi-stable*
+**End-of-life**
 
 Invenio v2.x code base is a hybrid architecture that uses Flask web
 development framework combined with Invenio v1.x framework.
@@ -52,15 +53,25 @@ Invenio v2.0:
 Invenio v1.x
 ------------
 
-*Stable*
+**End-of-life**
 
 Invenio v1.x code base is suitable for stable production. It uses legacy
 technology and custom web development framework.
 
 .. note::
 
-    Invenio v1.x is in feature freeze and will only receive important bug and
-    security fixes.
+    Invenio v1.x has reached end-of-life and will not receive any further
+    development nor security fixes.
+
+    Invenio v1.2.2 is the last stable release from the old Invenio legacy
+    technology code base. If you have been using one of previous Invenio
+    versions, it is recommended to upgrade to this version.
+
+
+.. note::
+
+    If you would like to check out Invenio v1.2 locally please see our
+    important `note <https://inveniosoftware.org/legacy/>`_ how to install it.
 
 Released versions include:
 

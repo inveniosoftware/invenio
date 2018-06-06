@@ -18,13 +18,5 @@ Invenio.
 
     tutorial/index
     development-environment
-    system-architecture
     application-architecture
-    extending-invenio
     invenio-modules
-    bundles
-    create-a-datamodel
-    docker
-    git
-    python
-    testing-practices

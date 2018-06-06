@@ -14,7 +14,7 @@ Configure travis-cli.org
 1. Create an account
 ^^^^^^^^^^^^^^^^^^^^
 
-We need first to create an account on `travis-cli.org <http://travis-cli.org>`_.
+We need first to create an account on `travis-cli.org <http://travis-ci.org>`_.
 
 .. image:: resources/travis-signup.png
     :align: center

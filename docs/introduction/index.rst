@@ -14,7 +14,4 @@ Introduction
     :maxdepth: 2
     :name: mastertoc
 
-    invenio
-    digitalrepositories
-    usecases
     history

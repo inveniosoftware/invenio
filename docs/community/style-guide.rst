@@ -7,8 +7,8 @@
 
 .. _style-guide:
 
-Style guide TODO
-================
+Style guide
+===========
 
 Python
 ------
