@@ -14,24 +14,27 @@ Quickstart
 
 Prerequisites
 -------------
-
 To be able to develop and run Invenio you will need the following installed and
 configured on your system:
 
 - `Docker <https://docs.docker.com/install>`_ and `Docker Compose <https://docs.docker.com/compose/install/>`_
 - `NodeJS v6.x and NPM v4.x <https://nodejs.org/en/download/package-manager>`_
+- `Enough virtual memory <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-prod-mode>`_
+  for Elasticsearch.
 
 Overview
 --------
-
 Creating your own Invenio instance requires scaffolding two code repositories
-using `Cookiecutter <https://cookiecutter.readthedocs.io/en/latest/installation.html>`_,
-one for the main website and one for the data model. These repositories will be
-where you customize and develop the features of your instance.
+using `Cookiecutter <https://cookiecutter.readthedocs.io/en/latest/installation.html>`_:
+
+- one code repository for the main website.
+- one code repository for the data model.
+
+These code repositories will be where you customize and develop the features of
+your instance.
 
 Bootstrap
 ---------
-
 First, let's create a `virtualenv <https://virtualenv.pypa.io/en/stable/installation/>`_
 using `virtualenvwrapper <https://virtualenvwrapper.readthedocs.io/en/latest/install.html>`_
 in order to sandbox our Python environment for development:
@@ -45,7 +48,7 @@ Now, let's scaffold the instance using the `official cookiecutter template
 
 .. code-block:: shell
 
-  $ pip install --user cookiecutter  # or "sudo apt install python-cookiecutter"
+  $ pip install cookiecutter
   $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance -c v3.0
   # ...fill in the fields...
 
@@ -54,8 +57,6 @@ initial setup of the services and dependencies of the project:
 
 .. code-block:: shell
 
-  # Increase virtual memory settings for Elasticsearch
-  $ sudo sysctl -w vm.max_map_count=262144
   # Fire up the database, Elasticsearch, Redis and RabbitMQ
   $ docker-compose up -d
   Creating network "myrepository_default" with the default driver
@@ -63,7 +64,26 @@ initial setup of the services and dependencies of the project:
   Creating myrepository_db_1    ... done
   Creating myrepository_es_1    ... done
   Creating myrepository_mq_1    ... done
-  $ ./scripts/bootstrap  # Install dependencies and generate static assets
+  # Install dependencies and generate static assets
+  $ ./scripts/bootstrap
+
+.. note::
+
+    Make sure you have `enough virtual memory
+    <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-prod-mode>`_
+    for Elasticsearch in Docker:
+
+    .. code-block:: shell
+
+        # Linux
+        $ sysctl -w vm.max_map_count=262144
+
+        # macOS
+        $ screen ~/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/tty
+        <enter>
+        linut00001:~# sysctl -w vm.max_map_count=262144
+
+
 
 Customize
 ---------
@@ -90,6 +110,9 @@ Let's also install the data model in our virtualenv:
 Now that we have a data model installed we can create database tables and
 Elasticsearch indices:
 
+.. code-block:: shell
+
+  $ cd ../my-repository
   $ ./scripts/setup
 
 Currently, the system doesn't have any users, but more important, it doesn't
@@ -102,14 +125,13 @@ have an administrator. Let's create one:
 
 Run
 ---
-
 You can now run the necessary processes for the instance:
 
 .. code-block:: shell
 
   # ...in a new terminal, start the celery worker
   $ workon my-repository
-  $ celery -A invenio_app.celery -l INFO
+  $ celery worker -A invenio_app.celery -l INFO
 
   # ...in a new terminal, start the flask development server
   $ workon my-repository
@@ -130,7 +152,7 @@ You can now run the necessary processes for the instance:
 Create a record
 ^^^^^^^^^^^^^^^
 
-By default, the data model has an records REST API endpoint configured, which
+By default, the data model has a records REST API endpoint configured, which
 allows performing CRUD and search operations over records. Let's create a
 simple record via ``curl``:
 
@@ -240,18 +262,18 @@ API:
     }
   }
 
-Preparing for production
-------------------------
-
+Next steps
+----------
 Although we can run and interact with the instance, we're not quite there yet
 in terms of having a proper Python package that's ready to be tested and
-deployed to a production environment. You may have noticed that after running
-the ``cookiecutter`` command for the instance and data model, there was a note
-for checking out some of the TODOs. As you may noticed then, you can run the
-following command in each of the generated folders to see a summary of the
-TODOs:
+deployed to a production environment.
 
-.. code-block:: shell
+You may have noticed that after running the ``cookiecutter`` command for the
+instance and the data model, there was a note for checking out some of the
+TODOs. Uou can run the following command in each code repository directory
+to see a summary of the TODOs again:
+
+.. code-block:: console
 
   $ grep --color=always --recursive --context=3 --line-number TODO .
 
@@ -260,10 +282,12 @@ Let's have a look at some of them one-by-one and explain what they are for:
 1. Creating a ``requirements.txt``: This file is used for pinning the Python
    dependencies of your instance to specific versions in order to achieve
    reproducible builds when deploying your instance. You can generate this file
-   in the following fashion:
+   in the following fashion (note, this is only for the *instance* and not
+   the *data model*):
 
-   .. code-block:: shell
+   .. code-block:: console
 
+      $ cd my-repository/
       $ pip install -e .
       $ pip install pip-tools
       $ pip-compile
@@ -272,31 +296,43 @@ Let's have a look at some of them one-by-one and explain what they are for:
    part of the distributed package. You can update the existing file by running
    the following commands:
 
-   .. code-block:: shell
+   .. code-block:: console
 
       $ git init
       $ git add -A
       $ pip install -e .[all]
       $ check-manifest -u
 
-3. Translations configuration (.tx/config): You might also want to generate the
-   necessary files to allow localization of the instance in different languages
-   via the `Transifex platform <https://www.transifex.com/>`_:
+3. Translations configuration (``.tx/config``): You might also want to generate
+   the necessary files to allow localization of the instance in different
+   languages via the `Transifex platform <https://www.transifex.com/>`_:
 
-   .. code-block:: shell
+   .. code-block:: console
 
       $ python setup.py extract_messages
       $ python setup.py init_catalog -l en
       $ python setup.py compile_catalog
-      # Ensure project has been created on Transifex under the my-repository organisation
-      # Install the transifex-client
+
+   Ensure project has been created on Transifex under the my-repository
+   organisation.
+
+   Install the transifex-client
+
+   .. code-block:: console
+
       $ pip install transifex-client
-      # Push source (.pot) and translations (.po) to Transifex
+
+   Push source (.pot) and translations (.po) to Transifex:
+
+   .. code-block:: console
+
       $ tx push -s -t
-      # Pull translations for a single language from Transifex
+
+   Pull translations for a single language from Transifex
+
+   .. code-block:: console
+
       $ tx pull -l en
-      # Pull translations for all languages from Transifex
-      $ tx pull -a
 
 Testing
 ^^^^^^^

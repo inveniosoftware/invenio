@@ -8,13 +8,26 @@
 Migrating to v3
 ===============
 
-Dump Invenio v1.2 or v2.1 data
-------------------------------
+.. warning::
 
-Dump CLI installation
-^^^^^^^^^^^^^^^^^^^^^
+   Invenio v3 is significantly different from v1 and thus migrating from v1 to
+   v3 is a complex operation.
 
-There are several ways of installing ``invenio-migrator`` in your Invenio v1.2 or
+   This guide will help you dump records and files from your v1 installation.
+   You will need to write code to import the dumped data into your v3
+   installation. This is necessary because v3 support many different data
+   models and thus you need to map your v1 MARC21 records into your new data
+   model in v3.
+
+Dumping data from v1.2
+----------------------
+The module `Invenio-Migrator
+<http://invenio-migrator.readthedocs.io/en/latest/>`_ will help you dump your
+v1 data and as well import the data in v3.
+
+Install Invenio-Migrator in v1
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+There are several ways of installing Invenio-Migrator in your Invenio v1.2 or
 v2.1 production environment, the one we recommend is using `Virtualenv
 <https://virtualenv.pypa.io/en/stable/>`_ to avoid any interference with the
 currently installed libraries:
@@ -28,8 +41,8 @@ currently installed libraries:
     $ pip install invenio-migrator --pre
     $ inveniomigrator dump --help
 
-It is important to use the option ``--system-site-packages`` as Invenio-Migrator
-will use Invenio legacy python APIs to perform the dump.
+It is important to use the option ``--system-site-packages`` as
+Invenio-Migrator will use Invenio legacy python APIs to perform the dump.
 The package ``virtualenvwrapper`` is not required but it is quite convenient.
 
 Dump records and files
@@ -41,8 +54,8 @@ Dump records and files
     $ cd /vagrant/dump/
     $ inveniomigrator dump records
 
-This will generate one or more JSON files containing 1000 records each tops, with
-the following information:
+This will generate one or more JSON files containing 1000 records each,
+with the following information:
 
 * The record id.
 * The record metadata, stored in the ``record`` key there is a list with one
@@ -81,27 +94,24 @@ using the ``--query`` argument when dumping from your legacy installation:
 
 Things
 ^^^^^^
+The dump command of the Invenio-Migrator works with, what we called, *things*.
+A *thing* is an entity you want to dump from your Invenio legacy installation,
+e.g. in the previous example the *thing* was *records*.
 
-The dump command of the Invenio-Migrator works with, what we called, *things*. A
-*thing* is an entity you want to dump from Invenio legacy, in the previous
-example the *thing* was records.
 The list of *things* Invenio-Migrator can dump by default is listed via
 entry-points in the ``setup.py``, this not only help us add new dump scripts
-easily, but also allows anyone to create their own from outside the
+easily, but also allows anyone to create their own dumpscripts from outside the
 Invenio-Migrator.
 
 You can read more about which *things* are already supported by the
-`Invenio-Migrator documentation <http://invenio-migrator.readthedocs.io>`_ and
-also we have section dedicated to :ref:`entrypoints` where you can learn how we
-used them to extend Invenio's functionality.
+`Invenio-Migrator documentation <http://invenio-migrator.readthedocs.io>`_.
 
-Load data into Invenio v3
--------------------------
+Loading data in v3
+------------------
 
-Load CLI installation
-^^^^^^^^^^^^^^^^^^^^^
-
-Invenio-Migrator can be installed in any Invenio 3 environment using PyPi and
+Install Invenio-Migrator in v3
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Invenio-Migrator can be installed in any Invenio v3 environment using PyPI and
 the extra dependencies ``loader``:
 
 .. code-block:: bash
@@ -109,19 +119,18 @@ the extra dependencies ``loader``:
     $ pip install invenio-migrator[loader]
 
 Depending on what you want to load you might need to have installed other
-packages, i.e. to load communities from Invenio 2.1 ``invenio-communities``
-needs to be installed.
+packages, i.e. to load communities from Invenio v2.1 you need
+``invenio-communities`` installed.
 
-This will add to your Invenio application a new set of commands under ``dumps``:
+This will add to your Invenio application a new set of commands under
+``dumps``:
 
 .. code-block:: bash
 
    $ invenio dumps --help
 
-
 Load records and files
 ^^^^^^^^^^^^^^^^^^^^^^
-
 .. code-block:: bash
 
     $ invenio dumps loadrecords /vagrant/dump/records_dump_0.json
@@ -140,9 +149,8 @@ if you want more information.
 
 Loaders
 ^^^^^^^
-
 Each of the entities that can be loaded by Invenio-Migrator have a companion
-command generally prefixed by *load*, i.e. ``loadrecords``.
+command generally prefixed by *load*, e.g. ``loadrecords``.
 
 The loaders are similar to the things we describe previously, but in this case,
 instead of entry-points, if you want to extend the default list of loaders it

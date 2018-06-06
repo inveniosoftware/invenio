@@ -6,9 +6,8 @@
     under the terms of the MIT License; see LICENSE file for more details.
 
 
-Develop a module
-================
-
+Form, views and templates
+=========================
 The goal of this tutorial is to add data to Invenio v3. We'll create a
 form that inserts the data in the database. Also we will touch different
 part of the development process such as:
@@ -19,17 +18,19 @@ part of the development process such as:
 - How to add new templates
 - How to use Jinja2
 
-Requirements
-------------
-
-Before starting let's make sure we have ``custom-data-module`` installed on
-your environment. We need that to ensure that we have the data model.
+Flask extensions
+^^^^^^^^^^^^^^^^
+It is important to understand that Invenio modules are just regular
+`Flask extensions
+<http://flask.pocoo.org/docs/1.0/extensiondev/#extension-dev>`_. The Flask
+documentation contains extensive documentation on the APIs, design patterns
+and in general how to develop with Flask, and it is highly recommended that you
+follow Flask tutorials to understand the basics of Flask.
 
 1. Create the form
 ^^^^^^^^^^^^^^^^^^
-
-Ok, let's create a module that contains the forms of our project, we will use
-Flask-WTF.
+First, let's create a module that contains the forms of our project, we will
+use Flask-WTF.
 
 
 in ``invenio_unicorn/forms.py``

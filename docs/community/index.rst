@@ -20,6 +20,7 @@ are here for the interested.
     channels
     contribution-guide
     style-guide
+    development-environment.rst
     translation-guide
     maintainers-guide/index.rst
     releases
