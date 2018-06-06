@@ -8,10 +8,10 @@
 History
 =======
 
-Invenio v3 for v1 users
------------------------
-Invenio v3 is a completely new application that has been rewritten from scratch
-in roughly a year. Why such a dramatic decision? To understand why the rewrite
+From software to framework
+--------------------------
+Invenio v3 is a completely new framework that has been rewritten from scratch.
+Why such a dramatic decision? To understand why the rewrite
 was necessary we have to go back to when Invenio was called CDSWare, back to
 August 1st 2002 when the first version of Invenio was released.
 
@@ -35,15 +35,31 @@ Following products did not even exists:
 * Facebook (2007)
 * Django (2005)
 
-A lot has happen in the past 15 years. Many problems that Invenio originally
-had to deal with now have open source off-the-shelf solutions available. In
-particular two things happen:
+A lot has happen since 2002. Many problems that Invenio originally had to deal
+with now have open source off-the-shelf solutions available. In particular two
+things happen:
 
 * Search become pervasive with the exponential growth of data collected and
   created on the internet every day, and open source products to solve handles
   these needs like Elasticsearch became big business.
 * Web frameworks for both front-end and back-end made it significant faster to
   develop web applications.
+
+In addition to above technological changes, it also started to become more and
+more difficult to adapt Invenio v1 to all the different use cases we wanted
+to support. Preservation archives have vastly different requirements from
+aggregators which have vastly different requirements from research data
+management systems. We further started to see performance problems with larger
+and larger number of records.
+
+Last but not least, we had many uses cases where it was no longer beneficial
+to store the records in MARC21, but instead adopt either newer or custom
+data model.
+
+All in all, new technologies, an aging product showing its cracks,
+slow development and a wish to have other data models was key determining
+factors in deciding to start from scratch and implement a framework rather than
+a software application.
 
 What happened to Invenio v2?
 ----------------------------
@@ -64,8 +80,3 @@ deal with very large research datasets.
 Thus, in late 2015 we were being slowed so much down by our past legacy that we
 saw no other way that starting over from scratch if we were to deal with the
 next 20 years of challenges.
-
-
-.. todo::
-
-    Expand this section

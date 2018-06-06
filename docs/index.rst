@@ -10,7 +10,11 @@
 .. toctree::
     :maxdepth: 2
 
-    introduction/index.rst
-    usersguide/index.rst
-    developersguide/index.rst
+    quickstart.rst
+    tutorial-module/index
+    invenio-modules.rst
+    application-architecture.rst
+    migrating.rst
+    orcid-login.rst
+    history.rst
     community/index.rst
