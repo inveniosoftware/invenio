@@ -12,6 +12,5 @@
 
     introduction/index.rst
     usersguide/index.rst
-    deploymentguide/index.rst
     developersguide/index.rst
     community/index.rst

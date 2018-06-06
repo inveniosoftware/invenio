@@ -13,8 +13,8 @@ If we remember that, our :ref:`code-of-conduct` will come naturally.
 .. rubric:: Get in touch
 
 See :ref:`getting-help` and :ref:`communication-channels`. Don't hesitate
-to get in touch with the Invenio maintainers (listed in ``MAINTAINERS`` file).
-The maintainers can help you kick start your contribution.
+to get in touch with the Invenio maintainers. The maintainers can help you kick
+start your contribution.
 
 Types of contributions
 ----------------------
@@ -67,8 +67,13 @@ Write code
   :ref:`style-guide` and the :ref:`setting-up-your-environment`. It will make
   your contributor life easier.
 
-- **Bootstrapping a new awesome module?** Use our `Invenio cookiecutter
-  template <http://github.com/inveniosoftware/cookiecutter-invenio-module>`_.
+- **Bootstrapping a new awesome module?** Use our Invenio cookiecutter
+  templates for `modules
+  <http://github.com/inveniosoftware/cookiecutter-invenio-module>`_,
+  `instances
+  <http://github.com/inveniosoftware/cookiecutter-invenio-instance>`_
+  or `data models
+  <http://github.com/inveniosoftware/cookiecutter-invenio-datamodel>`_
 
 Style guide (TL;DR)
 -------------------
@@ -130,6 +135,10 @@ For example::
 
     Co-authored-by: John Doe <john.doe@example.com>
 
+**Git signature:** The only signature we use is ``Co-authored-by`` (see above)
+to provide credit to co-authors. Previously we required a ``Signed-off-by``
+signature, however this is no longer required.
+
 Pull requests
 -------------
 Need help making your first pull request? Check out the GitHub guide
@@ -142,7 +151,8 @@ When making your pull request, please keep the following in mind:
 - Do write documentation. We all love well-documented frameworks, right?
 - Run tests locally using ``run-tests.sh`` script.
 - Make sure you have the rights if you include third-party code (and do credit
-  the orignial creator).
+  the orignial creator). Note, you cannot include GPL or AGPL licensed code.
+  LGPL and other more permissive open source license or fine.
 - Green light on all GitHub status checks is required in order to merge your
   PR.
 
