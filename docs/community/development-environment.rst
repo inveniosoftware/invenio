@@ -7,8 +7,8 @@
 
 .. _setting-up-your-environment:
 
-Setting up your development environment
-=======================================
+Developer environment guide
+===========================
 You can save a lot of time and frustrations by spending some time setting up
 your development environment. We have primarily adopted existing community
 style guides, and in most cases the formatting and checking can be fully

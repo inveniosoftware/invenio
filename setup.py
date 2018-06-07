@@ -34,7 +34,7 @@ extras_require = {
     'base': [
         'invenio-admin>=1.0.0,<1.1.0',
         'invenio-assets>=1.0.0,<1.1.0',
-        'invenio-formatter>=1.0.0,<1.1.0',
+        'invenio-formatter>=1.0.1,<1.1.0',
         'invenio-logging>=1.0.0,<1.1.0',
         'invenio-mail>=1.0.1,<1.1.0',
         'invenio-rest>=1.0.0,<1.1.0',

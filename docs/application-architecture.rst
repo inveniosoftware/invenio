@@ -190,8 +190,7 @@ In each of the application assembly phases, the Invneio factory automatically
 discover your installed Invenio modules. The way this works, is via Python
 **entry points**. When you install the Python package for an Invenio module,
 the package describes via entry points which Flask extensions, blueprints etc.
-that this module provides. The section :ref:`extending-invenio` describes in
-more detail how you use the entry points to extend Invenio.
+that this module provides.
 
 WSGI: UI and REST
 -----------------
