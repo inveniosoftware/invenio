@@ -113,6 +113,7 @@ Elasticsearch indices:
 .. code-block:: shell
 
   $ cd ../my-repository
+  $ ./scripts/bootstrap
   $ ./scripts/setup
 
 Currently, the system doesn't have any users, but more important, it doesn't

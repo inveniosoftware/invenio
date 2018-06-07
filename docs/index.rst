@@ -17,4 +17,5 @@
     migrating.rst
     orcid-login.rst
     history.rst
+    releases/index.rst
     community/index.rst

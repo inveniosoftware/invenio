@@ -1,0 +1,63 @@
+..
+    This file is part of Invenio.
+    Copyright (C) 2015-2018 CERN.
+
+    Invenio is free software; you can redistribute it and/or modify it
+    under the terms of the MIT License; see LICENSE file for more details.
+
+Version 1.x
+-----------
+
+**End-of-life**
+
+Invenio v1.x code base is suitable for stable production. It uses legacy
+technology and custom web development framework.
+
+.. note::
+
+    Invenio v1.x has reached end-of-life and will not receive any further
+    development nor security fixes.
+
+    Invenio v1.2.2 is the last stable release from the old Invenio legacy
+    technology code base. If you have been using one of previous Invenio
+    versions, it is recommended to upgrade to this version.
+
+
+.. note::
+
+    If you would like to check out Invenio v1.2 locally please see our
+    important `note <https://inveniosoftware.org/legacy/>`_ how to install it.
+
+Released versions include:
+
+Invenio v1.2:
+
+* `v1.2.2 <https://github.com/inveniosoftware/invenio/releases/tag/v1.2.2>`_ - released 2016-11-25
+* `v1.2.1 <https://github.com/inveniosoftware/invenio/releases/tag/v1.2.1>`_ - released 2015-05-21
+* `v1.2.0 <https://github.com/inveniosoftware/invenio/releases/tag/v1.2.0>`_ - released 2015-03-03
+
+Invenio v1.1:
+
+* `v1.1.7 <https://github.com/inveniosoftware/invenio/releases/tag/v1.1.7>`_ - released 2016-11-20
+* `v1.1.6 <https://github.com/inveniosoftware/invenio/releases/tag/v1.1.6>`_ - released 2015-05-21
+* `v1.1.5 <https://github.com/inveniosoftware/invenio/releases/tag/v1.1.5>`_ - released 2015-03-02
+* `v1.1.4 <https://github.com/inveniosoftware/invenio/releases/tag/v1.1.4>`_ - released 2014-08-31
+* `v1.1.3 <https://github.com/inveniosoftware/invenio/releases/tag/v1.1.3>`_ - released 2014-02-25
+* `v1.1.2 <https://github.com/inveniosoftware/invenio/releases/tag/v1.1.2>`_ - released 2013-08-19
+* `v1.1.1 <https://github.com/inveniosoftware/invenio/releases/tag/v1.1.1>`_ - released 2012-12-21
+* `v1.1.0 <https://github.com/inveniosoftware/invenio/releases/tag/v1.1.0>`_ - released 2012-10-21
+
+Invenio v1.0:
+
+* `v1.0.10 <https://github.com/inveniosoftware/invenio/releases/tag/v1.0.10>`_ - released 2016-11-09
+* `v1.0.9 <https://github.com/inveniosoftware/invenio/releases/tag/v1.0.9>`_ - released 2015-05-21
+* `v1.0.8 <https://github.com/inveniosoftware/invenio/releases/tag/v1.0.8>`_ - released 2015-03-02
+* `v1.0.7 <https://github.com/inveniosoftware/invenio/releases/tag/v1.0.7>`_ - released 2014-08-31
+* `v1.0.6 <https://github.com/inveniosoftware/invenio/releases/tag/v1.0.6>`_ - released 2014-01-31
+* `v1.0.5 <https://github.com/inveniosoftware/invenio/releases/tag/v1.0.5>`_ - released 2013-08-19
+* `v1.0.4 <https://github.com/inveniosoftware/invenio/releases/tag/v1.0.4>`_ - released 2012-12-21
+* `v1.0.3 <https://github.com/inveniosoftware/invenio/releases/tag/v1.0.3>`_ - released 2012-12-19
+* `v1.0.2 <https://github.com/inveniosoftware/invenio/releases/tag/v1.0.2>`_ - released 2012-10-19
+* `v1.0.1 <https://github.com/inveniosoftware/invenio/releases/tag/v1.0.1>`_ - released 2012-06-28
+* `v1.0.0 <https://github.com/inveniosoftware/invenio/releases/tag/v1.0.0>`_ - released 2012-02-29
+* `v1.0.0-rc0 <https://github.com/inveniosoftware/invenio/releases/tag/v1.0.0-rc0>`_ - released 2010-12-21

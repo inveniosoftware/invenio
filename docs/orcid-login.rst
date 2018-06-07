@@ -47,7 +47,7 @@ Configuring Invenio
 In order to enable OAuth authentication for ORCID, just add these line to your
 ``var/instance/invenio.cfg`` file.
 
-::
+.. code-block:: python
 
     from invenio_oauthclient.contrib import orcid
 
@@ -59,17 +59,19 @@ In order to enable OAuth authentication for ORCID, just add these line to your
             consumer_key="<your-orcid-client-id>",
             consumer_secret="<your-orcid-client-secret>",
     )
+
 where the client id and client secret are those provided by ORCID in the
 previous step.
 
-If you can now visit:
+If you can now visit:::
 
-    ``https://<SERVER_NAME>/login``
+    https://<SERVER_NAME>/login
 
 you will be able to see ORCID authentication enabled:
 
 .. image:: /_static/orcid-login.png
    :width: 500 px
+
 
 Sign-up on first login
 ~~~~~~~~~~~~~~~~~~~~~~

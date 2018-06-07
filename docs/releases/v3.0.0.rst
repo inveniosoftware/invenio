@@ -1,0 +1,158 @@
+..
+    This file is part of Invenio.
+    Copyright (C) 2015-2018 CERN.
+
+    Invenio is free software; you can redistribute it and/or modify it
+    under the terms of the MIT License; see LICENSE file for more details.
+
+Version 3.0.0
+=============
+
+We are proud to announce the final release of Invenio v3.0.0. Invenio 3 has
+been completely rewritten from scratch and have changed radically from previous
+Invenio versions. Invenio 3 is now framework, like a Swiss Army knife, of
+battle-tested, safe and secure modules providing you will all the features you
+need to build and run a trusted digital repository.
+
+Invenio 3 is officially released today, however, Invenio 3 has already been
+battle-tested in large-scale production systems for more than 1.5 years on
+sites such as:
+
+- `Zenodo <https://www.zenodo.org>`_
+- `CERN Open Data <http://opendata.cern.ch>`_
+- `CDS Videos <https://videos.cern.ch>`_
+
+Others sites are already in process of being built on Invenio 3:
+
+- `INSPIRE HEP <https://qa.inspirehep.net>`_ - an aggregator for High-Energy
+  Physics.
+- WEKO3 - repository platform for 500+ Japanese universities.
+
+What's new
+----------
+Invenio functionality is being released in **bundles** of modules. Invenio v3
+contains the following bundles totaling more than 27 individual Invenio
+modules:
+
+- **Base:** the core application framework with e.g. distributed task queue
+  support.
+- **Auth:** accounts management, role-based access control, OAuth 2.0 client
+  and provider, user profiles management.
+- **Metadata:** record and persistent identifier management including indexing,
+  querying and OAI-PMH server.
+
+The following bundles are being prepared for release in v3.1:
+
+- **Files**: advanced file management with multi-backend support as well as
+  IIIF Image API support.
+- **Statistics**: COUNTER-compliant statistics.
+
+See our `roadmap <https://inveniosoftware.org/roadmap/>`_ for further details.
+
+Getting started
+---------------
+
+In order to get started developing with Invenio v3 follow our
+:ref:`quickstart`.
+
+Next, head over https://invenio.readthedocs.io to understand how to develop
+with Invenio.
+
+In addtion, each Invenio module also has extensive documentation:
+
+**Base bundle**
+
+- `invenio-admin <http://invenio-admin.readthedocs.io>`_
+- `invenio-app <http://invenio-app.readthedocs.io>`_
+- `invenio-assets <http://invenio-assets.readthedocs.io>`_
+- `invenio-base <http://invenio-base.readthedocs.io>`_
+- `invenio-celery <http://invenio-celery.readthedocs.io>`_
+- `invenio-config <http://invenio-config.readthedocs.io>`_
+- `invenio-db <http://invenio-db.readthedocs.io>`_
+- `invenio-formatter <http://invenio-formatter.readthedocs.io>`_
+- `invenio-i18n <http://invenio-i18n.readthedocs.io>`_
+- `invenio-logging <http://invenio-logging.readthedocs.io>`_
+- `invenio-mail <http://invenio-mail.readthedocs.io>`_
+- `invenio-rest <http://invenio-rest.readthedocs.io>`_
+- `invenio-theme <http://invenio-theme.readthedocs.io>`_
+
+**Auth bundle**
+
+- `invenio-access <http://invenio-access.readthedocs.io>`_
+- `invenio-accounts <http://invenio-accounts.readthedocs.io>`_
+- `invenio-oauth2server <http://invenio-oauth2server.readthedocs.io>`_
+- `invenio-oauthclient <http://invenio-oauthclient.readthedocs.io>`_
+- `invenio-userprofiles <http://invenio-userprofiles.readthedocs.io>`_
+
+**Metadata bundle**
+
+- `invenio-indexer <http://invenio-indexer.readthedocs.io>`_
+- `invenio-jsonschemas <http://invenio-jsonschemas.readthedocs.io>`_
+- `invenio-oaiserver <http://invenio-oaiserver.readthedocs.io>`_
+- `invenio-pidstore <http://invenio-pidstore.readthedocs.io>`_
+- `invenio-records <http://invenio-records.readthedocs.io>`_
+- `invenio-records-rest <http://invenio-records-rest.readthedocs.io>`_
+- `invenio-records-ui <http://invenio-records-ui.readthedocs.io>`_
+- `invenio-search <http://invenio-search.readthedocs.io>`_
+- `invenio-search-ui <http://invenio-search-ui.readthedocs.io>`_
+
+Python compatibility
+--------------------
+
+Invenio v3.0 supports Python 2.7, 3.5, 3.6. We highly recommend only using the
+latest official release in each series.
+
+Python 2.7 end-of-life is scheduled for April 2020. Invenio will only support
+Python 2.7 until that date. We highly recommend that all new projects are
+started latest available Python 3 version.
+
+Elasticsearch compatibility
+---------------------------
+
+Invenio v3.0 supports Elasticsearch 2, 5 and 6.
+
+Elasticsearch v2 has reach end-of-life (February 2018) and Invenio v3.0 is the
+last release to support Elasticsearch v2.
+
+PostgreSQL compatibility
+------------------------
+
+Invenio v3.0 supports PostgreSQL 9.4 and 9.6. We have not yet tested Invenio
+v3.0 with PostgreSQL 10.
+
+MySQL compatibility
+-------------------
+
+Invenio v3.0 supports MySQL 5.6+.
+
+Deprecations
+------------
+
+Webpack
+~~~~~~~
+
+Invenio v3.0's current static assets management system is based on e.g.
+RequireJS will be replaced with Webpack. We expect this work to be ready for
+Invenio v3.1, and thus we are already deprecating the current support.
+Specifically this means that Invenio-Assets and Invenio-Theme will change
+significantly in Invenio v3.1. We would have liked to already have this ready
+for this v3.0 release, but unfortunately it was time-wise not possible.
+
+AngularJS
+~~~~~~~~~
+
+Invenio v3.0 comes with one AngularJS 1.4 application (Invenio-Search-JS).
+AngularJS is by now already outdated, and we are planning a rewrite of the
+application in another JavaScript framework that is currently in process of
+being selected. Essentially this means that you should not extend
+Invenio-Search-JS at this point, since it will change significantly.
+
+Maintenance policy
+------------------
+
+Invenio v3.0 will be supported with bug and security fixes until the release of
+Invenio v3.2 and minimum one year.
+
+We aim at one Invenio release with new features every 6 months. We expect
+upgrades between minor versions (e.g. v3.1 to v3.2) to be fairly
+straight-forward as in most cases only new features are added.
