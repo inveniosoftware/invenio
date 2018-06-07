@@ -8,15 +8,15 @@
 Version 3.0.0
 =============
 
-We are proud to announce the final release of Invenio v3.0.0. Invenio 3 has
-been completely rewritten from scratch and have changed radically from previous
-Invenio versions. Invenio 3 is now framework, like a Swiss Army knife, of
-battle-tested, safe and secure modules providing you will all the features you
-need to build and run a trusted digital repository.
+We are proud to announce the release of Invenio v3.0.0. Invenio has been
+completely rewritten from scratch with a radically  improved architecture and
+technical implementation. Invenio 3 is now a framework, like a Swiss Army
+knife, complete with battle-tested, safe and secure modules providing all the
+features you need to build and run a trusted digital repository.
 
-Invenio 3 is officially released today, however, Invenio 3 has already been
-battle-tested in large-scale production systems for more than 1.5 years on
-sites such as:
+Whilst Invenio 3 is officially released to the world today, in reality it has
+already been relied upon in large-scale production systems for more than 1.5
+years on sites such as:
 
 - `Zenodo <https://www.zenodo.org>`_
 - `CERN Open Data <http://opendata.cern.ch>`_
@@ -24,8 +24,7 @@ sites such as:
 
 Others sites are already in process of being built on Invenio 3:
 
-- `INSPIRE HEP <https://qa.inspirehep.net>`_ - an aggregator for High-Energy
-  Physics.
+- INSPIRE HEP - an aggregator for High-Energy Physics.
 - WEKO3 - repository platform for 500+ Japanese universities.
 
 What's new
@@ -45,7 +44,8 @@ The following bundles are being prepared for release in v3.1:
 
 - **Files**: advanced file management with multi-backend support as well as
   IIIF Image API support.
-- **Statistics**: COUNTER-compliant statistics.
+- **Statistics**: `COUNTER-compliant <https://www.projectcounter.org/>`_
+  statistics.
 
 See our `roadmap <https://inveniosoftware.org/roadmap/>`_ for further details.
 
@@ -58,7 +58,7 @@ In order to get started developing with Invenio v3 follow our
 Next, head over https://invenio.readthedocs.io to understand how to develop
 with Invenio.
 
-In addtion, each Invenio module also has extensive documentation:
+In addition, each Invenio module also has extensive documentation:
 
 **Base bundle**
 
@@ -96,8 +96,11 @@ In addtion, each Invenio module also has extensive documentation:
 - `invenio-search <http://invenio-search.readthedocs.io>`_
 - `invenio-search-ui <http://invenio-search-ui.readthedocs.io>`_
 
+Compatibilities
+---------------
+
 Python compatibility
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 Invenio v3.0 supports Python 2.7, 3.5, 3.6. We highly recommend only using the
 latest official release in each series.
@@ -107,29 +110,29 @@ Python 2.7 until that date. We highly recommend that all new projects are
 started latest available Python 3 version.
 
 Elasticsearch compatibility
----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Invenio v3.0 supports Elasticsearch 2, 5 and 6.
 
-Elasticsearch v2 has reach end-of-life (February 2018) and Invenio v3.0 is the
-last release to support Elasticsearch v2.
+Elasticsearch v2 has reached end-of-life (February 2018) and Invenio v3.0 is
+the last release to support Elasticsearch v2.
 
 PostgreSQL compatibility
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-Invenio v3.0 supports PostgreSQL 9.4 and 9.6. We have not yet tested Invenio
-v3.0 with PostgreSQL 10.
+Invenio v3.0 supports PostgreSQL 9.4, 9.5 and 9.6. We have not yet tested
+Invenio v3.0 with PostgreSQL 10.
 
 MySQL compatibility
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 Invenio v3.0 supports MySQL 5.6+.
 
 Deprecations
 ------------
 
-Webpack
-~~~~~~~
+AMD/RequireJS
+~~~~~~~~~~~~~
 
 Invenio v3.0's current static assets management system is based on e.g.
 RequireJS will be replaced with Webpack. We expect this work to be ready for
@@ -146,6 +149,7 @@ AngularJS is by now already outdated, and we are planning a rewrite of the
 application in another JavaScript framework that is currently in process of
 being selected. Essentially this means that you should not extend
 Invenio-Search-JS at this point, since it will change significantly.
+
 
 Maintenance policy
 ------------------
