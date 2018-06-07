@@ -72,7 +72,7 @@ you will be able to see ORCID authentication enabled:
    :width: 500 px
 
 Sign-up on first login
-~~~~~~~~~~~~----------
+~~~~~~~~~~~~~~~~~~~~~~
 The first time a user try to login with ORCID, they will be required to provide
 a username and email address. This is because ORCID does provide this
 information and it is required by Invenio in order to register an account.

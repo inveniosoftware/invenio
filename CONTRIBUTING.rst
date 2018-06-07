@@ -54,7 +54,7 @@ Write documentation
 
 Write code
 ~~~~~~~~~~
-- **Need help getting started?** See our :ref:`developers-guide`.
+- **Need help getting started?** See our :ref:`quickstart`.
 
 - **Need help setting up your editor?** See our
   :ref:`setting-up-your-environment` guide which helps your automate the
