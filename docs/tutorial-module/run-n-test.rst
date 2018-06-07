@@ -34,6 +34,7 @@ Some explanations about the command:
 - the ``[all]`` after the dot means we want to install all dependencies, which
   is common when developing. Depending on your use of the module, you can
   install only parts of it:
+
     - the default (nothing after the dots) installs the minimum to make the
       module run.
     - ``[tests]`` installs the requirements to test the module.

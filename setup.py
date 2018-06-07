@@ -13,7 +13,6 @@ import os
 from setuptools import find_packages, setup
 
 readme = open('README.rst').read()
-history = open('CHANGES.rst').read()
 
 tests_require = [
     'check-manifest>=0.35',
@@ -117,7 +116,7 @@ setup(
     name='invenio',
     version=version,
     description=__doc__,
-    long_description=readme + '\n\n' + history,
+    long_description=readme,
     keywords='Invenio digital library framework',
     license='MIT',
     author='CERN',

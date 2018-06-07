@@ -1,0 +1,36 @@
+..
+    This file is part of Invenio.
+    Copyright (C) 2015-2018 CERN.
+
+    Invenio is free software; you can redistribute it and/or modify it
+    under the terms of the MIT License; see LICENSE file for more details.
+
+Version 2.x
+-----------
+
+**End-of-life**
+
+Invenio v2.x code base is a hybrid architecture that uses Flask web
+development framework combined with Invenio v1.x framework.
+
+.. note::
+
+    The 2.x code base is not suitable for production systems, and will not
+    receive any further development nor security fixes.
+
+Released versions include:
+
+Invenio v2.1:
+
+* `v2.1.1 <https://github.com/inveniosoftware/invenio/releases/tag/v2.1.1>`_ - released 2015-09-01
+* `v2.1.0 <https://github.com/inveniosoftware/invenio/releases/tag/v2.1.0>`_ - released 2015-06-16
+
+Invenio v2.0:
+
+* `v2.0.6 <https://github.com/inveniosoftware/invenio/releases/tag/v2.0.6>`_ - released 2015-09-01
+* `v2.0.5 <https://github.com/inveniosoftware/invenio/releases/tag/v2.0.5>`_ - released 2015-07-17
+* `v2.0.4 <https://github.com/inveniosoftware/invenio/releases/tag/v2.0.4>`_ - released 2015-06-01
+* `v2.0.3 <https://github.com/inveniosoftware/invenio/releases/tag/v2.0.3>`_ - released 2015-05-15
+* `v2.0.2 <https://github.com/inveniosoftware/invenio/releases/tag/v2.0.2>`_ - released 2015-04-17
+* `v2.0.1 <https://github.com/inveniosoftware/invenio/releases/tag/v2.0.1>`_ - released 2015-03-20
+* `v2.0.0 <https://github.com/inveniosoftware/invenio/releases/tag/v2.0.0>`_ - released 2015-03-04
