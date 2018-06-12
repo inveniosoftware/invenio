@@ -111,10 +111,10 @@ pay off many-fold in the long run. See :ref:`setting-up-your-environment`.
 
 For example::
 
-    component: sumarize changes in 50 char or less
+    component: summarize changes in 50 char or less
 
     * More detailed explanatory text, if necessary. Formatted using
-      bullet points, preferabely `*`. Wrapped to 72 characters.
+      bullet points, preferably `*`. Wrapped to 72 characters.
 
     * Explain the problem that this commit is solving. Focus on why you
       are making this change as opposed to how (the code explains that).
@@ -129,8 +129,8 @@ For example::
     * Use words like "Adds", "Fixes" or "Breaks" in the listed bullets to help
       others understand what you did.
 
-    * If your commit closes or addresses an issue, you can metion
-      it in any of the bullets after the dot. (closses #XXX) (addresses
+    * If your commit closes or addresses an issue, you can mention
+      it in any of the bullets after the dot. (closes #XXX) (addresses
       #YYY)
 
     Co-authored-by: John Doe <john.doe@example.com>
@@ -151,7 +151,7 @@ When making your pull request, please keep the following in mind:
 - Do write documentation. We all love well-documented frameworks, right?
 - Run tests locally using ``run-tests.sh`` script.
 - Make sure you have the rights if you include third-party code (and do credit
-  the orignial creator). Note, you cannot include GPL or AGPL licensed code.
+  the original creator). Note, you cannot include GPL or AGPL licensed code.
   LGPL and other more permissive open source license or fine.
 - Green light on all GitHub status checks is required in order to merge your
   PR.
