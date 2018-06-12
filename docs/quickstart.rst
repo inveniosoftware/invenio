@@ -1,7 +1,7 @@
 ..
     This file is part of Invenio.
     Copyright (C) 2015-2018 CERN.
-    Copyright (C) 2018 Galter Health Sciences Library.
+    Copyright (C) 2018 Northwestern University, Feinberg School of Medicine, Galter Health Sciences Library.
 
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
@@ -36,7 +36,19 @@ your instance.
 
 Bootstrap
 ---------
-First, let's create a `virtualenv <https://virtualenv.pypa.io/en/stable/installation/>`_
+
+Before we begin, you want to make sure to have Cookiecutter installed. Invenio
+leverages this tool to generate the starting boilerplate for different
+components, so it will be useful to have in general.
+
+.. code-block:: shell
+
+  # Globally install or upgrade it
+  $ sudo pip install --upgrade cookiecutter
+  # Or locally install or upgrade it
+  $ pip install --user --upgrade cookiecutter
+
+We can now begin. First, let's create a `virtualenv <https://virtualenv.pypa.io/en/stable/installation/>`_
 using `virtualenvwrapper <https://virtualenvwrapper.readthedocs.io/en/latest/install.html>`_
 in order to sandbox our Python environment for development:
 
@@ -49,12 +61,27 @@ Now, let's scaffold the instance using the `official cookiecutter template
 
 .. code-block:: shell
 
-
-  (my-repository-venv)$ pip install cookiecutter
   (my-repository-venv)$ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance --checkout v3.0
-  # ...fill in the fields...
-
-For the purposes of this guide, our repository folder is `my-repository`.
+  project_name [My site]: My repository
+  project_shortname [my-repository]:
+  project_site [my-repository.com]:
+  package_name [my_repository]:
+  github_repo [my-repository/my-repository]:
+  description [Invenio digital library framework.]: My repository digital library
+  author_name [CERN]: Me
+  author_email [info@inveniosoftware.org]: me@my-repository.com
+  year [2018]:
+  copyright_holder [Me]:
+  transifex_project [my-repository]:
+  Select database:
+  1 - postgresql
+  2 - mysql
+  Choose from 1, 2 [1]:
+  Select elasticsearch:
+  1 - 6
+  2 - 5
+  Choose from 1, 2 [1]:
+  # ... project scaffolding output ...
 
 Now that we have our instance's source code ready we can proceed with the
 initial setup of the services and dependencies of the project:
