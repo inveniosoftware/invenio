@@ -1,6 +1,7 @@
 ..
     This file is part of Invenio.
     Copyright (C) 2015-2018 CERN.
+    Copyright (C) 2018 Galter Health Sciences Library.
 
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
@@ -18,7 +19,7 @@ To be able to develop and run Invenio you will need the following installed and
 configured on your system:
 
 - `Docker <https://docs.docker.com/install>`_ and `Docker Compose <https://docs.docker.com/compose/install/>`_
-- `NodeJS v6.x and NPM v4.x <https://nodejs.org/en/download/package-manager>`_
+- `NodeJS v6.x+ and NPM v4.x+ <https://nodejs.org/en/download/package-manager>`_
 - `Enough virtual memory <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-prod-mode>`_
   for Elasticsearch.
 
@@ -41,16 +42,19 @@ in order to sandbox our Python environment for development:
 
 .. code-block:: shell
 
-  $ mkvirtualenv my-repository
+  $ mkvirtualenv my-repository-venv
 
 Now, let's scaffold the instance using the `official cookiecutter template
 <https://github.com/inveniosoftware/cookiecutter-invenio-instance>`_.
 
 .. code-block:: shell
 
-  $ pip install cookiecutter
-  $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance -c v3.0
+
+  (my-repository-venv)$ pip install cookiecutter
+  (my-repository-venv)$ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance --checkout v3.0
   # ...fill in the fields...
+
+For the purposes of this guide, our repository folder is `my-repository`.
 
 Now that we have our instance's source code ready we can proceed with the
 initial setup of the services and dependencies of the project:
@@ -58,14 +62,15 @@ initial setup of the services and dependencies of the project:
 .. code-block:: shell
 
   # Fire up the database, Elasticsearch, Redis and RabbitMQ
-  $ docker-compose up -d
+  (my-repository-venv)$ cd my-repository/
+  (my-repository-venv)$ docker-compose up -d
   Creating network "myrepository_default" with the default driver
   Creating myrepository_cache_1 ... done
   Creating myrepository_db_1    ... done
   Creating myrepository_es_1    ... done
   Creating myrepository_mq_1    ... done
   # Install dependencies and generate static assets
-  $ ./scripts/bootstrap
+  (my-repository-venv)$ ./scripts/bootstrap
 
 .. note::
 
@@ -95,34 +100,35 @@ instance we will use the `official data model cookiecutter template
 
 .. code-block:: shell
 
-  $ cd ..  # switch back to the parent directory
-  $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-datamodel -c v3.0
+  (my-repository-venv)$ cd ..  # switch back to the parent directory
+  (my-repository-venv)$ cookiecutter gh:inveniosoftware/cookiecutter-invenio-datamodel --checkout v3.0
   # ...fill in the fields...
+
+For the purposes of this guide, our data model folder is `my-datamodel`.
 
 Let's also install the data model in our virtualenv:
 
 .. code-block:: shell
 
-  $ workon my-repository
-  $ cd my-datamodel
-  $ pip install -e .
+  (my-repository-venv)$ cd my-datamodel
+  (my-repository-venv)$ pip install --editable .
 
 Now that we have a data model installed we can create database tables and
 Elasticsearch indices:
 
 .. code-block:: shell
 
-  $ cd ../my-repository
-  $ ./scripts/bootstrap
-  $ ./scripts/setup
+  (my-repository-venv)$ cd ../my-repository
+  (my-repository-venv)$ ./scripts/bootstrap
+  (my-repository-venv)$ ./scripts/setup
 
 Currently, the system doesn't have any users, but more important, it doesn't
 have an administrator. Let's create one:
 
 .. code-block:: shell
 
-  $ my-repository users create admin@my-repository.com -a --password=<secret>
-  $ my-repository roles add admin@my-repository.com admin
+  (my-repository-venv)$ my-repository users create admin@my-repository.com -a --password=<secret>
+  (my-repository-venv)$ my-repository roles add admin@my-repository.com admin
 
 Run
 ---
@@ -131,23 +137,24 @@ You can now run the necessary processes for the instance:
 .. code-block:: shell
 
   # ...in a new terminal, start the celery worker
-  $ workon my-repository
-  $ celery worker -A invenio_app.celery -l INFO
+  $ workon my-repository-venv
+  (my-repository-venv)$ celery worker --app invenio_app.celery --loglevel INFO
 
   # ...in a new terminal, start the flask development server
-  $ workon my-repository
-  $ ./scripts/server
+  $ workon my-repository-venv
+  (my-repository-venv)$ ./scripts/server
   * Environment: development
   * Debug mode: on
   * Running on https://127.0.0.1:5000/ (Press CTRL+C to quit)
-  $ firefox https://127.0.0.1:5000/
+
+You can now visit https://127.0.0.1:5000/ !
 
 .. note::
 
     Because we are using a self-signed SSL certificate to enable HTTPS, your
     web browser will probably display a warning when you access the website.
     You can usually get around this by following the browser's instructions in
-    the warning message. For CLI tools like ``curl`` tou can ignore the SSL
+    the warning message. For CLI tools like ``curl``, you can ignore the SSL
     verification via the ``-k/--insecure`` option.
 
 Create a record
@@ -271,7 +278,7 @@ deployed to a production environment.
 
 You may have noticed that after running the ``cookiecutter`` command for the
 instance and the data model, there was a note for checking out some of the
-TODOs. Uou can run the following command in each code repository directory
+TODOs. You can run the following command in each code repository directory
 to see a summary of the TODOs again:
 
 .. code-block:: console
@@ -289,9 +296,10 @@ Let's have a look at some of them one-by-one and explain what they are for:
    .. code-block:: console
 
       $ cd my-repository/
-      $ pip install -e .
-      $ pip install pip-tools
-      $ pip-compile
+      $ workon my-repository-venv
+      (my-repository-venv)$ pip install --editable .
+      (my-repository-venv)$ pip install pip-tools
+      (my-repository-venv)$ pip-compile
 
 2. Python packages require a ``MANIFEST.in`` which specifies what files are
    part of the distributed package. You can update the existing file by running
@@ -299,10 +307,10 @@ Let's have a look at some of them one-by-one and explain what they are for:
 
    .. code-block:: console
 
-      $ git init
-      $ git add -A
-      $ pip install -e .[all]
-      $ check-manifest -u
+      (my-repository-venv)$ git init
+      (my-repository-venv)$ git add --all
+      (my-repository-venv)$ pip install --editable .[all]
+      (my-repository-venv)$ check-manifest --update
 
 3. Translations configuration (``.tx/config``): You might also want to generate
    the necessary files to allow localization of the instance in different
@@ -310,9 +318,9 @@ Let's have a look at some of them one-by-one and explain what they are for:
 
    .. code-block:: console
 
-      $ python setup.py extract_messages
-      $ python setup.py init_catalog -l en
-      $ python setup.py compile_catalog
+      (my-repository-venv)$ python setup.py extract_messages
+      (my-repository-venv)$ python setup.py init_catalog -l en
+      (my-repository-venv)$ python setup.py compile_catalog
 
    Ensure project has been created on Transifex under the my-repository
    organisation.
@@ -321,19 +329,19 @@ Let's have a look at some of them one-by-one and explain what they are for:
 
    .. code-block:: console
 
-      $ pip install transifex-client
+      (my-repository-venv)$ pip install transifex-client
 
    Push source (.pot) and translations (.po) to Transifex:
 
    .. code-block:: console
 
-      $ tx push -s -t
+      (my-repository-venv)$ tx push --skip --translations
 
    Pull translations for a single language from Transifex
 
    .. code-block:: console
 
-      $ tx pull -l en
+      (my-repository-venv)$ tx pull --language en
 
 Testing
 ^^^^^^^
@@ -343,10 +351,13 @@ In order to run tests for the instance, you can run:
 .. code-block:: shell
 
   # Install testing dependencies
-  $ pip install -e .[tests]
-  $ ./run-tests.sh  # will run all the tests...
+  $ workon my-repository-venv
+  # The following makes sure you have the tests dependencies installed
+  # if you already installed the instance via .[all] you can skip this install
+  (my-repository-venv)$ pip install --editable .[tests]
+  (my-repository-venv)$ ./run-tests.sh  # will run all the tests...
   # ...or to run individual tests
-  $ py.test tests/ui/test_views.py::test_ping
+  (my-repository-venv)$ pytest tests/ui/test_views.py::test_ping
 
 Documentation
 ^^^^^^^^^^^^^
@@ -356,6 +367,11 @@ following commands:
 
 .. code-block:: shell
 
-  $ cd docs
-  $ make html
-  $ firefox _build/html/index.html
+  $ workon my-repository-venv
+  # The following makes sure you have the docs dependencies installed
+  # if you already installed the instance via .[all] you can skip this install
+  (my-repository-venv)$ pip install --editable .[docs]
+  $ cd docs/
+  (my-repository-venv)$ make html
+
+Open up ``_build/html/index.html`` in your browser to see the documentation.
