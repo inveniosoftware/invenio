@@ -12,11 +12,12 @@ The goal of this tutorial is to add data to Invenio v3. We'll create a
 form that inserts the data in the database. Also we will touch different
 part of the development process such as:
 
-- How to create a new view
 - How to create a form
+- How to create a new view
 - How to add a utility function
 - How to add new templates
 - How to use Jinja2
+- How to define your own JSON Schema
 
 Flask extensions
 ^^^^^^^^^^^^^^^^
@@ -29,11 +30,11 @@ follow Flask tutorials to understand the basics of Flask.
 
 1. Create the form
 ^^^^^^^^^^^^^^^^^^
-First, let's create a module that contains the forms of our project, we will
-use Flask-WTF.
+First, let's create a Python module that contains the forms of our project, we
+will use `Flask-WTF <http://flask-wtf.readthedocs.io/en/stable/>`_.
 
 
-in ``invenio_unicorn/forms.py``
+In ``invenio_unicorn/forms.py``
 
 .. code-block:: python
 
@@ -58,12 +59,12 @@ in ``invenio_unicorn/forms.py``
 2. Create the views
 ^^^^^^^^^^^^^^^^^^^
 
-in ``invenio_unicorn/views.py`` we'll create the endpoints for
+In ``invenio_unicorn/views.py`` we'll create the endpoints for
 
 - ``create``: Form template
 - ``success``: Success template
 
-The ``views.py`` registers all the views of our application
+The ``views.py`` registers all the views of our application.
 
 .. code-block:: python
 
@@ -103,10 +104,10 @@ The ``views.py`` registers all the views of our application
         if form.validate_on_submit():
             # create the record
             create_record(
-              dict(
-                title=form.title.data,
-                description=form.description.data
-              )
+                dict(
+                    title=form.title.data,
+                    description=form.description.data
+                )
             )
             # redirect to the success page
             return redirect(url_for('invenio_unicorn.success'))
@@ -129,21 +130,14 @@ The ``views.py`` registers all the views of our application
 3. Create the templates
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-And now, let's create the templates
+And now, let's create the templates.
 
-in ``invenio_unicorn/templates/invenio_unicorn/create.html`` we override
-two ``blocks`` from the invenio ``BASE_TEMPLATE`` and those are:
-
-- javascript
-- page_body
-
-In the ``javascript`` block we will right a small fetcher, to get the
-created records from the API, and in the ``page_body`` we will add the
-form and the placeholder for the records list.
+In ``invenio_unicorn/templates/invenio_unicorn/create.html`` we override
+the ``page_body``:
 
 .. code-block:: html
 
-    {%- extends config.BASE_TEMPLATE %}
+    {% extends config.UNICORN_BASE_TEMPLATE %}
 
     {% macro errors(field) %}
       {% if field.errors %}
@@ -153,8 +147,8 @@ form and the placeholder for the records list.
           <li>{{ error }}</li>
         {% endfor %}
         </ul>
-      {% endif %}
       </span>
+      {% endif %}
     {% endmacro %}
 
     {% block page_body %}
@@ -199,11 +193,11 @@ form and the placeholder for the records list.
       </div>
     {% endblock page_body %}
 
-in ``invenio_unicorn/templates/invenio_unicorn/success.html``
+In ``invenio_unicorn/templates/invenio_unicorn/success.html``
 
 .. code-block:: html
 
-    {%- extends config.BASE_TEMPLATE %}
+    {% extends config.UNICORN_BASE_TEMPLATE %}
 
     {% block page_body %}
       <div class="container">
@@ -225,14 +219,13 @@ in ``invenio_unicorn/templates/invenio_unicorn/success.html``
 4. Create the record creation function
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-in ``invenio_unicorn/utils.py``
+The ``utils.py`` module will create a helper function that creates a record.
 
-On the ``utils.py`` module will create a helper function that creates a record.
+In ``invenio_unicorn/utils.py``
 
 .. code-block:: python
 
     """Utils module."""
-
     from __future__ import absolute_import, print_function
 
     import uuid
@@ -254,14 +247,12 @@ On the ``utils.py`` module will create a helper function that creates a record.
         # create uuid
         rec_uuid = uuid.uuid4()
         # add the schema
-        host = current_app.config.get('JSONSCHEMAS_HOST')
         data["$schema"] = \
             current_app.extensions['invenio-jsonschemas'].path_to_url(
-            'custom_record/custom-record-v1.0.0.json')
+                'records/custom-record-v1.0.0.json'
+            )
         # create PID
-        current_pidstore.minters['custid'](
-          rec_uuid, data, pid_value='custom_pid_{}'.format(rec_uuid)
-        )
+        current_pidstore.minters['recid'](rec_uuid, data)
         # create record
         created_record = Record.create(data, id_=rec_uuid)
         db.session.commit()
@@ -269,16 +260,60 @@ On the ``utils.py`` module will create a helper function that creates a record.
         # index the record
         indexer.index(created_record)
 
+5. Create the custom-record JSON Schema
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+As you can see, our records use a custom schema. To define and use this schema,
+we need to write the ``custom-record-v1.0.0.json`` inside the ``records``
+folder of your data model project (``my-datamodel`` from the Quickstart
+tutorial :ref:`customize`).
+
+In ``my-datamodel/my-datamodel/jsonschemas/records/custom-record-v1.0.0.json``
+
+.. code-block:: json
+
+    {
+      "$schema": "http://json-schema.org/draft-04/schema#",
+      "id": "http://localhost/schemas/records/custom-record-v1.0.0.json",
+      "additionalProperties": true,
+      "title": "my-datamodel v1.0.0",
+      "type": "object",
+      "properties": {
+        "title": {
+          "description": "Record title.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Record description.",
+          "type": "string"
+        },
+        "id": {
+          "description": "Invenio record identifier (integer).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "description"
+      ]
+    }
+
+
 Demo time
 ---------
 
-Let's start our server again.
+Let's now see our Invenio module in action when integrated with our Invenio instance.
+We will install this module in our Invenio instance and then run the ``server``
+script. First go to the root folder of the ``invenio-unicorn`` module, then
 
 .. code-block:: console
 
-    vagrant> invenio run -h 0.0.0.0
+    $ workon my-repository-venv
+    (my-repository-venv)$ pip install --editable .[all]
+    (my-repository-venv)$ cd ../my-repository
+    (my-repository-venv)$ ./scripts/server
 
-Then go to ``http://192.168.50.10/create`` and you will see the form we just
+Then go to ``http://localhost:5000/create`` and you will see the form we just
 created. There are two fields ``Title`` and ``Description``.
 
 Let's try the form, add something to the ``Title`` and click submit, you will

@@ -7,8 +7,8 @@
 
 .. _install-run-and-test:
 
-Install, run and test
-=====================
+Install, run, test, document and publish
+========================================
 In this section, we are going to see how to install the module we just
 scaffolded, run the tests, run the example application and build the
 documentation.
@@ -17,16 +17,23 @@ Before that, we need to **stop** any running Invenio instance.
 
 Install the module
 ------------------
-Install the module is very easy, you just need to go to the root directory of
-the module and run the command:
+First, create a virtualenv for the module:
 
 .. code-block:: bash
 
-    pip install -e .[all]
+    $ mkvirtualenv my-module-venv
+
+Installing the module is very easy, you just need to go to the root directory
+of the module and run the `pip install` command:
+
+.. code-block:: bash
+
+    (my-module-venv)$ cd invenio-unicorn/
+    (my-module-venv)$ pip install --editable .[all]
 
 Some explanations about the command:
 
-- the ``-e`` option is used for development. It means that if you change the
+- the ``--editable`` option is used for development. It means that if you change the
   files in the module, you won't have to reinstall it to see the changes. In a
   production environment, this option shouldn't be used.
 - the ``.`` is in fact the path to your module. As we are in the root folder of
@@ -52,9 +59,9 @@ following step needs to be run only once. Go in the root folder of the module:
 
 .. code-block:: bash
 
-    git init
-    git add -A
-    check-manifest -u
+    (my-module-venv)$ git init
+    (my-module-venv)$ git add --all
+    (my-module-venv)$ check-manifest --update
 
 What we have done:
 
@@ -68,7 +75,7 @@ Now, we are able to run the tests:
 
 .. code-block:: bash
 
-    ./run-tests.sh
+    (my-module-venv)$ ./run-tests.sh
 
 Everything should pass as we didn't change any files yet.
 
@@ -83,13 +90,13 @@ welcome page. To try it, go into the ``examples`` folder and run:
 
 .. code-block:: console
 
-    $ ./app-setup.sh
-    $ ./app-fixtures.sh
-    $ export FLASK_APP=app.py FLASK_DEBUG=1
-    $ flask run
+    (my-module-venv)$ ./app-setup.sh
+    (my-module-venv)$ ./app-fixtures.sh
+    (my-module-venv)$ export FLASK_APP=app.py FLASK_DEBUG=1
+    (my-module-venv)$ flask run
 
-You can now open a browser a go to the URL http://localhost:5000/ you should be
-able to see a welcome page.
+You can now open a browser and go to the URL http://localhost:5000/ where you
+should be able to see a welcome page.
 
 To clean the server, run the ``./app-teardown.sh`` script after killing the
 server.
@@ -99,16 +106,27 @@ Build the documentation
 The documentation can be built with the ``run-tests.sh`` script, but you need
 the *tests* requirements, and run the tests. If you just want to build the
 documentation, you will only need the *docs* requirements (see the install
-section above) and run:
+section above). Make sure you are back at the root directory
+of the module and run:
 
 .. code-block:: console
 
-    $ python setup.py build_sphinx
+    (my-module-venv)$ python setup.py build_sphinx
+
+Similar to how you generate the documentation for the Invenio instance, you
+can instead go into the ``docs/`` folder and run the ``make`` command:
+
+.. code-block:: console
+
+    $ cd docs/
+    (my-repository-venv)$ make html
+
+Open ``_build/html/index.html`` in browser and voilà, the documentation is there.
 
 Publishing on GitHub
 --------------------
 Before going further in the tutorial, we can publish your repository to GitHub.
-This allows to integrate e.g. TravisCI continue integration system and have
+This allows to integrate e.g. TravisCI continuous integration system and have
 easy publishing of your module to PyPI afterwards.
 
 First, create an empty repository in your GitHub account. Be sure to not

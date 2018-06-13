@@ -34,6 +34,8 @@ using `Cookiecutter <https://cookiecutter.readthedocs.io/en/latest/installation.
 These code repositories will be where you customize and develop the features of
 your instance.
 
+.. _bootstrap:
+
 Bootstrap
 ---------
 
@@ -123,6 +125,7 @@ initial setup of the services and dependencies of the project:
         linut00001:~# sysctl -w vm.max_map_count=262144
 
 
+.. _customize:
 
 Customize
 ---------
