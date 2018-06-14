@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2018 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -444,7 +444,7 @@ def get_mathjax_header(https=False):
            $MJV variable in the root Makefile.am
     """
     if CFG_MATHJAX_HOSTING.lower() == 'cdn':
-        mathjax_path = "//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1"
+        mathjax_path = "//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4"
     else:
         mathjax_path = "/MathJax"
 
