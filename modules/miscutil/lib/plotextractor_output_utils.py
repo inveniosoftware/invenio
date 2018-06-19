@@ -196,6 +196,7 @@ def prepare_image_data(extracted_image_data, tex_file, image_list):
         if not image == '':
             image_loc = get_image_location(image, sdir, image_list)
             if image_loc != None and os.path.exists(image_loc):
+                image_loc = os.path.normpath(image_loc)
                 image_locs_and_captions_and_labels.append(
                         (image_loc, caption, label))
         else:
@@ -419,16 +420,18 @@ def get_image_location(image, sdir, image_list, recurred=False):
                 return os.path.join('Figs', png_image)
 
     # maybe it is actually just loose.
+    converted_image_target_fname = os.path.split(converted_image_should_be)[-1]
     for png_image in os.listdir(sdir):
-        if os.path.split(converted_image_should_be)[-1] == png_image:
+        if converted_image_target_fname == png_image:
             return converted_image_should_be
         if os.path.isdir(os.path.join(sdir, png_image)):
             # try that, too!  we just do two levels, because that's all that's
             # reasonable..
             sub_dir = os.path.join(sdir, png_image)
             for sub_dir_file in os.listdir(sub_dir):
-                if os.path.split(converted_image_should_be)[-1] == sub_dir_file:
-                    return converted_image_should_be
+                if converted_image_target_fname == sub_dir_file:
+                    return os.path.join(sub_dir, converted_image_target_fname)
+
 
     # maybe it's actually up a directory or two: this happens in nested
     # tarballs where the TeX is stored in a different directory from the images
