@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2018 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -385,6 +385,7 @@ def create_handler(root):
         if req.method == 'OPTIONS':
             ## OPTIONS is used to now which method are allowed
             req.headers_out['Allow'] = ', '.join(allowed_methods)
+            req.headers_out['Access-Control-Allow-Origin'] = '*'
             raise apache.SERVER_RETURN, apache.OK
 
         # Set user agent for fckeditor.py, which needs it here
