@@ -2,7 +2,7 @@
 
 ## This file is part of Invenio.
 ## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-##               2010, 2011, 2012, 2013, 2014, 2015, 2016 CERN.
+##               2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -6702,6 +6702,8 @@ def prs_search_common(kwargs=None, req=None, of=None, cc=None, ln=None, uid=None
             # Print empty, but valid XML
             print_records_prologue(req, of)
             print_records_epilogue(req, of)
+        if of == 'recjson':
+            req.write('[]\n')
         return None
 
     # store this search query results into search results cache if needed:
