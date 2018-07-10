@@ -25,9 +25,9 @@ from datetime import datetime
 import re
 import zlib
 import copy
+import requests
 import urllib
-import urllib2
-import cookielib
+
 
 from invenio import bibformat
 
@@ -1774,18 +1774,18 @@ def perform_doi_search(doi):
     @return: the url returned by this page"""
     response = {}
     url = "https://doi.org/"
-    val = {'hdl': doi}
-    url_data = urllib.urlencode(val)
-    cj = cookielib.CookieJar()
-    header = [('User-Agent', CFG_DOI_USER_AGENT)]
-    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-    opener.addheaders = header
+    data = {'hdl': doi}
+    headers = {'user-agent': CFG_DOI_USER_AGENT}
     try:
-        resp = opener.open(url, url_data)
+        resp = requests.post(url, headers=headers, data=data,
+                             allow_redirects=False)
     except:
         return response
-    else:
-        response['doi_url'] = resp.geturl()
+
+    if resp.status_code in (301, 302):
+        redirect = resp.headers.get('Location', None)
+        if redirect:
+            response['doi_url'] = redirect
     return response
 
 
