@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2013, 2014, 2015, 2016 CERN.
+# Copyright (C) 2011, 2012, 2013, 2014, 2015, 2016, 2018 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -39,7 +39,7 @@ from invenio.shellutils import split_cli_ids_arg
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_low_level_submission
 from invenio.refextract_api import record_has_fulltext, \
-    record_can_extract_refs
+    record_can_extract_refs, record_can_overwrite_refs
 from invenio.bibtask import task_init, \
     write_message, \
     task_update_progress, \
@@ -373,7 +373,9 @@ def submit_refextract_task(recids):
     """Submit a refextract task if needed"""
     # First filter out recids we cannot safely extract references from
     # (mostly because they have been curated)
-    recids = [recid for recid in recids if not record_can_extract_refs(recid)]
+    recids = [recid for recid in recids
+              if record_can_extract_refs(recid)
+              or record_can_overwrite_refs(recid)]
 
     if recids:
         recids_str = ','.join(str(recid) for recid in recids)
