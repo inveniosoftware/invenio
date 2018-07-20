@@ -181,7 +181,7 @@ def _get_extids_from_orcid(orcid_id):
     return ext_ids_dict
 
 
-def get_dois_from_orcid(orcid_id, get_titles=False):
+def get_dois_from_orcid_api_v1(orcid_id, get_titles=False):
     """Get dois in case of a known ORCID.
 
     @param scope: orcid_id
@@ -236,6 +236,96 @@ def get_dois_from_orcid(orcid_id, get_titles=False):
         register_exception(alert_admin=True)
 
     return dois
+
+
+def get_dois_from_orcid_api_v2_1(orcid_id, get_titles=False, low_level=True):
+    """new api v 2.1 parsing of works"""
+
+    if not orcid_id:
+        return []
+
+    works = None
+
+    if low_level:
+        token = CFG_OAUTH2_CONFIGURATIONS['orcid'].get('search_token', '')
+        if not token:
+            return []
+        headers = {'Content-type': 'application/vnd.orcid+json',
+                   'Authorization type': 'Bearer', 'Access token': token}
+        url = 'https://pub.orcid.org/v2.1/{0}/works'
+        try:
+            res = requests.get(url.format(orcid_id), headers=headers, timeout=60)
+            if not res.status_code == requests.codes.ok:
+                res.raise_for_status()
+        except Exception:
+            register_exception(alert_admin=True)
+            return []
+
+        try:
+            works = res.json()
+        except ValueError:
+            register_exception(alert_admin=True)
+            return []
+    else:
+        # requires orcid.py version >= '1.0.0'
+        import pkg_resources
+        try:
+            orcversion = pkg_resources.get_distribution("orcid").version
+        except Exception:
+            return []
+
+        if orcversion and orcversion.startswith(0):
+            return []
+
+        try:
+            sandbox = 'sandbox' in CFG_OAUTH2_CONFIGURATIONS['orcid']['member_url']
+            ap = orcid.PublicAPI(
+                institution_key=CFG_OAUTH2_CONFIGURATIONS['orcid']['consumer_key'],
+                institution_secret=CFG_OAUTH2_CONFIGURATIONS['orcid']['consumer_secret'],
+                sandbox=sandbox,
+                timeout=60)
+            token = CFG_OAUTH2_CONFIGURATIONS['orcid'].get('search_token', '')
+            if not token:
+                token = ap.get_search_token_from_orcid()
+            works = ap.read_record_public(orcid_id, 'works', token)
+        except Exception:
+            register_exception(alert_admin=True)
+
+    if not works:
+        return []
+
+    dois = []
+
+    for work in works.get('group', {}):
+        if get_titles:
+            wksummary = work.get('work-summary', [])
+            for summary in wksummary:
+                title = ''
+                titles = summary.get('title', {})
+                if titles is not None:
+                    title = titles.get('title', {}).get('value', '')
+                eids = summary.get('external-ids', {})
+                if eids is None:
+                    continue
+                for eid in eids.get('external-id', []):
+                    if eid.get('external-id-type', '') == 'doi':
+                        doi = get_doi(eid.get('external-id-value', ''))
+                        if not doi:
+                            continue
+                        dois.append((doi, title))
+        else:
+            for eid in work.get('external-ids', {}).get('external-id', []):
+                if eid.get('external-id-type', '') == 'doi':
+                    doi = get_doi(eid.get('external-id-value', ''))
+                    if not doi:
+                        continue
+                    dois.append(doi)
+
+    return dois
+
+
+get_dois_from_orcid = get_dois_from_orcid_api_v2_1
+
 
 # ############################# PUSHING #######################################
 
