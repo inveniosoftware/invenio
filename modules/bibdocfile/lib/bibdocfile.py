@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -3813,7 +3813,7 @@ def download_local_file(filename, docformat=None):
     """
     # Make sure the format is OK.
     if docformat is None:
-        docformat = guess_format_from_url(filename)
+        docformat = guess_format_from_url(urllib.unquote(filename))
     else:
         docformat = normalize_format(docformat)
 
