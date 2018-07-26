@@ -23,6 +23,8 @@ import re
 
 import orcid
 import requests
+
+from retrying import retry, RetryError
 from invenio import bibtask
 from invenio.access_control_config import CFG_OAUTH2_CONFIGURATIONS
 from invenio.bibauthorid_backinterface import get_orcid_id_of_author
@@ -43,7 +45,8 @@ from invenio.orcid_xml_exporter import OrcidXmlExporter
 from invenio.search_engine import get_record
 from invenio.textutils import (RE_ALLOWED_XML_1_0_CHARS,
                                encode_for_jinja_and_xml)
-from requests.exceptions import HTTPError, RequestException
+from requests.exceptions import (HTTPError, RequestException,
+                                 ConnectTimeout, ReadTimeout)
 
 try:
     import json
@@ -238,6 +241,14 @@ def get_dois_from_orcid_api_v1(orcid_id, get_titles=False):
     return dois
 
 
+def retry_if_timeout_error(exception):
+    """
+    check whether it's a timeout
+    """
+    return isinstance(exception, ReadTimeout) \
+        or isinstance(exception, ConnectTimeout)
+
+
 def get_dois_from_orcid_api_v2_1(orcid_id, get_titles=False, low_level=True):
     """new api v 2.1 parsing of works"""
 
@@ -252,11 +263,24 @@ def get_dois_from_orcid_api_v2_1(orcid_id, get_titles=False, low_level=True):
             return []
         headers = {'Content-type': 'application/vnd.orcid+json',
                    'Authorization type': 'Bearer', 'Access token': token}
-        url = 'https://pub.orcid.org/v2.1/{0}/works'
-        try:
-            res = requests.get(url.format(orcid_id), headers=headers, timeout=60)
+
+        url = 'https://pub.orcid.org/v2.1/{0}/works'.format(orcid_id)
+
+        @retry(wrap_exception=True,
+               retry_on_exception=retry_if_timeout_error,
+               wait_exponential_multiplier=250,
+               stop_max_attempt_number=3)
+        def _get_works_from_orcid(url, headers, timeout=16):
+            res = requests.get(url, headers=headers, timeout=timeout)
             if not res.status_code == requests.codes.ok:
                 res.raise_for_status()
+            return res
+
+        try:
+            res = _get_works_from_orcid(url, headers)
+        except RetryError:
+            register_exception(alert_admin=True)
+            return []
         except Exception:
             register_exception(alert_admin=True)
             return []
