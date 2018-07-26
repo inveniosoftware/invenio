@@ -2,7 +2,7 @@
 ##
 ## This file is part of Invenio.
 ## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015,
-##               2016, 2017 CERN.
+##               2016, 2017, 2018 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1879,7 +1879,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 docformat = normalize_format(docformat[0])
             else:
                 if url:
-                    docformat = guess_format_from_url(url)
+                    docformat = guess_format_from_url(urllib.unquote(url))
                 else:
                     docformat = ""
 
