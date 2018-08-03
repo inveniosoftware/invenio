@@ -46,8 +46,7 @@ from invenio.bibtask import task_init, \
     task_get_option, \
     task_set_option, \
     task_sleep_now_if_required
-from invenio.search_engine_utils import get_fieldvalues
-from invenio.search_engine import search_pattern
+from invenio.search_engine import get_collection_reclist, search_pattern
 from invenio.config import CFG_VERSION, \
     CFG_TMPSHAREDDIR, \
     CFG_TMPDIR, \
@@ -316,6 +315,16 @@ def fetch_arxiv_version(recid):
         return int(version[1:])
 
 
+def record_has_arxiv_pdf(recid=None):
+    if recid is None:
+        return False
+    brd = BibRecDocs(recid)
+    for bdf in brd.list_latest_files(doctype="arXiv"):
+        if bdf.format.lower() in ('.pdf', '.pdfa'):
+            return True
+    return False
+
+
 def process_one(recid):
     """Checks given recid for updated pdfs on arxiv"""
     write_message('checking %s' % recid)
@@ -333,7 +342,7 @@ def process_one(recid):
     write_message('harvested_version %s' % harvest_version)
     write_message('arxiv_version %s' % arxiv_version)
 
-    if record_has_fulltext(recid) and harvest_version == arxiv_version:
+    if record_has_arxiv_pdf(recid) and harvest_version == arxiv_version:
         write_message('our version matches arxiv')
         raise AlreadyHarvested(status=harvest_status)
 
@@ -388,7 +397,7 @@ def fetch_records_with_arxiv_fulltext():
     Returns all the record IDs for records that have an arXiv bibdocfile
     attached.
     """
-    return intbitset(run_sql("select id_bibrec from bibrec_bibdoc join bibdoc on id_bibdoc=id where bibrec_bibdoc.type='arXiv' or bibdoc.doctype='arXiv'"))
+    return intbitset(run_sql("select id_bibrec from bibrec_bibdoc join bibdoc on id_bibdoc=id where (bibrec_bibdoc.type='arXiv' or bibdoc.doctype='arXiv') and bibdoc.status <> 'DELETED'"))
 
 
 def fetch_records_missing_arxiv_fulltext():
@@ -396,7 +405,9 @@ def fetch_records_missing_arxiv_fulltext():
     Returns all the record IDs for records which are supposed to have an arXiv
     fulltext but do not have it.
     """
-    return search_pattern(p='035__9:"arXiv" - 980:DELETED') - fetch_records_with_arxiv_fulltext()
+    return (search_pattern(p='035__9:"arXiv" - 980:DELETED')
+            & get_collection_reclist('HEP')) \
+        - fetch_records_with_arxiv_fulltext()
 
 _RE_ARXIV_ID = re.compile(re.escape(
     "<identifier>oai:arXiv.org:") + "(.+?)" + re.escape("</identifier>"), re.M)
@@ -421,7 +432,7 @@ def fetch_updated_arxiv_records(date):
 def fetch_records_modified_since(last_date):
     """Fetch all the recids of records modified since last_date in the system"""
     return intbitset(run_sql("SELECT id FROM bibrec WHERE"
-        " modification_date>=%s", (last_date, )))
+                             " modification_date>=%s", (last_date, )))
 
 
 def task_run_core(name=NAME):
