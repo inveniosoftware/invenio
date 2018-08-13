@@ -39,14 +39,21 @@ Bootstrap
 
 Before we begin, you want to make sure to have Cookiecutter installed. Invenio
 leverages this tool to generate the starting boilerplate for different
-components, so it will be useful to have in general.
+components, so it will be useful to have in general. We recommend you install
+it as a user package or in the virtualenv we define below.
 
 .. code-block:: shell
 
-  # Globally install or upgrade it
-  $ sudo pip install --upgrade cookiecutter
-  # Or locally install or upgrade it
+  # Install cookiecutter locally or upgrade it if already installed
   $ pip install --user --upgrade cookiecutter
+  # OR, once you have created a virtualenv per the steps below, install it
+  (my-repository-venv)$ pip install --upgrade cookiecutter
+
+.. note::
+
+  If you install Cookiecutter in the virtualenv, you will need to activate the
+  virtualenv to be able to use `cookiecutter` on the command-line.
+
 
 We can now begin. First, let's create a `virtualenv <https://virtualenv.pypa.io/en/stable/installation/>`_
 using `virtualenvwrapper <https://virtualenvwrapper.readthedocs.io/en/latest/install.html>`_
