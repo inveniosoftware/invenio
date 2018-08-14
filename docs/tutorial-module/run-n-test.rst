@@ -23,8 +23,8 @@ First, create a virtualenv for the module:
 
     $ mkvirtualenv my-module-venv
 
-Installing the module is very easy, you just need to go to the root directory
-of the module and run the `pip install` command:
+Installing the module is very easy, you just need to go to its root directory
+and `pip install` it:
 
 .. code-block:: bash
 
@@ -113,15 +113,8 @@ of the module and run:
 
     (my-module-venv)$ python setup.py build_sphinx
 
-Similar to how you generate the documentation for the Invenio instance, you
-can instead go into the ``docs/`` folder and run the ``make`` command:
-
-.. code-block:: console
-
-    $ cd docs/
-    (my-repository-venv)$ make html
-
-Open ``_build/html/index.html`` in browser and voilà, the documentation is there.
+Open ``docs/_build/html/index.html`` in browser and voilà, the documentation is
+there.
 
 Publishing on GitHub
 --------------------

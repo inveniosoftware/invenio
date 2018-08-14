@@ -303,13 +303,16 @@ Demo time
 ---------
 
 Let's now see our Invenio module in action when integrated with our Invenio instance.
-We will install this module in our Invenio instance and then run the ``server``
-script. First go to the root folder of the ``invenio-unicorn`` module, then
+First we activate our instance's virtualenv and we install the new Invenio-Unicorn module:
 
 .. code-block:: console
 
     $ workon my-repository-venv
     (my-repository-venv)$ pip install --editable .[all]
+
+Then, we go to the instance folder, `my-repository`, and start the ``server``
+script:
+
     (my-repository-venv)$ cd ../my-repository
     (my-repository-venv)$ ./scripts/server
 
