@@ -11,7 +11,7 @@ Tutorial: Develop a module
 .. toctree::
    :maxdepth: 2
 
-   cookiecutter
+   scaffold
    run-n-test
    develop
    first-commit
