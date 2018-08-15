@@ -11,6 +11,8 @@
 Create, Display, Search Records
 ===============================
 
+.. _create-a-record:
+
 Create a record
 ---------------
 
@@ -57,6 +59,8 @@ When the request was successful, the server returns the details of the created r
     the warning message. For CLI tools like ``curl``, you can ignore the SSL
     verification via the ``-k/--insecure`` option.
 
+.. _display-a-record:
+
 Display a record
 ----------------
 
@@ -87,6 +91,8 @@ fetch it via the REST API:
     "revision": 0,
     "updated": "2018-05-23T13:28:19.426213+00:00"
   }
+
+.. _search-for-records:
 
 Search for records
 ------------------
