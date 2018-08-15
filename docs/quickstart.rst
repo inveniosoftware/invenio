@@ -34,6 +34,8 @@ using `Cookiecutter <https://cookiecutter.readthedocs.io/en/latest/installation.
 These code repositories will be where you customize and develop the features of
 your instance.
 
+.. _bootstrap:
+
 Bootstrap
 ---------
 
@@ -123,6 +125,7 @@ initial setup of the services and dependencies of the project:
         linut00001:~# sysctl -w vm.max_map_count=262144
 
 
+.. _customize:
 
 Customize
 ---------
@@ -397,7 +400,7 @@ Documentation
 ^^^^^^^^^^^^^
 
 In order to build and preview the instance's documentation, you can run the
-following commands:
+`setup.py build_sphinx` command:
 
 .. code-block:: shell
 
@@ -405,7 +408,6 @@ following commands:
   # The following makes sure you have the docs dependencies installed
   # if you already installed the instance via .[all] you can skip this install
   (my-repository-venv)$ pip install --editable .[docs]
-  $ cd docs/
-  (my-repository-venv)$ make html
+  (my-repository-venv)$ python setup.py build_sphinx
 
-Open up ``_build/html/index.html`` in your browser to see the documentation.
+Open up ``docs/_build/html/index.html`` in your browser to see the documentation.

@@ -8,14 +8,10 @@
 Scaffold new module
 ===================
 The easiest way to create a new Invenio module is to use our provided
-cookiecutter template to scaffold the new module.
+`Cookiecutter <https://cookiecutter.readthedocs.io/en/latest/installation.html>`_
+template to scaffold the new module.
 
-First, you need to install Cookiecutter, which is available on PyPI (the
-``-U`` option will upgrade it if it is already installed):
-
-.. code-block:: console
-
-    $ pip install -U cookiecutter
+First, make sure you have Cookiecutter installed as per :ref:`bootstrap`.
 
 Now we will create the files for the module. A module is basically a folder
 gathering all the files needed for its installation and execution. So, go where
@@ -23,7 +19,7 @@ you want the directory to be created, and run the command:
 
 .. code-block:: console
 
-    $ cookiecutter https://github.com/inveniosoftware/cookiecutter-invenio-module.git
+    $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-module
 
 
 This will first clone the template from git to your current directory. Then,
