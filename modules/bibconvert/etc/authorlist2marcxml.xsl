@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!--
 This file is part of Invenio.
-Copyright (C) 2011 CERN.
+Copyright (C) 2011, 2018 CERN.
 
 Invenio is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as
@@ -22,9 +22,10 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
                 xmlns:marc="http://www.loc.gov/MARC21/slim"
                 xmlns:foaf="http://xmlns.com/foaf/0.1/"
                 xmlns:cal="http://www.slac.stanford.edu/spires/hepnames/authors_xml/"
+                xmlns:cali="http://inspirehep.net/info/HepNames/tools/authors_xml/"
                 xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                 xmlns:str="http://exslt.org/strings"
-                exclude-result-prefixes="marc foaf cal rdf str">
+                exclude-result-prefixes="marc foaf cal cali rdf str">
   <xsl:output method="xml" indent="yes" encoding="UTF-8"/>
   <!-- ************ FUNCTIONS ************ -->
 
@@ -52,8 +53,8 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
         <xsl:when test="normalize-space(foaf:familyName) != '' and normalize-space(foaf:givenName) != ''">
           <subfield code="a"><xsl:value-of select="normalize-space(translate(foaf:familyName, '.', ''))"/>, <xsl:value-of select="normalize-space(translate(foaf:givenName, '.', ''))"/></subfield>
         </xsl:when>
-        <xsl:when test="cal:authorNamePaper != ''">
-          <xsl:variable name="aname" select="cal:authorNamePaper" />
+        <xsl:when test="cal:authorNamePaper != ''|cali:authorNamePaper != ''">
+          <xsl:variable name="aname" select="cal:authorNamePaper|cali:authorNamePaper" />
           <xsl:variable name="tokens" select="str:split($aname, '.')" />
           <xsl:variable name="first">
               <xsl:for-each select="$tokens[position()!=last()]">
@@ -97,15 +98,20 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
     <xsl:param name="orgid"/>
     <xsl:variable name="orgname" select="//foaf:Organization[@id=$orgid]/cal:orgName[@source='spiresICN'] |
                                          //foaf:Organization[@id=$orgid]/cal:orgName[@source='inspire'] |
-                                         //foaf:Organization[@id=$orgid]/cal:orgName[@source='INSPIRE']" />
+                                         //foaf:Organization[@id=$orgid]/cal:orgName[@source='INSPIRE'] |
+                                         //foaf:Organization[@id=$orgid]/cali:orgName[@source='spiresICN'] |
+                                         //foaf:Organization[@id=$orgid]/cali:orgName[@source='inspire'] |
+                                         //foaf:Organization[@id=$orgid]/cali:orgName[@source='INSPIRE']" />
           <xsl:choose>
       <xsl:when test="not(contains($orgname, 'UNDEFINED')) and $orgname!=''" >
         <subfield code="u"><xsl:value-of select="normalize-space($orgname)"/></subfield>
       </xsl:when>
       <xsl:otherwise>
-          <xsl:for-each select="//collaborationauthorlist/cal:organizations/foaf:Organization">
-            <xsl:if test="cal:group[@with=$orgid]">
-              <subfield code="u"><xsl:value-of select="cal:orgName[@source='INSPIRE']"/></subfield>
+          <xsl:for-each
+	      select="//collaborationauthorlist/cal:organizations/foaf:Organization |
+		      //collaborationauthorlist/cali:organizations/foaf:Organization">
+            <xsl:if test="cal:group[@with=$orgid]|cali:group[@with=$orgid]">
+              <subfield code="u"><xsl:value-of select="cal:orgName[@source='INSPIRE']|cali:orgName[@source='INSPIRE']"/></subfield>
             </xsl:if>
           </xsl:for-each>
       </xsl:otherwise>
@@ -120,7 +126,7 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
 
 
     <!-- Go through each author affiliation and create 100/700__u subfield(s) -->
-    <xsl:for-each select="./cal:authorAffiliations/cal:authorAffiliation">
+    <xsl:for-each select="./cal:authorAffiliations/cal:authorAffiliation|./cali:authorAffiliations/cali:authorAffiliation">
       <xsl:variable name="orgid" select="@organizationid" />
 
       <!-- Print spiresICN if defined, otherwise print full name -->
@@ -130,7 +136,7 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
     </xsl:for-each>
 
     <!-- Fetch Inspire ID and create 100/700__i subfield -->
-    <xsl:for-each select="./cal:authorIDs/cal:authorID">
+    <xsl:for-each select="./cal:authorIDs/cal:authorID|./cali:authorIDs/cali:authorID">
       <xsl:if test="not(.//*[contains(., 'UNDEFINED')])">
         <xsl:choose>
             <xsl:when test="@source='INSPIRE' or @source='Inspire ID'">
@@ -151,7 +157,7 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
         </xsl:choose>
       </xsl:if>
     </xsl:for-each>
-    <xsl:for-each select="./cal:authorids/cal:authorid">
+    <xsl:for-each select="./cal:authorids/cal:authorid|./cali:authorids/cali:authorid">
       <xsl:if test="not(.//*[contains(., 'UNDEFINED')])">
         <xsl:choose>
             <xsl:when test="@source='INSPIRE' or @source='Inspire ID'">
