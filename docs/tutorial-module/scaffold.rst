@@ -32,20 +32,20 @@ Cookiecutter will ask you questions about the module you want to create:
     package_name [invenio_unicorn]:
     github_repo [inveniosoftware/invenio-unicorn]:
     description [Invenio module that adds more fun to the platform.]:
-    author_name [CERN]: Nice Unicorn
+    author_name [Nice Unicorn]:
     author_email [info@inveniosoftware.org]: nice@unicorn.com
     year [2017]:
     copyright_holder [Nice Unicorn]:
-    copyright_by_intergovernmental [True]: False
+    copyright_by_intergovernmental [True]:
     superproject [Invenio]:
     transifex_project [invenio-unicorn]:
     extension_class [InvenioUnicorn]:
     config_prefix [UNICORN]:
 
-A folder ``invenio-unicorn`` has been created, you can go inside and have a
-look at all the generated files. Don't be scared about the number of files -
-a lot of the files are standard files that follow best practices for any Python
-package.
 
-If you want further information about the created files, you can read the
-:ref:`invenio-module-layout` section.
+The directory ``invenio-unicorn`` has been created containing the generated files.
+All modules follow the same layout which
+is described in the :ref:`invenio-module-layout` section.
+
+Once you have a grasp on the module layout, you can continue to the
+:ref:`install-run-and-test` section, to learn how to install your new module.

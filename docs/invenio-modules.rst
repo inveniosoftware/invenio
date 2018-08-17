@@ -33,13 +33,10 @@ A simple module may have the following folder structure::
 
 These files are described in the sections below.
 
-Description of the files
-------------------------
-
 \*.rst files
 ++++++++++++
 
-All these files are used by people that wants to know more about your module (mainly developers).
+All these files are used by people who want to know more about your module (mainly developers).
 
 - ``README.rst`` is used to describe your module. You can see the short
   description written in the Cookiecutter here. You should update it with
@@ -73,14 +70,14 @@ Invenio application, and the translations.
 
 MANIFEST.in
 +++++++++++
-This file lists all the interested files in the sub-folders. This file should
+This file lists all the files included in the sub-folders. This file should
 be updated before the first commit. See the :ref:`install-run-and-test`
 section.
 
 run-tests.sh
 ++++++++++++
-This is used to run a list of tests locally, to be sure that your module works
-as you wish. It will generate the documentation, run *pytest* and do other
+This is used to run a list of tests locally, to make sure that your module works
+as intended. It will generate the documentation, run *pytest* and do other
 checks.
 
 docs folder
@@ -97,7 +94,7 @@ follow the steps described in the :ref:`run-the-example-app` section
 
 tests folder
 ++++++++++++
-Here are described all the tests for your application, that will be run when
+Here are all the tests for your application, that will be run when
 you execute the ``run-tests.sh`` script. If all these tests pass, you can
 safely commit your work.
 
@@ -111,40 +108,38 @@ into an underscore. Here is the code of your module. You can add any code files
 here, organized as you wish.
 
 The files that already exist are kind of a standard, we are going through them
-in the following sections. The rule of thumbs here is that if you need multiple
+in the following sections. A rule of thumb is that if you need multiple
 files for one action (for instance, 2 ``views``: one for the API and a standard
 one), create a folder having the name of the file you want to split (here, a
 ``views`` folder with ``ui.py`` and ``api.py`` inside).
 
 config.py
 >>>>>>>>>
-All your config variables should be declared in this file. Thus, if we look for
-how to customize your module, we just need to open this file.
+All configuration variables should be declared in this file.
 
 ext.py
 >>>>>>
-This is a specific file that you shouldn't touch except if you want to have
-advanced features. It contains a class that registers your module into the
-Invenio application, and load your default config variables from ``config.py``.
+This file contains a class that extends the Invenio application
+with your module. It registers the module during the initialization of the application
+and loads the default configuration from ``config.py``. 
 
 version.py
 >>>>>>>>>>
-Very basic file containing the version of your module.
+File containing the version of your module.
 
 views.py
 >>>>>>>>
-
-Here you declare the views or end points you want to expose. By default, it creates a simple view on the root end point that fills a template.
+Here you declare the views or end points you want to expose. By default, it creates a
+simple view on the root end point that renders a template.
 
 templates
 >>>>>>>>>
-
-All your Jinja templates should be stored in this folder. A Jinja template is an HTML file that can be modified thanks to some parameters.
+All your Jinja templates should be stored in this folder. A Jinja template is an HTML file that can be modified according to some parameters.
 
 static
 >>>>>>
-
-If your module needs JavaScript or CSS files, they should go in a folder called ``static``. Also, if you want to group them in bundles, you should add a ``bundles.py`` file next to the ``static`` folder.
+If your module contains JavaScript or CSS files, they should go in a folder called ``static``. Also, if you want to group them in bundles,
+you should add a ``bundles.py`` file next to the ``static`` folder.
 
 Module naming conventions
 -------------------------
