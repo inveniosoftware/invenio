@@ -5,12 +5,12 @@
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
+.. _develop:
 
 Form, views and templates
 =========================
-The goal of this tutorial is to add data to Invenio v3. We'll create a
-form that inserts the data in the database. Also we will touch different
-part of the development process such as:
+In this tutorial we'll see how to add data to our Invenio application.
+To accomplish this we will cover several parts of the development process such as:
 
 - How to create a form
 - How to create a new view
@@ -64,7 +64,7 @@ In ``invenio_unicorn/views.py`` we'll create the endpoints for
 - ``create``: Form template
 - ``success``: Success template
 
-The ``views.py`` registers all the views of our application.
+and register all the views to our application.
 
 .. code-block:: python
 
@@ -132,8 +132,8 @@ The ``views.py`` registers all the views of our application.
 
 And now, let's create the templates.
 
-In ``invenio_unicorn/templates/invenio_unicorn/create.html`` we override
-the ``page_body``:
+We create a `create.html` template in ``invenio_unicorn/templates/invenio_unicorn/``
+where we can override the ``page_body`` block, to place our form:
 
 .. code-block:: html
 
@@ -193,7 +193,9 @@ the ``page_body``:
       </div>
     {% endblock page_body %}
 
-In ``invenio_unicorn/templates/invenio_unicorn/success.html``
+And finally, the `success.html` page in
+`invenio_unicorn/templates/invenio_unicorn/` which will be rendered after a
+record is created.
 
 .. code-block:: html
 
@@ -219,7 +221,8 @@ In ``invenio_unicorn/templates/invenio_unicorn/success.html``
 4. Create the record creation function
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``utils.py`` module will create a helper function that creates a record.
+The ``utils.py`` file contains all helper functions of our module,
+so let's write the first utility that will create a record.
 
 In ``invenio_unicorn/utils.py``
 
@@ -303,14 +306,15 @@ Demo time
 ---------
 
 Let's now see our Invenio module in action when integrated with our Invenio instance.
-First we activate our instance's virtualenv and we install the new Invenio-Unicorn module:
+
+First we install our new Invenio-Unicorn module:
 
 .. code-block:: console
 
     $ pipenv install --editable .[all]
 
-Then, we go to the instance folder, `my-repository`, and start the ``server``
-script:
+Then, if you've followed the steps in the Quickstart guide, you can go to the
+instance folder, `my-repository`, and start the ``server`` script:
 
     $ cd ../my-site
     $ pipenv run ./scripts/server

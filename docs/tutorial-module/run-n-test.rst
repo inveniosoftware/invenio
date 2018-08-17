@@ -42,7 +42,7 @@ Some explanations about the command:
   is common when developing. Depending on your use of the module, you can
   install only parts of it:
 
-    - the default (nothing after the dots) installs the minimum to make the
+    - the default (nothing after the dot) installs the minimum to make the
       module run.
     - ``[tests]`` installs the requirements to test the module.
     - ``[docs]`` installs the requirements to build the documentation.
@@ -104,7 +104,7 @@ server.
 Build the documentation
 -----------------------
 The documentation can be built with the ``run-tests.sh`` script, but you need
-the *tests* requirements, and run the tests. If you just want to build the
+to have installed *tests* requirements, and to run the tests. If you just want to build the
 documentation, you will only need the *docs* requirements (see the install
 section above). Make sure you are back at the root directory
 of the module and run:
@@ -145,3 +145,9 @@ Finally, we create a new branch to develop on it
 .. code-block:: bash
 
     git checkout -b dev
+
+Next Step
+---------
+In the above steps we have seen how to do the basic operations with our module.
+To add some more functionality to it, the following guide shows the steps to create
+a view that will create records given some data: :ref:`develop`.
