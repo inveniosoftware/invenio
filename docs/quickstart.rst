@@ -72,22 +72,8 @@ initial setup of the services and dependencies of the project:
   Creating myrepository_es_1    ... done
   Creating myrepository_mq_1    ... done
 
-.. note::
-
-    Make sure you have `enough virtual memory
-    <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-prod-mode>`_
-    for Elasticsearch in Docker:
-
-    .. code-block:: shell
-
-        # Linux
-        $ sysctl -w vm.max_map_count=262144
-
-        # macOS
-        $ screen ~/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/tty
-        <enter>
-        linut00001:~# sysctl -w vm.max_map_count=262144
-
+If the Elasticsearch service fails to start mentioning that it requires more virtual memory,
+see the following fix <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-prod-mode>`_.
 
 .. _customize:
 
@@ -148,7 +134,8 @@ Create a record
 
 By default, the data model has a records REST API endpoint configured, which
 allows performing CRUD and search operations over records. Let's create a
-simple record via ``curl``:
+simple record via ``curl``, by sending a ``POST`` request to ``/api/records`` with
+some sample data:
 
 .. code-block:: shell
 
@@ -156,6 +143,10 @@ simple record via ``curl``:
       --request POST \
       --data '{"title":"Some title", "contributors": [{"name": "Doe, John"}]}' \
       https://localhost:5000/api/records/?prettyprint=1
+
+When the request was successful, the server returns the details of the created record:
+
+.. code-block:: shell
 
   {
     "created": "2018-05-23T13:28:19.426206+00:00",
@@ -213,7 +204,7 @@ Search for records
 The record you created before, besides being inserted into the database, is
 also indexed in Elasticsearch and available for searching. You can search for
 it via the Search UI page at https://localhost:5000/search, or via the REST
-API:
+API from the ``/api/records`` endpoint:
 
 .. code-block:: shell
 
