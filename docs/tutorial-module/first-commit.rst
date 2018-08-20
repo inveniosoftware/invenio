@@ -26,14 +26,14 @@ more information.
 
 .. code-block:: console
 
-    $ ./run-tests.sh
+    $ pipenv run ./run-tests.sh
 
 If it complains about the manifest, it is because we added new files, but we
 didn't register them into the ``MANIFEST.in`` file, so let's do so:
 
 .. code-block:: console
 
-    $ check-manifest -u
+    $ pipenv run check-manifest -u
 
 Push the code
 -------------

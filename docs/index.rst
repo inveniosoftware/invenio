@@ -10,7 +10,7 @@
 .. toctree::
     :maxdepth: 2
 
-    quickstart.rst
+    quickstart/index.rst
     tutorial-module/index
     invenio-modules.rst
     application-architecture.rst
