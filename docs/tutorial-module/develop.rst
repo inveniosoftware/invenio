@@ -307,14 +307,13 @@ First we activate our instance's virtualenv and we install the new Invenio-Unico
 
 .. code-block:: console
 
-    $ workon my-repository-venv
-    (my-repository-venv)$ pip install --editable .[all]
+    $ pipenv install --editable .[all]
 
 Then, we go to the instance folder, `my-repository`, and start the ``server``
 script:
 
-    (my-repository-venv)$ cd ../my-repository
-    (my-repository-venv)$ ./scripts/server
+    $ cd ../my-site
+    $ pipenv run ./scripts/server
 
 Then go to ``http://localhost:5000/create`` and you will see the form we just
 created. There are two fields ``Title`` and ``Description``.
