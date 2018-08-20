@@ -46,51 +46,17 @@ it as a user package or in the virtualenv we define below.
 
 .. code-block:: shell
 
-  # Install cookiecutter locally or upgrade it if already installed
-  $ pip install --user --upgrade cookiecutter
-  # OR, once you have created a virtualenv per the steps below, install it
-  (my-repository-venv)$ pip install --upgrade cookiecutter
-
-.. note::
-
-  If you install Cookiecutter in the virtualenv, you will need to activate the
-  virtualenv to be able to use `cookiecutter` on the command-line.
-
-
-We can now begin. First, let's create a `virtualenv <https://virtualenv.pypa.io/en/stable/installation/>`_
-using `virtualenvwrapper <https://virtualenvwrapper.readthedocs.io/en/latest/install.html>`_
-in order to sandbox our Python environment for development:
-
-.. code-block:: shell
-
-  $ mkvirtualenv my-repository-venv
+  # Install cookiecutter if it is not already installed
+  $ sudo apt-get install cookiecutter
 
 Now, let's scaffold the instance using the `official cookiecutter template
 <https://github.com/inveniosoftware/cookiecutter-invenio-instance>`_.
 
 .. code-block:: shell
 
-  (my-repository-venv)$ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance --checkout v3.0
-  project_name [My site]: My repository
-  project_shortname [my-repository]:
-  project_site [my-repository.com]:
-  package_name [my_repository]:
-  github_repo [my-repository/my-repository]:
-  description [Invenio digital library framework.]: My repository digital library
-  author_name [CERN]: Me
-  author_email [info@inveniosoftware.org]: me@my-repository.com
-  year [2018]:
-  copyright_holder [Me]:
-  transifex_project [my-repository]:
-  Select database:
-  1 - postgresql
-  2 - mysql
-  Choose from 1, 2 [1]:
-  Select elasticsearch:
-  1 - 6
-  2 - 5
-  Choose from 1, 2 [1]:
-  # ... project scaffolding output ...
+  $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance --checkout v3.0
+  project_name [My site]:
+  # continuing with the defaults ...
 
 Now that we have our instance's source code ready we can proceed with the
 initial setup of the services and dependencies of the project:
@@ -98,15 +64,13 @@ initial setup of the services and dependencies of the project:
 .. code-block:: shell
 
   # Fire up the database, Elasticsearch, Redis and RabbitMQ
-  (my-repository-venv)$ cd my-repository/
-  (my-repository-venv)$ docker-compose up -d
+  $ cd my-site/
+  $ docker-compose up -d
   Creating network "myrepository_default" with the default driver
   Creating myrepository_cache_1 ... done
   Creating myrepository_db_1    ... done
   Creating myrepository_es_1    ... done
   Creating myrepository_mq_1    ... done
-  # Install dependencies and generate static assets
-  (my-repository-venv)$ ./scripts/bootstrap
 
 .. note::
 
@@ -137,8 +101,8 @@ instance we will use the `official data model cookiecutter template
 
 .. code-block:: shell
 
-  (my-repository-venv)$ cd ..  # switch back to the parent directory
-  (my-repository-venv)$ cookiecutter gh:inveniosoftware/cookiecutter-invenio-datamodel --checkout v3.0
+  $ cd ..  # switch back to the parent directory
+  $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-datamodel --checkout v3.0
   # ...fill in the fields...
 
 For the purposes of this guide, our data model folder is `my-datamodel`.
@@ -147,25 +111,16 @@ Let's also install the data model in our virtualenv:
 
 .. code-block:: shell
 
-  (my-repository-venv)$ cd my-datamodel
-  (my-repository-venv)$ pip install --editable .
+  $ pipenv install -e ./my-datamodel
 
 Now that we have a data model installed we can create database tables and
 Elasticsearch indices:
 
 .. code-block:: shell
 
-  (my-repository-venv)$ cd ../my-repository
-  (my-repository-venv)$ ./scripts/bootstrap
-  (my-repository-venv)$ ./scripts/setup
-
-Currently, the system doesn't have any users, but more important, it doesn't
-have an administrator. Let's create one:
-
-.. code-block:: shell
-
-  (my-repository-venv)$ my-repository users create admin@my-repository.com -a --password=<secret>
-  (my-repository-venv)$ my-repository roles add admin@my-repository.com admin
+  $ cd my-site
+  $ ./scripts/bootstrap
+  $ ./scripts/setup
 
 Run
 ---
@@ -173,13 +128,7 @@ You can now run the necessary processes for the instance:
 
 .. code-block:: shell
 
-  # ...in a new terminal, start the celery worker
-  $ workon my-repository-venv
-  (my-repository-venv)$ celery worker --app invenio_app.celery --loglevel INFO
-
-  # ...in a new terminal, start the flask development server
-  $ workon my-repository-venv
-  (my-repository-venv)$ ./scripts/server
+  $ ./scripts/server
   * Environment: development
   * Debug mode: on
   * Running on https://127.0.0.1:5000/ (Press CTRL+C to quit)
