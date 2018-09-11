@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2016, 2017 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2016, 2017, 2018 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -630,7 +630,7 @@ re_doi = (re.compile(ur"""
     ((\(?doi(\s)*\)?:?(\s)*)                # 'doi:' or 'doi' or '(doi)' or 'doi   )' or '(doi :' ...
     |(https?://(dx\.)?doi\.org\/))?         # or 'http://(dx.)doi.org/'  (neither has to be present)
     (?P<doi>10\.                            # 10.                        (mandatory for DOI's)
-    \d{4}                                   # [0-9] x4
+    \d{4,5}                                 # [0-9] x4 or 5
     (/|%2f)                                 # / (possibly urlencoded)
     [\w\-_:;\(\)/\.<>]+                     # any character
     [\w\-_:;\(\)/<>])                       # any character excluding a full stop
