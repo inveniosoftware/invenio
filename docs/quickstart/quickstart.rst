@@ -48,13 +48,30 @@ it as a user package or in the virtualenv we define below.
 
   # Install cookiecutter if it is not already installed
   $ sudo apt-get install cookiecutter
+  # OR, once you have created a virtualenv per the steps below, install it
+  (my-repository-venv)$ pip install --upgrade cookiecutter
+
+
+.. note::
+
+  If you install Cookiecutter in the virtualenv, you will need to activate the
+  virtualenv to be able to use `cookiecutter` on the command-line.
+
+We can now begin. First, let's create a `virtualenv
+<https://virtualenv.pypa.io/en/stable/installation/>`_ using `virtualenvwrapper
+<https://virtualenvwrapper.readthedocs.io/en/latest/install.html>`_ in order to
+sandbox our Python environment for development:
+
+.. code-block:: shell
+
+  $ mkvirtualenv my-repository-venv
 
 Now, let's scaffold the instance using the `official cookiecutter template
 <https://github.com/inveniosoftware/cookiecutter-invenio-instance>`_.
 
 .. code-block:: shell
 
-  $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance --checkout v3.0
+  (my-repository-venv)$ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance --checkout v3.0
   # ...fill in the fields...
 
 Now that we have our instance's source code ready we can proceed with the
@@ -63,8 +80,8 @@ initial setup of the services and dependencies of the project:
 .. code-block:: shell
 
   # Fire up the database, Elasticsearch, Redis and RabbitMQ
-  $ cd my-site/
-  $ docker-compose up -d
+  (my-repository-venv)$ cd my-site/
+  (my-repository-venv)$ docker-compose up -d
   Creating network "mysite_default" with the default driver
   Creating mysite_cache_1 ... done
   Creating mysite_db_1    ... done
@@ -86,8 +103,8 @@ instance we will use the `official data model cookiecutter template
 
 .. code-block:: shell
 
-  $ cd ..  # switch back to the parent directory
-  $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-datamodel --checkout v3.0
+  (my-repository-venv)$ cd ..  # switch back to the parent directory
+  (my-repository-venv)$ cookiecutter gh:inveniosoftware/cookiecutter-invenio-datamodel --checkout v3.0
   # ...fill in the fields...
 
 For the purposes of this guide, our data model folder is `my-datamodel`.
@@ -96,16 +113,23 @@ Let's also install the data model in our virtualenv:
 
 .. code-block:: shell
 
-  $ pipenv install -e ./my-datamodel
+  (my-repository-venv)$ pip install -e .
+
+
+.. note::
+
+   Once you publish your data model somewhere, i.e. the `Python Package Index
+   <https://pypi.org/>`_, you might want to edit your instance's `setup.py` file
+   to add it there as a dependence.
 
 Now that we have a data model installed we can create database tables and
 Elasticsearch indices:
 
 .. code-block:: shell
 
-  $ cd my-site
-  $ ./scripts/bootstrap
-  $ ./scripts/setup
+  (my-repository-venv)$ cd my-site
+  (my-repository-venv)$ ./scripts/bootstrap
+  (my-repository-venv)$ ./scripts/setup
 
 Run
 ---
@@ -113,7 +137,7 @@ You can now run the necessary processes for the instance:
 
 .. code-block:: shell
 
-  $ ./scripts/server
+  (my-repository-venv)$ ./scripts/server
   * Environment: development
   * Debug mode: on
   * Running on https://127.0.0.1:5000/ (Press CTRL+C to quit)
