@@ -28,7 +28,7 @@ EXTRA_DIST = UNINSTALL THANKS RELEASE-NOTES configure-tests.py config.nice.in \
 # current MathJax version and packages
 # See also modules/miscutil/lib/htmlutils.py (get_mathjax_header)
 MJV = 2.3
-MATHJAX = http://invenio-software.org/download/mathjax/MathJax-v$(MJV).zip
+MATHJAX = http://inveniosoftware.web.cern.ch/inveniosoftware/download/mathjax/MathJax-v$(MJV).zip
 
 # current CKeditor version
 CKV = 3.6.6
@@ -139,7 +139,7 @@ install-js-test-driver:
 	@echo "*******************************************************"
 	mkdir -p $(prefix)/lib/java/js-test-driver && \
 	cd $(prefix)/lib/java/js-test-driver && \
-	wget http://invenio-software.org/download/js-test-driver/JsTestDriver-1.3.5.jar -O JsTestDriver.jar
+	wget http://inveniosoftware.web.cern.ch/inveniosoftware/download/js-test-driver/JsTestDriver-1.3.5.jar -O JsTestDriver.jar
 
 uninstall-js-test-driver:
 	@rm -rvf ${prefix}/lib/java/js-test-driver
@@ -154,31 +154,31 @@ install-jquery-plugins:
 	mkdir -p ${prefix}/var/www/js
 	mkdir -p $(prefix)/var/www/css
 	(cd ${prefix}/var/www/js && \
-	wget -O jquery.min.js http://invenio-software.org/download/jquery/jquery-1.7.1.min.js && \
+	wget -O jquery.min.js http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/jquery-1.7.1.min.js && \
 	wget -N http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js && \
-	wget -O jquery.jeditable.mini.js http://invenio-software.org/download/jquery/jquery.jeditable.custom.min.js && \
+	wget -O jquery.jeditable.mini.js http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/jquery.jeditable.custom.min.js && \
 	wget -N https://raw.githubusercontent.com/malsup/form/3.51/jquery.form.js --no-check-certificate && \
-	wget -N http://invenio-software.org/download/jquery/jquery.MultiFile.pack.js && \
-	wget -O jquery.tablesorter.zip http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip && \
-	wget -O uploadify.zip http://invenio-software.org/download/jquery/uploadify-v2.1.4.zip && \
+	wget -N http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/jquery.MultiFile.pack.js && \
+	wget -O jquery.tablesorter.zip http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/jquery.tablesorter.20111208.zip && \
+	wget -O uploadify.zip http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/uploadify-v2.1.4.zip && \
 	wget -N http://cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js && \
-	wget -N http://invenio-software.org/download/jquery/jquery.bookmark.package-1.4.0.zip && \
+	wget -N http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/jquery.bookmark.package-1.4.0.zip && \
 	unzip -u jquery.tablesorter.zip -d tablesorter && \
-	wget -N http://invenio-software.org/download/jquery/jquery.fileTree-1.01.zip && \
+	wget -N http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/jquery.fileTree-1.01.zip && \
 	unzip -u jquery.fileTree-1.01.zip && \
 	rm jquery.fileTree-1.01.zip && \
-	wget -N http://invenio-software.org/download/jquery/ColVis.min.js && \
+	wget -N http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/ColVis.min.js && \
 	mv ColVis.min.js jquery.dataTables.ColVis.min.js && \
 	rm jquery.tablesorter.zip && \
 	rm -rf uploadify && \
 	unzip -u uploadify.zip -d uploadify && \
-	wget -N http://invenio-software.org/download/jquery/flot-0.6.zip && \
+	wget -N http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/flot-0.6.zip && \
 	wget -N http://www.csspace.net/tmp/jquery-lightbox-0.5.zip && \
 	rm -rf jquery-lightbox && \
 	unzip -u jquery-lightbox-0.5.zip -d jquery-lightbox && \
 	sed -i 's/images\//\/js\/jquery-lightbox\/images\//g' jquery-lightbox/js/jquery.lightbox-0.5.js && \
 	rm -rf jquery-lightbox-0.5.zip && \
-	wget -O jquery-ui-timepicker-addon.js http://invenio-software.org/download/jquery/jquery-ui-timepicker-addon-1.0.3.js && \
+	wget -O jquery-ui-timepicker-addon.js http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/jquery-ui-timepicker-addon-1.0.3.js && \
 	unzip -u flot-0.6.zip && \
 	mv flot/jquery.flot.selection.min.js flot/jquery.flot.min.js flot/excanvas.min.js ./ && \
 	rm flot-0.6.zip && rm -r flot && \
@@ -186,30 +186,30 @@ install-jquery-plugins:
 	mv uploadify/cancel.png uploadify/uploadify.css uploadify/uploadify.allglyphs.swf uploadify/uploadify.fla uploadify/uploadify.swf ../img/ && \
 	mv uploadify/jquery.uploadify.v2.1.4.min.js ./jquery.uploadify.min.js && \
 	rm uploadify.zip && rm -r uploadify && \
-	wget -N http://invenio-software.org/download/jquery/json2.js --no-check-certificate && \
-	wget -O jquery.hotkeys.js http://invenio-software.org/download/jquery/jquery.hotkeys-0.8.js && \
-	wget -N http://invenio-software.org/download/jquery/jquery.treeview.zip && \
+	wget -N http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/json2.js --no-check-certificate && \
+	wget -O jquery.hotkeys.js http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/jquery.hotkeys-0.8.js && \
+	wget -N http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/jquery.treeview.zip && \
 	unzip -u jquery.treeview.zip -d jquery-treeview && \
 	rm jquery.treeview.zip && \
-	wget -N http://invenio-software.org/download/jquery/v1.5/js/jquery.ajaxPager.js && \
+	wget -N http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/v1.5/js/jquery.ajaxPager.js && \
 	unzip -u jquery.bookmark.package-1.4.0.zip && \
 	rm -f jquery.bookmark.ext.* bookmarks-big.png bookmarkBasic.html jquery.bookmark.js jquery.bookmark.pack.js && \
 	mv bookmarks.png ../img/ && \
 	mv jquery.bookmark.css ../css/ && \
-	wget -N --no-check-certificate http://invenio-software.org/download/jquery/jquery.omniwindow.js && \
-	wget -N --no-check-certificate http://invenio-software.org/download/jquery/jquery.blockUI.js && \
-	wget -N --no-check-certificate http://invenio-software.org/download/jquery/sly.min.js &&\
-	wget -N --no-check-certificate http://invenio-software.org/download/jquery/parsley.js &&\
-	wget -N --no-check-certificate http://invenio-software.org/download/jquery/spin.min.js &&\
+	wget -N --no-check-certificate http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/jquery.omniwindow.js && \
+	wget -N --no-check-certificate http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/jquery.blockUI.js && \
+	wget -N --no-check-certificate http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/sly.min.js &&\
+	wget -N --no-check-certificate http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/parsley.js &&\
+	wget -N --no-check-certificate http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/spin.min.js &&\
 	rm -f jquery.bookmark.package-1.4.0.zip && \
 	mkdir -p ${prefix}/var/www/img && \
 	cd ${prefix}/var/www/img && \
-	wget http://invenio-software.org/download/jquery/jquery-ui.tar.gz && \
+	wget http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/jquery-ui.tar.gz && \
 	tar xvfz jquery-ui.tar.gz && \
 	rm jquery-ui.tar.gz && \
 	wget -O datatables_jquery-ui.css https://raw.githubusercontent.com/DataTables/DataTables/1.10.0/media/css/demo_table_jui.css --no-check-certificate && \
 	cp jquery-ui/themes/redmond/jquery-ui.css . && \
-	wget -N http://invenio-software.org/download/jquery/v1.5/img/calendar.gif && \
+	wget -N http://inveniosoftware.web.cern.ch/inveniosoftware/download/jquery/v1.5/img/calendar.gif && \
 	cp jquery-ui/themes/redmond/images/*.png .)
 	@echo "***********************************************************"
 	@echo "** The jQuery plugins were successfully installed.       **"
@@ -270,7 +270,7 @@ install-ckeditor-plugin:
 	rm -rf /tmp/invenio-ckeditor-plugin
 	mkdir /tmp/invenio-ckeditor-plugin
 	(cd /tmp/invenio-ckeditor-plugin && \
-	wget 'http://invenio-software.org/download/ckeditor/$(CKEDITOR)' && \
+	wget 'http://inveniosoftware.web.cern.ch/inveniosoftware/download/ckeditor/$(CKEDITOR)' && \
 	unzip -u -d ${prefix}/var/www $(CKEDITOR)) && \
 	find ${prefix}/var/www/ckeditor/ -depth -name '_*' -exec rm -rf {} \; && \
 	find ${prefix}/var/www/ckeditor/ckeditor* -maxdepth 0 ! -name "ckeditor.js" -exec rm -r {} \; && \
@@ -294,7 +294,7 @@ install-pdfa-helper-files:
 	@echo "***********************************************************"
 	@echo "** Installing PDF/A helper files, please wait...         **"
 	@echo "***********************************************************"
-	wget 'http://invenio-software.org/download/invenio-demo-site-files/ISOCoatedsb.icc' -O ${prefix}/etc/websubmit/file_converter_templates/ISOCoatedsb.icc
+	wget 'http://inveniosoftware.web.cern.ch/inveniosoftware/download/invenio-demo-site-files/ISOCoatedsb.icc' -O ${prefix}/etc/websubmit/file_converter_templates/ISOCoatedsb.icc
 	@echo "***********************************************************"
 	@echo "** The PDF/A helper files were successfully installed.   **"
 	@echo "***********************************************************"
@@ -309,7 +309,7 @@ install-mediaelement:
 	unzip -u -d '/tmp/mediaelement' '/tmp/mediaelement/mediaelement.zip'
 	rm -rf ${prefix}/var/www/mediaelement
 	mkdir ${prefix}/var/www/mediaelement
-	mv /tmp/mediaelement/johndyer-mediaelement-*/build/* ${prefix}/var/www/mediaelement
+	mv /tmp/mediaelement/mediaelement-mediaelement-e6018c7/build/* ${prefix}/var/www/mediaelement
 	rm -rf /tmp/mediaelement
 	@echo "***********************************************************"
 	@echo "** MediaElement.js was successfully installed.           **"
@@ -399,8 +399,8 @@ update-v0.99.9-tables: # from v0.99.9 to v1.0.0-rc0
 	echo "ALTER TABLE schTASK CHANGE host host varchar(255) NOT NULL default '';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE hstTASK CHANGE host host varchar(255) NOT NULL default '';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE bib85x DROP INDEX kv, ADD INDEX kv (value(100));" | ${prefix}/bin/dbexec
-	echo "UPDATE clsMETHOD SET location='http://invenio-software.org/download/invenio-demo-site-files/HEP.rdf' WHERE name='HEP' AND location='';" | ${prefix}/bin/dbexec
-	echo "UPDATE clsMETHOD SET location='http://invenio-software.org/download/invenio-demo-site-files/NASA-subjects.rdf' WHERE name='NASA-subjects' AND location='';" | ${prefix}/bin/dbexec
+	echo "UPDATE clsMETHOD SET location='http://inveniosoftware.web.cern.ch/inveniosoftware/download/invenio-demo-site-files/HEP.rdf' WHERE name='HEP' AND location='';" | ${prefix}/bin/dbexec
+	echo "UPDATE clsMETHOD SET location='http://inveniosoftware.web.cern.ch/inveniosoftware/download/invenio-demo-site-files/NASA-subjects.rdf' WHERE name='NASA-subjects' AND location='';" | ${prefix}/bin/dbexec
 	echo "UPDATE accACTION SET name='runoairepository', description='run oairepositoryupdater task' WHERE name='runoaiarchive';" | ${prefix}/bin/dbexec
 	echo "UPDATE accACTION SET name='cfgoaiharvest', description='configure OAI Harvest' WHERE name='cfgbibharvest';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE accARGUMENT CHANGE value value varchar(255);" | ${prefix}/bin/dbexec

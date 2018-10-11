@@ -4,13 +4,13 @@ rdflib==2.4.2
 reportlab==2.5
 python-dateutil<=1.9999
 python-magic==0.4.2
-http://inveniosoftware.org/download/python/pyRXP-1.16-daily-unix.tar.gz
+http://inveniosoftware.web.cern.ch/inveniosoftware/download/python/pyRXP-1.16-daily-unix.tar.gz
 numpy==1.7.0
 lxml==3.1.2
 mechanize==0.2.5
 python-Levenshtein==0.10.2
 PyStemmer==1.3.0
-http://inveniosoftware.org/download/python/py-editdist-0.3.tar.gz
+http://inveniosoftware.web.cern.ch/inveniosoftware/download/python/py-editdist-0.3.tar.gz
 feedparser==5.1.3
 BeautifulSoup==3.2.1
 beautifulsoup4==4.1.3

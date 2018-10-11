@@ -52,7 +52,8 @@ RUN yum update -y && \
                    texlive \
                    unzip \
                    w3m \
-                   wget && \
+                   wget \
+		   mlocate && \
     yum clean all
 
 # Installing Python prerequisites:
@@ -90,7 +91,7 @@ RUN echo "[supervisord]" > /etc/supervisord.conf && \
     echo "command=/etc/init.d/sendmail start" >> /etc/supervisord.conf && \
     echo "" >> /etc/supervisord.conf && \
     echo "[program:redis-server]" >> /etc/supervisord.conf && \
-    echo "command=/usr/sbin/redis-server /etc/redis.conf" >> /etc/supervisord.conf && \
+    echo "command=/usr/bin/redis-server /etc/redis.conf" >> /etc/supervisord.conf && \
     echo "" >> /etc/supervisord.conf && \
     echo "[program:mysqld]" >> /etc/supervisord.conf && \
     echo "command=/usr/bin/mysqld_safe" >> /etc/supervisord.conf && \
