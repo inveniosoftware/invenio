@@ -2106,7 +2106,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
         if bsu_f and len(bsu_f) < 2:
             if of.startswith("h"):
-                write_warning(_("There is no index %s.  Searching for %s in all fields." % (bsu_f, bsu_p)), req=req)
+                write_warning(_("There is no index %s.  Searching for %s in all fields." % (cgi.escape(repr(bsu_f)), cgi.escape(repr(bsu_p)))), req=req)
             bsu_f = ''
             bsu_m = 'w'
             if of.startswith("h") and verbose:
