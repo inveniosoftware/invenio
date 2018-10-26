@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2015 CERN.
+## Copyright (C) 2011, 2012, 2015, 2018 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -739,7 +739,10 @@ def _get_coauthors_bai(collabs, person_id):
 
     exclude_recs = None
     if collabs:
-        query = 'author:%s and (%s)' % (cid, ' or '.join([('collaboration:"%s"' % x) for x in zip(*collabs)[0]]))
+        if len(collabs) > 1:
+            query = 'author:%s and (%s)' % (cid, ' or '.join([('collaboration:"%s"' % x) for x in zip(*collabs)[0]]))
+        else:
+            query = 'author:%s and %s' % (cid, 'collaboration:"%s"' % collabs[0][0])
         exclude_recs = perform_request_search(rg=0, p=query)
 
     personids = get_coauthors_of_author(person_id, exclude_recs)
