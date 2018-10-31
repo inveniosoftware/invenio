@@ -16,6 +16,8 @@ are here for the interested.
     :maxdepth: 2
     :name: mastertoc
 
+    maintenance-policy
+    v3.0.1
     v3.0.0
     v2
     v1

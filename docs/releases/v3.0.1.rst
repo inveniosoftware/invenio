@@ -1,0 +1,68 @@
+..
+    This file is part of Invenio.
+    Copyright (C) 2018 CERN.
+
+    Invenio is free software; you can redistribute it and/or modify it
+    under the terms of the MIT License; see LICENSE file for more details.
+
+Version 3.0.1
+=============
+
+Invenio v3.0.1 fixes several bugs in Invenio v3.0.0.
+
+Bug fixes
+---------
+
+- **Invenio-Access:** Fixed bug with the ``any_user``-need not being provided
+  by the anonymous identity.
+
+- **Invenio-App:** Fixed compatibility issue with latest release of
+  Flask-Talisman.
+
+- **Invenio-DB:** Fixed a compatibility issue with newly released
+  SQLAlchemy-Continiuum.
+
+- **Invenio-Search:** Fixed a compatibility issue with
+  elasticsearch-dsl>=6.2.0.
+
+- **Pytest-Invenio:** Fixed a problem which caused Invenio modules to be loaded
+  despite the related test fixtures not being used, thus causing import errors
+  if the module was not installed.
+
+- **Pytest-Invenio:** Fixed a compatibility issue with pytest v3.8.1+.
+
+- **Pytest-Invenio:** Fixed a problem with the Content-Security-Policy (CSP) in
+  the default test application.
+
+Enhancements
+------------
+
+- **Invenio:** Added documentation section on building data models.
+
+- **Invenio-App:** Added more relaxed Content Security Policy (CSP) when in
+  DEBUG mode to allow usage of Flask-DebugToolbar.
+
+- **Invenio-App:** Added support for loading multiple configuration modules
+  from the ``invenio_config.module``-entry point group instead of only one
+  module. The configuration modules are loaded in alphabetical ascending order
+  based on the entry point name.
+
+- **Invenio-Indexer:** Fixed issue that prevented configuration of the bulk
+  indexing parameters sent to Elasticsearch.
+
+- **Invenio-Records-REST:** Added support for permission checking on the search
+  REST API endpoint (e.g. ``/api/records/``).
+
+- **Invenio-Search:** Added a new configuration variable
+  ``SEARCH_RESULTS_MIN_SCORE`` to control minimum score needed in order to
+  include a document in a result set.
+
+- **Invenio-Search:** Added a new configuration variable
+  ``SEARCH_CLIENT_CONFIG`` to allow control over Elasticsearch connection
+  properties such as timeout and connection class.
+
+
+Maintenance policy
+------------------
+Invenio v3.0 will be supported with bug and security fixes until the release of
+Invenio v3.2 and minimum until 2019-06-07.

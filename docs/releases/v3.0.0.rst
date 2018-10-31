@@ -155,7 +155,7 @@ Maintenance policy
 ------------------
 
 Invenio v3.0 will be supported with bug and security fixes until the release of
-Invenio v3.2 and minimum one year.
+Invenio v3.2 and minimum until 2019-06-07.
 
 We aim at one Invenio release with new features every 6 months. We expect
 upgrades between minor versions (e.g. v3.1 to v3.2) to be fairly
