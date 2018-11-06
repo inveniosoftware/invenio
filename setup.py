@@ -32,12 +32,12 @@ extras_require = {
     # Bundles
     'base': [
         'invenio-admin>=1.0.0,<1.1.0',
-        'invenio-assets>=1.0.0,<1.1.0',
+        'invenio-assets>=1.1.0,<1.2.0',
         'invenio-formatter>=1.0.1,<1.1.0',
         'invenio-logging>=1.0.0,<1.1.0',
         'invenio-mail>=1.0.1,<1.1.0',
         'invenio-rest>=1.0.0,<1.1.0',
-        'invenio-theme>=1.0.0,<1.1.0',
+        'invenio-theme>=1.1.0,<1.2.0',
     ],
     'auth': [
         'invenio-access>=1.0.2,<1.1.0',
@@ -54,7 +54,7 @@ extras_require = {
         'invenio-records-rest>=1.2.1,<1.3.0',
         'invenio-records-ui>=1.0.1,<1.1.0',
         'invenio-records>=1.0.0,<1.1.0',
-        'invenio-search-ui>=1.0.1,<1.1.0',
+        'invenio-search-ui>=1.1.0,<1.2.0',
     ],
     # Database version
     'postgresql': [
@@ -101,7 +101,7 @@ install_requires = [
     'invenio-base>=1.0.1,<1.1.0',
     'invenio-celery>=1.0.0,<1.1.0',
     'invenio-config>=1.0.1,<1.1.0',
-    'invenio-i18n>=1.0.0,<1.1.0',
+    'invenio-i18n>=1.1.0,<1.2.0',
 ]
 
 packages = find_packages()
