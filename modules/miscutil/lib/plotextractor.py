@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2018 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -550,7 +550,7 @@ def extract_context(tex_file, extracted_image_data):
         new_image_data.append((image, caption, label, context_list))
     return new_image_data
 
-def extract_captions(tex_file, sdir, image_list, primary=True):
+def extract_captions(tex_file, sdir, image_list, level=0):
     """
     Take the TeX file and the list of images in the tarball (which all,
     presumably, are used in the TeX file) and figure out which captions
@@ -561,7 +561,7 @@ def extract_captions(tex_file, sdir, image_list, primary=True):
         the images
     @param: sdir (string): path to current sub-directory
     @param: image_list (list): list of images in tarball
-    @param: primary (bool): is this the primary call to extract_caption?
+    @param: level (int): nesting level of includes, recursion of extract_caption
 
     @return: images_and_captions_and_labels ([(string, string, list),
         (string, string, list), ...]):
@@ -607,7 +607,7 @@ def extract_captions(tex_file, sdir, image_list, primary=True):
     active_label = ""
 
     # cut out shit before the doc head
-    if primary:
+    if level == 0:
         for line_index in range(len(lines)):
             if lines[line_index].find(doc_head) < 0:
                 lines[line_index] = ''
@@ -758,11 +758,11 @@ def extract_captions(tex_file, sdir, image_list, primary=True):
             for new_tex_name in new_tex_names:
                 if new_tex_name != 'ERROR':
                     new_tex_file = get_tex_location(new_tex_name, tex_file)
-                    if new_tex_file != None and primary: #to kill recursion
+                    if new_tex_file != None and level < 2: #to kill recursion
                         extracted_image_data.extend(extract_captions(\
                                                       new_tex_file, sdir, \
                                                       image_list,
-                                                      primary=False))
+                                                      level=level+1))
 
         """PICTURE"""
 
