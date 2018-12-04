@@ -26,11 +26,9 @@ to see a summary of the TODOs again:
 
 Let's have a look at some of them one-by-one and explain what they are for:
 
-# we may not need 1. if we use pipenv
-
-2. Python packages require a ``MANIFEST.in`` which specifies what files are
+1. Python packages require a ``MANIFEST.in`` which specifies what files are
    part of the distributed package. You can update the existing file by running
-   the following commands:
+   the following commands in your site directory:
 
    .. code-block:: console
 
@@ -38,9 +36,9 @@ Let's have a look at some of them one-by-one and explain what they are for:
       $ git add --all
       $ pipenv install --editable .[all]
       $ pipenv shell  # activate the virtual environment
-      (my-site-<random-hash>)$ check-manifest --update
+      (my-site-venv)$ check-manifest --update
 
-3. Translations configuration (``.tx/config``): You might also want to generate
+2. Translations configuration (``.tx/config``): You might also want to generate
    the necessary files to allow localization of the instance in different
    languages via the `Transifex platform <https://www.transifex.com/>`_:
 
@@ -48,9 +46,9 @@ Let's have a look at some of them one-by-one and explain what they are for:
 
       # if you have activated the virtual environment skip `pipenv shell`
       $ pipenv shell
-      (my-site-<random-hash>)$ python setup.py extract_messages
-      (my-site-<random-hash>)$ python setup.py init_catalog -l en
-      (my-site-<random-hash>)$ python setup.py compile_catalog
+      (my-site-venv)$ python setup.py extract_messages
+      (my-site-venv)$ python setup.py init_catalog -l en
+      (my-site-venv)$ python setup.py compile_catalog
 
    Ensure project has been created on Transifex under the my-repository
    organisation.
@@ -59,21 +57,21 @@ Let's have a look at some of them one-by-one and explain what they are for:
 
    .. code-block:: console
 
-      (my-site-<random-hash>)$ pipenv install transifex-client
+      (my-site-venv)$ pipenv install transifex-client
 
    Push source (.pot) and translations (.po) to Transifex:
 
    .. code-block:: console
 
       # getting: tx ERROR: not enough values to unpack (expected 2, got 1)
-      (my-site-<random-hash>)$ tx push --skip --translations
+      (my-site-venv)$ tx push --skip --translations
 
    Pull translations for a single language from Transifex
 
    .. code-block:: console
 
       # same error here
-      (my-site-<random-hash>)$ tx pull --language en
+      (my-site-venv)$ tx pull --language en
 
 Testing
 ^^^^^^^
@@ -88,10 +86,10 @@ In order to run tests for the instance, you can run:
   $ pipenv install --editable .[tests]
   # if you have activated the virtual environment skip `pipenv shell`
   $ pipenv shell
-  (my-site-<random-hash>)$ ./run-tests.sh  # will run all the tests...
+  (my-site-venv)$ ./run-tests.sh  # will run all the tests...
   # ...or to run individual tests
   # ERROR: not found: /home/dinos/invenio/my-site/tests/ui/test_views.py::test_ping
-  (my-site-<random-hash>)$ pytest tests/ui/test_views.py
+  (my-site-venv)$ pytest tests/ui/test_views.py
 
 Documentation
 ^^^^^^^^^^^^^
@@ -106,6 +104,6 @@ In order to build and preview the instance's documentation, you can run the
   $ pipenv install --editable .[docs]
   # if you have activated the virtual environment skip `pipenv shell`
   $ pipenv shell
-  (my-site-<random-hash>)$ python setup.py build_sphinx
+  (my-site-venv)$ python setup.py build_sphinx
 
 Open up ``docs/_build/html/index.html`` in your browser to see the documentation.
