@@ -131,20 +131,20 @@ Now, go into the root directory of your module, and run
 
 .. code-block:: bash
 
-    git remote add origin URL-OF-YOUR-GITHUB-REPO
+    $ git remote add origin URL-OF-YOUR-GITHUB-REPO
 
 Now, we can commit and push the generated files:
 
 .. code-block:: bash
 
-    git commit -am "Initial module structure"
-    git push --set-upstream origin master
+    $ git commit -am "Initial module structure"
+    $ git push --set-upstream origin master
 
 Finally, we create a new branch to develop on it
 
 .. code-block:: bash
 
-    git checkout -b dev
+    $ git checkout -b dev
 
 Next Step
 ---------
