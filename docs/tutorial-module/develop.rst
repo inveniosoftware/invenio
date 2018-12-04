@@ -305,23 +305,19 @@ In ``my-datamodel/my-datamodel/jsonschemas/records/custom-record-v1.0.0.json``
 Demo time
 ---------
 
-Let's now see our Invenio module in action when integrated with our Invenio
-instance.
+Let's now see our Invenio module in action when integrated with our Invenio instance.
 
-First we install our new Invenio-Unicorn module. For the purposes of this guide,
-our instance folder is `my-site`, and it's placed in the same root folder as
-`invenio-unicorn`.
+First we install our new Invenio-Unicorn module:
 
 .. code-block:: console
 
-    $ workon my-repository-venv
-    (my-repository-venv)$ pip install --editable .[all]
+    $ pipenv install --editable .[all]
 
 Then, if you've followed the steps in the Quickstart guide, you can go to the
 instance folder, `my-repository`, and start the ``server`` script:
 
-    (my-repository-venv)$ cd ../my-site
-    (my-repository-venv)$ ./scripts/server
+    $ cd ../my-site
+    $ pipenv run ./scripts/server
 
 Then go to ``http://localhost:5000/create`` and you will see the form we just
 created. There are two fields ``Title`` and ``Description``.
