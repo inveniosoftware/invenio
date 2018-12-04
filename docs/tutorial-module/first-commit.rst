@@ -16,9 +16,9 @@ To do so, we will first list our changes and add them to our local git repositor
 
 .. code-block:: console
 
-    (my-module-venv)$ git status
+    $ git status
     # shows all the files that have been modified
-    (my-module-venv)$ git add .
+    $ git add .
     # adds all the modifications
 
 Let's test our changes before we publish them. See :ref:`run-the-tests` for
@@ -26,14 +26,14 @@ more information.
 
 .. code-block:: console
 
-    (my-module-venv)$ ./run-tests.sh
+    $ pipenv run ./run-tests.sh
 
 If it complains about the manifest, it is because we added new files, but we
 didn't register them into the ``MANIFEST.in`` file, so let's do so:
 
 .. code-block:: console
 
-    (my-module-venv)$ check-manifest -u
+    $ pipenv run check-manifest -u
 
 Push the code
 -------------
@@ -42,5 +42,5 @@ a branch created locally, we need to push the branch on GitHub:
 
 .. code-block:: console
 
-    (my-module-venv)$ git commit -am "New form, views and templates"
-    (my-module-venv)$ git push --set-upstream origin dev
+    $ git commit -am "New form, views and templates"
+    $ git push --set-upstream origin dev
