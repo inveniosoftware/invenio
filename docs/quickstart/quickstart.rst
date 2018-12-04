@@ -48,14 +48,19 @@ it as a user package or in the virtualenv we define below.
 
   # Install cookiecutter if it is not already installed
   $ sudo apt-get install cookiecutter
+  $ sudo apt-get install pipenv
 
 Now, let's scaffold the instance using the `official cookiecutter template
 <https://github.com/inveniosoftware/cookiecutter-invenio-instance>`_.
 
 .. code-block:: shell
 
-  $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance --checkout v3.0
+  $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance --checkout v3.1
   # ...fill in the fields...
+
+.. note::  The cookiecutter script will ask you to resolve some TODOs. They are not required for quick start and you
+   can leave TODOs until you follow the :ref:`next_steps` section of this tutorial.
+
 
 Now that we have our instance's source code ready we can proceed with the
 initial setup of the services and dependencies of the project:
@@ -72,7 +77,8 @@ initial setup of the services and dependencies of the project:
   Creating mysite_mq_1    ... done
 
 If the Elasticsearch service fails to start mentioning that it requires more virtual memory,
-see the following fix <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-prod-mode>`_.
+see the following `fix <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-prod-mode>`_.
+
 
 .. _customize:
 
@@ -87,16 +93,26 @@ instance we will use the `official data model cookiecutter template
 .. code-block:: shell
 
   $ cd ..  # switch back to the parent directory
-  $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-datamodel --checkout v3.0
+  $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-datamodel --checkout v3.1
   # ...fill in the fields...
 
 For the purposes of this guide, our data model folder is `my-datamodel`.
 
-Let's also install the data model in our virtualenv:
+Let's also install the data model in our virtualenv (the virtualenv will be created in your current directory):
 
 .. code-block:: shell
 
   $ pipenv install -e ./my-datamodel
+
+
+To activate the virtualenv of the new project, run:
+
+.. code-block:: shell
+
+  $ pipenv shell
+
+.. note:: If you have a trouble with creating the virtualenv by pipenv, you can first create the virtualenv, and then
+   run pipenv commands in the created virtual environment.
 
 Now that we have a data model installed we can create database tables and
 Elasticsearch indices:
