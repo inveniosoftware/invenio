@@ -15,11 +15,10 @@ Create, Display, Search Records
 
 Create a record
 ---------------
-
-By default, the data model has a records REST API endpoint configured, which
-allows performing CRUD and search operations over records. Let's create a
-simple record via ``curl``, by sending a ``POST`` request to ``/api/records`` with
-some sample data:
+By default, the toy data model has a records REST API endpoint configured,
+which allows performing CRUD and search operations over records. Let's create a
+simple record via ``curl``, by sending a ``POST`` request to ``/api/records``
+with some sample data:
 
 .. code-block:: shell
 
@@ -28,7 +27,8 @@ some sample data:
       --data '{"title":"Some title", "contributors": [{"name": "Doe, John"}]}' \
       https://localhost:5000/api/records/?prettyprint=1
 
-When the request was successful, the server returns the details of the created record:
+When the request was successful, the server returns the details of the created
+record:
 
 .. code-block:: shell
 
@@ -109,6 +109,11 @@ API from the ``/api/records`` endpoint:
 
   {
     "aggregations": {
+      "keywords": {
+        "buckets": [],
+        "doc_count_error_upper_bound": 0,
+        "sum_other_doc_count": 0
+      },
       "type": {
         "buckets": [],
         "doc_count_error_upper_bound": 0,
@@ -142,3 +147,7 @@ API from the ``/api/records`` endpoint:
       "self": "https://localhost:5000/api/records/?size=10&sort=mostrecent&page=1"
     }
   }
+
+Continue tutorial
+~~~~~~~~~~~~~~~~~
+:ref:`next-steps`

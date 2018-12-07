@@ -21,36 +21,29 @@ configured on your system:
 - `Docker <https://docs.docker.com/install>`_ and `Docker Compose <https://docs.docker.com/compose/install/>`_
 - `NodeJS v6.x+ and NPM v4.x+ <https://nodejs.org/en/download/package-manager>`_
 - `Enough virtual memory <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-prod-mode>`_
-  for Elasticsearch.
+  for Elasticsearch (when running in Docker).
+- `Cookiecutter <https://cookiecutter.readthedocs.io>`_
+- `Pipenv <https://pipenv.readthedocs.io>`_
 
-Overview
---------
-Creating your own Invenio instance requires scaffolding two code repositories
-using `Cookiecutter <https://cookiecutter.readthedocs.io/en/latest/installation.html>`_:
-
-- one code repository for the main website.
-- one code repository for the data model.
-
-These code repositories will be where you customize and develop the features of
-your instance.
-
-.. _bootstrap:
-
-Bootstrap
----------
-
-Before we begin, you want to make sure to have Cookiecutter installed. Invenio
-leverages this tool to generate the starting boilerplate for different
-components, so it will be useful to have in general. We recommend you install
-it as a user package or in the virtualenv we define below.
+Invenio uses Cookiecutter to scaffold the boilerplate for your new instance and
+uses Pipenv to manage Python dependencies in a virtual environment. Above links
+contain detailed installation instructions, but the impatient can use following
+commands:
 
 .. code-block:: shell
 
   # Install cookiecutter if it is not already installed
   $ sudo apt-get install cookiecutter
   $ sudo apt-get install pipenv
+  # or e.g.
+  $ pip install --upgrade cookiecutter pipenv
 
-Now, let's scaffold the instance using the `official cookiecutter template
+.. _bootstrap:
+
+Scaffold
+--------
+First step is to scaffold a new instance using the `official Invenio
+cookiecutter template
 <https://github.com/inveniosoftware/cookiecutter-invenio-instance>`_.
 
 .. code-block:: shell
@@ -58,80 +51,61 @@ Now, let's scaffold the instance using the `official cookiecutter template
   $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance --checkout v3.1
   # ...fill in the fields...
 
-.. note::  The cookiecutter script will ask you to resolve some TODOs. They are not required for quick start and you
-   can leave TODOs until you follow the :ref:`next_steps` section of this tutorial.
+Note, the cookiecutter script will ask you to resolve some TODOs. These will
+be covered in the :ref:`next-steps` section of this quick start guide.
 
+The scaffolded instance comes by default with a toy example data model to help
+you get started.
 
+Install
+-------
 Now that we have our instance's source code ready we can proceed with the
 initial setup of the services and dependencies of the project:
 
+First, fire up the database, Elasticsearch, Redis and RabbitMQ:
+
 .. code-block:: shell
 
-  # Fire up the database, Elasticsearch, Redis and RabbitMQ
   $ cd my-site/
   $ docker-compose up -d
-  Creating network "mysite_default" with the default driver
   Creating mysite_cache_1 ... done
   Creating mysite_db_1    ... done
   Creating mysite_es_1    ... done
   Creating mysite_mq_1    ... done
 
-If the Elasticsearch service fails to start mentioning that it requires more virtual memory,
-see the following `fix <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-prod-mode>`_.
+If the Elasticsearch service fails to start mentioning that it requires more
+virtual memory, see the following
+`fix <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-prod-mode>`_.
 
-
-.. _customize:
-
-Customize
----------
-
-This instance doesn't have a data model defined, and thus it doesn't include
-any records you can search and display. To scaffold a data model for the
-instance we will use the `official data model cookiecutter template
-<https://github.com/inveniosoftware/cookiecutter-invenio-datamodel>`_:
-
-.. code-block:: shell
-
-  $ cd ..  # switch back to the parent directory
-  $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-datamodel --checkout v3.1
-  # ...fill in the fields...
-
-For the purposes of this guide, our data model folder is `my-datamodel`.
-
-Let's also install the data model in our virtualenv (the virtualenv will be created in your current directory):
-
-.. code-block:: shell
-
-  $ pipenv install -e ./my-datamodel
-
-
-To activate the virtualenv of the new project, run:
+Next, activate the virtualenv of the new project by running:
 
 .. code-block:: shell
 
   $ pipenv shell
 
-.. note:: If you have a trouble with creating the virtualenv by pipenv, you can first create the virtualenv, and then
-   run pipenv commands in the created virtual environment.
-
-Now that we have a data model installed we can create database tables and
-Elasticsearch indices:
+Finally, install all dependencies, build the JS/CSS assets, create the database
+tables and create the Elasticsearch indices by running the bootstrap and setup
+scripts:
 
 .. code-block:: shell
 
-  $ cd my-site
-  $ ./scripts/bootstrap
-  $ ./scripts/setup
+  (my-site)$ ./scripts/bootstrap
+  (my-site)$ ./scripts/setup
 
 Run
 ---
-You can now run the necessary processes for the instance:
+You can now start the development web server and the background worker for your
+new Invenio instance:
 
 .. code-block:: shell
 
-  $ ./scripts/server
+  (my-site)$ ./scripts/server
   * Environment: development
   * Debug mode: on
   * Running on https://127.0.0.1:5000/ (Press CTRL+C to quit)
 
 You can now visit https://127.0.0.1:5000/ !
+
+Continue tutorial
+~~~~~~~~~~~~~~~~~
+:ref:`crud-operations`
