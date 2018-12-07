@@ -5,6 +5,8 @@
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
+.. _build-data-model:
+
 Build a data model
 ==================
 An Invenio data model, a bit simply put, defines *a record type*. You can also
@@ -55,6 +57,8 @@ scaffolded data model package:
     |-- setup.py
     `-- tests
         |-- ...
+
+If you decided to integrate the data model inside your instance the model will be under `records` directory.
 
 Building a data model involves the following tasks:
 
