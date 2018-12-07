@@ -269,7 +269,7 @@ In ``invenio_unicorn/utils.py``
 As you can see, our records use a custom schema. To define and use this schema,
 we need to write the ``custom-record-v1.0.0.json`` inside the ``records``
 folder of your data model project (``my-datamodel`` from the Quickstart
-tutorial :ref:`customize`).
+tutorial :ref:`build-data-model`).
 
 In ``my-datamodel/my-datamodel/jsonschemas/records/custom-record-v1.0.0.json``
 

@@ -17,7 +17,7 @@ deployed to a production environment.
 
 You may have noticed that after running the ``cookiecutter`` command for the
 instance and the data model, there was a note for checking out some of the
-TODOs. You can run the following command in each code repository directory
+TODOs. You can run the following command in the code repository directory
 to see a summary of the TODOs again:
 
 .. code-block:: console
@@ -32,11 +32,9 @@ Let's have a look at some of them one-by-one and explain what they are for:
 
    .. code-block:: console
 
-      $ git init
-      $ git add --all
-      $ pipenv install --editable .[all]
-      $ pipenv shell  # activate the virtual environment
-      (my-site-venv)$ check-manifest --update
+      (my-site)$ git init
+      (my-site)$ git add --all
+      (my-site)$ check-manifest --update
 
 2. Translations configuration (``.tx/config``): You might also want to generate
    the necessary files to allow localization of the instance in different
@@ -46,64 +44,53 @@ Let's have a look at some of them one-by-one and explain what they are for:
 
       # if you have activated the virtual environment skip `pipenv shell`
       $ pipenv shell
-      (my-site-venv)$ python setup.py extract_messages
-      (my-site-venv)$ python setup.py init_catalog -l en
-      (my-site-venv)$ python setup.py compile_catalog
+      (my-site)$ python setup.py extract_messages
+      (my-site)$ python setup.py init_catalog -l en
+      (my-site)$ python setup.py compile_catalog
 
-   Ensure project has been created on Transifex under the my-repository
-   organisation.
+   **Transifex**
+
+   Make sure you edit ``.tx/config`` and sign-up for Transifex before trying
+   below steps.
 
    Install the transifex-client
 
    .. code-block:: console
 
-      (my-site-venv)$ pipenv install transifex-client
+      (my-site)$ pipenv install transifex-client
 
    Push source (.pot) and translations (.po) to Transifex:
 
    .. code-block:: console
 
-      # getting: tx ERROR: not enough values to unpack (expected 2, got 1)
-      (my-site-venv)$ tx push --skip --translations
+      (my-site)$ tx push --skip --translations
 
    Pull translations for a single language from Transifex
 
    .. code-block:: console
 
-      # same error here
-      (my-site-venv)$ tx pull --language en
+      (my-site)$ tx pull --language en
 
 Testing
 ^^^^^^^
-
 In order to run tests for the instance, you can run:
 
 .. code-block:: shell
 
-  # Install testing dependencies
-  # The following makes sure you have the tests dependencies installed
-  # if you already installed the instance via .[all] you can skip this install
-  $ pipenv install --editable .[tests]
-  # if you have activated the virtual environment skip `pipenv shell`
-  $ pipenv shell
-  (my-site-venv)$ ./run-tests.sh  # will run all the tests...
+  # run all the tests...
+  (my-site)$ ./run-tests.sh
   # ...or to run individual tests
-  # ERROR: not found: /home/dinos/invenio/my-site/tests/ui/test_views.py::test_ping
-  (my-site-venv)$ pytest tests/ui/test_views.py
+  (my-site)$ pytest tests/test_version.py
 
 Documentation
 ^^^^^^^^^^^^^
 
 In order to build and preview the instance's documentation, you can run the
-`setup.py build_sphinx` command:
+`python setup.py build_sphinx` command:
 
 .. code-block:: shell
 
-  # The following makes sure you have the docs dependencies installed
-  # if you already installed the instance via .[all] you can skip this install
-  $ pipenv install --editable .[docs]
-  # if you have activated the virtual environment skip `pipenv shell`
-  $ pipenv shell
-  (my-site-venv)$ python setup.py build_sphinx
+  (my-site)$ python setup.py build_sphinx
 
-Open up ``docs/_build/html/index.html`` in your browser to see the documentation.
+Open up ``docs/_build/html/index.html`` in your browser to see the
+documentation.
