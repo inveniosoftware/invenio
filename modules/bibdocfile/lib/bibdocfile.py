@@ -3874,9 +3874,12 @@ def download_external_url(url, docformat=None):
     from_file, to_file, tmppath = None, None, ''
 
     try:
-        while r.get('hostname_cache.%s' % hostname):
-            # We have accessed this host within the last 2 seconds
-            time.sleep(2)
+        if hostname == CFG_LABS_HOSTNAME:
+            time.sleep(0.1)
+        else:
+            while r.get('hostname_cache.%s' % hostname):
+                # We have accessed this host within the last 2 seconds
+                time.sleep(2)
         from_file = open_url(url)
     except InvenioBibdocfileUnauthorizedURL, e:
         raise StandardError, str(e)
