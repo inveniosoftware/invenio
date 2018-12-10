@@ -10,11 +10,17 @@
 .. toctree::
     :maxdepth: 2
 
+    general/index.rst
     quickstart/index.rst
-    datamodel/build-a-datamodel
-    tutorial-module/index
-    invenio-modules.rst
-    application-architecture.rst
+    tutorials/build-a-repository.rst
+    tutorials/build-a-datamodel.rst
+    tutorials/build-a-module.rst
+    tutorials/developing-with-invenio.rst
+    tutorials/managing-access.rst
+    architecture/infrastructure.rst
+    architecture/application.rst
+    deployment/securing-your-instance.rst
+    deployment/monitoring.rst
     migrating.rst
     orcid-login.rst
     history.rst
