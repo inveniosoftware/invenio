@@ -15,9 +15,6 @@
 .. image:: https://img.shields.io/travis/inveniosoftware/invenio.svg
         :target: https://travis-ci.org/inveniosoftware/invenio
 
-.. image:: https://img.shields.io/coveralls/inveniosoftware/invenio.svg
-        :target: https://coveralls.io/r/inveniosoftware/invenio
-
 .. image:: https://badges.gitter.im/Join%20Chat.svg
     :target: https://gitter.im/inveniosoftware/invenio
 
