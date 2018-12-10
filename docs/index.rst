@@ -13,7 +13,7 @@
     general/index.rst
     quickstart/index.rst
     tutorials/build-a-repository.rst
-    tutorials/build-a-datamodel.rst
+    tutorials/understanding-datamodels.rst
     tutorials/build-a-module.rst
     tutorials/developing-with-invenio.rst
     tutorials/managing-access.rst
