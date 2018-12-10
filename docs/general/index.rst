@@ -14,3 +14,4 @@ Overview
    introduction.rst
    bundles.rst
    requirements.rst
+   getting-help.rst

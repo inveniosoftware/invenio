@@ -5,6 +5,4 @@
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
-.. _getting-help:
-
-.. include:: _getting-help.rst
+.. include:: ../community/_getting-help.rst
