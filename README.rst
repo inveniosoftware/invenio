@@ -12,8 +12,14 @@
 
 **Open Source framework for large-scale digital repositories.**
 
+.. image:: https://img.shields.io/pypi/v/invenio.svg
+    :target: https://pypi.org/project/invenio/
+
+.. image:: https://img.shields.io/github/license/inveniosoftware/invenio.svg
+    :target: https://github.com/inveniosoftware/invenio/blob/master/LICENSE
+
 .. image:: https://travis-ci.org/inveniosoftware/invenio.svg?branch=master
-        :target: https://travis-ci.org/inveniosoftware/invenio
+    :target: https://travis-ci.org/inveniosoftware/invenio
 
 .. image:: https://badges.gitter.im/Join%20Chat.svg
     :target: https://gitter.im/inveniosoftware/invenio
