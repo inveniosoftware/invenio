@@ -5,8 +5,8 @@
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
-Build a data model
-==================
+Understanding datamodels
+========================
 An Invenio data model, a bit simply put, defines *a record type*. You can also
 think of a data model as a supercharged database table.
 
@@ -67,8 +67,21 @@ Building a data model involves the following tasks:
 - Choose a persistent identifier scheme.
 - Configure the REST API and UI.
 
+Internal vs External representation:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The above mentioned tasks can be divided into two: Internal and external representation. 
+
+The two first ones, JSONSchemas and Elasticsearch mappings, correspond to the internal representation of the data. JSONSchemas are used to validate the data, verifying that it matches the Elasticsearch mapping. These last ones are used to specify the format in which the data is stored in Elasticsearch.
+
+Loaders and serializers do their part on the external representation. The firts ones transform the data received into the internal representation, whereas the serializers do the opposite, they transform the data from its internal representation into the external one. It is recommended to use ``Marshamallow`` to implement the loaders and serializers.
+
+Internal representation
+-----------------------
+Let's start by the internal representation of the records: JSONSchemas and ES mappings. 
+
 Define a JSONSchema
--------------------
+^^^^^^^^^^^^^^^^^^^
 Internally records are stored as JSON, and in order to validate the structure of
 the stored JSON you must write a `JSONSchema <http://json-schema.org>`_.
 
@@ -138,7 +151,7 @@ group ``invenio_jsonschemas.schemas``:
     the ``jsonschemas`` folder, in which case the entry point won't work.
 
 Define an Elasticsearch mapping
--------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 In order to make records searchable, the records need to be indexed in
 Elasticsearch. Similarly to the JSONSchema that allows you to validate the
 structure of the JSON, you need to define an *Elasticsearch mapping*, that
@@ -194,14 +207,15 @@ structure of the JSON, but also how it should be indexed.
 
 For instance, in the above example the ``title`` field is of type ``text``,
 which applies stemming when searching, whereas the ``keywords`` field is of
-type ``keyword``, which means no stemming is applied. The mapping also allows
-you to define e.g. that a ``lat`` and a ``lon`` field are in fact geographical
-coordinates, and enable geospatial queries over your records.
+type ``keyword``, which means no stemming is applied, therefore, this field
+is searched based on exacth match. The mapping also allows you to define e.g.
+that a ``lat`` and a ``lon`` field are in fact geographical coordinates, and
+enable geospatial queries over your records.
 
 .. _naming-schemas-mappings:
 
 Naming JSONSchemas and mappings
--------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 You may already have noticed that both JSONSchemas and Elasticsearch mappings
 are using the same folder structure and naming scheme:
 
@@ -304,8 +318,12 @@ Note, that the left-hand-side of the entry point,
     the ``mappings``, ``v5`` and ``v6`` folders, in which case the entry points
     won't be correctly discovered.
 
+External representation
+-----------------------
+As it was mentioned before there was an external and an internal representation. This is how the data will be parsed from user input and how it will be shown back to them. As it can be seen, both serializers and loaders depend on ``Marshmallow`` schemas. It is not mandatory to use it but it is **highly advised**. However, you can create your own if the given ones do not fit your data model.
+
 Define a Marshmallow schema
----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 `Marhsmallow <https://marshmallow.readthedocs.io/en/3.0/index.html>`_ is a
 Python library that helps you write highly advanced
 serialization/deserialization/validation rules for your input/output data.
@@ -361,7 +379,7 @@ schemas. There's however good reasons:
   form validation).
 
 Define serializers
-------------------
+^^^^^^^^^^^^^^^^^^^
 Think of serializers as the definition of your output formats for records. The
 serializers are responsible for transforming the internal JSON for a record
 into some external representation (e.g. another JSON format or XML).
@@ -419,7 +437,7 @@ You can see examples of the output from the two response serializers in
 the Quickstart section: :ref:`display-a-record` and :ref:`search-for-records`.
 
 Define loaders
---------------
+^^^^^^^^^^^^^^
 Think of loaders as the definition of your input formats for records. You only
 need loaders if you plan to allow creation of records via the REST API.
 
