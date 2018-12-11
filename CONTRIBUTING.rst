@@ -12,7 +12,7 @@ If we remember that, our :ref:`code-of-conduct` will come naturally.
 
 .. rubric:: Get in touch
 
-See :ref:`getting-help` and :ref:`communication-channels`. Don't hesitate
+See :ref:`Link <getting-help>` and :ref:`communication-channels`. Don't hesitate
 to get in touch with the Invenio maintainers. The maintainers can help you kick
 start your contribution.
 
@@ -24,7 +24,7 @@ Report bugs
 - **Found a bug? Want a new feature?** Open a GitHub issue on the applicable
   repository and get the conversation started (do search if the issue has
   already been reported). Not sure exactly where, how, or what to do?
-  See :ref:`getting-help`.
+  See :ref:`Link <getting-help>`.
 
 - **Found a security issue?** Alert us privately at
   `info@inveniosoftware.org <info@inveniosoftware.org>`_, this will allow us to
