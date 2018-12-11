@@ -78,10 +78,31 @@ The next step, is to index it in Elasticsearch so the record can be searched. Th
 
 So far, the record has been loaded (deserialized), minted, persisted and indexed. Therefore, it is only missing the las step: `serialization`. This operation is carried out by the **serializer**. In this case, the `json_v1_response <https://github.com/inveniosoftware/invenio-records-rest/blob/master/invenio_records_rest/serializers/__init__.py#L20>`_ is configured as serializer for responses. It will apply the corresponding `Marshmallow` schema and send the created record in the HTTP reponse with code 201.
 
-
 Reading a record
 ----------------
 
+In the following flowchart, the process that a record goes through upon creation is shown:
+
+.. image:: ../_static/diagrams/read_record.png
+    :align: center
+    :scale: 80%
+
+`Note: If it is not displayed correctly click on it to be able to zoom in.`
+
+The process to read a record is a bit more simple than the that of cration explained above. In order to keep with the previous example, we would perform a GET operation:
+
+.. code-block:: shell
+
+    curl -k --header "Content-Type: application/json" \
+        https://localhost:5000/api/records/1?prettyprint=1
+
+This will hit the `item_route (/records/<pid(recid):pid_value>) <https://github.com/inveniosoftware/invenio-records-rest/blob/master/invenio_records_rest/views.py#L692>`_ of the REST API.
+
+The next step is to obtain the record from the PID (`recid`) given in the URL. This is done by the **resolver**. Whose maps the given persistent identifier to an object in the database, and returns it.
+
+Afterwards, it has to be checked if the user has permissions to read the requested record, by default all authenticated users are allowed. You can see more about access control in `TODO <Point to Access section>`.
+
+Finally the record will be **serialized**. As before, the `json_v1_response <https://github.com/inveniosoftware/invenio-records-rest/blob/master/invenio_records_rest/serializers/__init__.py#L20>`_ is configured as serializer for responses. It will apply the corresponding `Marshmallow` schema and send the created record in the HTTP reponse with code 200.
 
 Next steps
 ----------
