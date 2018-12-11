@@ -73,12 +73,13 @@ Building a data model involves the following tasks:
 
 Internal vs External representation:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The tasks listed above can be divided in two categories, ones that affect the internal representation of records and ones that affect the external representation.
 
-The above mentioned tasks can be divided into two: Internal and external representation.
+The first two, where the JSONSchema and Elasticsearch mappings are defined, correspond to the internal representation of the data/records. JSONSchemas are used to validate the data, verifying that it matches the Elasticsearch mapping. The latter are used to specify the format in which the data is stored in Elasticsearch.
 
-The two first ones, JSONSchemas and Elasticsearch mappings, correspond to the internal representation of the data. JSONSchemas are used to validate the data, verifying that it matches the Elasticsearch mapping. These last ones are used to specify the format in which the data is stored in Elasticsearch.
+Loaders and serializers do their part on the external representation. The first ones transform the data received into the internal representation, whereas the serializers do the opposite, they transform the data from its internal representation into the external one. It is recommended to use ``Marshmallow`` to implement the loaders and serializers, how to do it is explained in `Define a Marshmallow schema`_.
 
-Loaders and serializers do their part on the external representation. The firts ones transform the data received into the internal representation, whereas the serializers do the opposite, they transform the data from its internal representation into the external one. It is recommended to use ``Marshamallow`` to implement the loaders and serializers.
+Specific examples for each one of them are given in the following sections.
 
 Internal representation
 -----------------------
@@ -212,7 +213,7 @@ structure of the JSON, but also how it should be indexed.
 For instance, in the above example the ``title`` field is of type ``text``,
 which applies stemming when searching, whereas the ``keywords`` field is of
 type ``keyword``, which means no stemming is applied, therefore, this field
-is searched based on exacth match. The mapping also allows you to define e.g.
+is searched based on exact match. The mapping also allows you to define e.g.
 that a ``lat`` and a ``lon`` field are in fact geographical coordinates, and
 enable geospatial queries over your records.
 
@@ -324,7 +325,7 @@ Note, that the left-hand-side of the entry point,
 
 External representation
 -----------------------
-As it was mentioned before there was an external and an internal representation. This is how the data will be parsed from user input and how it will be shown back to them. As it can be seen, both serializers and loaders depend on ``Marshmallow`` schemas. It is not mandatory to use it but it is **highly advised**. However, you can create your own if the given ones do not fit your data model.
+As it was mentioned before there is an external and an internal representation. This is how the data will be parsed from user input and how it will be shown back to them. As it can be seen, both serializers and loaders depend on ``Marshmallow`` schemas. It is not mandatory to use it but it is **highly advised**. However, you can create your own schemas if the given ones do not fit your data model.
 
 Define a Marshmallow schema
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

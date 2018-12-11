@@ -14,6 +14,7 @@
     quickstart/index.rst
     tutorials/build-a-repository.rst
     tutorials/understanding-datamodels.rst
+    tutorials/understanding-the-rest-api.rst
     tutorials/build-a-module.rst
     tutorials/developing-with-invenio.rst
     tutorials/managing-access.rst
