@@ -52,3 +52,24 @@ The key plugins you should look for in your editor of choice are:
 
 .. todo: docker, git, cli tools (hub), git aliases, getting pull-requests,
    virtualenv, virtualenv-wrapper, debugging pdb/ipdb, homebrew
+
+
+Working with Git and GitHub
+---------------------------
+There are a couple of utilities that allow you to work more efficiently with
+Git and GitHub.
+
+Hub
+~~~
+`Hub <https://hub.github.com>`_ is a command-line wrapper for git that makes it
+easier to work with GitHub. See the
+`installation instructions <https://hub.github.com>`_ for how install Hub.
+
+Here is a short overview of possibilities:
+
+```console
+# Clone one of your personal repositories from GitHub
+$ git clone invenio-app
+# Fetch the upstream inveniosoftware/invenio-app
+$ git fetch inveniosoftware
+```
