@@ -11,7 +11,8 @@
     :maxdepth: 2
 
     quickstart/index.rst
-    datamodel/understanding-datamodels
+    datamodel/understanding-datamodels.rst
+    datamodel/understanding-the-rest-api.rst
     tutorial-module/index
     invenio-modules.rst
     application-architecture.rst
