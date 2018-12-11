@@ -16,6 +16,7 @@ for maintaining one or more repositories.
 
    overview
    repositories
+   copyright-policy
 
 
 .. todo: branches, reviewing, merging, releasing, deprecating, faq
