@@ -70,11 +70,13 @@ Building a data model involves the following tasks:
 Internal vs External representation:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The above mentioned tasks can be divided into two: Internal and external representation. 
+The tasks listed above can be divided in two categories, ones that affect the internal representation of records and ones that affect the external representation. 
 
-The two first ones, JSONSchemas and Elasticsearch mappings, correspond to the internal representation of the data. JSONSchemas are used to validate the data, verifying that it matches the Elasticsearch mapping. These last ones are used to specify the format in which the data is stored in Elasticsearch.
+The first two, were the JSONSchema and Elasticsearch mappings are defined, correspond to the internal representation of the data/records.JSONSchemas are used to validate the data, verifying that it matches the Elasticsearch mapping. These latter are used to specify the format in which the data is stored in Elasticsearch.
 
 Loaders and serializers do their part on the external representation. The firts ones transform the data received into the internal representation, whereas the serializers do the opposite, they transform the data from its internal representation into the external one. It is recommended to use ``Marshamallow`` to implement the loaders and serializers.
+
+Specific examples for each one of them are given in the following sections.
 
 Internal representation
 -----------------------

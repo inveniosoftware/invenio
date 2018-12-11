@@ -76,7 +76,7 @@ Subsequently, the record has to be persisted to the SQL database. However, befor
 
 The next step, is to index it in Elasticsearch so the record can be searched. The record will be sent to the specified index (in the `$schema` field of the data) or the default if the attribute is not present. The validation of the data against the mapping is performed by Elasticsearch itself. In order to avoid errors and exceptions the JSONSchema should reflect the same data structure than the **ES mapping**.
 
-So far, the record has been loaded (deserialized), minted, persisted and indexed. Therefore, it is only missing the las step: `serialization`. This operation is carried out by the **serializer**. In this case, the `json_v1_response <https://github.com/inveniosoftware/invenio-records-rest/blob/master/invenio_records_rest/serializers/__init__.py#L20>`_ is configured as serializer for responses. It will apply the corresponding `Marshmallow` schema and send the created record in the HTTP reponse with code 201.
+So far, the record has been loaded (deserialized), minted, persisted and indexed. Therefore, it is only missing the last step: `serialization`. This operation is carried out by the **serializer**. In this case, the `json_v1_response <https://github.com/inveniosoftware/invenio-records-rest/blob/master/invenio_records_rest/serializers/__init__.py#L20>`_ is configured as serializer for responses. It will apply the corresponding `Marshmallow` schema and send the created record in the HTTP reponse with code 201.
 
 Reading a record
 ----------------
@@ -89,7 +89,7 @@ In the following flowchart, the process that a record goes through upon creation
 
 `Note: If it is not displayed correctly click on it to be able to zoom in.`
 
-The process to read a record is a bit more simple than the that of cration explained above. In order to keep with the previous example, we would perform a GET operation:
+The process to read a record is a bit more simple than that of cration explained above. In order to continue with the previous example, we would perform a GET operation:
 
 .. code-block:: shell
 
@@ -98,7 +98,7 @@ The process to read a record is a bit more simple than the that of cration expla
 
 This will hit the `item_route (/records/<pid(recid):pid_value>) <https://github.com/inveniosoftware/invenio-records-rest/blob/master/invenio_records_rest/views.py#L692>`_ of the REST API.
 
-The next step is to obtain the record from the PID (`recid`) given in the URL. This is done by the **resolver**. Whose maps the given persistent identifier to an object in the database, and returns it.
+The next step is to obtain the record from the PID (`recid`) given in the URL. This is done by the **resolver**, which maps the given persistent identifier to an object in the database, and returns it.
 
 Afterwards, it has to be checked if the user has permissions to read the requested record, by default all authenticated users are allowed. You can see more about access control in `TODO <Point to Access section>`.
 
