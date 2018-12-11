@@ -25,5 +25,5 @@
     :target: https://gitter.im/inveniosoftware/invenio
 
 Invenio is like a Swiss Army knife of battle-tested, safe and secure modules
-providing you will all the features you need to run a trusted digital
+providing you with all the features you need to run a trusted digital
 repository.
