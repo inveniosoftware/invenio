@@ -25,6 +25,7 @@ recursive-include docs *.png
 recursive-include docs *.py
 recursive-include docs *.rst
 recursive-include docs *.svg
+recursive-include docs *.xml
 recursive-include docs Makefile
 recursive-include misc *.py
 recursive-include misc *.rst
