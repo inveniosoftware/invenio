@@ -172,7 +172,40 @@ storage system like S3. In this case, you just have to be careful to manage
 access correctly on the external system.
 
 **Multiple storage systems**
-
 One force of Invenio is that you can store files on multiple systems at the
 same time. This is useful if you for instance need to use muliple system or
 do live migration from one system to another.
+
+Running with Docker
+-------------------
+Start by creating an Invenio instance with `cookiecutter-invenio-instance <https://github.com/inveniosoftware/cookiecutter-invenio-instance>`_.
+
+Among the generated files, there are two Dockerfiles `Dockerfile.base <https://github.com/inveniosoftware/cookiecutter-invenio-instance/blob/master/%7B%7Bcookiecutter.project_shortname%7D%7D/Dockerfile.base>`_
+and `Dockerfile <https://github.com/inveniosoftware/cookiecutter-invenio-instance/blob/master/%7B%7Bcookiecutter.project_shortname%7D%7D/Dockerfile>`_,
+which are used in that sequence to build the image for your application.
+
+The complete process is depicted in the following diagram:
+
+.. image:: resources/dockerfile-build-process.png
+   :align: center
+
+In respect to the diagram above the commands for each step of the process
+    1. For the first step you don't have to take any actions since  it is build with `docker-invenio <https://github.com/inveniosoftware/docker-invenio>`_ repository
+    2. :code:`docker build -f Dockerfile.base -t my-site-base .`
+    3. :code:`docker build -f Dockerfile -t my-site .`
+
+The last image is a ready-to-run Invenio instance. If you wish to install
+extra dependencies that are not included in the Dockerfiles, you can create
+a Dockerfile based on Dockerfile.base to handle the modifications.
+
+Leveraging Docker image layer caching can offer a significant speedup in your
+development process. This is the reason for maintaining two Dockerfiles,
+Dockerfile.base to create an image with the installed dependencies, and the
+final Dockerfile to install the application code and rebuild the static
+assets, which tend to change more frequently.
+
+In order to incorporate your latest changes, you can repeat the last step (3)
+of the build process.
+
+You can find more information on base images and how to incorporate your latest
+dependencies in repository.
