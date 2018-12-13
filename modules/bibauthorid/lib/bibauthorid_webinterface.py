@@ -2736,7 +2736,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
                     'cname': webapi.get_canonical_id_from_person_id(person_id),
                     'link_to_record': ulevel == "admin",
                     'hepnames_link': "%s/%s/" % (CFG_BASE_URL, "record"),
-                    'new_record_link': 'https://%s/authors/new' % CFG_LABS_HOSTNAME,
+                    'new_record_link': 'https://%s/submissions/authors' % CFG_LABS_HOSTNAME,
                     'update_link_prefix': "http://%s/authors/" % CFG_LABS_HOSTNAME,
                     'update_link_suffix': "/update",
                     'profile_link': "%s/%s" % (CFG_BASE_URL, "author/profile/")
