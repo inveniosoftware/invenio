@@ -3733,7 +3733,7 @@ class WebInterfacePerson(WebInterfaceDirectory):
             hepname_bibrec = get_bibrecord(recids[0])
 
         redirect_to_url(req,
-                        "https://%s/authors/%s/update" %
+                        "https://%s/submissions/authors/%s" %
                         (CFG_LABS_HOSTNAME, hepname_bibrec),
                         redirection_type=apache.HTTP_MOVED_PERMANENTLY)
 
