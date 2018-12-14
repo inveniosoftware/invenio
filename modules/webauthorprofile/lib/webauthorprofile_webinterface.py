@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2018 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -690,9 +690,9 @@ class WebAuthorPages(WebInterfaceDirectory):
                     'cname': webapi.get_canonical_id_from_person_id(person_id),
                     'link_to_record': ulevel == "admin",
                     'hepnames_link': "%s/%s/" % (CFG_BASE_URL, "record"),
-                    'new_record_link': 'http://%s/authors/new?bai=%s' % (CFG_LABS_HOSTNAME, webapi.get_canonical_id_from_person_id(person_id)),
-                    'update_link_prefix': "http://%s/authors/" % CFG_LABS_HOSTNAME,
-                    'update_link_suffix': "/update",
+                    'new_record_link': 'https://%s/submissions/authors?bai=%s' % (CFG_LABS_HOSTNAME, webapi.get_canonical_id_from_person_id(person_id)),
+                    'update_link_prefix': "https://%s/submissions/authors/" % CFG_LABS_HOSTNAME,
+                    'update_link_suffix': "",
                     'profile_link': "%s/%s" % (CFG_BASE_URL, "author/profile/")
                 })
 

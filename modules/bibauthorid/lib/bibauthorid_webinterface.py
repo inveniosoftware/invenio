@@ -2737,8 +2737,8 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
                     'link_to_record': ulevel == "admin",
                     'hepnames_link': "%s/%s/" % (CFG_BASE_URL, "record"),
                     'new_record_link': 'https://%s/submissions/authors' % CFG_LABS_HOSTNAME,
-                    'update_link_prefix': "http://%s/authors/" % CFG_LABS_HOSTNAME,
-                    'update_link_suffix': "/update",
+                    'update_link_prefix': "https://%s/submissions/authors/" % CFG_LABS_HOSTNAME,
+                    'update_link_suffix': "",
                     'profile_link': "%s/%s" % (CFG_BASE_URL, "author/profile/")
                 })
                 html_hepnames = WebProfilePage.render_template('personal_details_box', hepnames_data)
