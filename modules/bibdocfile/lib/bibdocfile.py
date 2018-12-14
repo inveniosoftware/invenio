@@ -3875,7 +3875,7 @@ def download_external_url(url, docformat=None):
 
     try:
         if hostname == CFG_LABS_HOSTNAME:
-            time.sleep(0.1)
+            time.sleep(0.05)
         else:
             while r.get('hostname_cache.%s' % hostname):
                 # We have accessed this host within the last 2 seconds
@@ -4884,7 +4884,11 @@ def open_url(url, headers=None, head_request=False):
     @return: a file-like object as returned by urllib2.urlopen.
     """
     # HACK: In order to support fetching files from Labs
-    if url.startswith('http://%s/' % CFG_LABS_HOSTNAME) or url.startswith('https://%s/' % CFG_LABS_HOSTNAME):
+    if url.startswith('http://%s/' % CFG_LABS_HOSTNAME) \
+       or url.startswith('https://%s/' % CFG_LABS_HOSTNAME):
+        # avoid external ssl redirect for labs
+        url = url.replace('http://{0}/'.format(CFG_LABS_HOSTNAME),
+                          'https://{0}/'.format(CFG_LABS_HOSTNAME))
         user, password = _load_inspire_legacy_credentials()
         s = requests.Session()
         s.headers['User-Agent'] = make_user_agent_string('bibdocfile')
