@@ -12,7 +12,7 @@
 
 **Open Source framework for large-scale digital repositories.**
 
-.. image:: https://img.shields.io/travis/inveniosoftware/invenio.svg
+.. image:: https://travis-ci.org/inveniosoftware/invenio.svg?branch=master
         :target: https://travis-ci.org/inveniosoftware/invenio
 
 .. image:: https://img.shields.io/coveralls/inveniosoftware/invenio.svg
