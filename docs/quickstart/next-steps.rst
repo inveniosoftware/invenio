@@ -71,6 +71,14 @@ Let's have a look at some of them one-by-one and explain what they are for:
 
       (my-site)$ tx pull --language en
 
+.. warning::
+
+    By default your Invenio instance will be fully open, which means that any
+    user will be allowed to perform any operation (Read, update, create and
+    delete) over the records. Check the :doc:`managing access <../tutorials/managing-access>`
+    section for information on how to adapt the permissions to your needs.
+
+
 Testing
 ^^^^^^^
 In order to run tests for the instance, you can run:
