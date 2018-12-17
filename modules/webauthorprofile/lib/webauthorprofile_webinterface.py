@@ -690,7 +690,7 @@ class WebAuthorPages(WebInterfaceDirectory):
                     'cname': webapi.get_canonical_id_from_person_id(person_id),
                     'link_to_record': ulevel == "admin",
                     'hepnames_link': "%s/%s/" % (CFG_BASE_URL, "record"),
-                    'new_record_link': 'https://%s/submissions/authors?bai=%s' % (CFG_LABS_HOSTNAME, webapi.get_canonical_id_from_person_id(person_id)),
+                    'new_record_link': 'https://%s/submissions/authors' % (CFG_LABS_HOSTNAME,),  # webapi.get_canonical_id_from_person_id(person_id)),
                     'update_link_prefix': "https://%s/submissions/authors/" % CFG_LABS_HOSTNAME,
                     'update_link_suffix': "",
                     'profile_link': "%s/%s" % (CFG_BASE_URL, "author/profile/")
