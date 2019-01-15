@@ -2,7 +2,7 @@
 ##
 ## This file is part of Invenio.
 ## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013,
-##               2014, 2015, 2016, 2017 CERN.
+##               2014, 2015, 2016, 2017, 2019 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1525,7 +1525,7 @@ def store_citation_warning(warning_type, cit_info):
     """
     r = run_sql("""SELECT 1 FROM rnkCITATIONDATAERR
                    WHERE type = %s
-                   AND citinfo = %s""", (warning_type, cit_info))
+                   AND citinfo = %s""", (warning_type, cit_info[:255]))
     if not r:
         run_sql("""INSERT INTO rnkCITATIONDATAERR (type, citinfo)
                    VALUES (%s, %s)""", (warning_type, cit_info))
