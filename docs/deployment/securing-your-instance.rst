@@ -39,7 +39,7 @@ Invenio has a configuration option called ``APP_ALLOWED_HOSTS`` which controls
 which hosts/domain names that can be served. A client request to a web server
 usually includes the domain name in the ``Host`` HTTP header:
 
-.. code-block:: http
+.. code-block:: python
 
     GET /
     Host: example.org

@@ -67,10 +67,12 @@ like below to your schema:
 
 .. code-block:: json
 
-    "owners": {
-      "type": "integer"
+    {
+        "owners": {
+        "type": "integer"
+        }
     }
-
+    
 Elasticsearch mapping
 ~~~~~~~~~~~~~~~~~~~~~
 In the quickstart example, our Elastisearch mapping is likely located in
@@ -79,8 +81,10 @@ like below to your mapping:
 
 .. code-block:: json
 
-    "owners": {
-      "type": "int"
+    {
+        "owners": {
+        "type": "int"
+        }
     }
 
 Requiring permissions
