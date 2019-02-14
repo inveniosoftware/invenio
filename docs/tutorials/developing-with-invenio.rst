@@ -15,136 +15,6 @@ Therefore in order to extend the application, we need to develop new modules.
 After covering how to create modules with cookiecutter, in this section we will go through
 the details of the development process.
 
-Install a module
-----------------
-
-Before installing a new module, any running Invenio instance must be stopped.
-Then, create a virtualenv for the module:
-
-.. code-block:: bash
-
-    $ mkvirtualenv my-module-venv
-
-Installing the module is very easy, you just need to go to its root directory
-and `pip install` it:
-
-.. code-block:: bash
-
-    (my-module-venv)$ cd invenio-foo/
-    (my-module-venv)$ pip install --editable .[all]
-
-Some explanations about the command:
-
-- The ``--editable`` option is used for development. It means that if you change the
-  files in the module, you won't have to reinstall it to see the changes. In a
-  production environment, this option shouldn't be used.
-- The ``.`` is in fact the path to your module. As we are in the root folder of
-  the module, we can just say *here*, which is what the dot means.
-- The ``[all]`` after the dot means we want to install all dependencies, which
-  is common when developing. Depending on your use of the module, you can
-  install only parts of it:
-
-    - The default (nothing after the dot) installs the minimum to make the
-      module run.
-    - ``[tests]`` installs the requirements to test the module.
-    - ``[docs]`` installs the requirements to build the documentation.
-    - Some modules have extra options.
-
-If you need multiple options, you can chain them: ``[tests,docs]``.
-
-.. _run-the-tests:
-
-Run the tests
--------------
-In order to run the tests, you need to have a valid git repository. The
-following step needs to be run only once. Go in the root folder of the module:
-
-.. code-block:: bash
-
-    (my-module-venv)$ git init
-    (my-module-venv)$ git add --all
-    (my-module-venv)$ check-manifest --update
-
-What we have done:
-
-- Change the folder into a git repository, so it can record the changes made to
-  the files.
-- Add all the files to this repository.
-- Update the file ``MANIFEST.in`` (this file controls which files are included
-  in your Python package when it is created and installed).
-
-Now, we are able to run the tests:
-
-.. code-block:: bash
-
-    (my-module-venv)$ ./run-tests.sh
-
-.. _run-the-example-app:
-
-Run the example application
----------------------------
-The example application is a minimal application that presents the features of your
-module. The example application is useful during development for testing.
-By default, it simply prints a welcome page.
-To try it, go into the ``examples`` folder and run:
-
-.. code-block:: console
-
-    (my-module-venv)$ ./app-setup.sh
-    (my-module-venv)$ ./app-fixtures.sh
-    (my-module-venv)$ export FLASK_APP=app.py FLASK_DEBUG=1
-    (my-module-venv)$ flask run
-
-You can now open a browser and go to the URL http://localhost:5000/ where you
-should be able to see a welcome page.
-
-To clean the server, run the ``./app-teardown.sh`` script after stopping the
-server.
-
-Build the documentation
------------------------
-The documentation can be built with the ``run-tests.sh`` script, but you need
-to have installed the package with its *tests* requirements. If you just want to build the
-documentation, you will only need the *docs* requirements (see the install
-section above). Make sure you are at the root directory
-of the module and run:
-
-.. code-block:: console
-
-    (my-module-venv)$ python setup.py build_sphinx
-
-Open ``docs/_build/html/index.html`` in browser and voilà, the documentation is
-there.
-
-Publishing on GitHub
---------------------
-Before going further in the tutorial, we can publish your repository to GitHub.
-This allows to integrate a continuous integration system such as TravisCI and allow for
-easy publishing of your module to PyPI afterwards.
-
-First, create an empty repository in your GitHub account. Be sure not to
-generate any *.gitignore* or *README* files, as our code already has them. If
-you don't have a GitHub account, you can skip this step, it is only necessary
-if you plan to publish your module on PyPI.
-
-Now, go into the root directory of your module, and run
-
-.. code-block:: bash
-
-    $ git remote add origin URL-OF-YOUR-GITHUB-REPO
-
-We can commit and push the generated files:
-
-.. code-block:: bash
-
-    $ git commit -am "Initial module structure"
-    $ git push --set-upstream origin master
-
-Finally, we create a new branch to develop on it
-
-.. code-block:: bash
-
-    $ git checkout -b dev
 
 Form, views and templates
 -------------------------
@@ -332,7 +202,7 @@ where we can override the ``page_body`` block, to place our form:
       </div>
     {% endblock page_body %}
 
-And finally, the `success.html` page in
+And finally, the ``success.html`` page in
 `invenio_foo/templates/invenio_foo/` which will be rendered after a
 record is created.
 
@@ -440,28 +310,34 @@ In ``my-datamodel/my-datamodel/jsonschemas/records/custom-record-v1.0.0.json``:
       ]
     }
 
+
 Demo time
 ---------
 
-Let's now see our Invenio module in action after it is integrated with our Invenio instance.
+Let's now see our Invenio module in action after it has been integrated in our
+Invenio instance.
 
-First we install our new invenio-foo module:
+First, install the new invenio-foo module in the virtual enviroment of the
+Invenio instance:
 
 .. code-block:: console
 
-    $ pipenv install --editable .[all]
+    $ pipenv shell  # activate the app virtual env
+    (my-site) $ cd ../invenio-foo
+    (my-site) $ pip install --editable .
 
 Then, if you've followed the steps in the :ref:`quickstart` guide, you can go to the
-instance folder, `my-repository`, and start the ``server`` script:
+instance folder, `my-site`, and start the ``server`` script:
 
 .. code-block:: console
 
-    $ cd ../my-site
-    $ pipenv run ./scripts/server
+    (my-site) $ cd ../my-site
+    (my-site) $ ./scripts/server
 
 Then go to ``http://localhost:5000/create`` and you will see the form we just
 created. There are two fields ``Title`` and ``Description``.
 
-Let's try the form, add something to the ``Title`` and click submit, you will
-see the validation errors on the form, fill in the ``Description`` and click
-submit. The form is now valid and it navigates you to the ``/success`` page.
+Let's try the form. Add something in the ``Title`` field and click on submit:
+you will see a validation error on the form. Fill in the ``Description``
+field and click on submit: the form is now valid and it navigates you to the
+``/success`` page.
