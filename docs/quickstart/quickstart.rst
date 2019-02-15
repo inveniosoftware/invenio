@@ -18,7 +18,7 @@ Prerequisites
 To be able to develop and run Invenio you will need the following installed and
 configured on your system:
 
-- `Docker <https://docs.docker.com/install>`_ and `Docker Compose <https://docs.docker.com/compose/install/>`_
+- `Docker v1.18+ <https://docs.docker.com/install>`_ and `Docker Compose v1.23+ <https://docs.docker.com/compose/install/>`_
 - `NodeJS v6.x+ and NPM v4.x+ <https://nodejs.org/en/download/package-manager>`_
 - `Enough virtual memory <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-prod-mode>`_
   for Elasticsearch (when running in Docker).

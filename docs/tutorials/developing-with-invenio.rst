@@ -278,7 +278,7 @@ In ``invenio_foo/utils.py``
 Our records can use a custom schema. To define and use this schema,
 we create the ``custom-record-v1.0.0.json`` file inside the ``records``
 folder of your data model project (``my-datamodel`` from the Quickstart
-tutorial :ref:`build-data-model`).
+tutorial :ref:`understanding-data-models`).
 
 In ``my-datamodel/my-datamodel/jsonschemas/records/custom-record-v1.0.0.json``:
 

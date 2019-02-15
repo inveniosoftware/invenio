@@ -17,17 +17,17 @@ Invenio is first and foremost a framework. It's a framework that you can use
 to build a turn-key repository solution, but it is not by itself a final
 turn-key repository software. Using Invenio requires you to develop code.
 
-Several repository software solutions are in the progress of being written on
-top of Invenio, including e.g.:
-
-- RERO ILS and Invenio ILS - Integrated Library System.
-- WEKO3 - Repository infrastructure for 500+ japanese universities.
-
 Several repositories have been built on top of Invenio v3, including e.g.:
 
 - Zenodo - General purpose research data repository.
 - CERN Open Data - Open data repository for CERN.
 - CERN Videos - Digital Assets Management system with video encoding support.
+
+Several repository software solutions are in the progress of being written on
+top of Invenio, including e.g.:
+
+- RERO ILS and Invenio ILS - Integrated Library System.
+- WEKO3 - Repository infrastructure for 500+ japanese universities.
 
 Scalability & Safety
 --------------------
@@ -38,7 +38,7 @@ or a 1 petabyte.
 
 That's why we say Invenio is a framework for large-scale digital repositories.
 Often, large-scale repositories does not fit in a standard box, which is why
-Invenio is first and foremost a framework, that helps you build your repository
+Invenio is first and foremost a framework that helps you build your repository
 faster and on a high-quality reliable foundation.
 
 Flexible metadata
@@ -70,7 +70,7 @@ Under the hood, Invenio uses Elasticsearch, the world's most popular open
 source search engine that provides powerful distributed and massively scalable
 search engine. Invenio provides all the features of Elasticsearch such as
 full-text search, powerful query syntax, advanced stemming and aggregations,
-super-fast auto-completion suggesters as well as geographical search.
+super-fast auto-completion suggesters as well as geospatial search.
 
 Invenio further leverages both instant indexing as well as extremely fast
 distributed bulk indexing with rates beyond 10,0000 records/second.
