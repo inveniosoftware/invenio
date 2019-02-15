@@ -71,6 +71,12 @@ Let's have a look at some of them one-by-one and explain what they are for:
 
       (my-site)$ tx pull --language en
 
+3. REST API permissions: By default your Invenio instance have no permissions
+   enabled, which means that any user will be allowed to perform any operation
+   (read, update, create and delete) over the records. Check
+   :ref:`managing-access` for information on how to adapt the permissions to
+   your needs.
+
 Testing
 ^^^^^^^
 In order to run tests for the instance, you can run:

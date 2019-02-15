@@ -11,7 +11,7 @@ Managing access to records
 ==========================
 Invenio comes with a access control system that is very powerful and flexible
 but which can also seem overwhelming at first. This guide will show you a
-basic example of how to protect your REST API so only some users can see
+basic example of how to protect our REST API so only some users can see
 certain records.
 
 If you haven't already done so, make sure you've followed the :ref:`quickstart`
@@ -30,8 +30,8 @@ records that a given user owns.
 
 In order to protect the two endpoints we will:
 
-1. **Store permissions** in a record by adding a new field *owner* to our data
-   model.
+1. **Store permissions** in a record by adding a new field ``owner`` to our
+   data model.
 2. **Require permissions** by writing:
     - a *permission factory* to protect the detail endpoint.
     - a *search filter* to filter results in the search endpoint.
@@ -40,7 +40,7 @@ In order to protect the two endpoints we will:
 Storing permissions
 -------------------
 First, below is an example of how we could store an owner inside a
-record by adding a new property ``owner``:
+record by adding a new field ``owner``:
 
 .. code-block:: json
 
@@ -52,18 +52,18 @@ record by adding a new property ``owner``:
 In order to be able to store the ``owner`` property in our data model, you
 must add this new field to the data model's:
 
-1. JSONSchema (think of the JSONSchema as the database table structure that you
-   add a new column to)
-2. Elasticsearch mapping (think of the mapping as a description of your data
-   should be indexed)
-3. Marshmallow schema (think of the Marshmallow schema as a description of how
-   you would render one or more rows in a database table to an end-user)
+1. **JSONSchema** (think of the JSONSchema as the database table structure that
+   you add a new column to).
+2. **Elasticsearch mapping** (think of the mapping as a description of how your
+   data should be indexed).
+3. **Marshmallow schema** (think of the Marshmallow schema as a description of
+   how you would render one or more rows in a database table to an end-user).
 
 JSONSchema
 ~~~~~~~~~~
-In the quickstart example, our JSONSchema is likely located in
-``../records/jsonschemas/record-v.1.0.0.json``, and you would add something
-like below to your schema:
+In the quickstart example, our JSONSchema is located in
+``.../records/jsonschemas/record-v.1.0.0.json``, and you would add something
+like below to our schema:
 
 .. code-block:: json
 
@@ -76,8 +76,8 @@ like below to your schema:
 Elasticsearch mapping
 ~~~~~~~~~~~~~~~~~~~~~
 In the quickstart example, our Elastisearch mapping is likely located in
-``../records/mappings/v6/record-v.1.0.0.json``, and you would add something
-like below to your mapping:
+``.../records/mappings/v6/record-v.1.0.0.json``, and you would add something
+like below to our mapping:
 
 .. code-block:: json
 
@@ -115,7 +115,7 @@ The permission factory function takes as input a record and creates a
 :py:class:`~invenio_access.permissions.Permission` object from it.
 
 The permission, when checked, requires that the current user has the same id as
-the id stored in the records ``owner`` property. This is expressed with the
+the id stored in the records ``owner`` field. This is expressed with the
 ``UserNeed``.
 
 **Permissions and needs**
@@ -203,8 +203,8 @@ the other operations with their a permission factory.
 
 Complex access rights
 ----------------------
-The toy example presented in this guide is too simple for must normal
-requirements, thus in order to provide some inspiration we here present two
+The toy example presented in this guide is too simple for most normal
+requirements, thus in order to provide some inspiration, we here present two
 more complex ways you could store access rights in records:
 
 Computed rights
@@ -221,8 +221,8 @@ out of sync with other properties. An example of such a record could be:
         "communities": ["blr"]
     }
 
-A permission factory could for above record, could then compute different
-permissions objects for different types of actions.
+A permission factory could for above record then compute different permissions
+objects for different types of actions.
 
 For reading the record, the permission could be:
 
@@ -236,7 +236,7 @@ For seeing the files in the record, the permission could be:
 
     Permission(UserNeed(1), UserNeed(2), RoleNeed('blr-curators'))
 
-For seeing the editing in the record, the permission could be:
+For editing the record, the permission could be:
 
 .. code-block:: python
 
@@ -263,7 +263,7 @@ access for which actions. An example of such a record could be:
     }
 
 This way, changes to rights can also be explicitly tracked via the records
-revision history and thus be auditable.
+revision history and thus be audited.
 
 Further information
 ~~~~~~~~~~~~~~~~~~~

@@ -12,6 +12,9 @@ Now that you have generated the skeleton of your repository via cookiecutter,
 bootstrapped your instance, run it and created a record, let's have a deep dive
 at the various files and folders that were generated and what they do.
 
+The generated skeleton is our default recommendation, however you are
+completely free to adapt it as your see fit.
+
 Management scripts
 ------------------
 
@@ -155,7 +158,7 @@ configuring the following files:
   - ``mq``: RabbitMQ, exposing port 5672 for the service and port 15672 for a
     management web server (accessible via the default username/password
     ``guest:guest``).
-  - ``cache``: Redis exposing port 6379..
+  - ``cache``: Redis exposing port 6379.
 
   When developing and running your instance locally these services can be
   accessed by your application.
