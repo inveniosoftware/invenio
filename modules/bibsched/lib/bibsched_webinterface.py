@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2019 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -51,7 +51,10 @@ class WebInterfaceBibSchedPages(WebInterfaceDirectory):
             return page_not_authorized(req=req, referer=referer,
                                        text=auth_message, navtrail=navtrail)
 
-        bibsched_tasks = get_bibsched_tasks()
+        periodic = True
+        if 'nonperiodic' in form:
+            periodic = False
+        bibsched_tasks = get_bibsched_tasks(include_periodic=periodic)
         header = ["ID", "Name", "Priority", "User", "Time", "Status",
                   "Progress"]
         map_status_css = {'WAITING': 'task_waiting', 'RUNNING': 'task_running',

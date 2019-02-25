@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2019 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -80,15 +80,20 @@ def get_javascript():
                  """ % {'site_url': CFG_SITE_URL}
     return js_scripts
 
-def get_bibsched_tasks():
+def get_bibsched_tasks(include_periodic=True):
     """
     Run SQL query to get all tasks present in bibsched queue
     """
-    waiting_tasks = run_sql("SELECT id,proc,priority,user,runtime,status,progress FROM schTASK WHERE (status='WAITING' OR status='SLEEPING') ORDER BY priority DESC, runtime ASC, id ASC")
+    excludeperiodic = ''
+    if not include_periodic:
+        excludeperiodic = "and sleeptime=''"
+
+    waiting_tasks = run_sql("SELECT id,proc,priority,user,runtime,status,progress FROM schTASK WHERE (status='WAITING' OR status='SLEEPING') %s ORDER BY priority DESC, runtime ASC, id ASC"
+                            % excludeperiodic)
     other_tasks = run_sql("SELECT id,proc,priority,user,runtime,status,progress\
                            FROM schTASK WHERE status IN ('RUNNING',\
                            'CONTINUING','SCHEDULED','ABOUT TO STOP',\
-                           'ABOUT TO SLEEP', 'DONE WITH ERRORS', 'ERRORS REPORTED')")
+                           'ABOUT TO SLEEP', 'DONE WITH ERRORS', 'ERRORS REPORTED') %s" % excludeperiodic,)
     return other_tasks + waiting_tasks
 
 def get_bibsched_mode():
