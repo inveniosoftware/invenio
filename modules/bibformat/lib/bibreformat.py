@@ -1,7 +1,7 @@
 ## -*- mode: python; coding: utf-8; -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011, 2012 CERN.
+## Copyright (C) 2007, 2008, 2010, 2011, 2012, 2019 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,7 +23,8 @@
 __revision__ = "$Id$"
 
 import os
-from datetime import datetime
+import random
+from datetime import datetime, timedelta
 
 from invenio.dbquery import run_sql
 
@@ -270,20 +271,28 @@ def all_records():
     return intbitset(run_sql("SELECT id FROM bibrec"))
 
 
-def outdated_caches(fmt, last_updated, chunk_size=5000):
+def outdated_caches(fmt, last_updated, chunk_size=2000000):
     sql = """SELECT br.id
              FROM bibrec AS br
              INNER JOIN bibfmt AS bf ON bf.id_bibrec = br.id
-             WHERE bf.format = %s
+             WHERE br.modification_date >= %s
+             AND bf.format = %s
              AND bf.last_updated < br.modification_date
              AND br.id BETWEEN %s AND %s"""
 
-    last_updated_str = last_updated.strftime('%Y-%m-%d %H:%M:%S')
+    random.seed()
+    if random.random() < 0.98:
+        tdelta = timedelta(hours=4)
+    else:
+        tdelta = timedelta(days=365)
+
+    last_updated_str = (last_updated - tdelta).strftime('%Y-%m-%d %H:%M:%S')
+    write_message("Querying database for outdated cache since %s" % last_updated_str)
     recids = intbitset()
     max_id = run_sql("SELECT max(id) FROM bibrec")[0][0] or 0
     for start in xrange(1, max_id + 1, chunk_size):
         end = start + chunk_size
-        recids += intbitset(run_sql(sql, (fmt, start, end)))
+        recids += intbitset(run_sql(sql, (last_updated_str, fmt, start, end)))
 
     return recids
 
@@ -295,6 +304,13 @@ def missing_caches(fmt, chunk_size=100000):
     @return: record IDs generator without pre-created format cache
     """
     write_message("Querying database for records without cache...")
+
+    # https://mariadb.com/kb/en/library/subqueries-and-joins/
+    # "select id from bibrec left join bibfmt on id=id_bibrec where id_bibrec is NULL" is slow
+    # subquery is a lot faster here
+    return intbitset(run_sql(
+        'select id from bibrec where id not in (select id_bibrec from bibfmt where format=%s)',
+        (fmt,)))
 
     all_recids = intbitset()
     max_id = run_sql("SELECT max(id) FROM bibrec")[0][0] or 0
