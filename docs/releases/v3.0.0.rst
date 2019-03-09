@@ -8,6 +8,8 @@
 Version 3.0.0
 =============
 
+*Released 2018-06-07*
+
 We are proud to announce the release of Invenio v3.0.0. Invenio has been
 completely rewritten from scratch with a radically  improved architecture and
 technical implementation. Invenio 3 is now a framework, like a Swiss Army
