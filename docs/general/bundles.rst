@@ -32,6 +32,8 @@ Included modules:
 - `invenio-base <https://invenio-base.readthedocs.io>`_
     - Flask application factories implementing the application loading patterns
       with entry points in Invenio.
+- `invenio-cache <https://invenio-cache.readthedocs.io>`_
+    - Caching module for Invenio, supporting Reddis and Memcached as backends.
 - `invenio-celery <https://invenio-celery.readthedocs.io>`_
     - Task discovery and default configuration of Celery for Invenio.
 - `invenio-config <https://invenio-config.readthedocs.io>`_
