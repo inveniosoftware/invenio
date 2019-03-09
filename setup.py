@@ -25,17 +25,17 @@ tests_require = [
     'pytest-invenio>=1.1.0,<1.2.0',
 ]
 
-db_version = '>=1.0.2,<1.1.0'
-search_version = '>=1.0.2,<1.1.0'
+db_version = '>=1.0.3,<1.1.0'
+search_version = '>=1.1.0,<1.2.0'
 
 extras_require = {
     # Bundles
     'base': [
         'invenio-admin>=1.1.1,<1.2.0',
-        'invenio-assets>=1.1.0,<1.2.0',
+        'invenio-assets>=1.1.2,<1.2.0',
         'invenio-formatter>=1.0.1,<1.1.0',
         'invenio-logging>=1.1.0,<1.2.0',
-        'invenio-mail>=1.0.1,<1.1.0',
+        'invenio-mail>=1.0.2,<1.1.0',
         'invenio-rest>=1.0.0,<1.1.0',
         'invenio-theme>=1.1.2,<1.2.0',
     ],
@@ -51,9 +51,9 @@ extras_require = {
         'invenio-jsonschemas>=1.0.0,<1.1.0',
         'invenio-oaiserver>=1.0.3,<1.1.0',
         'invenio-pidstore>=1.0.0,<1.1.0',
-        'invenio-records-rest>=1.3.0,<1.4.0',
+        'invenio-records-rest>=1.4.0,<1.5.0',
         'invenio-records-ui>=1.0.1,<1.1.0',
-        'invenio-records>=1.0.1,<1.1.0',
+        'invenio-records>=1.1.0,<1.2.0',
         'invenio-search-ui>=1.1.1,<1.2.0',
     ],
     # Database version
@@ -99,7 +99,8 @@ install_requires = [
     'Flask>=1.0.2',
     'invenio-app>=1.1.0,<1.2.0',
     'invenio-base>=1.0.2,<1.1.0',
-    'invenio-celery>=1.0.0,<1.1.0',
+    'invenio-cache>=1.0.0,<1.1.0',
+    'invenio-celery>=1.0.1,<1.1.0',
     'invenio-config>=1.0.1,<1.1.0',
     'invenio-i18n>=1.1.1,<1.2.0',
 ]
