@@ -5,6 +5,8 @@
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
+.. _bundles:
+
 Bundles
 =======
 Invenio is a highly modular framework with many modules that provide various
@@ -264,11 +266,7 @@ developed to take care of e.g. identifier normalization, DataCite/Dublin Core
 metadata generation, testing and citation formatting.
 
 - `citeproc-py-styles <https://citeproc-py-styles.readthedocs.io>`_
-    - Citation Style Language (CSL) style files packaged as a Python module.
-- `cookiecutter-invenio-instance <https://cookiecutter-invenio-instance.readthedocs.io>`_
-    - Cookiecutter template for new Invenio instances.
-- `cookiecutter-invenio-module <https://cookiecutter-invenio-module.readthedocs.io>`_
-    - Cookiecutter template for new Invenio modules.
+    - Citation Style Language (CSL) style files packaged as a Python module
 - `datacite <https://datacite.readthedocs.io>`_
     - Python library for generating DataCite XML from Python dictionaries and
       registering DOIs with the DataCite DOI registration service.
@@ -304,6 +302,16 @@ metadata generation, testing and citation formatting.
 - `xrootdpyfs <https://xrootdpyfs.readthedocs.io>`_
     - PyFilesystem plugin adding XRootD support.
 
+Scaffolding
+-----------
+Following modules provide templates for getting started with Invenio:
+
+- `cookiecutter-invenio-instance <https://github.com/inveniosoftware/cookiecutter-invenio-instance>`_
+    - Template for new Invenio instances.
+- `cookiecutter-invenio-datamodel <https://github.com/inveniosoftware/cookiecutter-invenio-datamodel>`_
+    - Template for new data models.
+- `cookiecutter-invenio-module <https://github.com/inveniosoftware/cookiecutter-invenio-module>`_
+    - Template for a reusable Invenio module.
 
 Notes on license
 ----------------
