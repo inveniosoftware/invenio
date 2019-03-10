@@ -14,8 +14,6 @@
     quickstart/index.rst
     tutorials/build-a-repository.rst
     tutorials/understanding-data-models.rst
-    tutorials/build-a-module.rst
-    tutorials/developing-with-invenio.rst
     tutorials/managing-access.rst
     deployment/securing-your-instance.rst
     architecture/infrastructure.rst
@@ -25,3 +23,10 @@
     history.rst
     releases/index.rst
     community/index.rst
+
+
+.. toctree::
+    :hidden:
+
+    tutorials/build-a-module.rst
+    tutorials/developing-with-invenio.rst
