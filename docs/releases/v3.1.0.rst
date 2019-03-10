@@ -1,0 +1,276 @@
+..
+    This file is part of Invenio.
+    Copyright (C) 2019 CERN.
+
+    Invenio is free software; you can redistribute it and/or modify it
+    under the terms of the MIT License; see LICENSE file for more details.
+
+Version 3.1.0
+=============
+
+*Released 2019-03-11*
+
+We are proud to announce the release of Invenio v3.1.0.
+
+**Python compatibility**
+
+Invenio v3.1 supports Python 2.7 (until 2019-12-31), Python 3.5 and Python 3.6.
+We expect to add support for Python 3.7 in the near-term future once Celery
+v4.3 has been released.
+
+Getting started
+---------------
+
+See our :ref:`quickstart` guide.
+
+What's new in Invenio v3.1?
+---------------------------
+
+Webpack build system
+~~~~~~~~~~~~~~~~~~~~
+Invenio v3.1 comes with a new assets build system based on Webpack for building
+and packaging your JavaScript applications, stylesheets and much more. The
+system replaces the previous AMD/RequireJS based system which was deprecated in
+v3.0.
+
+The old build system is still available to allow users to upgrade to Invenio
+v3.1 without first migrating to Webpack. The old build system will be removed
+in Invenio v3.3
+
+For more information about the new build system, please see:
+
+- `Invenio-Assets <https://invenio-assets.readthedocs.io/>`_
+- `Upgrade to Webpack <https://invenio-assets.readthedocs.io/en/latest/upgrade.html>`_
+
+The new Webpack build system is based on:
+
+- `Flask-WebpackExt <https://flask-webpackext.readthedocs.io/>`_
+- `Pywebpack <https://pywebpack.readthedocs.io/>`_
+
+Simplified scaffolding
+~~~~~~~~~~~~~~~~~~~~~~
+We have simplified the scaffolding of new Invenio instance by merging the
+data model template into the main Cookiecutter-Invenio-Instance.
+
+You can try the new approach by following our :ref:`quickstart`.
+
+The previous approach of two separate packages -- one for the application
+and one for the data model -- caused friction and confusion for new users and
+we therefore decided to merge both.
+
+This also first with our *long-term* goal, where we want to provide standard
+data models (such as DataCite, Dublin Core, MARC21) so that users don't have
+write their own data model.
+
+**Docker base image**
+
+We have released a new Docker image that can serve as base image for your
+Invenio instances. The image is based on CentOS 7 and comes with Python 3.6,
+Node.JS, NPM and some standard libraries often needed by Invenio.
+
+See `inveniosoftware/centos7-python <https://cloud.docker.com/u/inveniosoftware/repository/docker/inveniosoftware/centos7-python>`_
+on DockerHub.
+
+The new image is being used by our :ref:`quickstart` guide, and the image is
+usable in production environments like OpenShift.
+
+**Pipenv**
+
+In order to manage Python dependencies more reliable and securely for your
+Invenio instance we have moved to use `Pipenv <http://pipenv.readthedocs.io>`_
+which also handles the virtualenv creation.
+
+Pipenv has been integrated into the scaffolded Invenio instance, and you can
+read more about it in :ref:`build-repository`.
+
+Documentation
+~~~~~~~~~~~~~
+New sections where added to the documentation specifically on:
+
+- :ref:`bundles` and :ref:`requirements`
+- :ref:`build-repository`
+- :ref:`managing-access`
+- :ref:`securing-your-instance`
+- :ref:`infrastructure`
+
+Request tracing
+~~~~~~~~~~~~~~~
+Invenio v3.1 has added new features for improved request tracing to allow for
+better troubleshooting and auditing of problems. The feature allows logging a
+request id, session id and user id across multiple services such as Nginx and
+Invenio error logs. This enables e.g. system administrators to identify exactly
+which Nginx access log line caused a specific error logged by Invenio.
+
+If combined with e.g. centralised log aggregation, this can be used for e.g.
+viewing requests by a user in real-time, request performance statistics and
+many other metrics. Please note that in order to be compliant with EU General
+Data Protection Regulation (GDPR), you must ensure that these logs are
+automatically deleted after 3 months (the same is the case if you only log an
+IP address).
+
+- **Cookiecutter-Invenio-Instance**:
+    - Nginx configuration has been updated to automatically generate a random
+      request id and add is as ``X-Request-ID`` header.
+    - Nginx log format has been updated to log timing information, request id,
+      session id and user id if provided by the application server in the
+      ``X-Session-ID`` and ``X-User-ID`` HTTP headers. Nginx will remove both
+      headers prior to sending the response to the client.
+- **Invenio-App**:
+    - Extracts the ``X-Request-ID`` header (max 200 chars) if set in the HTTP
+      request and makes it available on the Flask ``g`` object as
+      ``g.request_id``.
+- **Invenio-Logging**:
+    - The request id is made available to all log handlers.
+    - The Sentry log handler will add the request ID as a tag if available.
+- **Invenio-Accounts**
+    - The ``X-Session-ID`` and ``X-User-ID`` HTTP headers will be added to the
+      HTTP repsponse if the configuration variable
+      ``ACCOUNTS_USERINFO_HEADERS`` is set to ``True``. This makes the session
+      and user id available to upstream servers like Nginx.
+
+
+Minor changes in v3.1
+---------------------
+
+**Token expiration**
+
+The token expiration was changed from 5 days to 30 minutes for the password
+reset token and email confirmation token. Using the tokens will as a
+side-effect login in the user, which means that if the link is leaked (e.g.
+forwarded by the users themselves), then another person can use the link to
+access the account. Flask-Security v3.1.0 addresses this issue, but has not
+yet been released.
+
+**Globus.org OAuth Login**
+
+Invenio v3.1 now comes with support for login with your Globus.org account.
+The feature was contributed by University of Chicago.
+
+See `Invenio-OAuthClient <https://invenio-oauthclient.readthedocs.io/en/latest/usage.html#module-invenio_oauthclient.contrib.globus>`_ for details.
+
+**Health-check view**
+
+A ``/ping`` view that can be enabled via the
+``APP_HEALTH_BLUEPRINT_ENABLED`` configuration variable has been added to
+support load balancers like HAProxy to check if the application server is
+responsive.
+
+Backwards incompatible changes
+------------------------------
+
+- **Pytest-Invenio:** The ``celery_config`` fixture has been renamed to
+  ``celery_config_ext`` due to naming conflict with fixture provided by
+  Celery.
+
+Deprecations in v3.1
+--------------------
+Following list of features have been deprecated and will be removed in either
+Invenio v3.2 or Invenio v3.3:
+
+Elasticsearch v2 support
+~~~~~~~~~~~~~~~~~~~~~~~~
+Elasticsearch v2 support will be removed in Invenio v3.2. Elasticsearch v2 has
+reached end of life and no longer receives any bug or security fixes.
+
+Both the support in Invenio-Search for creating indexes for v2 as well as any
+v2 Elasticsearch mappings in other Invenio modules will be removed.
+
+AMD/RequireJS
+~~~~~~~~~~~~~
+Invenio's assets build system based on AMD/RequireJS will be removed in
+Invenio v3.3.
+
+This involves e.g. the two CLI commands:
+
+.. code-block:: shell
+
+    $ invenio npm
+    $ invenio assets build
+
+Several Python modules in Invenio-Assets will be removed, including (but not
+limited to):
+
+    - ``invenio_assets.npm``
+    - ``invenio_assets.filters``
+    - ``invenio_assets.glob``
+    - ``invenio_assets.proxies``
+
+Also, bundle definitions in other Invenio modules will be removed. These are
+usually located in ``bundles.py`` files, e.g.:
+
+    - ``invenio_theme.bundles``
+
+Also, some static files will be removed from bundles, e.g.:
+
+    - ``invenio_theme/static/js/*``
+    - ``invenio_theme/static/scss/*``
+
+DynamicPermission class
+~~~~~~~~~~~~~~~~~~~~~~~
+The ``invenio_access.DynamicPermission`` class will be removed in Invenio v3.2.
+It has been superseded by the ``invenio_access.Permission`` class. The
+``Permission`` class by default deny an action in case no user/role is
+assigned. The ``DynamicPermission`` instead allowed an action if no user/role
+was assigned.
+
+Records CLI
+~~~~~~~~~~~
+The following CLI commands will be removed in Invenio v3.2:
+
+.. code-block:: shell
+
+    $ invenio records create
+    $ invenio records delete
+    $ invenio records patch
+
+Please use the REST API instead to create, patch and delete records.
+
+AngularJS (reminder from v3.0)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In Invenio v3.0 we deprecated the AngularJS 1.4 application Invenio-Search-JS
+as AngularJS by that time was already outdated. We have selected React and
+SemanticUI as the replacement framework for AngularJS.
+
+The new Webpack build system released in Invenio v3.1 is part of the strategy
+to move from AngularJS to React (note however that you can use Webpack with
+your favorite framework, including AngularJS).
+
+We have started the rewrite of Invenio-Search-JS and have already released the
+first version of
+`React-SearckKit <https://inveniosoftware.github.io/react-searchkit/>`_ which
+eventually will replace Invenio-Search-JS.
+
+Features removed in v3.1
+------------------------
+These following already deprecated features have been removed in Invenio v3.1.
+
+- ``invenio_records.tasks`` was removed from the Invenio-Records module.
+
+Maintenance policy
+------------------
+
+Invenio v3.1 will be supported with bug and security fixes until the release of
+Invenio v3.3 and minimum until 2020-03-31.
+
+See our :ref:`maintenance-policy`.
+
+What's next?
+------------
+We originally planned to release the Files and Statistics bundle in Invenio
+v3.1. We however decided it was more urgent to release the new Webpack build
+system in order to avoid too much code being written against the old build
+system.
+
+In Invenio v3.2 we are planning to release the **Files** bundle including:
+
+- `invenio-files-rest <https://invenio-files-rest.readthedocs.io>`_
+    - Object storage REST API for Invenio with many supported backend storage
+      protocols and file integrity checking.
+- `invenio-iiif <https://invenio-iiif.readthedocs.io>`_
+    - International Image Interoperability Framework (IIIF) server for making
+      thumbnails and zooming images.
+- `invenio-previewer <https://invenio-previewer.readthedocs.io>`_
+    - Previewer for Markdown, JSON/XML, CSV, PDF, JPEG, PNG, TIFF, GIF and ZIP
+      files.
+- `invenio-records-files <https://invenio-records-files.readthedocs.io>`_
+    - Integration layer between object storage and records.
