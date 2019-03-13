@@ -48,22 +48,22 @@ traffic into three categories of requests:
 
 This way you can dimension the number connection slots between different types
 of requests according to available resources. For instance a static file
-request can usually be served extremely efficient, while an application request
+request can usually be served extremely efficiently, while an application request
 usually takes longer and requires more memory.
 
-Similar, downloading a very file depends on the clients available bandwidth
+Similar, downloading a very file depends on the client's available bandwidth
 and can thus take up a connection slot for a significant amount time. If your
 storage system supports it, it is possible with Invenio to completely offload
 the serving of large files to your storage system (e.g. S3).
 
 All in all, the primary job of the load balancer is to manage traffic to your
 servers according to available resources. For instance during traffic floods
-the load balancer takes care of queue requests to the webservers.
+the load balancer takes care of queue requests to the web servers.
 
 **Backup pages**
 
 A load balancer can also direct traffic to a static backup site in case your
-main web servers a down. This is useful in order to communicate with users
+main web server is down. This is useful in order to communicate with users
 during major incidents.
 
 Web servers
@@ -80,7 +80,7 @@ Application servers
 ~~~~~~~~~~~~~~~~~~~
 The web server proxies traffic usually (but not necessarily) to a single
 application server running on the same machine. The application server
-is responsible for hanlding the application requests. Invenio is a Python
+is responsible for handling the application requests. Invenio is a Python
 application, and thus make use of the WSGI standard. There exists several
 application servers capable of running WSGI python application, e.g. Gunicorn,
 uWSGI and mod_wsgi.
@@ -94,7 +94,7 @@ a binary format.
 **Transactional databases**
 
 The primary reason using an SQL database is that they provide transactions,
-which is very important since data consistency for a repository is of outmost
+which is very important since data consistency for a repository is of utmost
 importance. Also, database servers can handle very large amounts of data
 as long as they are scaled and configured properly. Last but not least, they
 are usually highly reliable as compared to some NoSQL solutions.
@@ -108,12 +108,12 @@ than a database.
 
 Search and indexing
 -------------------
-Invenio uses Elasticsearch as it's underlying search engine since Elasticsearch
+Invenio uses Elasticsearch as its underlying search engine since Elasticsearch
 is fully JSON-based, and thus fit well together with storing records internally
 in the database as JSON documents.
 
-Elasticsearch furthermore is highly scalable and provide very powerful search
-and aggergation capabilities. You can for instance make geospatial queries with
+Elasticsearch furthermore is highly scalable and provides very powerful search
+and aggregation capabilities. You can for instance make geospatial queries with
 Elasticsearch.
 
 Direct indexing
@@ -145,14 +145,14 @@ registering a DOI.
 
 **Multiple queues**
 
-The background processing have support for multiple queues and advanced
+The background processing supports multiple queues and advanced
 workflows. You could for instance have a low priority queue that constantly
-run x number of file integrity checks per day, and another normal queue which
+runs x number of file integrity checks per day, and another normal queue
 for other tasks like DOI registration.
 
 **Cronjobs and retries**
 
-Celery also have supports for running jobs at scheduled intervals as well as
+Celery also supports running jobs at scheduled intervals as well as
 retrying tasks in case the fail (e.g. if a remote service is temporarily down).
 
 Caching and temporary storage
@@ -168,13 +168,13 @@ Storing files
 -------------
 Invenio comes with a default object storage REST API to expose files.
 Underneath the hood, Invenio can however store files in multiple different
-storage systems due to a simple storage abstraction layer. Also, it possible
+storage systems due to a simple storage abstraction layer. Also, it is possible
 to completely by-pass the Invenio object storage and directly use another
 storage system like S3. In this case, you just have to be careful to manage
 access correctly on the external system.
 
 **Multiple storage systems**
 
-One force of Invenio is that you can store files on multiple systems at the
-same time. This is useful if you for instance need to use muliple system or
+One strength of Invenio is that you can store files on multiple systems at the
+same time. This is useful if you for instance need to use multiple systems or
 do live migration from one system to another.
