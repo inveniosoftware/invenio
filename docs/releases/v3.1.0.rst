@@ -237,7 +237,7 @@ your favorite framework, including AngularJS).
 
 We have started the rewrite of Invenio-Search-JS and have already released the
 first version of
-`React-SearckKit <https://inveniosoftware.github.io/react-searchkit/>`_ which
+`React-SearchKit <https://inveniosoftware.github.io/react-searchkit/>`_ which
 eventually will replace Invenio-Search-JS.
 
 Features removed in v3.1
