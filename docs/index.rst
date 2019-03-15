@@ -12,6 +12,7 @@
 
     general/index.rst
     quickstart/index.rst
+    tutorials/bootcamp.rst
     tutorials/build-a-repository.rst
     tutorials/understanding-data-models.rst
     tutorials/managing-access.rst
