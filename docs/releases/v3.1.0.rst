@@ -49,7 +49,7 @@ The new Webpack build system is based on:
 
 Simplified scaffolding
 ~~~~~~~~~~~~~~~~~~~~~~
-We have simplified the scaffolding of new Invenio instance by merging the
+We have simplified the scaffolding of new Invenio instances by merging the
 data model template into the main Cookiecutter-Invenio-Instance.
 
 You can try the new approach by following our :ref:`quickstart`.
@@ -58,13 +58,13 @@ The previous approach of two separate packages -- one for the application
 and one for the data model -- caused friction and confusion for new users and
 we therefore decided to merge both.
 
-This also first with our *long-term* goal, where we want to provide standard
+This also fits with our *long-term* goal, where we want to provide standard
 data models (such as DataCite, Dublin Core, MARC21) so that users don't have
 write their own data model.
 
 **Docker base image**
 
-We have released a new Docker image that can serve as base image for your
+We have released a new Docker image that can serve as a base image for your
 Invenio instances. The image is based on CentOS 7 and comes with Python 3.6,
 Node.JS, NPM and some standard libraries often needed by Invenio.
 
@@ -164,7 +164,7 @@ Backwards incompatible changes
 
 Deprecations in v3.1
 --------------------
-Following list of features have been deprecated and will be removed in either
+The following list of features have been deprecated and will be removed in either
 Invenio v3.2 or Invenio v3.3:
 
 Elasticsearch v2 support
@@ -242,7 +242,7 @@ eventually will replace Invenio-Search-JS.
 
 Features removed in v3.1
 ------------------------
-These following already deprecated features have been removed in Invenio v3.1.
+The following already deprecated features have been removed in Invenio v3.1.
 
 - ``invenio_records.tasks`` was removed from the Invenio-Records module.
 
