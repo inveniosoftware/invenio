@@ -266,13 +266,19 @@ CMS PAS EWK            ---CMS-PAS-EWK
 CMS PAS BTV            ---CMS-PAS-BTV
 CMS PAS FWD            ---CMS-PAS-FWD
 CMS PAS TRK            ---CMS-PAS-TRK
-CMS PAS SMP            ---CMS-PAS-SMP
 CMS PAS PFT            ---CMS-PAS-PFT
 CMS PAS MUO            ---CMS-PAS-MUO
 CMS PAS JME            ---CMS-PAS-JME
 CMS PAS EGM            ---CMS-PAS-EGM
 CMS PAS DIF            ---CMS-PAS-DIF
 CMS PAS B2G            ---CMS-PAS-B2G
+CMS PAS LUM            ---CMS-PAS-LUM
+CMS PAS TAU            ---CMS-PAS-TAU
+CMS PAS GEN            ---CMS-PAS-GEN
+CMS PAS FTR            ---CMS-PAS-FTR
+CMS PAS FSQ            ---CMS-PAS-FSQ
+CMS PAS SBM            ---CMS-PAS-SBM
+CMS PAS PPS            ---CMS-PAS-PPS
 ATLTILECAL PUB         ---ATLTILECAL-PUB
 ATLAS TECH PUB         ---ATLAS-TECH-PUB
 TLCOM MAGNET           ---TLCOM-MAGNET
