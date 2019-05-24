@@ -19,9 +19,10 @@ turn-key repository software. Using Invenio requires you to develop code.
 
 Several repositories have been built on top of Invenio v3, including e.g.:
 
-- Zenodo - General purpose research data repository.
-- CERN Open Data - Open data repository for CERN.
-- CERN Videos - Digital Assets Management system with video encoding support.
+- `Zenodo <https://zenodo.org>`_ - General purpose research data repository.
+- `CERN Open Data <http://opendata.cern.ch>`_ - Open data repository for CERN.
+- `CERN Videos <https://videos.cern.ch>`_ - Digital Assets Management system
+  with video encoding support.
 
 Several repository software solutions are in the progress of being written on
 top of Invenio, including e.g.:
