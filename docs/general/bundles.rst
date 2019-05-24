@@ -125,17 +125,13 @@ Included modules:
 - `invenio-search-ui <https://invenio-search-ui.readthedocs.io>`_
     - User interface for searching records.
 
-Files bundle (beta)
--------------------
-
-.. note::
-
-    This bundle is in beta. The modules are being used in production systems
-    but are still missing some minor changes as well as documentation.
+Files bundle
+------------
 
 The files bundle contains all modules related to management of files in
 Invenio, including an object storage REST API, multiple supported storage
-backends, file previewers, and IIIF image server and an integration layer between files and records.
+backends, file previewers, and IIIF image server and an integration layer
+between files and records.
 
 Included modules:
 
@@ -150,8 +146,6 @@ Included modules:
       files.
 - `invenio-records-files <https://invenio-records-files.readthedocs.io>`_
     - Integration layer between object storage and records.
-- `invenio-xrootd <https://invenio-xrootd.readthedocs.io>`_
-    - Support for the storage protocol XRootD in Invenio.
 
 Statistics bundle (beta)
 ------------------------
@@ -190,7 +184,7 @@ Included modules:
 - `invenio-deposit <https://invenio-deposit.readthedocs.io>`_
     - REST API for managing deposit of records into Invenio with support for
       in progress editing of records.
-- `invenio-files-js <https://invenio-xrootd.readthedocs.io>`_
+- `invenio-files-js <https://www.npmjs.com/package/invenio-files-js>`_
     - AngularJS application for uploading files to Invenio via streaming the
       binary files in an HTTP request.
 - `invenio-records-js <https://invenio-records-js.readthedocs.io>`_
@@ -245,6 +239,8 @@ to change prior to final release and in most cases are missing documentation.
     - Angular 4 application for editing JSON records.
 - `invenio-s3 <https://invenio-s3.readthedocs.io>`_
     - Support for the S3 storage protocol in Invenio.
+- `invenio-saml <https://invenio-saml.readthedocs.io>`_
+    - SAML support for Invenio.
 - `invenio-sequencegenerator <https://invenio-sequencegenerator.readthedocs.io>`_
     - Module for minting and tracking multiple sequences for e.g. report
       numbers, journals etc.
@@ -253,17 +249,19 @@ to change prior to final release and in most cases are missing documentation.
 - `invenio-webhooks <https://invenio-webhooks.readthedocs.io>`_
     - REST API for receiving and processing webhook calls from third-party
       services.
+- `invenio-xrootd <https://invenio-xrootd.readthedocs.io>`_
+    - Support for the storage protocol XRootD in Invenio.
 - `react-searchkit <https://invenio-react-searchkit.readthedocs.io>`_
     - Modular React library for implementing search interfaces on top of
       Invenio, Elasticsearch or other search APIs. Replacement for
       Invenio-Search-JS.
 
-Core libraries
---------------
+Utility libraries
+-----------------
 
-Above Invenio modules dependent on a number of smaller core libraries we have
-developed to take care of e.g. identifier normalization, DataCite/Dublin Core
-metadata generation, testing and citation formatting.
+Above Invenio modules dependent on a number of smaller utility libraries we
+have developed to take care of e.g. identifier normalization, DataCite/Dublin
+Core metadata generation, testing and citation formatting.
 
 - `citeproc-py-styles <https://citeproc-py-styles.readthedocs.io>`_
     - Citation Style Language (CSL) style files packaged as a Python module
