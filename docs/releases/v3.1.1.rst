@@ -1,0 +1,29 @@
+..
+    This file is part of Invenio.
+    Copyright (C) 2019 CERN.
+
+    Invenio is free software; you can redistribute it and/or modify it
+    under the terms of the MIT License; see LICENSE file for more details.
+
+Version 3.1.1
+=============
+
+*Released 2019-07-15*
+
+Invenio v3.1.1 fixes two security issues.
+
+Security fixes
+--------------
+
+- **Invenio-App:** Fixed a Host header injection vulnerability.
+
+- **Invenio-Records:** Fixed a Cross-Site Scripting vulnerability in the
+  administration interface.
+
+Maintenance policy
+------------------
+
+Invenio v3.1 will be supported with bug and security fixes until the release of
+Invenio v3.3 and minimum until 2020-03-31.
+
+See our :ref:`maintenance-policy`.
