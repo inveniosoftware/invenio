@@ -53,7 +53,7 @@ extras_require = {
         'invenio-pidstore>=1.0.0,<1.1.0',
         'invenio-records-rest>=1.4.0,<1.5.0',
         'invenio-records-ui>=1.0.1,<1.1.0',
-        'invenio-records>=1.1.0,<1.2.0',
+        'invenio-records>=1.1.1,<1.2.0',
         'invenio-search-ui>=1.1.1,<1.2.0',
     ],
     # Database version
@@ -97,7 +97,7 @@ setup_requires = [
 
 install_requires = [
     'Flask>=1.0.2',
-    'invenio-app>=1.1.0,<1.2.0',
+    'invenio-app>=1.1.1,<1.2.0',
     'invenio-base>=1.0.2,<1.1.0',
     'invenio-cache>=1.0.0,<1.1.0',
     'invenio-celery>=1.0.1,<1.1.0',
