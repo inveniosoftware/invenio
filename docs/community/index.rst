@@ -23,6 +23,7 @@ are here for the interested.
     development-environment.rst
     translation-guide
     maintainers-guide/index.rst
+    security-policy.rst
     governance
     code-of-conduct
     license
