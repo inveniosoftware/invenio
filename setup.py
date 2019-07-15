@@ -16,12 +16,12 @@ readme = open('README.rst').read()
 
 tests_require = [
     'check-manifest>=0.35',
-    'coverage>=4.4.1',
+    'coverage>=4.5.3',
     'isort>=4.3',
-    'pydocstyle>=2.0.0',
-    'pytest-cov>=2.5.1',
+    'pydocstyle>=3.0.0',
+    'pytest-cov>=2.7.1',
     'pytest-pep8>=1.0.6',
-    'pytest>=3.3.1',
+    'pytest>=4.6.4,<5.0.0',
     'pytest-invenio>=1.0.5,<1.1.0',
 ]
 
