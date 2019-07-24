@@ -22,39 +22,51 @@ tests_require = [
     'pytest-cov>=2.7.1',
     'pytest-pep8>=1.0.6',
     'pytest>=4.6.4,<5.0.0',
-    'pytest-invenio>=1.1.0,<1.2.0',
+    # 'pytest-invenio>=1.2.0,<1.3.0',
+    'pytest-invenio>=1.1.0,<1.3.0',
 ]
 
-db_version = '>=1.0.3,<1.1.0'
-search_version = '>=1.1.0,<1.2.0'
+db_version = '>=1.0.4,<1.1.0'
+search_version = '>=1.2.0,<1.3.0'
 
 extras_require = {
     # Bundles
     'base': [
         'invenio-admin>=1.1.1,<1.2.0',
-        'invenio-assets>=1.1.2,<1.2.0',
-        'invenio-formatter>=1.0.1,<1.1.0',
-        'invenio-logging>=1.1.0,<1.2.0',
+        'invenio-assets>=1.1.3,<1.2.0',
+        'invenio-formatter>=1.0.2,<1.1.0',
+        'invenio-logging>=1.1.0,<1.3.0',
+        # 'invenio-logging>=1.2.0,<1.3.0',
         'invenio-mail>=1.0.2,<1.1.0',
         'invenio-rest>=1.0.0,<1.1.0',
-        'invenio-theme>=1.1.2,<1.2.0',
+        'invenio-theme>=1.1.4,<1.2.0',
     ],
     'auth': [
         'invenio-access>=1.1.0,<1.2.0',
         'invenio-accounts>=1.1.1,<1.2.0',
         'invenio-oauth2server>=1.0.3,<1.1.0',
-        'invenio-oauthclient>=1.1.2,<1.2.0',
+        'invenio-oauthclient>=1.1.3,<1.2.0',
         'invenio-userprofiles>=1.0.1,<1.1.0',
     ],
     'metadata': [
-        'invenio-indexer>=1.0.1,<1.1.0',
+        'invenio-indexer>=1.1.0,<1.2.0',
         'invenio-jsonschemas>=1.0.0,<1.1.0',
-        'invenio-oaiserver>=1.0.3,<1.1.0',
+        'invenio-oaiserver>=1.0.0,<1.2.0',
+        # 'invenio-oaiserver>=1.1.0,<1.2.0',
         'invenio-pidstore>=1.0.0,<1.1.0',
-        'invenio-records-rest>=1.4.0,<1.5.0',
+        'invenio-records-rest>=1.4.0,<1.6.0',
+        # 'invenio-records-rest>=1.5.0,<1.6.0',
         'invenio-records-ui>=1.0.1,<1.1.0',
-        'invenio-records>=1.1.1,<1.2.0',
+        'invenio-records>=1.2.2,<1.3.0',
         'invenio-search-ui>=1.1.1,<1.2.0',
+    ],
+    'files': [
+        'invenio-files-rest>=1.0.0,<1.1.0',
+        'invenio-records-files>=1.0.0,<1.1.0',
+        'invenio-previewer>=1.0.0a12,<1.1.0',
+        # 'invenio-previewer>=1.0.0,<1.1.0',
+        'invenio-iiif>=1.0.0a5,<1.1.0',
+        # 'invenio-iiif>=1.0.0,<1.1.0',
     ],
     # Database version
     'postgresql': [
@@ -96,12 +108,12 @@ setup_requires = [
 ]
 
 install_requires = [
-    'Flask>=1.0.2',
-    'invenio-app>=1.1.1,<1.2.0',
-    'invenio-base>=1.0.2,<1.1.0',
+    'Flask>=1.0.4',
+    'invenio-app>=1.2.0,<1.3.0',
+    'invenio-base>=1.1.0,<1.2.0',
     'invenio-cache>=1.0.0,<1.1.0',
     'invenio-celery>=1.0.1,<1.1.0',
-    'invenio-config>=1.0.1,<1.1.0',
+    'invenio-config>=1.0.2,<1.1.0',
     'invenio-i18n>=1.1.1,<1.2.0',
 ]
 
@@ -144,6 +156,6 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
-        'Development Status :: 5 - Production/Stable',
+        'Development Status :: 3 - Alpha',
     ],
 )
