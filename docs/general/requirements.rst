@@ -19,7 +19,7 @@ Following is a brief overview of the requirements of Invenio:
 - Supported databases:
     - PostgreSQL v9.4+, MySQL 5.6+ or SQLite (for testing).
 - Supported search engines:
-    - Elasticsearch v5 or v6.
+    - Elasticsearch v6 or v7.
 - Supported memory caches:
     - Redis or Memcache.
 - Supported message queues:

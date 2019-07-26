@@ -20,7 +20,7 @@ infrastructure. It consists of:
 - **Application servers:** UWSGI, Gunicorn or mod_wsgi.
 - **Distributed task queue:** Celery
 - **Database:** PostgreSQL, MySQL or SQLite.
-- **Search engine:** Elasticsearch (v5 and v6).
+- **Search engine:** Elasticsearch (v6 and v7).
 - **Message queue:** RabbitMQ, Redis or Amazon SQS.
 - **Cache system:** Redis or Memcache.
 - **Storage system:** Local, S3, XRootD, WebDAV and more.
