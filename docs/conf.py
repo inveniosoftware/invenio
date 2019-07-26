@@ -320,18 +320,18 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    'flask': ('http://flask.pocoo.org/docs/', None),
+    'flask': ('https://flask.readthedocs.io/', None),
     'flaskassets': ('https://flask-assets.readthedocs.io/en/latest/', None),
     'flaskregistry': (
         'https://flask-registry.readthedocs.io/en/latest/', None),
     'flaskscript': ('https://flask-script.readthedocs.io/en/latest/', None),
     'invenio-access': (
         'https://invenio-access.readthedocs.io/en/latest/', None),
-    'jinja': ('http://jinja.pocoo.org/docs/', None),
-    'python': ('https://docs.python.org/2.7/', None),
+    'jinja': ('https://jinja.readthedocs.io/', None),
+    'python': ('https://docs.python.org/', None),
     'sqlalchemy': ('http://docs.sqlalchemy.org/en/latest/', None),
     'webassets': ('https://webassets.readthedocs.io/en/latest/', None),
-    'werkzeug': ('http://werkzeug.pocoo.org/docs/', None),
+    'werkzeug': ('https://werkzeug.readthedocs.io/', None),
 }
 
 # Autodoc configuraton.

@@ -88,6 +88,9 @@ extras_require = {
     'elasticsearch6': [
         'invenio-search[elasticsearch6]{}'.format(search_version),
     ],
+    'elasticsearch7': [
+        'invenio-search[elasticsearch7]{}'.format(search_version),
+    ],
     # Docs and test dependencies
     'docs': [
         'Sphinx>=1.5.1',
