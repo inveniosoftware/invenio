@@ -62,11 +62,9 @@ extras_require = {
     ],
     'files': [
         'invenio-files-rest>=1.0.0,<1.1.0',
-        'invenio-records-files>=1.0.0,<1.1.0',
-        'invenio-previewer>=1.0.0a12,<1.1.0',
-        # 'invenio-previewer>=1.0.0,<1.1.0',
-        'invenio-iiif>=1.0.0a5,<1.1.0',
-        # 'invenio-iiif>=1.0.0,<1.1.0',
+        'invenio-records-files>=1.1.0,<1.2.0',
+        'invenio-previewer>=1.0.0,<1.1.0',
+        'invenio-iiif>=1.0.0,<1.1.0',
     ],
     # Database version
     'postgresql': [
