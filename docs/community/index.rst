@@ -22,6 +22,7 @@ are here for the interested.
     style-guide
     development-environment.rst
     translation-guide
+    documentation-style-guide.rst
     maintainers-guide/index.rst
     security-policy.rst
     governance
