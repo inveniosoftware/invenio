@@ -38,7 +38,7 @@ extras_require = {
         'invenio-logging>=1.1.0,<1.3.0',
         # 'invenio-logging>=1.2.0,<1.3.0',
         'invenio-mail>=1.0.2,<1.1.0',
-        'invenio-rest>=1.0.0,<1.1.0',
+        'invenio-rest>=1.1.0,<1.2.0',
         'invenio-theme>=1.1.4,<1.2.0',
     ],
     'auth': [
@@ -57,7 +57,7 @@ extras_require = {
         'invenio-records-rest>=1.4.0,<1.6.0',
         # 'invenio-records-rest>=1.5.0,<1.6.0',
         'invenio-records-ui>=1.0.1,<1.1.0',
-        'invenio-records>=1.2.2,<1.3.0',
+        'invenio-records>=1.3.0,<1.4.0',
         'invenio-search-ui>=1.1.1,<1.2.0',
     ],
     'files': [
