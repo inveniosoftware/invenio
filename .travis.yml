@@ -41,11 +41,11 @@ env:
     # ES7 + MySQL
     - REQUIREMENTS=release EXTRAS=all,mysql,elasticsearch7 SQLALCHEMY_DATABASE_URI="mysql+pymysql://travis@localhost:3306/invenio" ES_URL=$ES7_DOWNLOAD_URL
     # ES7 + PostgreSQL
-    - REQUIREMENTS=devel EXTRAS=all,postgresql,elasticsearch7 SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/invenio" ES_URL=$ES7_DOWNLOAD_URL
+    - REQUIREMENTS=devel EXTRAS=all,postgresql,elasticsearch7 SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/invenio" ES_URL=$ES7_DOWNLOAD_URL DEPLOY=true
 
 python:
   - "2.7"
-  - "3.5"
+  - "3.6"
 
 matrix:
   fast_finish: true
@@ -86,5 +86,5 @@ deploy:
   distributions: "sdist bdist_wheel"
   on:
     tags: true
-    python: "2.7"
+    python: "3.6"
     condition: $DEPLOY = true
