@@ -113,7 +113,7 @@ install_requires = [
     'invenio-app>=1.2.0,<1.3.0',
     'invenio-base>=1.1.0,<1.2.0',
     'invenio-cache>=1.0.0,<1.1.0',
-    'invenio-celery>=1.0.1,<1.1.0',
+    'invenio-celery>=1.1.0,<1.2.0',
     'invenio-config>=1.0.2,<1.1.0',
     'invenio-i18n>=1.1.1,<1.2.0',
 ]
