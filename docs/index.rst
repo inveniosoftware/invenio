@@ -16,6 +16,7 @@
     tutorials/build-a-repository.rst
     tutorials/understanding-data-models.rst
     tutorials/managing-access.rst
+    tutorials/upgrade-marshmallow.rst
     deployment/securing-your-instance.rst
     architecture/infrastructure.rst
     architecture/application.rst
