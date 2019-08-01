@@ -14,6 +14,7 @@ include .editorconfig
 include LICENSE
 include docs/requirements.txt
 include pytest.ini
+prune docs/_build
 recursive-include docs *.bat
 recursive-include docs *.css
 recursive-include docs *.gif
