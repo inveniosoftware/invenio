@@ -62,28 +62,28 @@ must add this new field to the data model's:
 JSONSchema
 ~~~~~~~~~~
 In the quickstart example, our JSONSchema is located in
-``.../records/jsonschemas/record-v.1.0.0.json``, and you would add something
-like below to our schema:
+``.../records/jsonschemas/records/record-v.1.0.0.json``, and you would add
+something like below to our schema:
 
 .. code-block:: json
 
     {
         "owners": {
-        "type": "integer"
+            "type": "integer"
         }
     }
-    
+
 Elasticsearch mapping
 ~~~~~~~~~~~~~~~~~~~~~
 In the quickstart example, our Elastisearch mapping is likely located in
-``.../records/mappings/v6/record-v.1.0.0.json``, and you would add something
-like below to our mapping:
+``.../records/mappings/v7/records/record-v.1.0.0.json``, and you would add
+something like below to our mapping:
 
 .. code-block:: json
 
     {
         "owners": {
-        "type": "int"
+            "type": "integer"
         }
     }
 
