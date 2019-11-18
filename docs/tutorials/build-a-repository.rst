@@ -156,7 +156,7 @@ configuring the following files:
   needed for developing the instance locally:
 
   - ``db``: The database, PostgreSQL or MySQL, exposing the 5432 or 3306 ports.
-  - ``es``: Elasticsearch version 5 or 6, exposing the 9200 and 9300 ports.
+  - ``es``: Elasticsearch version 6 or 7, exposing the 9200 and 9300 ports.
   - ``mq``: RabbitMQ, exposing port 5672 for the service and port 15672 for a
     management web server (accessible via the default username/password
     ``guest:guest``).

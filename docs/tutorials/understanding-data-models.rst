@@ -170,11 +170,11 @@ mapping
     |   |-- records
     |   |   |-- mappings
     |   |   |   |-- __init__.py
-    |   |   |   |-- v5
+    |   |   |   |-- v6
     |   |   |   |   |-- __init__.py
     |   |   |   |   `-- records
     |   |   |   |       `-- record-v1.0.0.json
-    |   |   |   `-- v6
+    |   |   |   `-- v7
     |   |   |       |-- __init__.py
     |   |   |       `-- records
     |   |   |           `-- record-v1.0.0.json
@@ -182,27 +182,25 @@ mapping
 Note, you need an Elasticsearch mapping per major version of Elasticsearch
 you want to support.
 
-In ``record-v1.0.0.json`` you should see something like:
+In ``record-v1.0.0.json`` (for Elasticsearch 7) you should see something like:
 
 .. code-block:: json
 
     {
         "mappings": {
-            "record-v1.0.0": {
-                "date_detection": false,
-                "numeric_detection": false,
-                "properties": {
-                    "$schema": {
-                        "type": "text",
-                        "index": false
-                    },
-                    "title": {
-                        "type": "text",
-                    },
-                    "keywords": {
-                        "type": "keyword"
-                    },
-                }
+            "date_detection": false,
+            "numeric_detection": false,
+            "properties": {
+                "$schema": {
+                    "type": "text",
+                    "index": false
+                },
+                "title": {
+                    "type": "text",
+                },
+                "keywords": {
+                    "type": "keyword"
+                },
             }
         }
     }
@@ -234,7 +232,7 @@ are using the same folder structure and naming scheme:
     |   |   |       `-- record-v1.0.0.json
     |   |   |-- mappings
     |   |   |   |-- __init__.py
-    |   |   |   `-- v6
+    |   |   |   `-- v7
     |   |   |       |-- __init__.py
     |   |   |       `-- records
     |   |   |           `-- record-v1.0.0.json
@@ -279,7 +277,7 @@ way, you create a new JSONSchema and new mappings (e.g. ``record-v1.1.0.json``)
     |   |   |       `-- record-v1.1.0.json
     |   |   |-- mappings
     |   |   |   |-- __init__.py
-    |   |   |   `-- v6
+    |   |   |   `-- v7
     |   |   |       |-- __init__.py
     |   |   |       `-- records
     |   |   |           `-- record-v1.0.0.json
@@ -322,7 +320,7 @@ Note, that the left-hand-side of the entry point,
 .. note::
 
     A typical mistake is to forget to add a blank ``__init__.py`` file inside
-    the ``mappings``, ``v5`` and ``v6`` folders, in which case the entry points
+    the ``mappings``, ``v6`` and ``v7`` folders, in which case the entry points
     won't be correctly discovered.
 
 .. _models-marshmallow:
