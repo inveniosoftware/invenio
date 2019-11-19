@@ -32,24 +32,27 @@ record:
 
 .. code-block:: shell
 
-  {
-    "created": "2018-05-23T13:28:19.426206+00:00",
-    "id": 1,
-    "links": {
-      "self": "https://localhost:5000/api/records/1"
-    },
-    "metadata": {
-      "contributors": [
-        {
-          "name": "Doe, John"
-        }
-      ],
-      "id": 1,
-      "title": "Some title"
-    },
-    "revision": 0,
-    "updated": "2018-05-23T13:28:19.426213+00:00"
-  }
+    {
+      "_bucket": "9ae1c979-9c6a-4603-afb2-38074eb48a54",
+      "created": "2019-11-22T10:30:06.135431+00:00",
+      "id": "1",
+      "links": {
+        "files": "https://localhost:5000/api/records/1/files",
+        "self": "https://localhost:5000/api/records/1"
+      },
+      "metadata": {
+        "$schema": "https://my-site.com/schemas/records/record-v1.0.0.json",
+        "contributors": [
+          {
+            "name": "Doe, John"
+          }
+        ],
+        "id": "1",
+        "title": "Some title"
+      },
+      "revision": 0,
+      "updated": "2019-11-22T10:30:06.135438+00:00"
+    }
 
 .. note::
 
@@ -74,23 +77,119 @@ fetch it via the REST API:
       https://localhost:5000/api/records/1?prettyprint=1
 
   {
-    "created": "2018-05-23T13:28:19.426206+00:00",
-    "id": 1,
+    "_bucket": "9ae1c979-9c6a-4603-afb2-38074eb48a54",
+    "created": "2019-11-22T10:30:06.135431+00:00",
+    "id": "1",
     "links": {
+      "files": "https://localhost:5000/api/records/1/files",
       "self": "https://localhost:5000/api/records/1"
     },
     "metadata": {
+      "$schema": "https://my-site.com/schemas/records/record-v1.0.0.json",
       "contributors": [
         {
           "name": "Doe, John"
         }
       ],
-      "id": 1,
+      "id": "1",
       "title": "Some title"
     },
     "revision": 0,
-    "updated": "2018-05-23T13:28:19.426213+00:00"
+    "updated": "2019-11-22T10:30:06.135438+00:00"
   }
+
+.. _upload-a-file:
+
+Upload a file
+-------------
+
+You can upload a file to a record.
+
+.. code-block:: shell
+
+  # Create an example file
+
+  $ echo 'example' > example.txt
+
+  # Upload a file named example.txt to the record with pid of 1
+
+  $ curl -k -X PUT https://localhost:5000/api/records/1/files/example.txt \
+     -H "Content-Type: application/octet-stream" \
+     --data-binary @example.txt
+
+  {
+    "version_id": "059a6706-632f-403a-beab-36e31e370737",
+    "is_head": true,
+    "mimetype": "text/plain",
+    "size": 8,
+    "key": "example.txt",
+    "delete_marker": false,
+    "links": {
+      "self": "https://localhost:5000/api/records/1/files/example.txt",
+      "version": "https://localhost:5000/api/records/1/files/example.txt?versionId=059a6706-632f-403a-beab-36e31e370737",
+      "uploads": "https://localhost:5000/api/records/1/files/example.txt?uploads"
+    },
+    "checksum": "md5:ddce269a1e3d054cae349621c198dd52",
+    "created": "2019-11-22T10:34:08.944425",
+    "tags": {},
+    "updated": "2019-11-22T10:34:08.951942"
+  }
+
+.. _list-files-of-a-record:
+
+List files of a record
+----------------------
+
+Get the list of files for the record.
+
+.. code-block:: shell
+
+  $ curl -k -X GET https://localhost:5000/api/records/1/files?prettyprint=1
+
+  {
+    "contents": [
+    {
+      "version_id": "059a6706-632f-403a-beab-36e31e370737",
+      "is_head": true,
+      "mimetype": "text/plain",
+      "size": 8,
+      "key": "example.txt",
+      "delete_marker": false,
+      "links": {
+        "self": "https://localhost:5000/api/records/1/files?key=example.txt",
+        "version": "https://localhost:5000/api/records/1/files?key=example.txt&versionId=059a6706-632f-403a-beab-36e31e370737",
+        "uploads": "https://localhost:5000/api/records/1/files?key=example.txt?uploads"
+      },
+      "checksum": "md5:ddce269a1e3d054cae349621c198dd52",
+      "created": "2019-11-22T10:34:08.944425",
+      "tags": {},
+      "updated": "2019-11-22T10:34:08.951942"
+    }
+    ],
+    "id": "9ae1c979-9c6a-4603-afb2-38074eb48a54",
+    "size": 16,
+    "locked": false,
+    "max_file_size": null,
+    "links": {
+      "self": "https://localhost:5000/api/records/1/files",
+      "versions": "https://localhost:5000/api/records/1/files?versions",
+      "uploads": "https://localhost:5000/api/records/1/files?uploads"
+    },
+    "quota_size": null,
+    "created": "2019-11-22T10:30:06.118477",
+    "updated": "2019-11-22T10:34:08.962336"
+  }
+
+.. _download-a-file:
+
+Download a file
+---------------
+
+Download the file named ``example.txt`` of the record.
+
+.. code-block:: shell
+
+  $ curl -k -X GET https://localhost:5000/api/records/1/files/example.txt -o example.txt
 
 .. _search-for-records:
 
@@ -123,28 +222,31 @@ API from the ``/api/records`` endpoint:
     "hits": {
       "hits": [
         {
-          "created": "2018-05-23T13:28:19.426206+00:00",
-          "id": 1,
+          "_bucket": "9ae1c979-9c6a-4603-afb2-38074eb48a54",
+          "created": "2019-11-22T10:30:06.135431+00:00",
+          "id": "1",
           "links": {
+            "files": "https://localhost:5000/api/records/1/files",
             "self": "https://localhost:5000/api/records/1"
           },
           "metadata": {
+            "$schema": "https://my-site.com/schemas/records/record-v1.0.0.json",
             "contributors": [
               {
                 "name": "Doe, John"
               }
             ],
-            "id": 1,
+            "id": "1",
             "title": "Some title"
           },
           "revision": 0,
-          "updated": "2018-05-23T13:28:19.426213+00:00"
+          "updated": "2019-11-22T10:30:06.135438+00:00"
         }
       ],
       "total": 1
     },
     "links": {
-      "self": "https://localhost:5000/api/records/?size=10&sort=mostrecent&page=1"
+      "self": "https://localhost:5000/api/records/?sort=mostrecent&size=10&page=1"
     }
   }
 
