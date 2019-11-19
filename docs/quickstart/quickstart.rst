@@ -20,7 +20,7 @@ configured on your system:
 
 - `Docker v1.18+ <https://docs.docker.com/install>`_ and `Docker Compose v1.23+ <https://docs.docker.com/compose/install/>`_
 - `NodeJS v6.x+ and NPM v4.x+ <https://nodejs.org/en/download/package-manager>`_
-- `Enough virtual memory <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-prod-mode>`_
+- `Enough virtual memory <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#_set_vm_max_map_count_to_at_least_262144>`_
   for Elasticsearch (when running in Docker).
 - `Cookiecutter <https://cookiecutter.readthedocs.io>`_
 - `Pipenv <https://pipenv.readthedocs.io>`_
@@ -75,7 +75,7 @@ First, fire up the database, Elasticsearch, Redis and RabbitMQ:
 
 If the Elasticsearch service fails to start mentioning that it requires more
 virtual memory, see the following
-`fix <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-prod-mode>`_.
+`fix <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#_set_vm_max_map_count_to_at_least_262144>`_.
 
 Next, activate the virtualenv of the new project by running:
 
