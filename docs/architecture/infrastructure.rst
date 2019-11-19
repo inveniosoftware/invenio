@@ -166,11 +166,6 @@ storage. The cache is for instance used for:
 
 Storing files
 -------------
-Invenio files bundle consists of the necessary invenio modules to provide
-out of the box support for file storage and preview.
-
-- How to enable file support for your invenio application. (move to training)
-
 Invenio comes with a default object storage REST API to expose files.
 Underneath the hood, Invenio can however store files in multiple different
 storage systems due to a simple storage abstraction layer. Also, it is possible
