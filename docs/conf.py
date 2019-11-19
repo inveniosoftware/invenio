@@ -320,19 +320,29 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    'flask': ('https://flask.readthedocs.io/', None),
+    'flask': ('https://flask.palletsprojects.com/en/1.1.x/', None),
     'flaskassets': ('https://flask-assets.readthedocs.io/en/latest/', None),
     'flaskregistry': (
         'https://flask-registry.readthedocs.io/en/latest/', None),
     'flaskscript': ('https://flask-script.readthedocs.io/en/latest/', None),
     'invenio-access': (
         'https://invenio-access.readthedocs.io/en/latest/', None),
-    'jinja': ('https://jinja.readthedocs.io/', None),
+    'invenio-celery': (
+        'https://invenio-celery.readthedocs.io/en/latest/', None),
+    'invenio-files-rest': (
+        'https://invenio-files-rest.readthedocs.io/en/latest/', None),
+    'invenio-previewer': (
+        'https://invenio-previewer.readthedocs.io/en/latest/', None),
+    'invenio-iiif': (
+        'https://invenio-iiif.readthedocs.io/en/latest/', None),
+    'invenio-records-files': (
+        'https://invenio-records-files.readthedocs.io/en/latest/', None),
+    'jinja': ('https://jinja.palletsprojects.com/en/2.10.x/', None),
     'python': ('https://docs.python.org/', None),
     'sqlalchemy': ('http://docs.sqlalchemy.org/en/latest/', None),
     'webassets': ('https://webassets.readthedocs.io/en/latest/', None),
-    'werkzeug': ('https://werkzeug.readthedocs.io/', None),
+    'werkzeug': ('https://werkzeug.palletsprojects.com/en/0.16.x/', None),
 }
 
-# Autodoc configuraton.
+# Autodoc configuration.
 autoclass_content = 'both'

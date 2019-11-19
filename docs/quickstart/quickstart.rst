@@ -1,6 +1,6 @@
 ..
     This file is part of Invenio.
-    Copyright (C) 2015-2018 CERN.
+    Copyright (C) 2015-2019 CERN.
     Copyright (C) 2018 Northwestern University, Feinberg School of Medicine, Galter Health Sciences Library.
 
     Invenio is free software; you can redistribute it and/or modify it
@@ -15,97 +15,83 @@ Launch an Invenio instance
 
 Prerequisites
 -------------
-To be able to develop and run Invenio you will need the following installed and
-configured on your system:
+Invenio requires the following software installed in your system:
 
 - `Docker v1.18+ <https://docs.docker.com/install>`_ and `Docker Compose v1.23+ <https://docs.docker.com/compose/install/>`_
 - `NodeJS v6.x+ and NPM v4.x+ <https://nodejs.org/en/download/package-manager>`_
-- `Enough virtual memory <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-prod-mode>`_
+- `Enough virtual memory <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#_set_vm_max_map_count_to_at_least_262144>`_
   for Elasticsearch (when running in Docker).
-- `Cookiecutter <https://cookiecutter.readthedocs.io>`_
+- The Python package `Cookiecutter <https://cookiecutter.readthedocs.io>`_
 - `Pipenv <https://pipenv.readthedocs.io>`_
-
-Invenio uses Cookiecutter to scaffold the boilerplate for your new instance and
-uses Pipenv to manage Python dependencies in a virtual environment. Above links
-contain detailed installation instructions, but the impatient can use following
-commands:
-
-.. code-block:: shell
-
-  # Install cookiecutter if it is not already installed
-  $ sudo apt-get install cookiecutter
-  $ sudo apt-get install pipenv
-  # or e.g.
-  $ pip install --upgrade cookiecutter pipenv
 
 .. _bootstrap:
 
-Scaffold
---------
-First step is to scaffold a new instance using the `official Invenio
+Create an Invenio instance
+--------------------------
+First step is to create your new Invenio instance using the `official Invenio
 cookiecutter template
 <https://github.com/inveniosoftware/cookiecutter-invenio-instance>`_.
 
 .. code-block:: shell
 
-  $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance --checkout v3.1
-  # ...fill in the fields...
+    $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance --checkout v3.2
 
-Note, the cookiecutter script will ask you to resolve some TODOs. These will
-be covered in the :ref:`next-steps` section of this quick start guide.
+The cookiecutter initialisation procedure will prompt you with a series of questions
+aiming to customise your new instance, e.g. the name of your application.
 
-The scaffolded instance comes by default with a toy example data model to help
-you get started.
+.. note::
+    At the end of the initialisation, you will be warned to manually change some parts
+    of the generated code marked with ``TODOs``. These will be covered in the
+    :ref:`final-steps` section of this quick start guide.
 
 Install
 -------
-Now that we have our instance's source code ready we can proceed with the
-initial setup of the services and dependencies of the project:
+Now that your project is generated, you will have to install all needed Python dependencies
+and initialise the application services such as the database and the search engine.
 
-First, fire up the database, Elasticsearch, Redis and RabbitMQ:
+From now on, the quick start guide will use the name ``my-site`` to refer to your
+newly created Invenio application.
 
-.. code-block:: shell
+Let's run the service using ``docker-compose``:
 
-  $ cd my-site/
-  $ docker-compose up -d
-  Creating mysite_cache_1 ... done
-  Creating mysite_db_1    ... done
-  Creating mysite_es_1    ... done
-  Creating mysite_mq_1    ... done
+.. code-block:: console
 
-If the Elasticsearch service fails to start mentioning that it requires more
-virtual memory, see the following
-`fix <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-prod-mode>`_.
+    $ cd my-site/
+    $ docker-compose up
+    Creating my-site_cache_1 ... done
+    Creating my-site_db_1    ... done
+    Creating my-site_es_1    ... done
+    Creating my-site_mq_1    ... done
 
-Next, activate the virtualenv of the new project by running:
+If Elasticsearch service fails to start, it might be due to its requirement for
+additional virtual memory than the one provided by your system defaults.
+For more information, see
+`Elasticsearch documentation <https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#_set_vm_max_map_count_to_at_least_262144>`_.
 
-.. code-block:: shell
+Let's run the installation scripts:
 
-  $ pipenv shell
+.. code-block:: console
 
-Finally, install all dependencies, build the JS/CSS assets, create the database
-tables and create the Elasticsearch indices by running the bootstrap and setup
-scripts:
+    $ ./scripts/bootstrap
+    $ ./scripts/setup
 
-.. code-block:: shell
+This will:
 
-  (my-site)$ ./scripts/bootstrap
-  (my-site)$ ./scripts/setup
+* install required Python packages
+* build JS/CSS assets
+* create and initialise the database and the search engine
 
 Run
 ---
-You can now start the development web server and the background worker for your
-new Invenio instance:
+Let's run Invenio and open your browser to https://127.0.0.1:5000/:
 
-.. code-block:: shell
+.. code-block:: console
 
-  (my-site)$ ./scripts/server
-  * Environment: development
-  * Debug mode: on
-  * Running on https://127.0.0.1:5000/ (Press CTRL+C to quit)
+    $ ./scripts/server
+    * Environment: development
+    * Debug mode: on
+    * Running on https://127.0.0.1:5000/ (Press CTRL+C to quit)
 
-You can now visit https://127.0.0.1:5000/ !
-
-Continue tutorial
-~~~~~~~~~~~~~~~~~
-:ref:`crud-operations`
+Records
+-------
+Learn how to create and view records: :ref:`crud-operations`.

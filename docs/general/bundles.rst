@@ -128,10 +128,9 @@ Included modules:
 Files bundle
 ------------
 
-The files bundle contains all modules related to management of files in
-Invenio, including an object storage REST API, multiple supported storage
-backends, file previewers, and IIIF image server and an integration layer
-between files and records.
+The files bundle contains all modules related to files management,
+an object storage REST API, storage backends, file previewers,
+IIIF image APIs and an integration layer between files and records.
 
 Included modules:
 
@@ -233,10 +232,6 @@ to change prior to final release and in most cases are missing documentation.
 - `invenio-query-parser <https://invenio-query-parser.readthedocs.io>`_
     - Invenio v1 compatible query parser for Invenio v3. Note the module is GPL
       licensed due to a GPL-licensed dependency.
-- `invenio-records-editor <https://invenio-records-editor.readthedocs.io>`_
-    - JSON record editor.
-- `invenio-records-editor-js <https://invenio-records-editor-js.readthedocs.io>`_
-    - Angular 4 application for editing JSON records.
 - `invenio-s3 <https://invenio-s3.readthedocs.io>`_
     - Support for the S3 storage protocol in Invenio.
 - `invenio-saml <https://invenio-saml.readthedocs.io>`_

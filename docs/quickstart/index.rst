@@ -15,4 +15,4 @@ Quickstart
 
    quickstart
    crud-operations
-   next-steps
+   final-steps

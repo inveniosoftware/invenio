@@ -1,6 +1,6 @@
 ..
     This file is part of Invenio.
-    Copyright (C) 2015-2018 CERN.
+    Copyright (C) 2015-2019 CERN.
     Copyright (C) 2018 Northwestern University, Feinberg School of Medicine, Galter Health Sciences Library.
 
     Invenio is free software; you can redistribute it and/or modify it
@@ -8,146 +8,241 @@
 
 .. _crud-operations:
 
-Create, Display, Search Records
-===============================
+Create, display and search records
+==================================
 
 .. _create-a-record:
 
 Create a record
 ---------------
-By default, the toy data model has a records REST API endpoint configured,
-which allows performing CRUD and search operations over records. Let's create a
-simple record via ``curl``, by sending a ``POST`` request to ``/api/records``
-with some sample data:
+Invenio provides REST APIs to perform operations on records, such as
+create, search or retrieve.
 
-.. code-block:: shell
+Let's create a simple record via ``curl``, by sending a ``POST`` request to
+the ``/api/records`` endpoint with some sample data:
 
-  $ curl -k --header "Content-Type: application/json" \
-      --request POST \
-      --data '{"title":"Some title", "contributors": [{"name": "Doe, John"}]}' \
-      https://localhost:5000/api/records/?prettyprint=1
+.. code-block:: console
 
-When the request was successful, the server returns the details of the created
-record:
+    $ curl -k --header "Content-Type: application/json" \
+        --request POST \
+        --data '{"title":"Some title", "contributors": [{"name": "Doe, John"}]}' \
+        https://127.0.0.1:5000/api/records/?prettyprint=1
 
-.. code-block:: shell
+The response of the request contains the newly created record metadata:
 
-  {
-    "created": "2018-05-23T13:28:19.426206+00:00",
-    "id": 1,
-    "links": {
-      "self": "https://localhost:5000/api/records/1"
-    },
-    "metadata": {
-      "contributors": [
-        {
-          "name": "Doe, John"
-        }
-      ],
-      "id": 1,
-      "title": "Some title"
-    },
-    "revision": 0,
-    "updated": "2018-05-23T13:28:19.426213+00:00"
-  }
+.. code-block:: console
 
-.. note::
-
-    Because we are using a self-signed SSL certificate to enable HTTPS, your
-    web browser will probably display a warning when you access the website.
-    You can usually get around this by following the browser's instructions in
-    the warning message. For CLI tools like ``curl``, you can ignore the SSL
-    verification via the ``-k/--insecure`` option.
+    {
+      "created": "2019-11-22T10:30:06.135431+00:00",
+      "id": "1",
+      "links": {
+        "files": "https://127.0.0.1:5000/api/records/1/files",
+        "self": "https://127.0.0.1:5000/api/records/1"
+      },
+      "metadata": {
+        "contributors": [
+          {
+            "name": "Doe, John"
+          }
+        ],
+        "id": "1",
+        "title": "Some title"
+      },
+      "revision": 0,
+      "updated": "2019-11-22T10:30:06.135438+00:00"
+    }
 
 .. _display-a-record:
 
 Display a record
 ----------------
 
-You can now visit the record's page at https://localhost:5000/records/1, or
-fetch it via the REST API:
+You can now visit the record's page at https://127.0.0.1:5000/records/1.
 
-.. code-block:: shell
+.. note::
+    To enable HTTPS, Invenio uses a self-signed SSL certificate.
+    Your web browser should display a warning when accessing the website
+    since it will consider it insecure. You can safely ignore it when
+    developing locally.
 
-  # You can find this URL under the "links.self" key of the previous response
-  $ curl -k --header "Content-Type: application/json" \
-      https://localhost:5000/api/records/1?prettyprint=1
+You can also fetch the record via REST APIs:
 
-  {
-    "created": "2018-05-23T13:28:19.426206+00:00",
-    "id": 1,
-    "links": {
-      "self": "https://localhost:5000/api/records/1"
-    },
-    "metadata": {
-      "contributors": [
-        {
-          "name": "Doe, John"
-        }
-      ],
-      "id": 1,
-      "title": "Some title"
-    },
-    "revision": 0,
-    "updated": "2018-05-23T13:28:19.426213+00:00"
-  }
+.. code-block:: console
+
+    $ curl -k --header "Content-Type: application/json" \
+        https://127.0.0.1:5000/api/records/1?prettyprint=1
+
+    {
+      "created": "2019-11-22T10:30:06.135431+00:00",
+      "id": "1",
+      "links": {
+        "files": "https://127.0.0.1:5000/api/records/1/files",
+        "self": "https://127.0.0.1:5000/api/records/1"
+      },
+      "metadata": {
+        "contributors": [
+          {
+            "name": "Doe, John"
+          }
+        ],
+        "id": "1",
+        "title": "Some title"
+      },
+      "revision": 0,
+      "updated": "2019-11-22T10:30:06.135438+00:00"
+    }
 
 .. _search-for-records:
 
 Search for records
 ------------------
+The record that you have created is safely stored in the database but
+also indexed in Elasticsearch for fast searching. You can see the list of
+records and perform search queries at https://127.0.0.1:5000/search,
+or via the REST API from the ``/api/records`` endpoint:
 
-The record you created before, besides being inserted into the database, is
-also indexed in Elasticsearch and available for searching. You can search for
-it via the Search UI page at https://localhost:5000/search, or via the REST
-API from the ``/api/records`` endpoint:
+.. code-block:: console
 
-.. code-block:: shell
+    $ curl -k --header "Content-Type: application/json" \
+        https://127.0.0.1:5000/api/records/?prettyprint=1
 
-  $ curl -k --header "Content-Type: application/json" \
-      https://localhost:5000/api/records/?prettyprint=1
-
-  {
-    "aggregations": {
-      "keywords": {
-        "buckets": [],
-        "doc_count_error_upper_bound": 0,
-        "sum_other_doc_count": 0
-      },
-      "type": {
-        "buckets": [],
-        "doc_count_error_upper_bound": 0,
-        "sum_other_doc_count": 0
-      }
-    },
-    "hits": {
-      "hits": [
-        {
-          "created": "2018-05-23T13:28:19.426206+00:00",
-          "id": 1,
-          "links": {
-            "self": "https://localhost:5000/api/records/1"
-          },
-          "metadata": {
-            "contributors": [
-              {
-                "name": "Doe, John"
-              }
-            ],
-            "id": 1,
-            "title": "Some title"
-          },
-          "revision": 0,
-          "updated": "2018-05-23T13:28:19.426213+00:00"
+    {
+      "aggregations": {
+        "keywords": {
+          "buckets": [],
+          "doc_count_error_upper_bound": 0,
+          "sum_other_doc_count": 0
+        },
+        "type": {
+          "buckets": [],
+          "doc_count_error_upper_bound": 0,
+          "sum_other_doc_count": 0
         }
-      ],
-      "total": 1
-    },
-    "links": {
-      "self": "https://localhost:5000/api/records/?size=10&sort=mostrecent&page=1"
+      },
+      "hits": {
+        "hits": [
+          {
+            "created": "2019-11-22T10:30:06.135431+00:00",
+            "id": "1",
+            "links": {
+              "files": "https://127.0.0.1:5000/api/records/1/files",
+              "self": "https://127.0.0.1:5000/api/records/1"
+            },
+            "metadata": {
+              "contributors": [
+                {
+                  "name": "Doe, John"
+                }
+              ],
+              "id": "1",
+              "title": "Some title"
+            },
+            "revision": 0,
+            "updated": "2019-11-22T10:30:06.135438+00:00"
+          }
+        ],
+        "total": 1
+      },
+      "links": {
+        "self": "https://127.0.0.1:5000/api/records/?sort=mostrecent&size=10&page=1"
+      }
     }
-  }
 
-Continue tutorial
-~~~~~~~~~~~~~~~~~
-:ref:`next-steps`
+.. _upload-a-file:
+
+Upload a file
+-------------
+Invenio allows you to attach files to a record. Let's upload a file
+to the previously created record.
+
+.. code-block:: console
+
+    # create a sample file
+
+    $ echo 'my file content' > example.txt
+
+    # Upload the file to the record with PID 1
+
+    $ curl -k -X PUT https://127.0.0.1:5000/api/records/1/files/example.txt \
+        -H "Content-Type: application/octet-stream" \
+        --data-binary @example.txt
+
+The response of the request contains the uploaded file's metadata:
+
+.. code-block:: console
+
+    {
+      "version_id": "059a6706-632f-403a-beab-36e31e370737",
+      "is_head": true,
+      "mimetype": "text/plain",
+      "size": 8,
+      "key": "example.txt",
+      "delete_marker": false,
+      "links": {
+        "self": "https://127.0.0.1:5000/api/records/1/files/example.txt",
+        "version": "https://127.0.0.1:5000/api/records/1/files/example.txt?versionId=059a6706-632f-403a-beab-36e31e370737",
+        "uploads": "https://127.0.0.1:5000/api/records/1/files/example.txt?uploads"
+      },
+      "checksum": "md5:ddce269a1e3d054cae349621c198dd52",
+      "created": "2019-11-22T10:34:08.944425",
+      "tags": {},
+      "updated": "2019-11-22T10:34:08.951942"
+    }
+
+.. _list-files-of-a-record:
+
+List the files of a record
+--------------------------
+You can use REST APIs to retrieve all the files attached to a record:
+
+.. code-block:: console
+
+    $ curl -k -X GET https://127.0.0.1:5000/api/records/1/files?prettyprint=1
+
+    {
+      "contents": [
+      {
+        "version_id": "059a6706-632f-403a-beab-36e31e370737",
+        "is_head": true,
+        "mimetype": "text/plain",
+        "size": 8,
+        "key": "example.txt",
+        "delete_marker": false,
+        "links": {
+          "self": "https://127.0.0.1:5000/api/records/1/files?key=example.txt",
+          "version": "https://127.0.0.1:5000/api/records/1/files?key=example.txt&versionId=059a6706-632f-403a-beab-36e31e370737",
+          "uploads": "https://127.0.0.1:5000/api/records/1/files?key=example.txt?uploads"
+        },
+        "checksum": "md5:ddce269a1e3d054cae349621c198dd52",
+        "created": "2019-11-22T10:34:08.944425",
+        "tags": {},
+        "updated": "2019-11-22T10:34:08.951942"
+      }
+      ],
+      "id": "9ae1c979-9c6a-4603-afb2-38074eb48a54",
+      "size": 16,
+      "locked": false,
+      "max_file_size": null,
+      "links": {
+        "self": "https://127.0.0.1:5000/api/records/1/files",
+        "versions": "https://127.0.0.1:5000/api/records/1/files?versions",
+        "uploads": "https://127.0.0.1:5000/api/records/1/files?uploads"
+      },
+      "quota_size": null,
+      "created": "2019-11-22T10:30:06.118477",
+      "updated": "2019-11-22T10:34:08.962336"
+    }
+
+.. _download-a-file:
+
+Download a file
+---------------
+Let's download the file that we have just uploaded:
+
+.. code-block:: console
+
+    $ curl -k -X GET https://127.0.0.1:5000/api/records/1/files/example.txt -o example.txt
+
+Final steps
+-----------
+Complete the initialisation of your Invenio application: :ref:`final-steps`.

@@ -1,6 +1,6 @@
 ..
     This file is part of Invenio.
-    Copyright (C) 2018 CERN.
+    Copyright (C) 2019 CERN.
 
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
@@ -55,13 +55,13 @@ Internally Invenio natively store records as JSON documents whose structure
 can be validated and described with JSONSchemas. Records can easily be linked
 via JSONRef providing you with powerful tools to model your records. Invenio
 further comes with robust metadata transformation layer that can serialize
-records to e.g. MARCXML, DataCite XML, JSON-LD, Citation Style Langauge (CSL)
+records to e.g. MARCXML, DataCite XML, JSON-LD, Citation Style Language (CSL)
 JSON and many other formats.
 
 In addition Invenio provides a persistent identifier store and a resolver
 that allows you to use your preferred persistent identifier scheme for
 identifying records such as DOIs (Digital Object Identifiers), Handles, PURLs,
-URNs or your own local identifier. The persistent identifer resolver further
+URNs or your own local identifier. The persistent identifier resolver further
 has support for advanced features such as tombstone pages, redirection and
 merged records.
 
@@ -74,7 +74,7 @@ full-text search, powerful query syntax, advanced stemming and aggregations,
 super-fast auto-completion suggesters as well as geospatial search.
 
 Invenio further leverages both instant indexing as well as extremely fast
-distributed bulk indexing with rates beyond 10,0000 records/second.
+distributed bulk indexing with rates beyond 10,000 records/second.
 
 File management
 ---------------

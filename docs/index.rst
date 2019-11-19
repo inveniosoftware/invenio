@@ -16,6 +16,7 @@
     tutorials/build-a-repository.rst
     tutorials/understanding-data-models.rst
     tutorials/managing-access.rst
+    tutorials/handling-files.rst
     tutorials/upgrade-marshmallow.rst
     deployment/securing-your-instance.rst
     architecture/infrastructure.rst
@@ -25,6 +26,7 @@
     history.rst
     releases/index.rst
     community/index.rst
+    upgrading.rst
 
 
 .. toctree::
