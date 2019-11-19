@@ -25,6 +25,7 @@
     history.rst
     releases/index.rst
     community/index.rst
+    managing-files/index.rst
 
 
 .. toctree::
