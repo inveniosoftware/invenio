@@ -22,8 +22,7 @@ tests_require = [
     'pytest-cov>=2.7.1',
     'pytest-pep8>=1.0.6',
     'pytest>=4.6.4,<5.0.0',
-    # 'pytest-invenio>=1.2.0,<1.3.0',
-    'pytest-invenio>=1.1.0,<1.3.0',
+    'pytest-invenio>=1.2.0,<1.3.0',
 ]
 
 db_version = '>=1.0.4,<1.1.0'
@@ -62,7 +61,7 @@ extras_require = {
     ],
     'files': [
         'invenio-files-rest>=1.0.0,<1.1.0',
-        'invenio-records-files>=1.1.0,<1.2.0',
+        'invenio-records-files>=1.2.0,<1.3.0',
         'invenio-previewer>=1.0.0,<1.1.0',
         'invenio-iiif>=1.0.0,<1.1.0',
     ],
