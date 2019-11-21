@@ -12,5 +12,5 @@ Handling Files
    :maxdepth: 1
 
    integration
-   backends
-   serve
+   management
+   storage
