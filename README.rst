@@ -6,9 +6,9 @@
     under the terms of the MIT License; see LICENSE file for more details.
 
 
-============
- Invenio v3
-============
+======================
+ Invenio Framework v3
+======================
 
 **Open Source framework for large-scale digital repositories.**
 
@@ -24,6 +24,6 @@
 .. image:: https://badges.gitter.im/Join%20Chat.svg
     :target: https://gitter.im/inveniosoftware/invenio
 
-Invenio is like a Swiss Army knife of battle-tested, safe and secure modules
-providing you with all the features you need to run a trusted digital
+Invenio Framework is like a Swiss Army knife of battle-tested, safe and secure
+modules providing you with all the features you need to run a trusted digital
 repository.
