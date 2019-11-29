@@ -19,7 +19,7 @@ Pipfile modifications
 
 The most important changes that you will have to make are in ``Pipfile``.
 
-First you need to change the invenio version:
+First you need to change the Invenio version:
 
 ::
 
@@ -28,6 +28,10 @@ First you need to change the invenio version:
 If you want to use the new files bundle make sure you include the ``files``
 bundle. Add any additional :ref:`bundles` you would like in your project in
 ``extras``.
+
+Make sure that your database and Elasticsearch version matches your
+installation. In above example the database is ``postgresql`` and the
+Elasticsearch version is ``elasticsearch7``.
 
 To install the new packages in ``Pipfile`` run the following commands:
 
@@ -47,8 +51,8 @@ To install the new packages in ``Pipfile`` run the following commands:
     pipenv run invenio webpack buildall
 
 
-Database
---------
+Database tables
+---------------
 Changes have been made to the database from Invenio 3.1 so you will need to
 upgrade the database by running the latest Alembic recipes:
 
@@ -65,8 +69,8 @@ To integrate the files bundle with your Invenio instance, please see the guide
 to configure files for Invenio 3.2.
 
 For files to work properly ensure that the config variables
-``RECORDS_FILES_REST_ENDPOINTS`` and ``FILES_REST_PERMISSION_FACTORY`` have been
-configured properly.
+``RECORDS_FILES_REST_ENDPOINTS`` and ``FILES_REST_PERMISSION_FACTORY`` have
+been configured properly.
 
 .. note::
 
@@ -85,8 +89,8 @@ To support uploading files to an old record you first need to create
 a bucket for each record you want to enable files support for and update the
 record's metadata.
 
-Invenio currently doesn't provide a script for this migration.
-However, here a snippet that can help with the migration:
+Invenio currently doesn't provide a script for this migration. However, here a
+snippet that can help with the migration:
 
 .. code-block:: python
 
@@ -110,16 +114,18 @@ However, here a snippet that can help with the migration:
 
 Elasticsearch
 -------------
-Invenio 3.2 comes with support for Elasticsearch 7. Support for Elasticsearch
-v2 and v5 has been deprecated and will be removed in future releases. It's recommended
-to upgrade your Elasticsearch version to stay up-to-date.
+Invenio 3.2 comes with support for Elasticsearch 6 and 7. Support for
+Elasticsearch v2 and v5 has been deprecated and will be removed in future
+releases. It's recommended to upgrade your Elasticsearch version to stay
+up-to-date.
 
 .. note::
 
-    If you're upgrading to Elasticsearch v7, don't forget to add mappings for v7.
+    If you're upgrading to Elasticsearch v7, don't forget to add mappings for
+    v7.
 
 There are currently two paths to upgrade to Elasticsearch v7: upgrade by
-reindexing all your records or by using rolling upgrades.
+reindexing all your records or by using Elasticsearch rolling upgrades.
 
 Upgrade to v7 by reindexing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -137,22 +143,28 @@ database with the following command:
     ``pid_type`` and reindex all records.
 
 However, this means you have to reindex everything and will require some
-downtime. Please read :ref:`rolling-upgrades` for a solution without any
-downtime.
-
+downtime
 
 .. _rolling-upgrades:
 
-Rolling upgrades from Elasticsearch v5 and v6
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Upgrade by Elasticsearch rolling upgrades
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Elasticsearch supports `rolling upgrades <https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-upgrade.html>`_
 which can upgrade your Elasticsearch installation between certain versions
-without any interruption to your service. For example, if you're running v5.2
-you could upgrade to v7.3 using these upgrade steps:
+without any interruption to your service. This will allow you to upgrade from
+v5 to v6 or v6 to v7, but not from v5 to v7 due to index incompatibilities.
 
-1. Rolling upgrade to 5.6
-2. Rolling upgrade to 6.8
-3. Rolling upgrade to 7.3
+Upgrade by index migration
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Please see the `Elasticsearch documentation <https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-upgrade.html>`_
-for how to perform these upgrades.
+.. note::
+
+    This section describes an unreleased feature.
+
+Invenio v3.3 will add support for online index migration. This will allow you
+to upgrade between Elasticsearch versions, migrate indexes between clusters as
+well as upgrade Elasticsearch mappings. You can read more about this upcoming
+feature on:
+
+- `Keeping up with Elasticsearch <https://inveniosoftware.org/blog/2019-05-24-sprint-report/>`_
+- `Invenio-Index-Migrator <https://github.com/inveniosoftware/invenio-index-migrator>`_

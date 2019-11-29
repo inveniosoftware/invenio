@@ -24,9 +24,10 @@
     migrating.rst
     orcid-login.rst
     history.rst
+    upgrading.rst
     releases/index.rst
     community/index.rst
-    upgrading.rst
+
 
 
 .. toctree::

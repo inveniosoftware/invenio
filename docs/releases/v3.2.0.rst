@@ -1,0 +1,285 @@
+..
+    This file is part of Invenio.
+    Copyright (C) 2019 CERN.
+
+    Invenio is free software; you can redistribute it and/or modify it
+    under the terms of the MIT License; see LICENSE file for more details.
+
+Version 3.2.0
+=============
+
+*Released 2019-11-29*
+
+We are proud to announce the release of Invenio v3.2.0.
+
+**Python compatibility**
+
+Invenio v3.2 supports Python 2.7 (until 2019-12-31), Python 3.5 and Python 3.6.
+Python 3.7 is supported as long as you don't use ``msgpack`` as task serializer
+for Celery, due to an incompatibility with Celery v4.3 and msgpack libraries.
+
+Getting started
+---------------
+
+See our :ref:`quickstart` guide.
+
+What's new in Invenio v3.2?
+---------------------------
+
+Files bundle
+~~~~~~~~~~~~
+
+We have released four new modules as part of the new Files bundle:
+
+- `Invenio-Files-REST <http://invenio-files-rest.readthedocs.io>`_: Object store REST API for managing files in Invenio.
+- `Invenio-Records-Files <http://invenio-records-files.readthedocs.io>`_: Integration layer between records and files.
+- `Invenio-Previewer  <http://invenio-previewer.readthedocs.io>`_: File previewers support.
+- `Invenio-IIIF <http://invenio-iiif.readthedocs.io>`_: IIIF Image API support for thumbnail and zooming on images.
+
+To understand more about how to use the new Files bundle see our integration
+guide in :ref:`integrating-files`.
+
+
+Elasticsearch v7 support
+~~~~~~~~~~~~~~~~~~~~~~~~
+Invenio now supports Elasticsearch v7.
+
+
+Marshmallow 3 compatibility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Invenio now support both Marshmallow v2 or v3. The support is done via a
+compatibility layer, that allows Invenio to work with either schemas from v2 or
+v3. This should allow users to upgrade to Invenio v3.2 without being forced to
+upgrade their Marshmallow schemas immediately to v3.
+
+We advice all users to start planning an upgrade of their Marshmallow schemas
+from v2 to v3 as the upgrade is non-trivial and needs proper testing due to
+significant differences between Marshmallow v2 and v3.
+
+Invenio will continue support for both Marshmallow v2 and v3 for a transition
+period to allow users to upgrade at their own pace. After the transition period
+Marshmallow v2 support will be deprecated and removed from Invenio.
+
+For information about how to upgrade see :ref:`marshmallow`.
+
+Search index prefixing
+~~~~~~~~~~~~~~~~~~~~~~
+Elasticsearch does not support the concept of virtual hosts and thus with
+previous versions of Invenio it was not possible to share an Elasticsearch
+cluster between multiple Invenio instances.
+
+We have now added support for index/alias/template prefixing, so that all
+names can be prefixed with a string and thus allows multiple Invenio instances
+to share an Elasticsearch cluster. Note, that this is only name prefixing, thus
+technically two Invenio instances will can read each other indexes and thus
+must trust each other.
+
+Read more about the new feature on
+https://invenio-search.readthedocs.io/en/latest/configuration.html#index-prefixing.
+
+
+Minor changes in v3.2
+---------------------
+
+**Documentation improvements**
+
+We've improved documentation for a couple of modules:
+
+- Invenio-Search: `Configuring your Elasticsearch connection <https://invenio-search.readthedocs.io/en/latest/configuration.html>`_
+- Invenio-Records: `Optimistic concurrency control <https://invenio-records.readthedocs.io/en/latest/concurrency.html>`_
+- Invenio-DB: `Database session management <https://invenio-db.readthedocs.io/en/latest/session_management.html>`_
+
+**Elasticsearch request library changed**
+
+Previously Invenio was using the Python library ``requests`` for connecting via
+HTTP to Elasticsearch. The library has now been changed to use ``urllib3``
+instead as recommended by Elasticsearch.
+
+The old behavior can be restored by configuring the ``connection_class`` in
+the Elasticsearch client configuration:
+
+.. code-block:: python
+
+    from elasticsearch.connection import RequestsHttpConnection
+
+    SEARCH_CLIENT_CONFIG = dict(
+        connection_class=RequestsHttpConnection
+    )
+
+**Hide webpack warnings**
+
+Webpack warnings are now by default hidden.
+
+**HTML sanitization improvements**
+
+Invenio-Formatter has a new template filter
+:py:func:`~invenio_formatter.filters.html.sanitize_html` to use for HTML
+sanitization.
+
+The default configuration provided by Invenio-Config now sets default values
+for :py:data:`~invenio_config.default.ALLOWED_HTML_TAGS` and
+:py:data:`~invenio_config.default.ALLOWED_HTML_ATTRS` which is used by the
+``bleach`` library for HTML sanitization. Please be careful if you change these
+values as it is very easy to open up for Cross-Site Scripting (XSS) attacks.
+
+**Sentry now supported via Sentry SDK instead of Raven**
+
+Invenio-Logging still has support for Raven, but being moved to Sentry SDK.
+To use the old Raven library set the following variable in your
+
+.. code-block:: python
+
+    SENTRY_SDK = False
+
+**Rate limiting improvements**
+
+There are now differentiated rate limits for authenticated (5000 per hour,
+100 per minute) vs anonymous users (1000 per hour, 60 per minute). The
+limits can be changed via
+:py:data:`~invenio_app.config.RATELIMIT_AUTHENTICATED_USER` and
+:py:data:`~invenio_app.config.RATELIMIT_GUEST_USER` configuration variables.
+You can also setup per endpoint rate limits via the
+:py:data:`~invenio_app.config.RATELIMIT_PER_ENDPOINT` configuration variable.
+
+There is also a new error template for when HTTP 429 (rate limited) error code
+is being returned. It can be changed via
+:py:data:`~invenio_theme.config.THEME_429_TEMPLATE` configuration variable.
+
+**Records REST API improvements**
+
+Two new query parameters was added to the search REST API in order to make
+implementation of infinite scroll on a frontend application easier:
+
+- ``from``: For pagination you can now use ``from`` (an item index) and
+  ``size``  instead of ``page`` (a page index) and ``size``.
+- ``aggs``: The parameter can be used to completely turn-off computation of all
+  aggregations (``?aggs=``) or select only specific aggregations to be show
+  ``?aggs=year``).
+
+**CSV serializer**
+
+A new CSV serializer (:py:class:`~invenio_records_rest.serializers.csv`) has
+been added to Invenio-Records-REST.
+
+**Improved indexing signal**
+
+Introduced a new method ``.dynamic_connect()`` on the signal
+:py:func:`~invenio_indexer.signals.before_record_index` which allows
+conditional indexing. This is useful to e.g. only connect a receiver to a
+specific index.
+
+**Bug fixes**
+
+- Invenio-OAuthClient: The ``next`` parameter which determines where to
+  redirect after an successful authentication could not have query string
+  parameters in the URL.
+
+Deprecations in v3.2
+--------------------
+Following list of features have been deprecated and will be removed in either
+Invenio v3.2 or Invenio v3.3:
+
+Elasticsearch v2 and v5 support
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+We did not remove Elasticsearch v2 support in Invenio v3.2 as originally
+announced due to not having a user-friendly solution for upgrading
+Elasticsearch indexes. In Invenio v3.3 we plan to release the
+Invenio-Index-Migrator module which makes migrating/upgrading Elasticsearch
+indexes easy, and we thus plan to fully remove Elasticsearvh v2 and v5 support
+in either Invenio v3.3 or v3.4.
+
+Both Elasticsearch v2 and v5 have reached end of life and no longer receives
+any bug or security fixes from Elastic.
+
+Both the support in Invenio-Search for creating indexes for v2/v5 as well as
+any v2/v5 Elasticsearch mappings in other Invenio modules will be removed.
+
+AMD/RequireJS (reminder from v3.1)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Invenio's assets build system based on AMD/RequireJS will be removed in
+Invenio v3.3 or v3.4.
+
+This involves e.g. the two CLI commands:
+
+.. code-block:: shell
+
+    $ invenio npm
+    $ invenio assets build
+
+Several Python modules in Invenio-Assets will be removed, including (but not
+limited to):
+
+    - ``invenio_assets.npm``
+    - ``invenio_assets.filters``
+    - ``invenio_assets.glob``
+    - ``invenio_assets.proxies``
+
+Also, bundle definitions in other Invenio modules will be removed. These are
+usually located in ``bundles.py`` files, e.g.:
+
+    - ``invenio_theme.bundles``
+
+Also, some static files will be removed from bundles, e.g.:
+
+    - ``invenio_theme/static/js/*``
+    - ``invenio_theme/static/scss/*``
+
+AngularJS (reminder from v3.0)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In Invenio v3.0 we deprecated the AngularJS 1.4 application Invenio-Search-JS
+as AngularJS by that time was already outdated. We have selected React and
+SemanticUI as the replacement framework for AngularJS.
+
+The new Webpack build system released in Invenio v3.1 is part of the strategy
+to move from AngularJS to React (note however that you can use Webpack with
+your favorite framework, including AngularJS).
+
+We have started the rewrite of Invenio-Search-JS and have already released the
+first version of
+`React-SearchKit <https://inveniosoftware.github.io/react-searchkit/>`_ which
+eventually will replace Invenio-Search-JS.
+
+Features removed in v3.2
+------------------------
+These following *already* deprecated features have been removed in Invenio
+v3.2.
+
+**Records CLI**
+
+The CLI in Invenio-Records module was removed.
+
+**DynamicPermission class**
+
+The ``DynamicPermission`` class was removed from Invenio-Access. The
+functionality provided by the class is still available via the
+:py:class:`~invenio_access.permissions:Permission` class.
+
+
+Maintenance policy
+------------------
+
+Invenio v3.2 will be supported with bug and security fixes until the release of
+Invenio v3.4 and minimum until 2020-11-29.
+
+See our :ref:`maintenance-policy`.
+
+What's next?
+------------
+In Invenio v3.3 we are planning to release the **Statistics** bundle including:
+
+- `invenio-stats <https://invenio-stats.readthedocs.io>`_
+    - Invenio module for statistical data processing and querying with support
+      for collecting COUNTER Research Data Usage Metrics compliant statistics.
+- `counter-robots <https://counter-robots.readthedocs.io>`_
+    - Library for COUNTER-compliant detection of machines and robots.
+
+In addition to the Statistics bundle, we will also release final versions of
+the following two modules:
+
+- `invenio-index-migrator <https://invenio-index-migrator.readthedocs.io>`_
+    - Elasticsearch index migrator for Invenio (aka zero down-time reindexing
+      and index migration).
+- `invenio-records-permissions <https://github.com/inveniosoftware/invenio-records-permissions>`_
+    - Declarative permission policies for Invenio-Records-REST/UI. This module
+      allows managing permissions for records in a simple declarative manner.
+

@@ -329,6 +329,12 @@ intersphinx_mapping = {
         'https://invenio-access.readthedocs.io/en/latest/', None),
     'invenio-celery': (
         'https://invenio-celery.readthedocs.io/en/latest/', None),
+    'invenio-config': (
+        'https://invenio-config.readthedocs.io/en/latest/', None),
+    'invenio-db': (
+        'https://invenio-db.readthedocs.io/en/latest/', None),
+    'invenio-formatter': (
+        'https://invenio-formatter.readthedocs.io/en/latest/', None),
     'invenio-files-rest': (
         'https://invenio-files-rest.readthedocs.io/en/latest/', None),
     'invenio-previewer': (
@@ -337,6 +343,8 @@ intersphinx_mapping = {
         'https://invenio-iiif.readthedocs.io/en/latest/', None),
     'invenio-records-files': (
         'https://invenio-records-files.readthedocs.io/en/latest/', None),
+    'invenio-theme': (
+        'https://invenio-theme.readthedocs.io/en/latest/', None),
     'jinja': ('https://jinja.palletsprojects.com/en/2.10.x/', None),
     'python': ('https://docs.python.org/', None),
     'sqlalchemy': ('http://docs.sqlalchemy.org/en/latest/', None),
