@@ -7,13 +7,13 @@
 
 .. _marshmallow:
 
-Marshmallow v3 compatibility
-============================
+Marshmallow v2/v3 compatibility
+===============================
 
 Marshmallow
 -----------
 
-Marhsmallow is a package for serialization and deserialization of complex data
+Marshmallow is a package for serialization and deserialization of complex data
 structures from and to Python types. You can discover its usage within
 Invenio in the `documentation <https://invenio.readthedocs.io/en/latest/tutorials/understanding-data-models.html?highlight=marshmallow#define-a-marshmallow-schema>`_.
 
