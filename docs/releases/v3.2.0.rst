@@ -8,15 +8,13 @@
 Version 3.2.0
 =============
 
-*Released 2019-11-29*
+*Released 2019-12-20*
 
 We are proud to announce the release of Invenio v3.2.0.
 
 **Python compatibility**
 
 Invenio v3.2 supports Python 2.7 (until 2019-12-31), Python 3.5 and Python 3.6.
-Python 3.7 is supported as long as you don't use ``msgpack`` as task serializer
-for Celery, due to an incompatibility with Celery v4.3 and msgpack libraries.
 
 Getting started
 ---------------
@@ -280,7 +278,3 @@ the following two modules:
 - `invenio-index-migrator <https://invenio-index-migrator.readthedocs.io>`_
     - Elasticsearch index migrator for Invenio (aka zero down-time reindexing
       and index migration).
-- `invenio-records-permissions <https://github.com/inveniosoftware/invenio-records-permissions>`_
-    - Declarative permission policies for Invenio-Records-REST/UI. This module
-      allows managing permissions for records in a simple declarative manner.
-
