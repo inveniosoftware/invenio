@@ -258,7 +258,7 @@ Maintenance policy
 ------------------
 
 Invenio v3.2 will be supported with bug and security fixes until the release of
-Invenio v3.4 and minimum until 2020-11-29.
+Invenio v3.4 and minimum until 2020-12-20.
 
 See our :ref:`maintenance-policy`.
 
