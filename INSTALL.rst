@@ -1,6 +1,6 @@
 ..
     This file is part of Invenio.
-    Copyright (C) 2015-2018 CERN.
+    Copyright (C) 2015-2019 CERN.
 
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
@@ -8,19 +8,38 @@
 Installation
 ============
 
-The best way to get an Invenio demo instance up and running immediately is by
-using Docker or Vagrant, for example:
+Please see our quick start guide on
+https://invenio.readthedocs.io/en/latest/quickstart/index.html
+
+1. Scaffold
+-----------
 
 .. code-block:: console
 
-   $ docker-compose build
-   $ docker-compose up -d
-   $ docker-compose run --rm web ./scripts/populate-instance.sh
-   $ firefox http://127.0.0.1/records/1
+    # prerequisites: cookiecutter and pipenv
+    # scaffold my-site instance
+    $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance \
+        --checkout v3.2
 
-This will start an Invenio demo instance containing several example records and
-all the needed services such as PostgreSQL, Elasticsearch, Redis, RabbitMQ.
+2. Install
+----------
 
-For a detailed walk-through on how to set up your Invenio instance, please see
-our `installation documentation
-<http://invenio.readthedocs.io/en/latest/installation/index.html>`_.
+.. code-block:: console
+
+    $ cd my-site/
+    # start services (db, es, mq, cache)
+    $ docker-compose up
+    # build and install my-site instance
+    $ ./scripts/bootstrap
+
+3. Run
+------
+
+.. code-block:: console
+
+    # setup database and indexes
+    $ ./scripts/setup
+    # start webserver and task queue
+    $ ./scripts/server
+    # your site is running!
+    $ firefox https://127.0.0.1:5000/
