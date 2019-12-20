@@ -325,6 +325,8 @@ intersphinx_mapping = {
     'flaskregistry': (
         'https://flask-registry.readthedocs.io/en/latest/', None),
     'flaskscript': ('https://flask-script.readthedocs.io/en/latest/', None),
+    'invenio-app': (
+        'https://invenio-app.readthedocs.io/en/latest/', None),
     'invenio-access': (
         'https://invenio-access.readthedocs.io/en/latest/', None),
     'invenio-celery': (
@@ -335,6 +337,8 @@ intersphinx_mapping = {
         'https://invenio-db.readthedocs.io/en/latest/', None),
     'invenio-formatter': (
         'https://invenio-formatter.readthedocs.io/en/latest/', None),
+    'invenio-indexer': (
+        'https://invenio-indexer.readthedocs.io/en/latest/', None),
     'invenio-files-rest': (
         'https://invenio-files-rest.readthedocs.io/en/latest/', None),
     'invenio-previewer': (
@@ -343,6 +347,8 @@ intersphinx_mapping = {
         'https://invenio-iiif.readthedocs.io/en/latest/', None),
     'invenio-records-files': (
         'https://invenio-records-files.readthedocs.io/en/latest/', None),
+    'invenio-records-rest': (
+        'https://invenio-records-rest.readthedocs.io/en/latest/', None),
     'invenio-theme': (
         'https://invenio-theme.readthedocs.io/en/latest/', None),
     'jinja': ('https://jinja.palletsprojects.com/en/2.10.x/', None),

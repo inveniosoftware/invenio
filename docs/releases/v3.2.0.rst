@@ -158,13 +158,14 @@ implementation of infinite scroll on a frontend application easier:
 
 **CSV serializer**
 
-A new CSV serializer (:py:class:`~invenio_records_rest.serializers.csv`) has
-been added to Invenio-Records-REST.
+A new CSV serializer (
+:py:class:`~invenio_records_rest.serializers.csv.CSVSerializer`) has been added
+to Invenio-Records-REST.
 
 **Improved indexing signal**
 
 Introduced a new method ``.dynamic_connect()`` on the signal
-:py:func:`~invenio_indexer.signals.before_record_index` which allows
+:py:data:`~invenio_indexer.signals.before_record_index` which allows
 conditional indexing. This is useful to e.g. only connect a receiver to a
 specific index.
 
@@ -252,7 +253,7 @@ The CLI in Invenio-Records module was removed.
 
 The ``DynamicPermission`` class was removed from Invenio-Access. The
 functionality provided by the class is still available via the
-:py:class:`~invenio_access.permissions:Permission` class.
+:py:class:`~invenio_access.permissions.Permission` class.
 
 
 Maintenance policy
