@@ -331,7 +331,7 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/2.7/', None),
     'sqlalchemy': ('http://docs.sqlalchemy.org/en/latest/', None),
     'webassets': ('https://webassets.readthedocs.io/en/latest/', None),
-    'werkzeug': ('http://werkzeug.pocoo.org/docs/', None),
+    'werkzeug': ('http://werkzeug.pocoo.org/docs/en/0.16.x/', None),
 }
 
 # Autodoc configuraton.
