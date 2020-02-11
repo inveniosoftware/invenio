@@ -14,4 +14,4 @@ and parsed by ``setup.py``.
 
 from __future__ import absolute_import, print_function
 
-__version__ = "3.1.1"
+__version__ = "3.1.2"
