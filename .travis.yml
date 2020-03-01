@@ -9,7 +9,7 @@
 notifications:
   email: false
 
-sudo: false
+os: linux
 
 addons:
   postgresql: 9.4
@@ -31,7 +31,7 @@ env:
     - ES6_DOWNLOAD_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.8.1.tar.gz"
     - ES7_DOWNLOAD_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.2.0-linux-x86_64.tar.gz"
     - ES_HOST=127.0.0.1
-  matrix:
+  jobs:
     # ES5 + MySQL
     - REQUIREMENTS=lowest EXTRAS=all,mysql,elasticsearch5 SQLALCHEMY_DATABASE_URI="mysql+pymysql://travis@localhost:3306/invenio" ES_URL=$ES5_DOWNLOAD_URL
     # ES6 + MySQL
@@ -47,7 +47,7 @@ python:
   - "2.7"
   - "3.6"
 
-matrix:
+jobs:
   fast_finish: true
   allow_failures:
     - env: REQUIREMENTS=devel EXTRAS=all,postgresql,elasticsearch6 SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/invenio" ES_URL=$ES6_DOWNLOAD_URL
@@ -80,7 +80,7 @@ after_success:
 
 deploy:
   provider: pypi
-  user: inveniosoftware
+  username: inveniosoftware
   password:
     secure: "LnOMPTAl/ANHMY+yGhLoLM8v/kzsNlpCX77zwGHMdoaUIEYopNFEzHc7u3/G5wqRFPy2Oy1gaqQIiWbdOmH1q85LeLkMp5jf5w8qzIvkN/ltnpxazbQ5d7uZjvHUSVYLnEa64hucUQ3l/2PEM02ijZdgt9N25YIwpuW/HNyYzzY="
   distributions: "sdist bdist_wheel"
