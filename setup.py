@@ -112,6 +112,7 @@ install_requires = [
     'invenio-celery>=1.1.1,<1.2.0',
     'invenio-config>=1.0.2,<1.1.0',
     'invenio-i18n>=1.1.1,<1.2.0',
+    'Werkzeug>=0.15.0,<1.0.0'
 ]
 
 packages = find_packages()

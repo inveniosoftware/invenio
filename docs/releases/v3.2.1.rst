@@ -1,0 +1,22 @@
+..
+    This file is part of Invenio.
+    Copyright (C) 2020 CERN.
+
+    Invenio is free software; you can redistribute it and/or modify it
+    under the terms of the MIT License; see LICENSE file for more details.
+
+Version 3.2.1
+=============
+
+*Released 2020-02-11*
+
+Invenio v3.2.1 fixes issues with an incompatibility of the recent released
+Werkzeug v1.0
+
+Maintenance policy
+------------------
+
+Invenio v3.2 will be supported with bug and security fixes until the release of
+Invenio v3.4 and minimum until 2020-12-20.
+
+See our :ref:`maintenance-policy`.
