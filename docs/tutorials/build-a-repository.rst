@@ -167,7 +167,7 @@ configuring the following files:
 
 **docker-compose.full.yml**
 
-  This file contains a full-fledged definition of a production-like application
+  This file contains a full-fledged definition of a more scalable application
   infrastructure. It has all of the ``docker-compose.yml`` file's containers
   defined, and additionally:
 
@@ -188,14 +188,9 @@ configuring the following files:
   described below.
 
   .. warning::
-
-      While one might be tempted to deploy this as a fully functional Invenio
-      instance, it is not meant to be a turn-key solution, since it hasn't been
-      tested for this purpose. This is rather meant to be an inspiration (in
-      terms of configuration, networking and general principles) for
-      configuring your own setup either by replacing the container services
-      with actual nodes/machines or configuring a production-level container
-      orchestration system like Kubernetes, OpenShift, etc.
+      This file is **not** intended to be used for production, neither as
+      reference for a production infrastructure. It is just an example of a
+      more complete application deployment.
 
 **Dockerfile.base**
 
