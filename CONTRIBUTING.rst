@@ -167,3 +167,47 @@ To speed up the integration process, it helps if on GitHub you `allow
 maintainers to edit your pull request
 <https://help.github.com/articles/allowing-changes-to-a-pull-request-branch-created-from-a-fork/>`_
 so they can fix small issues autonomously.
+
+.. rubric: Review guidelines
+
+A pull request will probably be reviewed by someone in a different location,
+maybe even a different time zone. Therefore, avoiding blockings and
+misunderstandings is key. The following ideas could help ease and speed
+up the review process:
+
+- Be clear when something is ready to be reviewed (see `WIP` above).
+- If a PR requires changes, say so explicitly, but politely (use emojis!).
+- When something is ready to be merged say it explicitly. If the reviewer does
+  not have permission to merge, (s)he should ping the corresponding person.
+- When reviewing, rate your comments. This would help to understand if
+  a comment must be addressed (e.g. it has substantial implications) or it is
+  something the reviewer thought of but is a matter of "take it or leave it". A
+  proposed scale is:
+  1. Comment/Doubt/Question: exactly that. A doubt, a question or a comment.
+  2. Minor: a change that the reviewer thinks might need change. However, it
+  is not blocking, it is up to the developer to choose if and how to change
+  it. It can be merged!
+  3. Moderate/Normal (Default): a change that requires further discussion
+  (e.g. breaking changes). It cannot be merged, unless explicitly stated by
+  the reviewer (e.g. choose a solution proposed by the reviewer and implement
+  it). Depending on the nature of the change a new review
+  might be needed, use common sense.
+  4. Major: a change that needs further discussion, probably a chat. Even the
+  opinion of an architect. It has high implications. It cannot be merged.
+  5. Shelved: a suggestion that will be treated later on as part of a
+  different issue. It is a good practice to reference the issue. Note that
+  any of the previous (comment, minor, moderate and major) can be shelved if
+  agreed by the PR creator and the reviewer.
+
+Here is an example:
+
+  minor: I think this variable name should be plural since it refers to a list.
+
+If no level is given, assume it is of "moderate" level within reason (might
+clearly be minor or major). GitHub suggestions for instance are typically
+minor, so no need to tag them all the time.
+
+Following these guidelines builds trust over time. As a reviewer, you know
+your comments will be heard and as a submitter, you know someone has taken the
+time to go over your work and help you solve the problem you were tackling. In
+both cases, it's done in a friendly and efficient manner.
