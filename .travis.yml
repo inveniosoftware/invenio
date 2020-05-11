@@ -52,7 +52,6 @@ matrix:
   fast_finish: true
   allow_failures:
     - env: REQUIREMENTS=devel EXTRAS=all,postgresql,elasticsearch6 SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/invenio" ES_URL=$ES6_DOWNLOAD_URL
-    - python: "3.7"
     - python: "3.8"
 
 before_install:
