@@ -73,9 +73,6 @@ extras_require = {
         'invenio-db[versioning]{}'.format(db_version),
     ],
     # Elasticsearch version
-    'elasticsearch2': [
-        'invenio-search[elasticsearch2]{}'.format(search_version),
-    ],
     'elasticsearch5': [
         'invenio-search[elasticsearch5]{}'.format(search_version),
     ],
