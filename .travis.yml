@@ -45,11 +45,15 @@ env:
 
 python:
   - "3.6"
+  - "3.7"
+  - "3.8"
 
 matrix:
   fast_finish: true
   allow_failures:
     - env: REQUIREMENTS=devel EXTRAS=all,postgresql,elasticsearch6 SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/invenio" ES_URL=$ES6_DOWNLOAD_URL
+    - python: "3.7"
+    - python: "3.8"
 
 before_install:
   - "sudo apt-get install graphviz"
@@ -83,7 +87,6 @@ deploy:
   password:
     secure: "LnOMPTAl/ANHMY+yGhLoLM8v/kzsNlpCX77zwGHMdoaUIEYopNFEzHc7u3/G5wqRFPy2Oy1gaqQIiWbdOmH1q85LeLkMp5jf5w8qzIvkN/ltnpxazbQ5d7uZjvHUSVYLnEa64hucUQ3l/2PEM02ijZdgt9N25YIwpuW/HNyYzzY="
   distributions: "sdist bdist_wheel"
+  skip_existing: true
   on:
     tags: true
-    python: "3.6"
-    condition: $DEPLOY = true
