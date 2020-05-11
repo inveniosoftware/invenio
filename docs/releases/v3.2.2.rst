@@ -1,0 +1,34 @@
+..
+    This file is part of Invenio.
+    Copyright (C) 2020 CERN.
+
+    Invenio is free software; you can redistribute it and/or modify it
+    under the terms of the MIT License; see LICENSE file for more details.
+
+Version 3.2.2
+=============
+
+*Released 2020-05-15*
+
+Invenio v3.2.2 fixes issues with incompatibilities with several libraries:
+- WTForms recently release has moved `email_validator` to an optional
+dependency. It has been added in the corresponding packages.
+- SQLAlchemy-Utils v0.36 breaks compatibility of Invenio models with MySQL. It
+enforces setting the length on type `VARCHAR`.
+- Sphinx v3.0+ breaks the build of documentation, due to a Flask context issue.
+- Flask is now provided as a centrally managed dependency from `Invenio-Base`.
+
+Invenio v3.2.2 support Python version 3.5 and 3.6. Python 2 support in Invenio
+ended on January 1st, 2020 with the official end of life for Python 2 on the
+same date.
+
+Example applications have started to be removed from the Invenio modules, and
+they are not supported anymore.
+
+Maintenance policy
+------------------
+
+Invenio v3.2 will be supported with bug and security fixes until the release of
+Invenio v3.4 and minimum until 2020-12-20.
+
+See our :ref:`maintenance-policy`.
