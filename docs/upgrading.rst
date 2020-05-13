@@ -5,8 +5,63 @@
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
-Upgrading to version 3.2
-========================
+Upgrading
+=========
+
+Read the following guides if you want to upgrade your Invenio instance.
+
+
+Upgrading from 3.2 to 3.3
+-------------------------
+
+If you have your instance of Invenio v3.2 already up and running and
+you would like to upgrade to version v3.3 you don't need to set up your
+project from scratch. The goal of this guide is to show the steps to upgrade
+your project without losing any of your work.
+
+Pipfile modifications
+^^^^^^^^^^^^^^^^^^^^^
+
+The most important changes that you will have to make are in ``Pipfile``.
+
+1. Change the Invenio version:
+
+.. code::
+
+    invenio = { version = "==3.3.0", extras = ["base", "auth", "metadata", "files", "postgresql", "elasticsearch7" ]}
+
+
+2. Make sure that your database and Elasticsearch version matches your
+   installation. In above example the database is ``postgresql`` and the
+   Elasticsearch version is ``elasticsearch7``.
+
+3. Remove the following line from Pipfile:
+
+.. code:: diff
+
+    - lxml = ">=3.5.0,<4.2.6"
+      marshmallow = ">=3.0.0,<4.0.0"
+    - SQLAlchemy-Utils = ">=0.33.1,<0.36"
+
+4. Install the new packages in ``Pipfile`` by running the following commands:
+
+.. code:: bash
+
+    # Update Pipfile.lock
+    pipenv lock --dev
+
+    # Install packages specified in Pipfile.lock
+    pipenv sync --dev
+
+    # Install application code and entrypoints from 'setup.py'
+    pipenv run pip install -e .
+
+    # Build assets
+    pipenv run invenio collect -v
+    pipenv run invenio webpack buildall
+
+Upgrading from 3.1 to 3.2
+-------------------------
 
 If you have your instance of Invenio v3.1 already up and running and
 you would like to upgrade to version v3.2 you don't need to set up your
@@ -15,7 +70,7 @@ your project without losing any of your work.
 
 
 Pipfile modifications
----------------------
+^^^^^^^^^^^^^^^^^^^^^
 
 The most important changes that you will have to make are in ``Pipfile``.
 
@@ -52,7 +107,7 @@ To install the new packages in ``Pipfile`` run the following commands:
 
 
 Database tables
----------------
+^^^^^^^^^^^^^^^
 Changes have been made to the database from Invenio 3.1 so you will need to
 upgrade the database by running the latest Alembic recipes:
 
@@ -64,7 +119,7 @@ Your database should now have the latest changes.
 
 
 Files
------
+^^^^^
 To integrate the files bundle with your Invenio instance, please see the guide
 to configure files for Invenio 3.2.
 
@@ -79,7 +134,7 @@ been configured properly.
     ``records/ext.py``.
 
 Uploading files
-~~~~~~~~~~~~~~~
+"""""""""""""""
 Records created after you upgraded to Invenio 3.2 will support files
 out-of-the-box as long as files are configured properly.
 
@@ -113,7 +168,7 @@ snippet that can help with the migration:
 
 
 Elasticsearch
--------------
+^^^^^^^^^^^^^
 Invenio 3.2 comes with support for Elasticsearch 6 and 7. Support for
 Elasticsearch v2 and v5 has been deprecated and will be removed in future
 releases. It's recommended to upgrade your Elasticsearch version to stay
@@ -128,7 +183,7 @@ There are currently two paths to upgrade to Elasticsearch v7: upgrade by
 reindexing all your records or by using Elasticsearch rolling upgrades.
 
 Upgrade to v7 by reindexing
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""""""""""
 The easiest way to upgrade to v7 is to upgrade your Invenio installation,
 install Elasticsearch v7 and then reindex all your records stored in the
 database with the following command:
@@ -148,14 +203,14 @@ downtime
 .. _rolling-upgrades:
 
 Upgrade by Elasticsearch rolling upgrades
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""""""""""""""""""""""""
 Elasticsearch supports `rolling upgrades <https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-upgrade.html>`_
 which can upgrade your Elasticsearch installation between certain versions
 without any interruption to your service. This will allow you to upgrade from
 v5 to v6 or v6 to v7, but not from v5 to v7 due to index incompatibilities.
 
 Upgrade by index migration
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+""""""""""""""""""""""""""
 
 .. note::
 
