@@ -17,6 +17,7 @@ are here for the interested.
     :name: mastertoc
 
     maintenance-policy
+    v3.3.0
     v3.2.2
     v3.2.1
     v3.2.0
