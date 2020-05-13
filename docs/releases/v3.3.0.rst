@@ -1,0 +1,96 @@
+..
+    This file is part of Invenio.
+    Copyright (C) 2020 CERN.
+
+    Invenio is free software; you can redistribute it and/or modify it
+    under the terms of the MIT License; see LICENSE file for more details.
+
+Version 3.3.0
+=============
+
+*Released 2020-05-18*
+
+We are proud to announce the release of Invenio v3.3.0.
+
+**Python compatibility**
+
+Invenio v3.3 supports Python versions 3.6 and 3.7. Python 2 support in Invenio
+ended on January 1st, 2020 with the official end of life for Python 2 on the
+same date.
+
+Getting started
+---------------
+
+See our :ref:`quickstart` guide.
+
+What's new in Invenio v3.3?
+---------------------------
+
+Python 3.7
+~~~~~~~~~~
+
+Single Page Applications
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Invenio-OAuthclient: Adds a new REST OAuth workflow, which SPA applications
+can use to integrate a login flow through package's oauth providers i.e cern,
+github, orcid, globus.
+
+Accounts REST API
+~~~~~~~~~~~~~~~~~
+
+CSRF Protection
+~~~~~~~~~~~~~~~
+- Invenio-REST: Adds a CSRF middleware, called `CSRFProtectMiddlewate` to
+protect API views against CSRF attacks.
+- CSRF checks are skipped in REST API calls using a personal OAUTH API
+token.
+
+Dependency management
+~~~~~~~~~~~~~~~~~~~~~
+
+Centralised dependency management to specific modules. 
+
+Helm charts (BETA)
+~~~~~~~~~~~~~~~~~~
+
+
+Minor changes in v3.3
+---------------------
+- Invenio-Access: Adds explicit excludes of needs feature to load permission
+- Invenio-Celery: Fix for rate limiting during celery task
+- Invenio-Files-REST: Serving of files can be offload to Nginx
+
+Deprecations in v3.3
+--------------------
+
+
+Features removed in v3.3
+------------------------
+
+- Support for Elasticsearch 2
+
+Maintenance policy
+------------------
+
+Invenio v3.3 will be supported with bug and security fixes until the release of
+Invenio v3.5 and minimum until 2021-05-18.
+
+See our :ref:`maintenance-policy`.
+
+What's next?
+------------
+In Invenio v3.4 we are planning to release the **Statistics** bundle including:
+
+- `invenio-stats <https://invenio-stats.readthedocs.io>`_
+    - Invenio module for statistical data processing and querying with support
+      for collecting COUNTER Research Data Usage Metrics compliant statistics.
+- `counter-robots <https://counter-robots.readthedocs.io>`_
+    - Library for COUNTER-compliant detection of machines and robots.
+
+In addition to the Statistics bundle, we will also release final versions of
+the following two modules:
+
+- `invenio-index-migrator <https://invenio-index-migrator.readthedocs.io>`_
+    - Elasticsearch index migrator for Invenio (aka zero down-time reindexing
+      and index migration).
