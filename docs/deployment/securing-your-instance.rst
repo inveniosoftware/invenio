@@ -81,3 +81,28 @@ of you application server:
 
     # config.py
     WSGI_PROXIES = 2
+
+CSRF protection
+---------------
+Invenio has different ways of protecting your application from Cross Site
+Forgery (CSRF) attacks.
+
+In the UI application, `Flask-WTF <https://flask-wtf.readthedocs.io/en/stable/csrf.html>`_
+is used to protect against these type of attacks.
+
+In the REST application, Invenio has a configuration
+option called ``REST_CSRF_ENABLED`` which controls if it should apply the CSRF
+check or not. It uses the ``invenio_rest.csrf.CSRFProtectMiddleware``
+to validate the ``csrftoken`` cookie and the request's ``HTTP_X_CSRFTOKEN``
+header.
+
+When ``REST_CSRF_ENABLED`` is enabled, if your REST call is using an OAuth
+Access API Token e.g
+
+.. code-block:: console
+
+    POST /
+    Authorization: Bearer <token>
+    ...
+
+then the CSRF checks are skipped.
