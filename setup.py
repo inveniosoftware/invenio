@@ -57,7 +57,7 @@ extras_require = {
         'invenio-search-ui>=1.2.0,<1.3.0',
     ],
     'files': [
-        'invenio-files-rest>=1.0.5,<1.1.0',
+        'invenio-files-rest>=1.2.0,<1.3.0',
         'invenio-iiif>=1.1.0,<1.2.0',
         'invenio-previewer>=1.2.1,<1.3.0',
         'invenio-records-files>=1.2.1,<1.3.0',
