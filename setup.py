@@ -33,7 +33,7 @@ extras_require = {
     'base': [
         'invenio-admin>=1.2.1,<1.3.0',
         'invenio-assets>=1.2.0,<1.3.0',
-        'invenio-formatter>=1.0.3,<1.1.0',
+        'invenio-formatter>=1.1.0a1,<1.2.0',
         'invenio-logging>=1.3.0,<1.4.0',
         'invenio-mail>=1.0.2,<1.1.0',
         'invenio-rest>=1.2.1,<1.3.0',
@@ -44,7 +44,7 @@ extras_require = {
         'invenio-accounts>=1.4.0a2,<1.5.0',
         'invenio-oauth2server>=1.2.0,<1.3.0',
         'invenio-oauthclient>=1.2.1,<1.3.0',
-        'invenio-userprofiles>=1.1.1,<1.2.0',
+        'invenio-userprofiles>=1.2.0a1,<1.3.0',
     ],
     'metadata': [
         'invenio-indexer>=1.1.1,<1.2.0',
@@ -52,7 +52,7 @@ extras_require = {
         'invenio-oaiserver>=1.2.0,<1.3.0',
         'invenio-pidstore>=1.2.0,<1.3.0',
         'invenio-records-rest>=1.7.1,<1.8.0',
-        'invenio-records-ui>=1.1.0,<1.2.0',
+        'invenio-records-ui>=1.2.0a1,<1.3.0',
         'invenio-records>=1.3.1,<1.4.0',
         'invenio-search-ui>=2.0.0a2,<2.1.0',
     ],
@@ -107,7 +107,7 @@ install_requires = [
     'invenio-cache>=1.1.0,<1.2.0',
     'invenio-celery>=1.2.0,<1.3.0',
     'invenio-config>=1.0.3,<1.1.0',
-    'invenio-i18n>=1.2.0,<1.3.0',
+    'invenio-i18n>=1.3.0a1,<1.4.0',
 ]
 
 packages = find_packages()
