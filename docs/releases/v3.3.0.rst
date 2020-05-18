@@ -29,37 +29,62 @@ What's new in Invenio v3.3?
 Python 3.7
 ~~~~~~~~~~
 
+Invenio v3.3 Python 3.7 is supported!
+
 Single Page Applications
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Invenio-OAuthclient: Adds a new REST OAuth workflow, which SPA applications
-can use to integrate a login flow through package's oauth providers i.e cern,
-github, orcid, globus.
+Invenio-OAuthClient adds new RESTful endpoints, so it can be used via REST
+only. These enables SPA applications to use it and integrate a login flow
+through package's oauth providers i.e cern, github, orcid, globus.
 
 Accounts REST API
 ~~~~~~~~~~~~~~~~~
 
 CSRF Protection
 ~~~~~~~~~~~~~~~
-- Invenio-REST: Adds a CSRF middleware, called `CSRFProtectMiddlewate` to
-protect API views against CSRF attacks.
-- CSRF checks are skipped in REST API calls using a personal OAUTH API
-token.
+Invenio-REST adds a CSRF middleware, called `CSRFProtectMiddlewate` to protect
+API views against CSRF attacks. The CSRF checks can be skipped in REST API
+calls when using a personal OAuth API token.
 
 Dependency management
 ~~~~~~~~~~~~~~~~~~~~~
 
-Centralised dependency management to specific modules. 
+To efficiently manage 3rd-party dependenceis, i.e. Python packages that are not
+part of the `inveniosoftware` GitHub organization, the concept of "coordinator"
+modules is introduced. These are core Invenio modules that are responsible for
+properly specifying 3rd-party dependencies.
 
-Helm charts (BETA)
+Here's a table of all the current coordinator modules:
+
+=================== ==================================================================================================================
+ Module             Dependencies
+=================== ==================================================================================================================
+ `invenio-base`     `Flask`, `werkzeug`, `six`, `blinker`
+ `invenio-accounts` `Flask-Security`, `Flask-KVSession`, `Flask-Login`
+ `invenio-admin`    `Flask-Admin`
+ `invenio-celery`   `celery`, `kombu`, `msgpack`
+ `invenio-rest`     `webargs`, `marshmallow`
+ `invenio-i18n`     `Flask-BabelEx`
+ `invenio-db`       `Flask-SQLAlchemy`, `Flask-Alembic`, `SQLAlchemy`, `SQLAlchemy-Continuum`, `SQLAlchemy-Utils`, `psycopg2`, `pymysql`
+ `invenio-search`   `elasticsearch`, `elasticsearch-dsl`
+ `pytest-invenio`   `pytest`, `coverage`, `isort`, `check-manifest`
+=================== ==================================================================================================================
+
+Helm chart (BETA)
 ~~~~~~~~~~~~~~~~~~
+Helm-Invenio provides a helm chart to deploy an Invenio application along with
+all its required services: Redis, RabbitMQ, HAProxy, Nginx, Elasticsearch,
+Logstash and PostgreSQL.
 
+This chart is currently in beta version. Its templates are currently specific
+for OpenShift. However, work is on-going to support bare Kubernetes deployments.
 
 Minor changes in v3.3
 ---------------------
-- Invenio-Access: Adds explicit excludes of needs feature to load permission
-- Invenio-Celery: Fix for rate limiting during celery task
-- Invenio-Files-REST: Serving of files can be offload to Nginx
+- Invenio-Access: adds `explicit excludes`. It enables to deny an specific
+  need or role.
+- Invenio-Celery: fixes the rate limiting during celery task
 
 Deprecations in v3.3
 --------------------
