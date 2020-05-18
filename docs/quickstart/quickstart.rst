@@ -1,6 +1,6 @@
 ..
     This file is part of Invenio.
-    Copyright (C) 2015-2019 CERN.
+    Copyright (C) 2015-2020 CERN.
     Copyright (C) 2018 Northwestern University, Feinberg School of Medicine, Galter Health Sciences Library.
 
     Invenio is free software; you can redistribute it and/or modify it
@@ -34,7 +34,7 @@ cookiecutter template
 
 .. code-block:: shell
 
-    $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance --checkout v3.2
+    $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance --checkout v3.3
 
 The cookiecutter initialisation procedure will prompt you with a series of questions
 aiming to customise your new instance, e.g. the name of your application.
