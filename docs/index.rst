@@ -1,6 +1,6 @@
 ..
     This file is part of Invenio.
-    Copyright (C) 2015-2018 CERN.
+    Copyright (C) 2015-2020 CERN.
 
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
@@ -24,7 +24,7 @@
     migrating.rst
     orcid-login.rst
     history.rst
-    upgrading.rst
+    upgrading/index.rst
     releases/index.rst
     community/index.rst
 
