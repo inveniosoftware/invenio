@@ -23,23 +23,29 @@ Getting started
 
 See our :ref:`quickstart` guide.
 
+Upgrading to v3.3
+~~~~~~~~~~~~~~~~~
+
+To upgrade your Invenio instance to v3.3 follow the upgrading guide:
+:ref:`upgrade-3_1-3_2`
+
+
 What's new in Invenio v3.3?
 ---------------------------
 
 Python 3.7
 ~~~~~~~~~~
 
-Invenio v3.3 Python 3.7 is supported!
+Python 3.7 is now supported by Invenio!
 
-Single Page Applications
-~~~~~~~~~~~~~~~~~~~~~~~~
+Improved support for Single Page Applications
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Invenio-OAuthClient adds new RESTful endpoints, so it can be used via REST
-only. These enables SPA applications to use it and integrate a login flow
-through package's oauth providers i.e cern, github, orcid, globus.
-
-Accounts REST API
-~~~~~~~~~~~~~~~~~
+Invenio v3.3 improves the support for Single Page Applications (SPA) by adding
+REST APIs for account management operations such as login, logout, user registration,
+password change, email confirmation and more. The integrated OAuth client
+also adds a new REST API so that you can login via your OAuth providers such
+as GitHub, ORCID and Globus.
 
 CSRF Protection
 ~~~~~~~~~~~~~~~
@@ -50,10 +56,10 @@ calls when using a personal OAuth API token.
 Dependency management
 ~~~~~~~~~~~~~~~~~~~~~
 
-To efficiently manage 3rd-party dependenceis, i.e. Python packages that are not
-part of the `inveniosoftware` GitHub organization, the concept of "coordinator"
-modules is introduced. These are core Invenio modules that are responsible for
-properly specifying 3rd-party dependencies.
+We have revamped management of third-party dependencies. New releases
+of some of the many third-party packages Invenio depends on could often
+cause dependency conflicts. Invenio v3.3 introduces the concept of coordinator
+packages, who are responsible for properly specifying third-party dependencies.
 
 Here's a table of all the current coordinator modules:
 
@@ -71,24 +77,11 @@ Here's a table of all the current coordinator modules:
  `pytest-invenio`   `pytest`, `coverage`, `isort`, `check-manifest`
 =================== ==================================================================================================================
 
-Helm chart (BETA)
-~~~~~~~~~~~~~~~~~~
-Helm-Invenio provides a helm chart to deploy an Invenio application along with
-all its required services: Redis, RabbitMQ, HAProxy, Nginx, Elasticsearch,
-Logstash and PostgreSQL.
-
-This chart is currently in beta version. Its templates are currently specific
-for OpenShift. However, work is on-going to support bare Kubernetes deployments.
-
 Minor changes in v3.3
 ---------------------
-- Invenio-Access: adds `explicit excludes`. It enables to deny an specific
-  need or role.
+
+- Invenio-Access: adds `explicit excludes`. It enables to deny a specific need or role.
 - Invenio-Celery: fixes the rate limiting during celery task
-
-Deprecations in v3.3
---------------------
-
 
 Features removed in v3.3
 ------------------------
@@ -105,17 +98,8 @@ See our :ref:`maintenance-policy`.
 
 What's next?
 ------------
-In Invenio v3.4 we are planning to release the **Statistics** bundle including:
+In Invenio v3.4 we are planning to release two major new features:
 
-- `invenio-stats <https://invenio-stats.readthedocs.io>`_
-    - Invenio module for statistical data processing and querying with support
-      for collecting COUNTER Research Data Usage Metrics compliant statistics.
-- `counter-robots <https://counter-robots.readthedocs.io>`_
-    - Library for COUNTER-compliant detection of machines and robots.
-
-In addition to the Statistics bundle, we will also release final versions of
-the following two modules:
-
-- `invenio-index-migrator <https://invenio-index-migrator.readthedocs.io>`_
-    - Elasticsearch index migrator for Invenio (aka zero down-time reindexing
-      and index migration).
+- Theming support and a new Semantic UI theme.
+- A statistics bundle that adds support for collecting COUNTER Research Data Usage Metrics compliant statistics.
+- Index migration support for migrating between Elasticsearch clusters (aka zero down-time reindexing and index migration).
