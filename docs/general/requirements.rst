@@ -1,6 +1,6 @@
 ..
     This file is part of Invenio.
-    Copyright (C) 2018 CERN.
+    Copyright (C) 2018-2020 CERN.
 
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
@@ -13,9 +13,7 @@ Requirements
 Following is a brief overview of the requirements of Invenio:
 
 - Supported Python versions:
-    - Python 3: v3.4, v3.5 and v3.6 (v3.7 is not yet supported due to Celery
-      incompatibility).
-    - Python 2: v2.7 (until 2020, the official end of life for Python 2.7)
+    - Python 3: v3.6 and v3.7.
 - Supported databases:
     - PostgreSQL v9.4+, MySQL 5.6+ or SQLite (for testing).
 - Supported search engines:
@@ -31,8 +29,7 @@ Following is a brief overview of the requirements of Invenio:
     - uWSGI
     - mod_wsgi
 - Supported Flask versions:
-    - v0.12.x
-    - v1.0.x
+    - v1.0.4+
 - Supported Celery versions:
     - v4.0, 4.1, 4.2
     - v3.1
