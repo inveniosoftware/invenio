@@ -32,12 +32,12 @@ extras_require = {
     # Bundles
     'base': [
         'invenio-admin>=1.2.1,<1.3.0',
-        'invenio-assets>=1.2.0,<1.3.0',
+        'invenio-assets>=1.2.2,<1.3.0',
         'invenio-formatter>=1.1.0a1,<1.2.0',
         'invenio-logging>=1.3.0,<1.4.0',
         'invenio-mail>=1.0.2,<1.1.0',
         'invenio-rest>=1.2.1,<1.3.0',
-        'invenio-theme>=1.3.0a3,<1.4.0',
+        'invenio-theme>=1.3.0a4,<1.4.0',
     ],
     'auth': [
         'invenio-access>=1.4.1,<1.5.0',
