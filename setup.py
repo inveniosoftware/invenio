@@ -15,14 +15,7 @@ from setuptools import find_packages, setup
 readme = open('README.rst').read()
 
 tests_require = [
-    'check-manifest>=0.35',
-    'coverage>=4.5.3',
-    'isort>=4.3',
-    'pydocstyle>=3.0.0',
-    'pytest-cov>=2.7.1',
-    'pytest-invenio>=1.3.1,<1.4.0',
-    'pytest-pep8>=1.0.6',
-    'pytest>=4.6.4,<5.0.0',
+    'pytest-invenio>=1.3.2,<1.4.0',
 ]
 
 db_version = '>=1.0.5,<1.1.0'
@@ -32,16 +25,16 @@ extras_require = {
     # Bundles
     'base': [
         'invenio-admin>=1.2.1,<1.3.0',
-        'invenio-assets>=1.2.2,<1.3.0',
+        'invenio-assets>=1.2.3,<1.3.0',
         'invenio-formatter>=1.1.0a1,<1.2.0',
         'invenio-logging>=1.3.0,<1.4.0',
         'invenio-mail>=1.0.2,<1.1.0',
         'invenio-rest>=1.2.1,<1.3.0',
-        'invenio-theme>=1.3.0a4,<1.4.0',
+        'invenio-theme>=1.3.0a5,<1.4.0',
     ],
     'auth': [
         'invenio-access>=1.4.1,<1.5.0',
-        'invenio-accounts>=1.4.0a2,<1.5.0',
+        'invenio-accounts>=1.4.0a3,<1.5.0',
         'invenio-oauth2server>=1.2.0,<1.3.0',
         'invenio-oauthclient>=1.3.0,<1.4.0',
         'invenio-userprofiles>=1.2.0a1,<1.3.0',
