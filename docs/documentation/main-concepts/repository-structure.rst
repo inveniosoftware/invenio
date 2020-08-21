@@ -7,8 +7,10 @@
 
 .. _build-repository:
 
-Build a repository
-==================
+Repository structure
+====================
+
+CHANGE ME PLEASE
 
 Now that you have generated the skeleton of your repository via cookiecutter,
 bootstrapped your instance, run it and created a record, let's have a deep dive

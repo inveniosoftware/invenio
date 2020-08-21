@@ -17,3 +17,4 @@ Guides on how to upgrade to a specific Invenio version.
 
     upgrade-3_2-3_3
     upgrade-3_1-3_2
+    upgrade-marshmallow

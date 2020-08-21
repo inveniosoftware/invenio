@@ -145,7 +145,7 @@ This folder has the name of your module, in lower case with the dash changed
 to an underscore. It contains the code of your module. You can add any code files
 here, organized as you wish.
 
-The files that already exist are standard, and are covered 
+The files that already exist are standard, and are covered
 in the following sections. A rule of thumb is that if you need multiple
 files for one action (for instance, 2 ``views``: one for the API and a standard
 one), create a folder having the name of the file you want to split (here, a
@@ -164,7 +164,7 @@ ext.py
 >>>>>>
 This file contains a class that extends the Invenio application
 with your module. It registers the module during the initialization of the application
-and loads the default configuration from ``config.py``. 
+and loads the default configuration from ``config.py``.
 
 version.py
 >>>>>>>>>>
@@ -337,8 +337,3 @@ command:
 .. code-block:: console
 
     $ pipenv install invenio-foo
-
-Next steps
-----------
-
-To learn more about the development process in Invenio, follow the next guide :ref:`developing-with-invenio`.

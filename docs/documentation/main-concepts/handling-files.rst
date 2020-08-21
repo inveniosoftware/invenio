@@ -80,7 +80,7 @@ between a Record and a Bucket. By default in Invenio,
 a record has a reference to one bucket and
 a bucket to one record.
 
-.. image:: ../_static/invenio-files-integration.png
+.. image:: /_static/invenio-files-integration.png
 
 Invenio allows you to set up different scenarios and have, for example,
 multiple buckets per records and viceversa or buckets not attached

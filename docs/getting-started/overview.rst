@@ -5,8 +5,8 @@
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
-Introduction
-============
+Overview
+========
 
 Invenio is an open source framework for building large-scale digital
 repositories.

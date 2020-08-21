@@ -25,7 +25,7 @@ infrastructure. It consists of:
 - **Cache system:** Redis or Memcache.
 - **Storage system:** Local, S3, XRootD, WebDAV and more.
 
-.. image:: _static/infrastructure.png
+.. image:: /_static/infrastructure.png
     :align: center
 
 Request handling

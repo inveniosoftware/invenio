@@ -16,14 +16,8 @@ are here for the interested.
     :maxdepth: 2
     :name: mastertoc
 
-    getting-help
-    channels
-    contribution-guide
-    style-guide
-    development-environment.rst
-    translation-guide
-    maintainers-guide/index.rst
-    security-policy.rst
+    contributing/index
+    security-policy
     governance
     code-of-conduct
     license

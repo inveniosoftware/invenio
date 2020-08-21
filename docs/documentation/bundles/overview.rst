@@ -7,8 +7,8 @@
 
 .. _bundles:
 
-Bundles
-=======
+Overview
+========
 Invenio is a highly modular framework with many modules that provide various
 different functionality. We are packing related modules into bundles which is
 released together at the same time.
