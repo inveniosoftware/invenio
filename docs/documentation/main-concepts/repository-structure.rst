@@ -10,14 +10,10 @@
 Repository structure
 ====================
 
-CHANGE ME PLEASE
-
-Now that you have generated the skeleton of your repository via cookiecutter,
-bootstrapped your instance, run it and created a record, let's have a deep dive
-at the various files and folders that were generated and what they do.
-
-The generated skeleton is our default recommendation, however you are
-completely free to adapt it as your see fit.
+This section describes the file structure of a standard invenio project.
+The cookiecutter generates this skeleton for you.
+Note that the following file structure is our default recommandation,
+however you are completely free to adapt it as your see fit.
 
 Management scripts
 ------------------

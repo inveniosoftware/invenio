@@ -11,7 +11,7 @@ Main concepts
 =============
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     repository-structure
     understanding-data-models

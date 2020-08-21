@@ -127,6 +127,7 @@ html_theme_options = {
     'github_banner': True,
     'show_powered_by': False,
     'sidebar_collapse': True,
+    'show_relbar_bottom': True,
     'extra_nav_links': {
         'invenio@GitHub': 'https://github.com/inveniosoftware/invenio',
         'invenio@PyPI': 'https://pypi.python.org/pypi/invenio/',

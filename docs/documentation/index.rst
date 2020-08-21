@@ -17,6 +17,4 @@ Documentation
     main-concepts/index
     bundles/index
     how-to/index
-    releases/index
-    upgrading/index
-    migrating
+    life-cycle/index

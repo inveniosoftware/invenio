@@ -1,18 +1,16 @@
 ..
     This file is part of Invenio.
-    Copyright (C) 2018 CERN.
+    Copyright (C) 2020 CERN.
 
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
-.. _quickstart:
-
-Quickstart
+Life cycle
 ==========
 
 .. toctree::
    :maxdepth: 2
 
-   installation
-   crud-operations
-   final-steps
+   releases/index
+   upgrading/index
+   migrating
