@@ -32,7 +32,7 @@ Visit `EditorConfig <https://editorconfig.org>`_ to see the list of supported ed
 Editors
 ~~~~~~~
 Following editors (listed alphabetically) are used by our existing developers.
-Don't hesitate to reach out on our Gitter channel, to ask for help for useful
+Don't hesitate to reach out on our Discord server, to ask for help for useful
 plugins:
 
 - `Atom <https://atom.io>`_

@@ -21,8 +21,8 @@
 .. image:: https://travis-ci.org/inveniosoftware/invenio.svg?branch=master
     :target: https://travis-ci.org/inveniosoftware/invenio
 
-.. image:: https://badges.gitter.im/Join%20Chat.svg
-    :target: https://gitter.im/inveniosoftware/invenio
+.. image:: https://img.shields.io/badge/Discord-join%20chat-%237289da
+    :target: https://discord.gg/8qatqBC
 
 Invenio Framework is like a Swiss Army knife of battle-tested, safe and secure
 modules providing you with all the features you need to run a trusted digital

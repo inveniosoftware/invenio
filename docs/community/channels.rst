@@ -14,10 +14,7 @@ Chatrooms
 ---------
 Most day-to-day communication is happening in our chatrooms:
 
-- `Public chatroom <https://gitter.im/inveniosoftware/invenio>`_ (for everyone)
-- `Developer chatroom <https://gitter.im/inveniosoftware/invenio>`_ (for
-  `members <https://github.com/orgs/inveniosoftware/people>`_ of inveniosoftware
-  GitHub organisation).
+- `Public chatroom <https://discord.gg/8qatqBC>`_ (for everyone)
 
 If you want to join the developer chatroom, just ask for an invite on the
 public chatroom.

@@ -52,7 +52,7 @@ handle the issue.
 
 The notifications are sent to:
 
-  - Chatroom: https://gitter.im/inveniosoftware/invenio
+  - Chatroom: https://discord.gg/8qatqBC
   - Mailing list: project-invenio-announce@cern.ch
 
 **Time-sensitive issues**

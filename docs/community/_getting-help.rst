@@ -19,7 +19,7 @@ Ask questions or browse answers to exsiting questions.
 
 .. rubric:: Chatroom
 
-- https://gitter.im/inveniosoftware/invenio
+- https://discord.gg/8qatqBC
 
 Probably the fastest way to get a reply is to join our chatroom. Here most
 developers and maintainers of Invenio hangout during their regular working
