@@ -8,14 +8,14 @@
 Releasing
 =========
 
-In general, you have two types of releases:
+The most common releases are:
 
 - **Major/Minor-level release** - Often these releases add significant new
-  features and needs to go through extensive testing.
+  features and need to go through extensive testing.
 - **Patch-level release** - Often these releases fix security issues or
   important bugs.
 
-For major/minor-level releases, you'll often be working only with the
+For major/minor-level releases, you'll mostly be working only with the
 ``master``-branch and only make a single PyPI release. For patch-level
 releases you'll often be working with multiple maintenance branches and make
 several PyPI releases for all currently maintained versions of Invenio.
@@ -23,8 +23,10 @@ several PyPI releases for all currently maintained versions of Invenio.
 Depending on the package that you are releasing, you will have to follow
 a different procedure. You might have to release:
 
-- one of the Python or JavaScript/React modules (happening rather often)
-- the Invenio framework, the ``invenio`` package (happening less often)
+- One of the Python (e.g. `Invenio-DB <https://pypi.org/project/invenio-db/>`_)
+  or JavaScript/React (e.g. `React-SearchKit <https://www.npmjs.com/package/react-searchkit>`_)
+  modules (happening rather often).
+- The Invenio framework, the `invenio <https://pypi.org/project/invenio/>`_ package (happening less often).
 
 Before you start
 ----------------
@@ -53,7 +55,8 @@ modules are automatically picked up: the dependencies upper bounds are
 normally allowing the installation of patch-level releases.
 
 Most of the Invenio modules have maintenance branches for previous
-major/minor releases. They are normally named ``maint-<version>``.
+major/minor releases. They are normally named ``maint-<version>``,
+e.g. `Invenio-Records-Rest maint-1.6 <https://github.com/inveniosoftware/invenio-records-rest/tree/maint-1.6>_`.
 
 With patch-level releases, you'll often make multiple releases and work with
 multiple maintenance branches. For instance, you might have to merge a
@@ -71,10 +74,11 @@ e.g. ``3.3``, the upper bound for an Invenio module ``foo``
 A new minor release ``1.3.0`` of this module will not affect
 ``invenio 3.3``.
 
-If this is not the case, you will have to make sure that the new release
-of the module ``foo`` will not introduce backward incompatible changes,
-because it will be installed by ``invenio 3.3``, potentially breaking
-existing Invenio installations.
+.. warning::
+    If this is not the case, you will have to make sure that the new release
+    of the module ``foo`` will not introduce backward incompatible changes,
+    because it will be installed by ``invenio 3.3``, potentially breaking
+    existing Invenio installations.
 
 Module release
 --------------
@@ -91,12 +95,14 @@ How to release an Invenio module.
       is correct. Pay attention how you write, keep consistency with previous
       sentences forms.
 4. Bump version in ``version.py`` (follow semantic versioning).
-5. Create a release commit (message pattern:
+5. If the module is changing from alpha/beta to official release remember to
+   modify the classifiers in the setup.py according to `PyPi classifiers <https://pypi.org/classifiers/>`_.
+6. Create a release commit (message pattern:
    ``release: v<major>.<minor>.<patch>``).
-6. Create tag and push release:
+7. Create tag and push release:
     - ``git tag v<major>.<minor>.<patch>``
     - ``git push inveniosoftware master v<major>.<minor>.<patch>``
-7. Regularly check ``Travis`` and ``PyPI`` to ensure the release went through.
+8. Regularly check ``Travis`` and ``PyPI`` to ensure the release went through.
 
 **JavaScript/React module**
 
@@ -129,15 +135,15 @@ After the procedure described above, you will have to:
 1. Checkout the ``maint`` branch and create a new release branch:
     - ``git checkout maint-<major>.<minor>``
     - ``git checkout -b rel-v<major>.<minor>.<patch>``
-2. Cherry-pick the commits that you need to backport, resolve any conflict.
-   (yes, cherry-pick :))
+2. Cherry-pick (yes, cherry-pick :)) the commits that you need to backport and resolve any conflict:
+    - ``git cherry-pick <commit id>``
 3. Run tests.
-4. Createa new commit with updated ``changes`` file and bumped version,
-   as described above.
+4. Create a new commit with updated ``changes`` file and bumped version,
+   as described above in step 3 of Python or JavaScript module release.
 5. Issue a pull request against the **maintenance branch** (
    ``maint-<major>.<minor>``).
 6. If Travis fails:
-    - Fix issue and ensure head commit is the release commit (i.e. rebase if
+    - Fix issue and **ensure head commit is the release commit** (i.e. rebase if
       necessary).
 7. Merge, tag and push release:
     - ``git merge --ff-only rel-v<major>.<minor>.<patch>``
@@ -152,9 +158,9 @@ the various Invenio modules needed for the release have been merged and
 released. Then:
 
 1. Update the ``setup.py``:
-    - review all modules lower and upper bounds and adjust them as needed.
+    - Review all modules lower and upper bounds and adjust them as needed.
 2. Documentation:
-    - review documentation and make sure new features or breaking changes are
+    - Review documentation and make sure new features or breaking changes are
       documented, to help users when upgrading.
 3. Prepare release notes (`see example <https://github.com/inveniosoftware/invenio/commit/f4d0aa5ac78d76228fe86754eeb3bbfe81a1854f>`_):
     - In ``docs/releases/``, copy an existing patch-level or minor
@@ -183,11 +189,23 @@ You can manually reproduce the publishing process done by ``Travis`` by doing:
 1. Activate your virtualenv for the package that you want to release.
 2. Generate the different distributions:
     - ``python setup.py compile_catalog sdist bdist_wheel``
+
+    .. note::
+        ``compile_catalog`` is an optional argument, only valid if your module include translation files.
 3. Install the tool to upload releases to PyPI:
     - ``pip install twine wheel``
 4. Publish:
-    - ``twine upload --repository <repo-name> dist/*``. The command will
-      ask for username and password. Architects should have the credentials.
+    4. Publish:
+    - ``twine upload dist/*``. The command will ask for username and password. `Invenio architects <https://github.com/orgs/inveniosoftware/teams/architects>`_ should have the credentials.
+
+    .. warning::
+        The wildcard will upload any file that are present in the folder. Make sure you build the package from a clean state
+        to avoid old build's files appearing in the released package. E.g. ``rm -rf compile_catalog sdist bdist_wheel``
+        before building the package.
+
+    .. note::
+        If it is your first time releasing in PyPI, or you are not sure if the release is correct, you can test it in https://test.pypi.org/ see the `documentation
+        <https://twine.readthedocs.io/en/latest/#using-twine>`_.
 
 **NpmJS**
 
@@ -198,7 +216,7 @@ when creating a totally new package, never released yet.
    `npm <https://www.npmjs.com/get-npm>`_ client installed in your machine.
 2. Login on ``NpmJS``:
     - ``npm login``: you will need ``inveniosoftware`` username and password.
-      Architects should have the credentials.
+      `Invenio architects <https://github.com/orgs/inveniosoftware/teams/architects>`_ should have the credentials.
 3. Optionally, verify the package before releasing:
     - ``npm pack``: this will create the final archive that will be
       published on ``NpmJS`` in case you want to check its content.
