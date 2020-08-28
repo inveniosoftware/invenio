@@ -18,6 +18,7 @@ for maintaining one or more repositories.
 
    overview
    repositories
+   releasing
    copyright-policy
 
 
