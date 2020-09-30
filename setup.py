@@ -19,7 +19,7 @@ tests_require = [
 ]
 
 db_version = '>=1.0.5,<1.1.0'
-search_version = '>=1.3.1,<1.4.0'
+search_version = '>=1.4.0,<1.5.0'
 
 extras_require = {
     # Bundles
@@ -40,13 +40,13 @@ extras_require = {
         'invenio-userprofiles>=1.2.0a4,<1.3.0',
     ],
     'metadata': [
-        'invenio-indexer>=1.1.2,<1.2.0',
+        'invenio-indexer>=1.2.0,<1.3.0',
         'invenio-jsonschemas>=1.1.0,<1.2.0',
         'invenio-oaiserver>=1.2.0,<1.3.0',
         'invenio-pidstore>=1.2.1,<1.3.0',
         'invenio-records-rest>=1.7.2,<1.8.0',
         'invenio-records-ui>=1.2.0a1,<1.3.0',
-        'invenio-records>=1.3.2,<1.4.0',
+        'invenio-records>=1.4.0a3,<1.5.0',
         'invenio-search-ui>=2.0.0a4,<2.1.0',
     ],
     'files': [
