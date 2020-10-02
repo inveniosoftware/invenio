@@ -15,7 +15,7 @@ from setuptools import find_packages, setup
 readme = open('README.rst').read()
 
 tests_require = [
-    'pytest-invenio>=1.3.2,<1.4.0',
+    'pytest-invenio>=1.4.0,<1.5.0',
 ]
 
 db_version = '>=1.0.5,<1.1.0'
@@ -77,7 +77,7 @@ extras_require = {
     ],
     # Docs and test dependencies
     'docs': [
-        'Sphinx>=1.5.1',
+        'Sphinx>=3,<4',
     ],
     'tests': tests_require,
 }
@@ -89,10 +89,6 @@ for name, reqs in extras_require.items():
         continue
     extras_require['all'].extend(reqs)
 
-
-setup_requires = [
-    'pytest-runner>=3.0.0,<5',
-]
 
 install_requires = [
     'invenio-app>=1.3.0,<1.4.0',
@@ -128,7 +124,6 @@ setup(
     entry_points={},
     extras_require=extras_require,
     install_requires=install_requires,
-    setup_requires=setup_requires,
     tests_require=tests_require,
     classifiers=[
         'Environment :: Web Environment',
