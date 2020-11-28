@@ -5,11 +5,25 @@
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
-How-to's
-========
+.. _releases:
+
+Versions
+---------
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 1
+    :name: mastertoc
 
-   orcid-login
-   build-a-module
+    v3.3.0
+    v3.2.2
+    v3.2.1
+    v3.2.0
+    v3.1.2
+    v3.1.1
+    v3.1.0
+    v3.0.2
+    v3.0.1
+    v3.0.0
+    v2
+    v1
+    v0

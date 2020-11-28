@@ -54,3 +54,13 @@ Advanced topics
 ---------------
 
 - `Tutorial 15 - Application architecture <https://github.com/inveniosoftware/training/tree/v3.1/15-application-architecture/>`_
+
+
+How-to's
+--------
+
+.. toctree::
+   :maxdepth: 2
+
+   how-to/orcid-login
+   how-to/build-a-module

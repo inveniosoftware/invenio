@@ -7,8 +7,8 @@
 
 .. _setting-up-your-environment:
 
-Developer environment guide
-===========================
+Setting up your system
+======================
 
 The following is a guide to help you prepare your system for developing with
 Invenio. A proper development environment setup can save a lot of time and
@@ -166,6 +166,14 @@ commands:
 
 In order to create e.g. DOI badges you need the DejaVu Sans font installed.
 Go to https://dejavu-fonts.github.io/ and follow the instructions.
+
+**Docker Desktop for Mac**
+
+You may need to increase the resources assigned to Docker Desktop for Mac
+See https://docs.docker.com/docker-for-mac/#resources.
+
+A typical sign of needed more resources, is that services are not running or
+images are having problems building.
 
 Linux
 ~~~~~

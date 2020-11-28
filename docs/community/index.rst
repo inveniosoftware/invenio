@@ -21,3 +21,4 @@ are here for the interested.
     governance
     code-of-conduct
     license
+    history

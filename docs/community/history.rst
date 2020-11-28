@@ -80,3 +80,24 @@ deal with very large research datasets.
 Thus, in late 2015 we were being slowed so much down by our past legacy that we
 saw no other way that starting over from scratch if we were to deal with the
 next 20 years of challenges.
+
+Mailing lists
+-------------
+We have discontinued the use of mailing lists, but for historical reasons you
+can still find them here:
+
+- ``project-invenio-announce@cern.ch``: Originally used for announcing new
+  Invenio releases and other major news concerning the project.
+  `archive <https://groups.cern.ch/group/project-invenio-announce/Lists/Archive/100.aspx>`_
+- ``project-invenio-general@cern.ch``: Originally used for discussion among
+  users and administrators of Invenio instances.
+  `old general archive <https://groups.cern.ch/group/project-invenio-general/Lists/Archive/100.aspx>`_,
+  `very old general archive <https://groups.cern.ch/group/project-cdsware-users/Lists/Archive/100.aspx>`_
+- ``project-invenio-devel@cern.ch``: Originally used for discussion among
+  Invenio developers.
+  `old devel archive <https://groups.cern.ch/group/project-invenio-devel/Lists/Archive/100.aspx>`_,
+  `very old devel archive <https://groups.cern.ch/group/project-cdsware-developers/Lists/Archive/100.aspx>`_
+
+Note that all the mailing lists are also archived (as of the 20th of
+July, 2011) on `The Mail Archive <http://www.mail-archive.com/>`_.
+

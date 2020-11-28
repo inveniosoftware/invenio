@@ -14,8 +14,7 @@ Getting started
    :maxdepth: 2
 
    overview
-   history
+   development-environment
    quickstart/index
    getting-help
-   channels
-   development-environment
+

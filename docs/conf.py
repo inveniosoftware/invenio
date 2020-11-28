@@ -52,7 +52,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Invenio'
-copyright = u'2015-2019, CERN'
+copyright = u'2015-2020, CERN'
 author = u'CERN'
 
 # The version info for the project you're documenting, acts as replacement for

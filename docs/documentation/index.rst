@@ -16,5 +16,3 @@ Documentation
     requirements
     main-concepts/index
     bundles/index
-    how-to/index
-    life-cycle/index

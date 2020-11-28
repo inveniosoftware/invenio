@@ -14,3 +14,4 @@
     tutorials/bootcamp
     documentation/index
     community/index
+    releases/index

@@ -13,15 +13,15 @@ Requirements
 Following is a brief overview of the requirements of Invenio:
 
 - Supported Python versions:
-    - Python 3: v3.6 and v3.7.
+    - Python 3: v3.6, v3.7 and 3.8.
 - Supported databases:
-    - PostgreSQL v9.4+, MySQL 5.6+ or SQLite (for testing).
+    - PostgreSQL v9.6+, MySQL 5.6+ or SQLite (for testing).
 - Supported search engines:
     - Elasticsearch v6 or v7.
 - Supported memory caches:
     - Redis or Memcache.
 - Supported message queues:
-    - RabbitMQ, Redis or Amazon SQS (untested).
+    - RabbitMQ, Redis.
 - Supported storage protocols:
     - Local, S3, WebDAV, XRootD and many more.
 - Supported WSGI servers:
@@ -31,11 +31,10 @@ Following is a brief overview of the requirements of Invenio:
 - Supported Flask versions:
     - v1.0.4+
 - Supported Celery versions:
-    - v4.0, 4.1, 4.2
-    - v3.1
+    - v5.0, v4.4
 - Supported operating systems:
-    - macOS: Newer releases.
-    - Linux: Newer distributions such as Ubuntu 16/18 or CentOS 7.
+    - macOS: Newer releases
+    - Linux: Newer distributions such as Ubuntu 18 or CentOS 7.
 
 System requirements
 -------------------

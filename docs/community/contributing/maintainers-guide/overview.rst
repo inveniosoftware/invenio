@@ -32,7 +32,7 @@ the website, forums, interest groups etc.
 
 - Help contributors get their contributions integrated in Invenio.
 - Answer questions and help users in e.g. the chat rooms (see
-  :ref:`communication-channels`).
+  :ref:`getting-help`).
 - Manage issues, assignments and milestones.
 - Review and merge pull requests.
 - Prepare releases.
@@ -66,7 +66,7 @@ make a difference on the project!
 
 Still sounds like something for you? Get in contact with one the Invenio
 product manager, one of the architects or one of the project coordinators. They
-will help you through the process. See :ref:`communication-channels`.
+will help you through the process. See :ref:`getting-help`.
 
 Stepping down as maintainer
 ---------------------------

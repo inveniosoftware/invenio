@@ -25,5 +25,11 @@
     :target: https://discord.gg/8qatqBC
 
 Invenio Framework is like a Swiss Army knife of battle-tested, safe and secure
-modules providing you with all the features you need to run a trusted digital
+modules providing you with all the features you need to build a trusted digital
 repository.
+
+**Built with Invenio Framework**
+
+Looking for a turn-key Research Data Management platform? Checkout `InvenioRDM <https://inveniosoftware.org/products/rdm/>`_
+
+Looking for a modern Integrated Library System? Checkout `InvenioILS <https://inveniosoftware.org/products/ils/>`_

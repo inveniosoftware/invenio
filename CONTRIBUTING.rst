@@ -12,9 +12,8 @@ If we remember that, our :ref:`code-of-conduct` will come naturally.
 
 .. rubric:: Get in touch
 
-See :ref:`Link <getting-help>` and :ref:`communication-channels`. Don't hesitate
-to get in touch with the Invenio maintainers. The maintainers can help you kick
-start your contribution.
+See :ref:`Link <getting-help>`. Don't hesitate to get in touch with the
+Invenio maintainers. The maintainers can help you kick start your contribution.
 
 Types of contributions
 ----------------------

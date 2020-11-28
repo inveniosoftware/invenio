@@ -15,9 +15,9 @@ you can get in touch with other users and developers:
 
 .. rubric:: Forum/Knowledge base
 
-- https://github.com/inveniosoftware/troubleshooting
+- https://invenio-talk.web.cern.ch
 
-Ask questions or browse answers to exsiting questions.
+Ask questions or browse answers to existing questions.
 
 .. rubric:: Chatroom
 
@@ -32,6 +32,4 @@ hours.
 - https://github.com/inveniosoftware
 
 If you have feature requests or want to report potential bug, you can do it by
-opening an issue in one of the individual Invenio module repositories. In each
-repository there is a ``MAINTAINERS`` file in the root, which lists the who
-is maintaining the module.
+opening an issue in one of the individual Invenio module repositories.
