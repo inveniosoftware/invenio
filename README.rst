@@ -28,7 +28,7 @@ Invenio Framework is like a Swiss Army knife of battle-tested, safe and secure
 modules providing you with all the features you need to build a trusted digital
 repository.
 
-**Our other products***
+**Our other products**
 
 Looking for a turn-key Research Data Management platform? Checkout `InvenioRDM <https://inveniosoftware.org/products/rdm/>`_
 
