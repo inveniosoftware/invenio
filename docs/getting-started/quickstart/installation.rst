@@ -34,7 +34,7 @@ cookiecutter template
 
 .. code-block:: shell
 
-    $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance --checkout v3.3
+    $ cookiecutter gh:inveniosoftware/cookiecutter-invenio-instance --checkout v3.4
 
 The cookiecutter initialisation procedure will prompt you with a series of questions
 aiming to customise your new instance, e.g. the name of your application.
