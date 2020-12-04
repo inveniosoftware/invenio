@@ -30,6 +30,7 @@ Each module has a separate documentation which you can find linked below.
    alpha
    utilities
    scaffolding
+   documentation
 
 
 Notes on license
