@@ -46,7 +46,10 @@ extras_require = {
         'invenio-pidstore>=1.2.1,<1.3.0',
         'invenio-records-rest>=1.7.2,<1.8.0',
         'invenio-records-ui>=1.2.0a1,<1.3.0',
-        'invenio-records>=1.4.0a3,<1.5.0',
+        # Note: Invenio-Records v1.5.x is allowed on purpose in v3.4 to
+        # allow the relations support to be released once it's more mature
+        # without having to release Invenio v3.5.
+        'invenio-records>=1.4.0,<1.6.0',
         'invenio-search-ui>=2.0.0a10,<2.1.0',
     ],
     'files': [
