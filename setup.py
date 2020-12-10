@@ -50,12 +50,12 @@ extras_require = {
         # allow the relations support to be released once it's more mature
         # without having to release Invenio v3.5.
         'invenio-records>=1.4.0,<1.6.0',
-        'invenio-search-ui>=2.0.0a10,<2.1.0',
+        'invenio-search-ui>=2.0.0,<2.1.0',
     ],
     'files': [
         'invenio-files-rest>=1.2.0,<1.3.0',
         'invenio-iiif>=1.1.0,<1.2.0',
-        'invenio-previewer>=1.3.0a5,<1.4.0',
+        'invenio-previewer>=1.3.0,<1.4.0',
         'invenio-records-files>=1.2.1,<1.3.0',
     ],
     # Database version
