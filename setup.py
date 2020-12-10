@@ -18,8 +18,8 @@ tests_require = [
     'pytest-invenio>=1.4.0,<1.5.0',
 ]
 
-db_version = '>=1.0.5,<1.1.0'
-search_version = '>=1.4.0,<1.5.0'
+db_version = '>=1.0.8,<1.1.0'
+search_version = '>=1.4.1,<1.5.0'
 
 extras_require = {
     # Bundles
@@ -29,23 +29,23 @@ extras_require = {
         'invenio-formatter>=1.1.0,<1.2.0',
         'invenio-logging>=1.3.0,<1.4.0',
         'invenio-mail>=1.0.2,<1.1.0',
-        'invenio-rest>=1.2.1,<1.3.0',
-        'invenio-theme>=1.3.0,<1.4.0',
+        'invenio-rest>=1.2.3,<1.3.0',
+        'invenio-theme>=1.3.1,<1.4.0',
     ],
     'auth': [
         'invenio-access>=1.4.1,<1.5.0',
         'invenio-accounts>=1.4.0,<1.5.0',
-        'invenio-oauth2server>=1.3.0a3,<1.4.0',
-        'invenio-oauthclient>=1.4.0a2,<1.5.0',
-        'invenio-userprofiles>=1.2.0a4,<1.3.0',
+        'invenio-oauth2server>=1.3.0,<1.4.0',
+        'invenio-oauthclient>=1.4.0,<1.5.0',
+        'invenio-userprofiles>=1.2.0,<1.3.0',
     ],
     'metadata': [
         'invenio-indexer>=1.2.0,<1.3.0',
         'invenio-jsonschemas>=1.1.1,<1.2.0',
         'invenio-oaiserver>=1.2.0,<1.3.0',
         'invenio-pidstore>=1.2.1,<1.3.0',
-        'invenio-records-rest>=1.7.2,<1.8.0',
-        'invenio-records-ui>=1.2.0a1,<1.3.0',
+        'invenio-records-rest>=1.8.0,<1.9.0',
+        'invenio-records-ui>=1.2.0,<1.3.0',
         # Note: Invenio-Records v1.5.x is allowed on purpose in v3.4 to
         # allow the relations support to be released once it's more mature
         # without having to release Invenio v3.5.
@@ -94,10 +94,10 @@ for name, reqs in extras_require.items():
 
 
 install_requires = [
-    'invenio-app>=1.3.0,<1.4.0',
+    'invenio-app>=1.3.1,<1.4.0',
     'invenio-base>=1.2.3,<1.3.0',
     'invenio-cache>=1.1.0,<1.2.0',
-    'invenio-celery>=1.2.0,<1.3.0',
+    'invenio-celery>=1.2.2,<1.3.0',
     'invenio-config>=1.0.3,<1.1.0',
     'invenio-i18n>=1.3.0,<1.4.0',
 ]
@@ -139,6 +139,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Development Status :: 5 - Production/Stable',
     ],
 )
