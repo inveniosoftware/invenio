@@ -1,0 +1,121 @@
+name: CI
+
+on:
+  push:
+    branches: master
+  pull_request:
+    branches: master
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '0 3 * * 6'
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason'
+        required: false
+        default: 'Manual trigger'
+
+jobs:
+  Tests:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+          python-version: [3.6, 3.7, 3.8, 3.9]
+          requirements-level: [min, pypi]
+          cache-service: [redis]
+          db-service: [postgresql9, postgresql11, mysql5, mysql8]
+          mq-service: [rabbitmq, redis]
+          search-service: [elasticsearch6, elasticsearch7]
+
+          exclude:
+          # Add combinations to this list that should be excluded from the final
+          # build. Doing this will help keeping the number of jobs down.
+          # E.g. removing 3.8 - min combination will avoid 8 jobs to be submited
+          # [3.8] * [min] * [postgresql9, postgresql11, mysql5, mysql8] * [elasticsearch6, elasticsearch7]
+          - python-version: 3.7
+            requirements-level: min
+
+          - python-version: 3.8
+            requirements-level: min
+
+          - python-version: 3.9
+            requirements-level: min
+
+          - db-service: postgresql11
+            python-version: 3.6
+
+          - db-service: mysql8
+            python-version: 3.6
+
+          - search-service: elasticsearch7
+            python-version: 3.6
+
+          - search-service: elasticsearch6
+            db-service: postgresql11
+
+          - search-service: elasticsearch6
+            db-service: mysql8
+
+          - search-service: elasticsearch7
+            db-service: postgresql9
+
+          - search-service: elasticsearch7
+            db-service: mysql5
+
+          include:
+          - db-service: postgresql9
+            DB_EXTRAS: "postgresql"
+
+          - db-service: postgresql11
+            DB_EXTRAS: "postgresql"
+
+          - db-service: mysql5
+            DB_EXTRAS: "mysql"
+
+          - db-service: mysql8
+            DB_EXTRAS: "mysql"
+
+          - search-service: elasticsearch6
+            SEARCH_EXTRAS: "elasticsearch6"
+
+          - search-service: elasticsearch7
+            SEARCH_EXTRAS: "elasticsearch7"
+
+    env:
+      CACHE: ${{ matrix.cache-service }}
+      DB: ${{ matrix.db-service }}
+      MQ: ${{ matrix.mq-service }}
+      SEARCH: ${{ matrix.search-service }}
+      EXTRAS: all,${{ matrix.DB_EXTRAS }},${{matrix.SEARCH_EXTRAS}}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Generate dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools py wheel requirements-builder
+          requirements-builder -e "$EXTRAS" --level=${{ matrix.requirements-level }} setup.py > .${{ matrix.requirements-level }}-${{ matrix.python-version }}-requirements.txt
+
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('.${{ matrix.requirements-level }}-${{ matrix.python-version }}-requirements.txt') }}
+
+      - name: Install dependencies
+        run: |
+          pip install -r .${{matrix.requirements-level}}-${{ matrix.python-version }}-requirements.txt
+          pip install ".[$EXTRAS]"
+          pip freeze
+          docker --version
+          docker-compose --version
+
+      - name: Run tests
+        run: |
+          ./run-tests.sh
