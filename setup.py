@@ -30,11 +30,11 @@ extras_require = {
         'invenio-logging>=1.3.0,<1.4.0',
         'invenio-mail>=1.0.2,<1.1.0',
         'invenio-rest>=1.2.3,<1.3.0',
-        'invenio-theme>=1.3.1,<1.4.0',
+        'invenio-theme>=1.3.2,<1.4.0',
     ],
     'auth': [
         'invenio-access>=1.4.1,<1.5.0',
-        'invenio-accounts>=1.4.0,<1.5.0',
+        'invenio-accounts>=1.4.2,<1.5.0',
         'invenio-oauth2server>=1.3.0,<1.4.0',
         'invenio-oauthclient>=1.4.0,<1.5.0',
         'invenio-userprofiles>=1.2.0,<1.3.0',
@@ -55,7 +55,7 @@ extras_require = {
     'files': [
         'invenio-files-rest>=1.2.0,<1.3.0',
         'invenio-iiif>=1.1.0,<1.2.0',
-        'invenio-previewer>=1.3.0,<1.4.0',
+        'invenio-previewer>=1.3.1,<1.4.0',
         'invenio-records-files>=1.2.1,<1.3.0',
     ],
     # Database version
