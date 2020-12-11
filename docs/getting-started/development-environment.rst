@@ -175,10 +175,199 @@ See https://docs.docker.com/docker-for-mac/#resources.
 A typical sign of needed more resources, is that services are not running or
 images are having problems building.
 
-Linux
-~~~~~
+Ubuntu
+~~~~~~
 
-Want to write it? Contact us on the chat!
+System setup guide for Ubuntu.
+
+**Discord**
+
+The easiest way to install Discord is by using snap.
+
+.. code-block:: console
+
+    $ sudo snap install discord
+
+**Docker**
+
+To install docker you can follow the instructions in `docker for Ubuntu. <https://docs.docker.com/engine/install/ubuntu/>`_  
+
+
+**docker-compose**
+
+For defining and running multi-container Docker applications.
+
+.. code-block:: console
+
+    $ sudo apt install docker-compose
+
+**Google chrome**
+
+Needed for some end-to-end tests.
+
+.. code-block:: console
+
+    $ sudo apt install gdebi-core wget
+    $ wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    $ sudo gdebi google-chrome-stable_current_amd64.deb
+
+**Visual studio code**
+
+A text editor used by many Invenio developers.
+
+.. code-block:: console
+
+    $ sudo snap install --classic code
+
+**htop**
+
+A better top.
+
+.. code-block:: console
+
+    $ sudo apt install htop
+
+**tree**
+
+Pretty print a directory structure.
+
+.. code-block:: console
+
+    $ sudo apt install tree
+
+**OC CLI**
+
+Needed if you deploy on openshift.
+
+Download the latest OpenShift Origin files. As of this writing, that version number is 3.11.0.
+
+.. code-block:: console
+
+    $ wget https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz
+
+Once the file is downloaded, extract it with the command:
+
+.. code-block:: console
+
+    $ tar xvzf openshift*.tar.gz
+
+Change into the newly-created directory with the command:
+
+.. code-block:: console
+
+    $ cd openshift-origin-client-tools*/
+
+Move the kubectl and oc binaries with the command:
+
+.. code-block:: console
+
+    $ sudo mv  oc kubectl  /usr/local/bin/
+
+**shuttle**
+
+Needed for tunneling into CERN.
+
+.. code-block:: console
+
+    $ sudo apt install sshuttle iptables
+
+**Python**
+
+Invenio is developed using Python and JavaScript. We highly recommend that
+install ``pyenv`` and ``nvm`` - both tools manage version of python and node
+respectively. Install the following packages:
+
+**nvm**
+
+.. code-block:: console
+
+    $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+
+**Pyenv**
+
+Update and install the required dependncies.
+
+.. code-block:: console
+
+    $ sudo apt update -y
+    $ sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
+
+Clone the repository
+
+.. code-block:: console
+
+    $ git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+
+Configure the environment.
+
+.. code-block:: console
+
+    $ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+    $ echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+    $ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n eval "$(pyenv init -)"\nfi' >> ~/.bashrc
+
+Restart shell.
+
+.. code-block:: console
+
+    $ exec "$SHELL"
+
+**pyenv-virtualenv**
+
+.. code-block:: console
+
+    $ git clone https://github.com/pyenv/pyenv-virtualenv.git $(pyenv root)/plugins/pyenv-virtualenv
+
+**pyenv-virtualenvwrapper**
+
+.. code-block:: console
+
+    $ git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git $(pyenv root)/plugins/pyenv-virtualenvwrapper
+
+Once you have installed above packages, you can proceed with installing Python versions. The following will install Python 3.6, 3.7 and 3.8 and set the default Python installation to Python 3.8 (node you can always install the latest patch-level release):
+
+.. code-block:: console
+
+    $ pyenv install 3.6.9
+    $ pyenv install 3.7.8
+    $ pyenv install 3.8.5
+    $ pyenv global 3.8.5
+
+
+You should edit your `.bashrc` or `.zshrc` file to initialise pyenv:
+
+.. code-block:: sh
+
+    # nvm setup
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"
+
+    # pyenv
+    eval "$(pyenv init -)"
+
+    # pyenv-virtualenv
+    eval "$(pyenv virtualenv-init -)"
+
+    # pyenv-virtualenvwrapper
+    pyenv virtualenvwrapper
+
+Now, you can create e.g. Python virtual environments using the following
+commands:
+
+.. code-block:: console
+
+    $ mkvirtualenv <name>
+    $ mkvirtualenv -p python3.7 <name>
+    $ workon <name>
+    
+**cookiecutter**
+
+Tool to bootstrap new modules from templates.
+
+.. code-block:: console
+
+    pip install cookiecutter
+
 
 Editor
 ------
