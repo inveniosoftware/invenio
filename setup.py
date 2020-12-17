@@ -24,20 +24,20 @@ search_version = '>=1.4.1,<1.5.0'
 extras_require = {
     # Bundles
     'base': [
-        'invenio-admin>=1.2.1,<1.3.0',
+        'invenio-admin>=1.3.0,<1.4.0',
         'invenio-assets>=1.2.5,<1.3.0',
         'invenio-formatter>=1.1.0,<1.2.0',
         'invenio-logging>=1.3.0,<1.4.0',
         'invenio-mail>=1.0.2,<1.1.0',
         'invenio-rest>=1.2.3,<1.3.0',
-        'invenio-theme>=1.3.3,<1.4.0',
+        'invenio-theme>=1.3.5,<1.4.0',
     ],
     'auth': [
         'invenio-access>=1.4.1,<1.5.0',
-        'invenio-accounts>=1.4.2,<1.5.0',
-        'invenio-oauth2server>=1.3.1,<1.4.0',
+        'invenio-accounts>=1.4.3,<1.5.0',
+        'invenio-oauth2server>=1.3.2,<1.4.0',
         'invenio-oauthclient>=1.4.0,<1.5.0',
-        'invenio-userprofiles>=1.2.0,<1.3.0',
+        'invenio-userprofiles>=1.2.1,<1.3.0',
     ],
     'metadata': [
         'invenio-indexer>=1.2.0,<1.3.0',
