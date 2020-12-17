@@ -14,6 +14,7 @@ Versions
     :maxdepth: 1
     :name: mastertoc
 
+    v3.4.0
     v3.3.0
     v3.2.2
     v3.2.1

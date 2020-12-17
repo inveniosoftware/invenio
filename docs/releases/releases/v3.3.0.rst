@@ -27,7 +27,7 @@ Upgrading to v3.3
 ~~~~~~~~~~~~~~~~~
 
 To upgrade your Invenio instance to v3.3 follow the upgrading guide:
-:ref:`upgrade-3_1-3_2`
+:ref:`upgrade-3_2-3_3`
 
 
 What's new in Invenio v3.3?

@@ -5,6 +5,8 @@
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
+.. _upgrade-3_1-3_2:
+
 Upgrading from Invenio v3.1 to v3.2
 ===================================
 
