@@ -68,7 +68,7 @@ The most important changes that you will have to make are in ``Pipfile``.
     -pytest-random-order = ">=0.5.4"
     -pytest-runner = ">=3.0.0,<5"
     -Sphinx = ">=1.5.1"
-    +pytest-invenio = ">=1.4.0,<1.5.0"
+    +pytest-invenio = ">=1.4.1,<1.5.0"
     +Sphinx = ">=3,<4"
 
 4. Add the following line to your ``config.py`` file:
