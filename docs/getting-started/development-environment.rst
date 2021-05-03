@@ -175,10 +175,235 @@ See https://docs.docker.com/docker-for-mac/#resources.
 A typical sign of needed more resources, is that services are not running or
 images are having problems building.
 
-Linux
-~~~~~
+Ubuntu
+~~~~~~
 
-Want to write it? Contact us on the chat!
+System setup guide for Ubuntu.
+
+**General tools/packages useful during development:**
+
+.. code-block:: sh
+
+        $ apt install git-all                  # Distributed version control system
+        $ apt-get install sqlitebrowser        # UI for SQLite
+        $ snap install spectacle               # Organise windows with keyboard shortcuts
+        $ apt-get install libcairo2-dev        # Graphics library
+        $ apt-get install htop                 # A better top
+        $ apt-get install tree                 # Pretty print a directory structure
+        $ apt install wget                     # Http client
+        $ apt-get install hub                  # Extends git with github features
+        $ apt-get install bash-completion      # If bash is used as shell
+        $ apt install sshuttle iptables        # Needed for tunneling into CERN.
+
+**Docker**
+
+To install docker you can follow the instructions in `docker for Ubuntu. <https://docs.docker.com/engine/install/ubuntu/>`_
+
+If you get the following error after installing Docker and running simple commands:
+
+.. code-block:: console
+
+    Got permission denied ... /var/run/docker.sock: connect: permission denied
+
+see `here <https://stackoverflow.com/questions/48568172/docker-sock-permission-denied/>`_ for some tips on how to solve it.
+
+**docker-compose**
+
+For defining and running multi-container Docker applications.
+
+.. code-block:: console
+
+    $ sudo apt install docker-compose
+
+**Google chrome**
+
+Needed for some end-to-end tests.
+
+.. code-block:: console
+
+    $ sudo apt install gdebi-core wget
+    $ wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    $ sudo gdebi google-chrome-stable_current_amd64.deb
+
+**OC CLI**
+
+Needed if you deploy on openshift.
+
+Download the latest OpenShift Origin files. As of this writing, that version number is 3.11.0.
+
+.. code-block:: console
+
+    $ wget https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz
+
+Once the file is downloaded, extract it with the command:
+
+.. code-block:: console
+
+    $ tar xvzf openshift*.tar.gz
+
+Change into the newly-created directory with the command:
+
+.. code-block:: console
+
+    $ cd openshift-origin-client-tools*/
+
+Move the kubectl and oc binaries with the command:
+
+.. code-block:: console
+
+    $ sudo mv  oc kubectl  /usr/local/bin/
+
+**Installation problems**
+If during the installation you encounter broken packages, try the follwoing command:
+
+.. code-block:: sh
+
+    $ sudo apt --fix-broken install
+
+**Python**
+
+Invenio is developed using Python and JavaScript.
+
+
+If you want to check which version of Python you have, try the following:
+
+.. code-block:: sh
+
+    # Check the system Python version
+    $ python --version
+
+    # Check the Python 2 version
+    $ python2 --version
+
+    # Check the Python 3 version
+    $ python3 --version
+
+To install Python 3.8 type the following commands:
+
+.. code-block:: sh
+
+    $ sudo apt-get update
+    $ sudo apt-get install python3.8 python3-pip
+
+In the following `list <https://invenio.readthedocs.io/en/latest/getting-started/quickstart/installation.html#prerequisites/>`_ you can check if your system has the necessary requirements.
+
+We highly recommend that install ``pyenv`` and ``nvm`` - both tools manage version of python and node
+respectively. Install the following packages:
+
+**nvm**
+
+.. code-block:: console
+
+    $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+
+To check if you have the latest version of node installed type the following commands:
+
+.. code-block:: sh
+
+    $ sudo npm cache clean -f
+    $ sudo npm install -g n
+    $ sudo n stable
+
+**Pyenv**
+
+Update and install the required dependencies.
+
+.. code-block:: console
+
+    $ sudo apt update -y
+    $ sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
+
+Clone the repository
+
+.. code-block:: console
+
+    $ git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+
+Configure the environment.
+
+.. code-block:: console
+
+    $ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+    $ echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+    $ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n eval "$(pyenv init -)"\nfi' >> ~/.bashrc
+
+Restart shell.
+
+.. code-block:: console
+
+    $ exec "$SHELL"
+
+**Pipenv**
+
+Pipenv is a packaging tool for Python that solves some common problems associated with the typical workflow using pip and virtualenv. We suggest the following installation guide:
+
+https://realpython.com/pipenv-guide/#pipenv-introduction
+
+**virtualenv**
+
+virtualenv is a CLI tool that needs a Python interpreter to run. We recommend the following installation guide:
+
+https://virtualenv.pypa.io/en/latest/installation.html
+
+**virtualenvwrapper**
+
+Note that after the installation, virtualenvwrapper.sh can be found in ~/.local/bin
+
+.. code-block::
+
+    $ pip3 install --user virtualenvwrapper
+
+Once you have installed above packages, you can proceed with installing Python versions.
+The following will install Python 3.6, 3.7 and 3.8 and set the default Python installation to Python 3.8 (node you can always install the latest patch-level release):
+
+.. code-block:: console
+
+    $ pyenv install 3.6.9
+    $ pyenv install 3.7.8
+    $ pyenv install 3.8.5
+    $ pyenv global 3.8.5
+
+
+You should edit your `.bashrc` or `.zshrc` file to initialise pyenv:
+
+.. code-block:: sh
+
+    # nvm setup
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"
+
+    # pyenv
+    eval "$(pyenv init -)"
+
+    # pyenv-virtualenv
+    eval "$(pyenv virtualenv-init -)"
+
+    # pyenv-virtualenvwrapper
+    pyenv virtualenvwrapper
+
+Now, you can create e.g. Python virtual environments using the following
+commands:
+
+.. code-block:: console
+
+    $ mkvirtualenv <name>
+    $ mkvirtualenv -p python3.7 <name>
+    $ workon <name>
+
+
+To deactivate the virtual environment simple type:
+
+.. code-block:: console
+
+     $ deactivate
+
+**cookiecutter**
+
+Tool to bootstrap new modules from templates.
+
+.. code-block:: console
+
+    pip install cookiecutter
 
 Editor
 ------
