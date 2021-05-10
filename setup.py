@@ -36,7 +36,7 @@ extras_require = {
         'invenio-access>=1.4.1,<1.5.0',
         'invenio-accounts>=1.4.3,<1.5.0',
         'invenio-oauth2server>=1.3.2,<1.4.0',
-        'invenio-oauthclient>=1.4.0,<1.5.0',
+        'invenio-oauthclient>=1.5.0,<1.6.0',
         'invenio-userprofiles>=1.2.1,<1.3.0',
     ],
     'metadata': [
