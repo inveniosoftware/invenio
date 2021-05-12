@@ -95,7 +95,7 @@ for name, reqs in extras_require.items():
 
 install_requires = [
     'invenio-app>=1.3.1,<1.4.0',
-    'invenio-base>=1.2.3,<1.3.0',
+    'invenio-base>=1.2.4,<1.3.0',
     'invenio-cache>=1.1.0,<1.2.0',
     'invenio-celery>=1.2.2,<1.3.0',
     'invenio-config>=1.0.3,<1.1.0',
