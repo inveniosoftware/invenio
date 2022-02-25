@@ -42,7 +42,7 @@ extras_require = {
     'metadata': [
         'invenio-indexer>=1.2.1,<1.3.0',
         'invenio-jsonschemas>=1.1.3,<1.2.0',
-        'invenio-oaiserver>=1.3.0,<1.4.0',
+        'invenio-oaiserver>=1.4.0,<1.5.0',
         'invenio-pidstore>=1.2.2,<1.3.0',
         'invenio-records-rest>=1.8.0,<1.9.0',
         'invenio-records-ui>=1.2.0,<1.3.0',
