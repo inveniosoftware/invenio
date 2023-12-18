@@ -12,7 +12,7 @@ Setting up your system
 
 The following is a guide to help you prepare your system for developing with
 Invenio. A proper development environment setup can save a lot of time and
-frustrations. Note that the following guide, is not meant as a guide for
+frustrations. Note that the following is not meant as a guide for
 setting up servers.
 
 System setup
@@ -51,7 +51,7 @@ Here are some recommended cask packages (only ``docker`` is required):
 **Normal packages**
 
 Normal packages are usually command line tools/libraries that end up in
-/usr/local and that you use from the CLI. You can install normal packages
+:code:`/usr/local` and that you use from the CLI. You can install normal packages
 using the command:
 
 .. code-block:: console
@@ -89,7 +89,7 @@ Following are CLI tools that are useful during development:
     gh           # GitHub CLI client (useful e.g for checking out PRs)
     gifify       # make short screen recordings for bug reports
     git          # our version control system
-    hub          # extends git with github features
+    hub          # alternative GitHub CLI client
 
 General CLI tools:
 
@@ -99,7 +99,7 @@ General CLI tools:
     tree            # pretty print a directory structure
     wget            # http client
     zsh-completion  # if you use zsh as shell
-    base-completion # if you use bash as shell
+    bash-completion # if you use bash as shell
 
 CERN specific tools:
 
@@ -125,8 +125,7 @@ respectively. Install the following packages:
 
 Once you have installed above packages, you can proceed with installing Python
 versions. The following will install Python 3.6, 3.7 and 3.8 and set the
-default Python installation to Python 3.8 (node you can always install the
-latest patch-level release):
+default Python installation to Python 3.8.
 
 .. code-block:: console
 
@@ -134,6 +133,12 @@ latest patch-level release):
     $ pyenv install 3.7.8
     $ pyenv install 3.8.5
     $ pyenv global 3.8.5
+
+Install the latest patch-level release for node.
+
+.. code-block:: console
+
+    $ nvm install --lts
 
 You should edit your `.bashrc` or `.zshrc` file to initialise pyenv:
 
@@ -152,7 +157,7 @@ You should edit your `.bashrc` or `.zshrc` file to initialise pyenv:
     # pyenv-virtualenvwrapper
     pyenv virtualenvwrapper
 
-Now, you can create e.g. Python virtual environments using the following
+Now, you can create Python virtual environments using the following
 commands:
 
 .. code-block:: console
@@ -164,7 +169,7 @@ commands:
 
 **Fonts**
 
-In order to create e.g. DOI badges you need the DejaVu Sans font installed.
+In order to create DOI badges you need the DejaVu Sans font installed.
 Go to https://dejavu-fonts.github.io/ and follow the instructions.
 
 **Docker Desktop for Mac**
@@ -172,7 +177,7 @@ Go to https://dejavu-fonts.github.io/ and follow the instructions.
 You may need to increase the resources assigned to Docker Desktop for Mac
 See https://docs.docker.com/docker-for-mac/#resources.
 
-A typical sign of needed more resources, is that services are not running or
+Typically this is necessary if services are not running or
 images are having problems building.
 
 Ubuntu
@@ -184,16 +189,16 @@ System setup guide for Ubuntu.
 
 .. code-block:: sh
 
-        $ apt install git-all                  # Distributed version control system
-        $ apt-get install sqlitebrowser        # UI for SQLite
-        $ snap install spectacle               # Organise windows with keyboard shortcuts
-        $ apt-get install libcairo2-dev        # Graphics library
-        $ apt-get install htop                 # A better top
-        $ apt-get install tree                 # Pretty print a directory structure
-        $ apt install wget                     # Http client
-        $ apt-get install hub                  # Extends git with github features
-        $ apt-get install bash-completion      # If bash is used as shell
-        $ apt install sshuttle iptables        # Needed for tunneling into CERN.
+        $ apt install git-all              # Distributed version control system
+        $ apt install sqlitebrowser        # UI for SQLite
+        $ apt install libcairo2-dev        # Graphics library
+        $ apt install htop                 # A better top
+        $ apt install tree                 # Pretty print a directory structure
+        $ apt install wget                 # Http client
+        $ apt install hub                  # Extends git with github features
+        $ apt install bash-completion      # If bash is used as shell
+        $ apt install sshuttle iptables    # Needed for tunneling into CERN.
+        $ snap install spectacle           # Organise windows with keyboard shortcuts
 
 **Docker**
 
@@ -215,7 +220,7 @@ For defining and running multi-container Docker applications.
 
     $ sudo apt install docker-compose
 
-**Google chrome**
+**Google Chrome**
 
 Needed for some end-to-end tests.
 
@@ -235,26 +240,26 @@ Download the latest OpenShift Origin files. As of this writing, that version num
 
     $ wget https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz
 
-Once the file is downloaded, extract it with the command:
+Once the file is downloaded, extract it:
 
 .. code-block:: console
 
     $ tar xvzf openshift*.tar.gz
 
-Change into the newly-created directory with the command:
+Change into the newly-created directory:
 
 .. code-block:: console
 
     $ cd openshift-origin-client-tools*/
 
-Move the kubectl and oc binaries with the command:
+Move the kubectl and oc binaries:
 
 .. code-block:: console
 
     $ sudo mv  oc kubectl  /usr/local/bin/
 
 **Installation problems**
-If during the installation you encounter broken packages, try the follwoing command:
+If during the installation you encounter broken packages, try the following command:
 
 .. code-block:: sh
 
@@ -300,9 +305,7 @@ To check if you have the latest version of node installed type the following com
 
 .. code-block:: sh
 
-    $ sudo npm cache clean -f
-    $ sudo npm install -g n
-    $ sudo n stable
+    $ nvm use --lts
 
 **Pyenv**
 
@@ -347,14 +350,14 @@ https://virtualenv.pypa.io/en/latest/installation.html
 
 **virtualenvwrapper**
 
-Note that after the installation, virtualenvwrapper.sh can be found in ~/.local/bin
+Note that after the installation, virtualenvwrapper.sh can be found in :code:`~/.local/bin`
 
 .. code-block::
 
     $ pip3 install --user virtualenvwrapper
 
 Once you have installed above packages, you can proceed with installing Python versions.
-The following will install Python 3.6, 3.7 and 3.8 and set the default Python installation to Python 3.8 (node you can always install the latest patch-level release):
+The following will install Python 3.6, 3.7 and 3.8 and set the default Python installation to Python 3.8:
 
 .. code-block:: console
 
@@ -363,6 +366,11 @@ The following will install Python 3.6, 3.7 and 3.8 and set the default Python in
     $ pyenv install 3.8.5
     $ pyenv global 3.8.5
 
+Install the latest patch-level release for node.
+
+.. code-block:: console
+
+    $ nvm install --lts
 
 You should edit your `.bashrc` or `.zshrc` file to initialise pyenv:
 
@@ -424,7 +432,7 @@ editors.
 Editors
 ~~~~~~~
 Following editors are used by our existing developers. Don't hesitate to reach
-out on our Discord server, to ask for help for useful plugins:
+out on our Discord server to ask for help for useful plugins:
 
 - `Emacs <https://www.gnu.org/software/emacs/>`_
 - `PyCharm <https://www.jetbrains.com/pycharm/>`_
