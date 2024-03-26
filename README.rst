@@ -14,7 +14,7 @@ Warning
 -------
 The main development effort is currently on the `InvenioRDM project <https://inveniosoftware.org/products/rdm/>`_
 and there will be no new releases of Invenio framework. However, each Invenio module is
-actively maintained as part of `InvenioRDM <https://github.com/inveniosoftware/invenio-app-rdm>`_.
+actively maintained as part of `InvenioRDM. <https://github.com/inveniosoftware/invenio-app-rdm>`_
 
 **Open Source framework for large-scale digital repositories.**
 
