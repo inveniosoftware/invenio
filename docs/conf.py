@@ -75,7 +75,7 @@ release = version
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -356,7 +356,7 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/', None),
     'sqlalchemy': ('http://docs.sqlalchemy.org/en/latest/', None),
     'webassets': ('https://webassets.readthedocs.io/en/latest/', None),
-    'werkzeug': ('https://werkzeug.palletsprojects.com/en/0.16.x/', None),
+    'werkzeug': ('https://werkzeug.palletsprojects.com/', None),
 }
 
 # Autodoc configuration.
