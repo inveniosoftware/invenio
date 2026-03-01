@@ -19,7 +19,7 @@ tests_require = [
 ]
 
 db_version = '>=1.0.9,<1.1.0'
-search_version = '>=1.4.2,<1.5.0'
+search_version = '>=2.1.0,<4.0.0'
 
 extras_require = {
     # Bundles
@@ -65,15 +65,15 @@ extras_require = {
     'sqlite': [
         'invenio-db[versioning]{}'.format(db_version),
     ],
-    # Elasticsearch version
-    'elasticsearch5': [
-        'invenio-search[elasticsearch5]{}'.format(search_version),
-    ],
-    'elasticsearch6': [
-        'invenio-search[elasticsearch6]{}'.format(search_version),
-    ],
+    # Search engine version
     'elasticsearch7': [
         'invenio-search[elasticsearch7]{}'.format(search_version),
+    ],
+    'opensearch1': [
+        'invenio-search[opensearch1]{}'.format(search_version),
+    ],
+    'opensearch2': [
+        'invenio-search[opensearch2]{}'.format(search_version),
     ],
     # Docs and test dependencies
     'docs': [
@@ -85,7 +85,8 @@ extras_require = {
 extras_require['all'] = []
 for name, reqs in extras_require.items():
     if name in ('sqlite', 'mysql', 'postgresql') \
-            or name.startswith('elasticsearch'):
+            or name.startswith('elasticsearch') \
+            or name.startswith('opensearch'):
         continue
     extras_require['all'].extend(reqs)
 
@@ -134,9 +135,10 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
         'Development Status :: 5 - Production/Stable',
     ],
 )
