@@ -5,27 +5,31 @@ on:
     tags:
       - v*
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   Publish:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.7
+          python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install build dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install setuptools wheel
+          pip install build
+
       - name: Build package
-        run: |
-          python setup.py sdist bdist_wheel
+        run: python -m build
+
       - name: Publish on PyPI
-        uses: pypa/gh-action-pypi-publish@v1.3.1
+        uses: pypa/gh-action-pypi-publish@v1.13.0
         with:
-          user: __token__
           password: ${{ secrets.pypi_token }}
