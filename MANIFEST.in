@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2015-2018 CERN.
 # SPDX-License-Identifier: MIT
 
+exclude .git-blame-ignore-revs
 include *.rst
 include *.sh
 include *.txt
